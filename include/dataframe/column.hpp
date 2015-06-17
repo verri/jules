@@ -9,24 +9,24 @@
 
 namespace jules {
 
-class column
-{
-private:
-    template<typename T>
-    using storage_t = dataframe_detail::storage<T>;
+class column {
+  private:
+    template <typename T> using storage_t = dataframe_detail::storage<T>;
     using storage_eraser_t = dataframe_detail::storage_eraser;
 
-public:
-    template<typename T>
-    column(const std::string& name, std::initializer_list<T> values) :
-        name_{name}, storage_{new storage_t<T>(values)} {}
+  public:
+    template <typename T>
+    column(const std::string& name, std::initializer_list<T> values)
+        : name_{name}, storage_{new storage_t<T>(values)}
+    {
+    }
 
-private:
+  private:
     std::string name_;
     std::unique_ptr<storage_eraser_t> storage_;
 
-    template<typename T>
-    auto& storage() {
+    template <typename T> auto& storage()
+    {
         return dynamic_cast<storage_t<T>&>(*storage_);
     }
 };
