@@ -24,11 +24,11 @@ class column
 
     template <typename T> column(std::initializer_list<T> values) : storage_{new storage_t<T>(values)} {}
 
-    template <typename T> bool can_coerse_to() const { return storage_ptr<T>() != nullptr; }
+    template <typename T> bool are_elements() const { return storage_ptr<T>() != nullptr; }
 
-    bool can_coerse_to_numeric() const { return storage_->can_coerse_to_numeric(); }
+    bool can_coerce_to_numeric() const { return storage_->can_coerce_to_numeric(); }
 
-    bool can_coerse_to_string() const { return storage_->can_coerse_to_string(); }
+    bool can_coerce_to_string() const { return storage_->can_coerce_to_string(); }
 
   private:
     string_t name_;
