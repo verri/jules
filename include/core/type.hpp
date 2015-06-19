@@ -1,30 +1,42 @@
 #ifndef JULES_CORE_TYPE_H
 #define JULES_CORE_TYPE_H
 
-#include <type_traits>
 #include <iterator>
 #include <string>
+#include <type_traits>
+#include <utility>
 
 namespace jules
 {
+template <typename T> struct tag {
+    using untag = T;
+};
+
 struct numeric_rules {
-    using value_type = double;
-    static value_type coerce_from(const std::string& value) { return std::stod(value); }
+    using type = double;
+    static type coerce_from(const std::string& value) { return std::stod(value); }
 };
 
-struct default_coercion_rules {
-    using numeric_t = double;
-    using string_t = std::string;
-
-    static string_t coerce_to_string(numeric_t value) { return std::to_string(value); }
-    static numeric_t coerce_to_numeric(string_t value) { return std::stod(value); }
+struct string_rules {
+    using type = std::string;
+    static type coerce_from(double value) { return std::to_string(value); }
 };
 
-template <typename... Rules> struct coercion_traits {
-    // auto
+template <typename... Rules> class coercion_rules
+{
+  private:
+    using types = std::tuple<typename Rules::type...>;
+    using rules = std::tuple<Rules...>;
+
+  public:
+    template <std::size_t I> using type = typename std::tuple_element<I, types>::type;
+    static constexpr std::size_t ntypes() { return sizeof...(Rules); }
+
+    template <std::size_t I> using rule = typename std::tuple_element<I, rules>::type;
+    static constexpr std::size_t nrules() { return sizeof...(Rules); }
 };
 
-using default_coercion_traits = coercion_traits<numeric_rules>;
+using default_coercion_rules = coercion_rules<numeric_rules, string_rules>;
 
 template <typename R, typename I = decltype(std::begin(R{}))>
 struct range_traits : public std::iterator_traits<I> {
