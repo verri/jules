@@ -1,4 +1,4 @@
-SRC = $(shell find . -iname \*.[ch]pp)
+SRC = $(shell find include test -iname \*.[ch]pp)
 
 format:
 	@echo Formatting $(SRC)

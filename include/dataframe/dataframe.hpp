@@ -3,21 +3,16 @@
 
 #include "dataframe/column.hpp"
 
-namespace jules {
-
+namespace jules
+{
 class data_frame
 {
   public:
-      dataframe(column&&... columns) {
-          columns_.reserve(sizeof...(columns));
-
-
-      }
+    dataframe(column&&... columns) { columns_.reserve(sizeof...(columns)); }
 
   private:
     vector_t<column> columns_;
 };
-
 
 } // namespace jules
 
