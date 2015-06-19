@@ -7,6 +7,11 @@
 
 namespace jules
 {
+struct numeric_rules {
+    using value_type = double;
+    static value_type coerce_from(const std::string& value) { return std::stod(value); }
+};
+
 struct default_coercion_rules {
     using numeric_t = double;
     using string_t = std::string;
@@ -14,6 +19,12 @@ struct default_coercion_rules {
     static string_t coerce_to_string(numeric_t value) { return std::to_string(value); }
     static numeric_t coerce_to_numeric(string_t value) { return std::stod(value); }
 };
+
+template <typename... Rules> struct coercion_traits {
+    // auto
+};
+
+using default_coercion_traits = coercion_traits<numeric_rules>;
 
 template <typename R, typename I = decltype(std::begin(R{}))>
 struct range_traits : public std::iterator_traits<I> {

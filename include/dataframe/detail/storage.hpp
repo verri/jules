@@ -31,36 +31,25 @@ template <typename Coercion> class storage_eraser
     virtual ~storage_eraser(){};
 
     template <typename T> storage_eraser_ptr coerce_to() const { return coerce_to_(tag<T>{}); }
-
     template <typename T> bool can_coerce_to() const { return can_coerce_to_(tag<T>{}); }
 
     virtual std::type_index elements_type() const = 0;
 
+    template <typename T> auto& down_cast() { return *reinterpret_cast<storage<T, Coercion>*>(this); }
+    template <typename T> const auto& down_cast() const
+    {
+        return *reinterpret_cast<const storage<T, Coercion>*>(this);
+    }
+
+    template <typename T> auto& safe_down_cast() { return dynamic_cast<storage<T, Coercion>&>(*this); }
+    template <typename T> const auto& safe_down_cast() const
+    {
+        return dynamic_cast<const storage<T, Coercion>&>(*this);
+    }
+
   protected:
-    template <typename T> auto coerce_to_(T) const
-    {
-        using Storage = storage<typename T::untag, Coercion>;
-        auto_assert(can_coerce_to_(T{}));
-        return storage_eraser_ptr{new Storage{reinterpret_cast<Storage&>(*this)}};
-    }
-
-    template <typename T> bool can_coerce_to_(T) const
-    {
-        using Storage = storage<typename T::untag, Coercion>;
-        return dynamic_cast<const Storage*>(this) != nullptr;
-    }
-
-    template <typename T> const auto* cthis() const
-    {
-        auto_assert(can_coerce_to_(T{}));
-        return reinterpret_cast<const storage<T, Coercion>*>(this);
-    }
-
-    template <typename T> auto* cthis()
-    {
-        auto_assert(can_coerce_to_(T{}));
-        return reinterpret_cast<storage<T, Coercion>*>(this);
-    }
+    template <typename T> storage_eraser_ptr coerce_to_(T) const { return nullptr; }
+    template <typename T> bool can_coerce_to_(T) const { return false; }
 
     virtual storage_eraser_ptr coerce_to_(tag<numeric_t>) const = 0;
     virtual storage_eraser_ptr coerce_to_(tag<string_t>) const = 0;
