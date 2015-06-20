@@ -61,4 +61,7 @@ TEST_CASE("coercion", "[coercion]")
 
     CHECK_THROWS_AS(sstorage->downcast<int>(), std::bad_cast);
     CHECK_NOTHROW(sstorage->downcast<std::string>());
+
+    auto clone = sstorage->clone();
+    CHECK(clone->elements_type() == sstorage->elements_type());
 }

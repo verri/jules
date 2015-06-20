@@ -16,6 +16,9 @@ namespace dataframe_detail
 {
 template <typename T, typename Coercion> class storage;
 
+//
+// Virtual coercions generatores.
+//
 template <typename Eraser, typename Coercion, size_t I>
 class generate_virtual_coercions : public generate_virtual_coercions<Eraser, Coercion, I - 1>
 {
@@ -49,6 +52,9 @@ template <typename Eraser, typename Coercion> class generate_virtual_coercions<E
     ~generate_virtual_coercions() {}
 };
 
+//
+// Element type eraser.
+//
 template <typename Coercion>
 class storage_eraser
     : public generate_virtual_coercions<storage_eraser<Coercion>, Coercion, Coercion::ntypes() - 1>
@@ -59,7 +65,16 @@ class storage_eraser
     using base = generate_virtual_coercions<storage_eraser<Coercion>, Coercion, Coercion::ntypes() - 1>;
 
   public:
+    storage_eraser() = default;
+    storage_eraser(const storage_eraser&) = default;
+    storage_eraser(storage_eraser&&) = default;
+
     virtual ~storage_eraser(){};
+
+    storage_eraser& operator=(const storage_eraser&) = default;
+    storage_eraser& operator=(storage_eraser&&) = default;
+
+    virtual storage_eraser_ptr clone() const = 0;
 
     template <typename T> storage_eraser_ptr coerce_to() const { return this->coerce_to_(tag<T>{}); }
     template <typename T> bool can_coerce_to() const { return this->can_coerce_to_(tag<T>{}); }
@@ -172,6 +187,10 @@ class generate_concrete_coercions
 
   public:
     using generate_concrete_coercions<T, Coercion, I - 1>::generate_concrete_coercions;
+
+    generate_concrete_coercions() = default;
+    generate_concrete_coercions(const generate_concrete_coercions&) = default;
+    generate_concrete_coercions(generate_concrete_coercions&&) = default;
 };
 
 template <typename T, typename Coercion>
@@ -201,18 +220,33 @@ class generate_concrete_coercions<T, Coercion, 0>
 
   public:
     using std::vector<T>::vector;
+
+    generate_concrete_coercions() = default;
+    generate_concrete_coercions(const generate_concrete_coercions&) = default;
+    generate_concrete_coercions(generate_concrete_coercions&&) = default;
 };
 
 template <typename T, typename Coercion>
 class storage : public generate_concrete_coercions<T, Coercion, Coercion::ntypes() - 1>
 {
     static_assert(!std::is_reference<T>::value, "storage type can not be a reference");
-    friend class storage_eraser<Coercion>;
 
   public:
     using generate_concrete_coercions<T, Coercion, Coercion::ntypes() - 1>::generate_concrete_coercions;
 
+    storage() = default;
+
+    storage(const storage&) = default;
+    storage(storage&&) = default;
+
+    storage& operator=(const storage&) = default;
+    storage& operator=(storage&&) = default;
+
     virtual std::type_index elements_type() const override final { return typeid(T); }
+    virtual std::unique_ptr<storage_eraser<Coercion>> clone() const override final
+    {
+        return std::unique_ptr<storage_eraser<Coercion>>{new storage{*this}};
+    }
 };
 
 } // namespace dataframe_detail
