@@ -2,6 +2,7 @@
 #define JULES_DATAFRAME_DETAIL_STORAGE_H
 
 #include "core/type.hpp"
+#include "util/async.hpp"
 
 #include <algorithm>
 #include <iterator>
@@ -71,8 +72,8 @@ class storage_eraser
 
     virtual ~storage_eraser(){};
 
-    storage_eraser& operator=(const storage_eraser&) = default;
-    storage_eraser& operator=(storage_eraser&&) = default;
+    storage_eraser& operator=(const storage_eraser&) = delete;
+    storage_eraser& operator=(storage_eraser&&) = delete;
 
     virtual storage_eraser_ptr clone() const = 0;
 
@@ -127,10 +128,13 @@ class specific_concrete_coercion<
     template <typename Iter> storage_eraser_ptr sp_coerce_to_(Iter begin, Iter end, tag<type>) const
     {
         auto result = new storage<type, Coercion>;
+        auto d = defer([&result]() { delete result; }); // prevents possible memory leak.
+
         result->reserve(end - begin);
         std::transform(begin, end, std::back_inserter(*result),
                        [](const T& value) { return Coercion::template rule<I>::coerce_from(value); });
-        return storage_eraser_ptr{result};
+
+        return storage_eraser_ptr{forget(result)}; // 'forget' prevents deferred deletion.
     }
 
     constexpr bool sp_can_coerce_to_(tag<type>) const { return true; }
@@ -149,9 +153,12 @@ class specific_concrete_coercion<T, U, Coercion, I, std::enable_if_t<std::is_con
     template <typename Iter> storage_eraser_ptr sp_coerce_to_(Iter begin, Iter end, tag<type>) const
     {
         auto result = new storage<type, Coercion>;
+        auto d = defer([&result]() { delete result; }); // prevents possible memory leak.
+
         result->reserve(end - begin);
         std::transform(begin, end, std::back_inserter(*result), [](const T& value) -> type { return value; });
-        return storage_eraser_ptr{result};
+
+        return storage_eraser_ptr{forget(result)}; // 'forget' prevents deferred deletion.
     }
 
     constexpr bool sp_can_coerce_to_(tag<type>) const { return true; }
@@ -239,8 +246,8 @@ class storage : public generate_concrete_coercions<T, Coercion, Coercion::ntypes
     storage(const storage&) = default;
     storage(storage&&) = default;
 
-    storage& operator=(const storage&) = default;
-    storage& operator=(storage&&) = default;
+    storage& operator=(const storage&) = delete;
+    storage& operator=(storage&&) = delete;
 
     virtual std::type_index elements_type() const override final { return typeid(T); }
     virtual std::unique_ptr<storage_eraser<Coercion>> clone() const override final

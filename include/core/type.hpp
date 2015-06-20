@@ -45,6 +45,15 @@ struct range_traits : public std::iterator_traits<I> {
                   "begin and end iteratores do not match");
 };
 
+template <typename F, typename Enabler = void> struct is_callable {
+    static constexpr bool value = false;
+};
+
+template <typename F>
+struct is_callable<F, typename std::enable_if_t<std::is_same<void, decltype(std::declval<F>()())>::value>> {
+    static constexpr bool value = true;
+};
+
 } // namespace jules
 
 #endif // JULES_CORE_TYPE_H
