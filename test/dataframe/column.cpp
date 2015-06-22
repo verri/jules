@@ -16,26 +16,26 @@ TEST_CASE("column constructor using initializer list", "[constructor]")
     auto c_str_column = column("char*", {"hello", "world"});
     auto toy_column = column("toy", {Toy{}, Toy{}});
 
-    REQUIRE(int_column.can_coerse_to<int>());
-    REQUIRE(c_str_column.can_coerse_to<const char*>());
-    REQUIRE(toy_column.can_coerse_to<Toy>());
+    REQUIRE(int_column.elements_type() == typeid(int));
+    REQUIRE(c_str_column.elements_type() == typeid(const char*));
+    REQUIRE(toy_column.elements_type() == typeid(Toy));
 
-    REQUIRE(int_column.can_coerse_to_numeric());
-    REQUIRE(int_column.can_coerse_to_string());
+    REQUIRE(int_column.can_coerce_to<double>());
+    REQUIRE(int_column.can_coerce_to<std::string>());
 
-    REQUIRE(!c_str_column.can_coerse_to_numeric());
-    REQUIRE(c_str_column.can_coerse_to_string());
+    REQUIRE(c_str_column.can_coerce_to<double>());
+    REQUIRE(c_str_column.can_coerce_to<std::string>());
 
-    REQUIRE(!toy_column.can_coerse_to_numeric());
-    REQUIRE(!toy_column.can_coerse_to_string());
+    REQUIRE(!toy_column.can_coerce_to<double>());
+    REQUIRE(!toy_column.can_coerce_to<std::string>());
 }
 
 TEST_CASE("column constructor inference", "[constructor]")
 {
     using jules::column;
 
-    auto check_column = [](const column& col, auto value) { REQUIRE(col.can_coerse_to<decltype(value)>()); };
+    auto check_column = [](const column& col, const auto& value) { REQUIRE(col.elements_type() == value); };
 
-    check_column({"int", {1, 2, 3}}, int{});
-    check_column({1.0, 2.0, 3.0, 1.0}, double{});
+    check_column({"int", {1, 2, 3}}, typeid(int));
+    check_column({1.0, 2.0, 3.0, 1.0}, typeid(double));
 }
