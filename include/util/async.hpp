@@ -21,7 +21,7 @@ template <typename F> struct defer_helper {
 } // namespace detail
 
 template <typename F> auto defer(F&& f) { return detail::defer_helper<F>{std::forward<F>(f)}; }
-template <typename T> T* forget(T*& pointer)
+template <typename T> T* move_ptr(T*& pointer)
 {
     T* tmp = pointer;
     pointer = nullptr;

@@ -3,16 +3,27 @@
 
 #include "dataframe/column.hpp"
 
+#include <initializer_list>
+#include <vector>
+
 namespace jules
 {
-class data_frame
+
+template <typename Coercion>
+class base_dataframe
 {
   public:
-    dataframe(column&&... columns) { columns_.reserve(sizeof...(columns)); }
+    using column_t = base_column<Coercion>;
+
+    base_dataframe(std::initializer_list<column_t> columns)
+        : columns_(columns.begin(), columns.end()) {}
+
 
   private:
-    vector_t<column> columns_;
+    std::vector<column_t> columns_;
 };
+
+using dataframe = base_dataframe<default_coercion_rules>;
 
 } // namespace jules
 

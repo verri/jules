@@ -17,9 +17,6 @@ namespace dataframe_detail
 {
 template <typename T, typename Coercion> class storage;
 
-//
-// Virtual coercions generatores.
-//
 template <typename Eraser, typename Coercion, size_t I>
 class generate_virtual_coercions : public generate_virtual_coercions<Eraser, Coercion, I - 1>
 {
@@ -53,9 +50,6 @@ template <typename Eraser, typename Coercion> class generate_virtual_coercions<E
     ~generate_virtual_coercions() {}
 };
 
-//
-// Element type eraser.
-//
 template <typename Coercion>
 class storage_eraser
     : public generate_virtual_coercions<storage_eraser<Coercion>, Coercion, Coercion::ntypes() - 1>
@@ -83,7 +77,7 @@ class storage_eraser
     virtual std::type_index elements_type() const = 0;
 
     template <typename T> auto& downcast() { return dynamic_cast<storage<T, coercion_rules>&>(*this); }
-    template <typename T> const auto& downcat() const
+    template <typename T> const auto& downcast() const
     {
         return dynamic_cast<const storage<T, coercion_rules>&>(*this);
     }
@@ -106,9 +100,9 @@ class specific_concrete_coercion
     using storage_eraser_ptr = std::unique_ptr<storage_eraser<Coercion>>;
 
   protected:
-    template <typename Iter> storage_eraser_ptr sp_coerce_to_(Iter, Iter, tag<type>) const { return nullptr; }
+    template <typename Iter> storage_eraser_ptr coerce_to_(Iter, Iter, tag<type>) const { return nullptr; }
 
-    constexpr bool sp_can_coerce_to_(tag<type>) const { return false; }
+    constexpr bool can_coerce_to_(tag<type>) const { return false; }
 };
 
 // User-defined coercion rules.  If it is possible to convert from T to type using ONLY a
@@ -125,19 +119,19 @@ class specific_concrete_coercion<
     using storage_eraser_ptr = std::unique_ptr<storage_eraser<Coercion>>;
 
   protected:
-    template <typename Iter> storage_eraser_ptr sp_coerce_to_(Iter begin, Iter end, tag<type>) const
+    template <typename Iter> storage_eraser_ptr coerce_to_(Iter begin, Iter end, tag<type>) const
     {
         auto result = new storage<type, Coercion>;
-        auto d = defer([&result]() { delete result; }); // prevents possible memory leak.
+        auto d = defer([&result] { delete result; });
 
         result->reserve(end - begin);
         std::transform(begin, end, std::back_inserter(*result),
                        [](const T& value) { return Coercion::template rule<I>::coerce_from(value); });
 
-        return storage_eraser_ptr{forget(result)}; // 'forget' prevents deferred deletion.
+        return storage_eraser_ptr{move_ptr(result)};
     }
 
-    constexpr bool sp_can_coerce_to_(tag<type>) const { return true; }
+    constexpr bool can_coerce_to_(tag<type>) const { return true; }
 };
 
 // Automatic coercion rules.  If it is possible to convert from T to type using a
@@ -150,18 +144,18 @@ class specific_concrete_coercion<T, U, Coercion, I, std::enable_if_t<std::is_con
     using storage_eraser_ptr = std::unique_ptr<storage_eraser<Coercion>>;
 
   protected:
-    template <typename Iter> storage_eraser_ptr sp_coerce_to_(Iter begin, Iter end, tag<type>) const
+    template <typename Iter> storage_eraser_ptr coerce_to_(Iter begin, Iter end, tag<type>) const
     {
         auto result = new storage<type, Coercion>;
-        auto d = defer([&result]() { delete result; }); // prevents possible memory leak.
+        auto d = defer([&result] { delete result; });
 
         result->reserve(end - begin);
         std::transform(begin, end, std::back_inserter(*result), [](const T& value) -> type { return value; });
 
-        return storage_eraser_ptr{forget(result)}; // 'forget' prevents deferred deletion.
+        return storage_eraser_ptr{move_ptr(result)};
     }
 
-    constexpr bool sp_can_coerce_to_(tag<type>) const { return true; }
+    constexpr bool can_coerce_to_(tag<type>) const { return true; }
 };
 
 template <typename T, typename Coercion, std::size_t I>
@@ -184,12 +178,12 @@ class generate_concrete_coercions
 
     virtual storage_eraser_ptr coerce_to_(tag<type> tag) const override final
     {
-        return specific::sp_coerce_to_(this->begin(), this->end(), tag);
+        return specific::coerce_to_(this->begin(), this->end(), tag);
     }
 
     virtual bool can_coerce_to_(tag<type> tag) const override final
     {
-        return specific::sp_can_coerce_to_(tag);
+        return specific::can_coerce_to_(tag);
     }
 
   public:
@@ -217,12 +211,12 @@ class generate_concrete_coercions<T, Coercion, 0>
 
     virtual storage_eraser_ptr coerce_to_(tag<type> tag) const override final
     {
-        return specific::sp_coerce_to_(this->begin(), this->end(), tag);
+        return specific::coerce_to_(this->begin(), this->end(), tag);
     }
 
     virtual bool can_coerce_to_(tag<type> tag) const override final
     {
-        return specific::sp_can_coerce_to_(tag);
+        return specific::can_coerce_to_(tag);
     }
 
   public:

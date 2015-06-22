@@ -10,7 +10,7 @@
 
 namespace jules
 {
-template <typename Coercion> class column_
+template <typename Coercion> class base_column
 {
   private:
     template <typename T> using storage_t = dataframe_detail::storage<T, Coercion>;
@@ -18,12 +18,12 @@ template <typename Coercion> class column_
 
   public:
     template <typename T>
-    column_(const std::string& name, std::initializer_list<T> values)
+    base_column(const std::string& name, std::initializer_list<T> values)
         : name_{name}, storage_{new storage_t<T>(values)}
     {
     }
 
-    template <typename T> column_(std::initializer_list<T> values) : storage_{new storage_t<T>(values)} {}
+    template <typename T> base_column(std::initializer_list<T> values) : storage_{new storage_t<T>(values)} {}
 
     template <typename T> bool can_coerce_to() const { return storage_->template can_coerce_to<T>(); }
     std::type_index elements_type() const { return storage_->elements_type(); }
@@ -31,24 +31,9 @@ template <typename Coercion> class column_
   private:
     std::string name_;
     std::unique_ptr<storage_eraser_t> storage_;
-
-    template <typename T> auto& storage()
-    {
-        return dynamic_cast<storage_t<std::remove_reference_t<T>>&>(*storage_);
-    }
-
-    template <typename T> auto* storage_ptr()
-    {
-        return dynamic_cast<storage_t<std::remove_reference_t<T>>*>(storage_.get());
-    }
-
-    template <typename T> const auto* storage_ptr() const
-    {
-        return dynamic_cast<storage_t<std::remove_reference_t<T>>*>(storage_.get());
-    }
 };
 
-using column = column_<default_coercion_rules>;
+using column = base_column<default_coercion_rules>;
 
 } // namespace jules
 
