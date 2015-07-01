@@ -70,6 +70,7 @@ class storage_eraser
     storage_eraser& operator=(storage_eraser&&) = delete;
 
     virtual storage_eraser_ptr clone() const = 0;
+    virtual std::size_t size() const = 0;
 
     template <typename T> storage_eraser_ptr coerce_to() const { return this->coerce_to_(tag<T>{}); }
     template <typename T> bool can_coerce_to() const { return this->can_coerce_to_(tag<T>{}); }
@@ -242,6 +243,8 @@ class storage : public generate_concrete_coercions<T, Coercion, Coercion::ntypes
     {
         return std::unique_ptr<storage_eraser<Coercion>>{new storage{*this}};
     }
+
+    virtual std::size_t size() const override final { return std::vector<T>::size(); }
 };
 
 } // namespace dataframe_detail

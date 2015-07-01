@@ -9,10 +9,16 @@
 #include <memory>
 #include <typeindex>
 
+// XXX resize must be private!
+
 namespace jules
 {
+template <typename Coercion> class base_dataframe;
+
 template <typename Coercion> class base_column
 {
+    friend class base_dataframe<Coercion>;
+
   private:
     template <typename T> using storage_t = dataframe_detail::storage<T, Coercion>;
     using storage_eraser_t = dataframe_detail::storage_eraser<Coercion>;
@@ -62,6 +68,8 @@ template <typename Coercion> class base_column
         auto& st = storage_->template downcast<T>();
         return detail::base_vector<const T>{st.data(), st.size()};
     }
+
+    auto size() const { return storage_->size(); }
 
   private:
     std::string name_;

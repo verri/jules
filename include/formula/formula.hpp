@@ -30,6 +30,9 @@ template <typename Coercion> class term_eraser
     virtual column_t& coerce_and_apply_modifiers(column_t& col) = 0;
     virtual std::unique_ptr<term_eraser> clone() = 0;
 
+    auto& name() { return name; }
+    const auto& name() const { return name; }
+
   protected:
     std::string name_;
 };
@@ -116,14 +119,20 @@ template <typename Coercion> class base_term<Coercion, void> : public detail::te
     }
 };
 
-template <typename Coercion = default_coercion_rules> class base_formula
+template <typename Coercion> class base_formula
 {
+  private:
+    using dataframe_t = base_dataframe<Coercion>;
+    using column_t = base_column<Coercion>;
+
   public:
     base_formula(std::unique_ptr<detail::term_eraser<Coercion>>&& response,
                  std::vector<std::unique_ptr<detail::term_eraser<Coercion>>>&& terms)
         : response_{std::move(response)}, terms_{std::move(terms)}
     {
     }
+
+    column_t response(const dataframe_t& data) { return response_->extract_from(data); }
 
   private:
     std::unique_ptr<detail::term_eraser<Coercion>> response_;
