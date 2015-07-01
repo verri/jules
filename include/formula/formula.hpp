@@ -82,7 +82,10 @@ class base_term : public detail::term_eraser<Coercion>
 
   private:
     explicit base_term(const base_term& source, const std::function<T(const T&)>& g) : detail::term_eraser<Coercion>{source.name_} {
-        f_ = [g=g, h=source.f_](const T& value) { return g(h(value)); };
+        if (source.f_)
+            f_ = [g=g, h=source.f_](const T& value) { return g(h(value)); };
+        else
+            f_ = [g=g](const T& value) { return g(value); };
     }
 
     std::function<T(const T&)> f_;
