@@ -3,6 +3,7 @@
 #include "catch.hpp"
 #include "dataframe/detail/storage.hpp"
 
+#include <algorithm>
 #include <iterator>
 #include <numeric>
 

@@ -7,16 +7,11 @@ TEST_CASE("tutorial", "[tutorial]")
 {
     using jules::dataframe;
 
-    dataframe df{
-        {"int", {1, 2}},
-        {"const char*", {"hello", " ", "world", "!"}}
-    };
+    dataframe df{{"int", {1, 2}}, {"const char*", {"hello", " ", "world", "!"}}};
 
     for (auto&& rows : df.rows()) {
-
     }
 
     for (auto&& rows : df.rows<int, const char*>()) {
-
     }
 }

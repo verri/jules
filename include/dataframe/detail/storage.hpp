@@ -181,10 +181,7 @@ class generate_concrete_coercions
         return specific::coerce_to_(this->begin(), this->end(), tag);
     }
 
-    virtual bool can_coerce_to_(tag<type> tag) const override final
-    {
-        return specific::can_coerce_to_(tag);
-    }
+    virtual bool can_coerce_to_(tag<type> tag) const override final { return specific::can_coerce_to_(tag); }
 
   public:
     using generate_concrete_coercions<T, Coercion, I - 1>::generate_concrete_coercions;
@@ -214,10 +211,7 @@ class generate_concrete_coercions<T, Coercion, 0>
         return specific::coerce_to_(this->begin(), this->end(), tag);
     }
 
-    virtual bool can_coerce_to_(tag<type> tag) const override final
-    {
-        return specific::can_coerce_to_(tag);
-    }
+    virtual bool can_coerce_to_(tag<type> tag) const override final { return specific::can_coerce_to_(tag); }
 
   public:
     using std::vector<T>::vector;
