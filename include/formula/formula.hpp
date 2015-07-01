@@ -13,8 +13,8 @@ namespace jules
 {
 namespace detail
 {
-
-template <typename Coercion> class term_eraser {
+template <typename Coercion> class term_eraser
+{
   public:
     using dataframe_t = base_dataframe<Coercion>;
     using column_t = base_column<Coercion>;
@@ -35,9 +35,8 @@ template <typename Coercion> class term_eraser {
 };
 
 template <typename Coercion> struct term_erased_list {
-
-    template <typename... Args>
-    term_erased_list(Args&&... args) {
+    template <typename... Args> term_erased_list(Args&&... args)
+    {
         for_each_arg([this](auto&& x) { terms.push_back(&x); }, args...);
     }
 
@@ -46,11 +45,9 @@ template <typename Coercion> struct term_erased_list {
     std::vector<term_eraser<Coercion>*> terms;
 };
 
-
 } // namespace detail
 
-template <typename Coercion, typename T = void>
-class base_term : public detail::term_eraser<Coercion>
+template <typename Coercion, typename T = void> class base_term : public detail::term_eraser<Coercion>
 {
   private:
     using column_t = typename detail::term_eraser<Coercion>::column_t;
@@ -64,35 +61,40 @@ class base_term : public detail::term_eraser<Coercion>
     base_term& operator=(const base_term& source) = delete;
     base_term& operator=(base_term&& source) = delete;
 
-    virtual column_t& coerce_and_apply_modifiers(column_t& col) override final {
+    virtual column_t& coerce_and_apply_modifiers(column_t& col) override final
+    {
         col.template coerce_to<T>();
-        if (f_) col.template as_array<T>().apply(f_);
+        if (f_)
+            col.template as_array<T>().apply(f_);
 
         return col;
     }
 
-    virtual std::unique_ptr<detail::term_eraser<Coercion>> clone() override final {
+    virtual std::unique_ptr<detail::term_eraser<Coercion>> clone() override final
+    {
         return std::unique_ptr<detail::term_eraser<Coercion>>{new base_term{*this}};
     }
 
     // TODO automatically generate other operators
-    template <typename U> base_term friend operator*(const U& operand, const base_term& other) {
+    template <typename U> base_term friend operator*(const U& operand, const base_term& other)
+    {
         return base_term{other, [operand](const T& value) { return value * operand; }};
     }
 
   private:
-    explicit base_term(const base_term& source, const std::function<T(const T&)>& g) : detail::term_eraser<Coercion>{source.name_} {
+    explicit base_term(const base_term& source, const std::function<T(const T&)>& g)
+        : detail::term_eraser<Coercion>{source.name_}
+    {
         if (source.f_)
-            f_ = [g=g, h=source.f_](const T& value) { return g(h(value)); };
+            f_ = [ g = g, h = source.f_ ](const T& value) { return g(h(value)); };
         else
-            f_ = [g=g](const T& value) { return g(value); };
+            f_ = [g = g](const T& value) { return g(value); };
     }
 
     std::function<T(const T&)> f_;
 };
 
-template <typename Coercion>
-class base_term<Coercion, void> : public detail::term_eraser<Coercion>
+template <typename Coercion> class base_term<Coercion, void> : public detail::term_eraser<Coercion>
 {
   private:
     using column_t = typename detail::term_eraser<Coercion>::column_t;
@@ -106,11 +108,10 @@ class base_term<Coercion, void> : public detail::term_eraser<Coercion>
     base_term& operator=(const base_term& source) = delete;
     base_term& operator=(base_term&& source) = delete;
 
-    virtual column_t& coerce_and_apply_modifiers(column_t& col) override final {
-        return col;
-    }
+    virtual column_t& coerce_and_apply_modifiers(column_t& col) override final { return col; }
 
-    virtual std::unique_ptr<detail::term_eraser<Coercion>> clone() override final {
+    virtual std::unique_ptr<detail::term_eraser<Coercion>> clone() override final
+    {
         return std::unique_ptr<detail::term_eraser<Coercion>>{new base_term{*this}};
     }
 };
@@ -119,16 +120,17 @@ template <typename Coercion = default_coercion_rules> class base_formula
 {
   public:
     base_formula(std::unique_ptr<detail::term_eraser<Coercion>>&& response,
-                 std::vector<std::unique_ptr<detail::term_eraser<Coercion>>>&& terms) :
-        response_{std::move(response)}, terms_{std::move(terms)} {}
+                 std::vector<std::unique_ptr<detail::term_eraser<Coercion>>>&& terms)
+        : response_{std::move(response)}, terms_{std::move(terms)}
+    {
+    }
 
   private:
     std::unique_ptr<detail::term_eraser<Coercion>> response_;
     std::vector<std::unique_ptr<detail::term_eraser<Coercion>>> terms_;
 };
 
-template <typename Coercion, typename T>
-class base_response : public base_term<Coercion, T>
+template <typename Coercion, typename T> class base_response : public base_term<Coercion, T>
 {
   private:
     using base_term = base_term<Coercion, T>;
@@ -143,15 +145,14 @@ class base_response : public base_term<Coercion, T>
     base_response& operator=(const base_response& source) = delete;
     base_response& operator=(base_response&& source) = delete;
 
-    base_formula<Coercion> operator=(const detail::term_erased_list<Coercion>& terms) {
+    base_formula<Coercion> operator=(const detail::term_erased_list<Coercion>& terms)
+    {
         std::vector<term_ptr> terms_vector;
         for (auto&& term : terms)
             terms_vector.push_back(term->clone());
 
-        return base_formula<Coercion>{
-            std::move(term_ptr{new base_term{*dynamic_cast<base_term*>(this)}}),
-            std::move(terms_vector)
-        };
+        return base_formula<Coercion>{std::move(term_ptr{new base_term{*dynamic_cast<base_term*>(this)}}),
+                                      std::move(terms_vector)};
     }
 };
 

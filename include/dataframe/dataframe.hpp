@@ -13,7 +13,7 @@ template <typename Coercion> class base_dataframe
   public:
     using column_t = base_column<Coercion>;
 
-    base_dataframe(std::initializer_list<column_t> columns) : columns_(columns.begin(), columns.end()) {}
+    base_dataframe(std::initializer_list<column_t> columns) : columns_(columns) {}
 
   private:
     std::vector<column_t> columns_;

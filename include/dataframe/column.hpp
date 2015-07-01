@@ -26,7 +26,24 @@ template <typename Coercion> class base_column
 
     template <typename T> base_column(std::initializer_list<T> values) : storage_{new storage_t<T>(values)} {}
 
-    template <typename T> base_column& coerce_to() {
+    base_column(const base_column& source)
+        : name_{source.name_}, storage_{std::move(source.storage_->clone())}
+    {
+    }
+    base_column(base_column&& source) = default;
+
+    base_column& operator=(const base_column& source)
+    {
+        name_ = std::move(source.name_);
+        storage_ = std::move(source.storage_);
+
+        return *this;
+    }
+
+    base_column& operator=(base_column&& source) = default;
+
+    template <typename T> base_column& coerce_to()
+    {
         storage_->template coerce_to<T>();
         return *this;
     }
@@ -37,13 +54,13 @@ template <typename Coercion> class base_column
     template <typename T> auto as_array()
     {
         auto& st = storage_->template downcast<T>();
-        return detail::base_array<T>{st.data(), st.size()};
+        return detail::base_vector<T>{st.data(), st.size()};
     }
 
-    template <typename T> detail::base_array<const T> as_array() const
+    template <typename T> auto as_array() const
     {
         auto& st = storage_->template downcast<T>();
-        return detail::base_array<const T>{st.data(), st.size()};
+        return detail::base_vector<const T>{st.data(), st.size()};
     }
 
   private:
