@@ -4,59 +4,54 @@
 #include "util/numeric.hpp"
 
 #include <array>
-#include <cstddef>
+#include <valarray>
 
 namespace jules
 {
-namespace detail
-{
-template <typename T, std::size_t N> class base_array
+
+template <typename T, std::size_t N> class array
 {
     static_assert(N > 0, "array dimension must be greater than 0.");
 
   public:
-    explicit base_array(T* data, const std::array<std::size_t, N>& dim) : data_{data}, dim_(dim) {}
-    template <typename... Dim> explicit base_array(T* data, Dim... dim) : data_{data}, dim_{dim...} {}
+    array() = default;
 
-    base_array(const base_array& source) = delete;
-    base_array(base_array&& source) : data_{source.data_}, dim_(source.dim_)
+    explicit array(const std::array<std::size_t, N>& dim) : dim_(dim), data_(prod(dim)) {};
+
+    explicit array(const T* data, const std::array<std::size_t, N>& dim) : dim_(dim), data_(data, prod(dim)) {}
+    template <typename... Dim> explicit array(const T* data, Dim... dim) : dim_{dim...}, data_(data, prod(dim_)) {}
+
+    explicit array(T*&& data, const std::array<std::size_t, N>& dim) : dim_(dim), data_(data, prod(dim)) {}
+    template <typename... Dim> explicit array(T*&& data, Dim... dim) : dim_{dim...}, data_(data, prod(dim_)) {}
+
+    ~array() = default;
+
+    array(const array& source) = default;
+    array(array&& source) = default;
+
+    array& operator=(const array& source) = default;
+    array& operator=(array&& source) = default;
+
+    template <typename F> array& apply(F&& f)
     {
-        source.data_ = nullptr;
-        for (auto&& d : dim_)
-            d = 0;
-    }
-
-    base_array& operator=(const base_array& source) = delete;
-    base_array& operator=(base_array&& source)
-    {
-        data_ = source.data_;
-        dim_ = source.dim_;
-
-        source.data_ = nullptr;
-        for (auto&& d : dim_)
-            d = 0;
-
+        for (auto&& value : data_)
+            value = f(value);
         return *this;
     }
 
-    template <typename F> base_array& apply(F&& f)
-    {
-        for (std::size_t i{}; i < size(); ++i)
-            data_[i] = f(data_[i]);
-        return *this;
-    }
+    std::size_t size() const { return data_.size(); }
+    std::size_t size(std::size_t i) const { return dim_.at(i); }
 
-    std::size_t size() const { return prod(dim_); }
+    T* data() { return data_.data(); }
+    const T* data() const { return data_.data(); }
 
   private:
-    T* data_;
     std::array<std::size_t, N> dim_;
+    std::valarray<T> data_;
 };
 
-template <typename T> using base_matrix = base_array<T, 2>;
-template <typename T> using base_vector = base_array<T, 1>;
-
-} // namespace detail
+template <typename T> using matrix = array<T, 2>;
+template <typename T> using vector = array<T, 1>;
 
 } // namespace jules
 

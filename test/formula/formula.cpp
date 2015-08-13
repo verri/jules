@@ -1,12 +1,13 @@
-#define CATCH_CONFIG_MAIN
+//#define CATCH_CONFIG_MAIN
 
-#include "catch.hpp"
+//#include "catch.hpp"
 
 #include "formula/formula.hpp"
 
 #include <algorithm>
 
-TEST_CASE("Formula", "[formula]")
+//TEST_CASE("Formula", "[formula]")
+int main()
 {
     using jules::dataframe;
     using jules::formula;
@@ -18,7 +19,7 @@ TEST_CASE("Formula", "[formula]")
     dataframe test{{"x", {1, 2, 3}}, {"y", {3, 4, 0}}, {"z", {5, 8, 6}}};
 
     auto z = f.response(test).template as_array<double>();
-    // auto xy = f.terms(test).template as_array<double>();
+    auto xy = f.terms(test).template as_array<double>();
 
     // auto z_ = rowapply(xy, [](auto&& row) { return sum(row); });
 

@@ -50,26 +50,23 @@ template <typename Coercion> class base_column
 
     template <typename T> base_column& coerce_to()
     {
-        storage_->template coerce_to<T>();
+        storage_ = storage_->template coerce_to<T>();
         return *this;
     }
 
     template <typename T> bool can_coerce_to() const { return storage_->template can_coerce_to<T>(); }
     std::type_index elements_type() const { return storage_->elements_type(); }
 
-    template <typename T> auto as_array()
-    {
-        auto& st = storage_->template downcast<T>();
-        return detail::base_vector<T>{st.data(), st.size()};
-    }
-
     template <typename T> auto as_array() const
     {
         auto& st = storage_->template downcast<T>();
-        return detail::base_vector<const T>{st.data(), st.size()};
+        return vector<T>{st.data(), st.size()};
     }
 
     auto size() const { return storage_->size(); }
+
+    auto& name() { return name_; }
+    const auto& name() const { return name_; }
 
   private:
     std::string name_;
