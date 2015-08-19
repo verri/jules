@@ -13,7 +13,6 @@
 
 namespace jules
 {
-
 template <typename Coercion> class base_dataframe;
 
 template <typename Coercion> class base_column
@@ -36,17 +35,15 @@ template <typename Coercion> class base_column
 
     template <typename T> base_column& coerce_to();
     template <typename T, typename Coercion_>
-        friend base_column<Coercion_> coerce_to(const base_column<Coercion_>& source);
+    friend base_column<Coercion_> coerce_to(const base_column<Coercion_>& source);
 
     template <typename T> bool can_coerce_to() const { return storage_->template can_coerce_to<T>(); }
-    template <typename T, typename Coercion_>
-        friend bool can_coerce_to(const base_column<Coercion_>& column);
+    template <typename T, typename Coercion_> friend bool can_coerce_to(const base_column<Coercion_>& column);
 
     std::type_index elements_type() const { return storage_->elements_type(); }
 
     template <typename T, typename Coercion_>
-        friend array_view<dataframe_detail::storage<T, Coercion_>>
-        make_view(base_column<Coercion_>& column);
+    friend array_view<dataframe_detail::storage<T, Coercion_>> make_view(base_column<Coercion_>& column);
 
     auto size() const { return storage_->size(); }
 

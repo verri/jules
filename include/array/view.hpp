@@ -3,11 +3,10 @@
 
 namespace jules
 {
-
 template <typename C> class array_view
 {
   private:
-      using size_type = typename C::size_type;
+    using size_type = typename C::size_type;
 
   public:
     array_view(C& container) : container_(container) {}
@@ -18,8 +17,6 @@ template <typename C> class array_view
   private:
     C& container_;
 };
-
-
 
 } // namespace jules
 

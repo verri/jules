@@ -5,9 +5,7 @@
 
 namespace jules
 {
-
-template <typename Coercion>
-base_dataframe<Coercion>& base_dataframe<Coercion>::cbind(const column_t& column)
+template <typename Coercion> base_dataframe<Coercion>& base_dataframe<Coercion>::cbind(const column_t& column)
 {
     const auto& name = column.name();
     auto it = colindexes_.find(name);
@@ -23,8 +21,7 @@ base_dataframe<Coercion>& base_dataframe<Coercion>::cbind(const column_t& column
     return *this;
 }
 
-template <typename Coercion>
-base_dataframe<Coercion>& base_dataframe<Coercion>::cbind(column_t&& column)
+template <typename Coercion> base_dataframe<Coercion>& base_dataframe<Coercion>::cbind(column_t&& column)
 {
     const auto& name = column.name();
     auto it = colindexes_.find(name);
@@ -40,8 +37,7 @@ base_dataframe<Coercion>& base_dataframe<Coercion>::cbind(column_t&& column)
     return *this;
 }
 
-template <typename Coercion>
-auto base_dataframe<Coercion>::col(const std::string& name) -> column_t&
+template <typename Coercion> auto base_dataframe<Coercion>::col(const std::string& name) -> column_t &
 {
     auto it = colindexes_.find(name);
     if (it == colindexes_.end())
@@ -50,7 +46,7 @@ auto base_dataframe<Coercion>::col(const std::string& name) -> column_t&
 }
 
 template <typename Coercion>
-auto base_dataframe<Coercion>::col(const std::string& name) const -> const column_t&
+auto base_dataframe<Coercion>::col(const std::string& name) const -> const column_t &
 {
     auto it = colindexes_.find(name);
     if (it == colindexes_.end())

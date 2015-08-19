@@ -18,7 +18,6 @@ int main()
 
     dataframe test{{"x", {1, 2, 3}}, {"y", {3, 4, 0}}, {"z", {5, 8, 6}}};
 
-
     auto z = f.response(test).template as_array<double>();
     auto xy = f.terms(test).template as_array<double>();
 

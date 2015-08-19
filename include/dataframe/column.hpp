@@ -5,7 +5,6 @@
 
 namespace jules
 {
-
 template <typename Coercion>
 template <typename T>
 base_column<Coercion>::base_column(const std::string& name, std::initializer_list<T> values)
@@ -21,8 +20,8 @@ base_column<Coercion>::base_column(std::initializer_list<T> values)
 }
 
 template <typename Coercion>
-base_column<Coercion>::base_column(const std::string& name, std::unique_ptr<storage_eraser_t>&& storage) :
-    name_{name}, storage_{std::move(storage)}
+base_column<Coercion>::base_column(const std::string& name, std::unique_ptr<storage_eraser_t>&& storage)
+    : name_{name}, storage_{std::move(storage)}
 {
 }
 
@@ -32,8 +31,7 @@ base_column<Coercion>::base_column(const base_column& source)
 {
 }
 
-template <typename Coercion>
-auto base_column<Coercion>::operator=(const base_column& source) -> base_column&
+template <typename Coercion> auto base_column<Coercion>::operator=(const base_column& source) -> base_column &
 {
     name_ = source.name_;
     storage_ = std::move(source.storage_->clone());
@@ -41,21 +39,19 @@ auto base_column<Coercion>::operator=(const base_column& source) -> base_column&
     return *this;
 }
 
-template <typename Coercion>
-template <typename T> auto base_column<Coercion>::coerce_to() -> base_column&
+template <typename Coercion> template <typename T> auto base_column<Coercion>::coerce_to() -> base_column &
 {
     storage_ = storage_->template coerce_to<T>();
     return *this;
 }
 
-template <typename T, typename Coercion>
-base_column<Coercion> coerce_to(const base_column<Coercion>& source)
+template <typename T, typename Coercion> base_column<Coercion> coerce_to(const base_column<Coercion>& source)
 {
     return base_column<Coercion>{source.name(), source.storage_->template coerce_to<T>()};
 }
 
-template <typename T, typename Coercion>
-bool can_coerce_to(const base_column<Coercion>& column) {
+template <typename T, typename Coercion> bool can_coerce_to(const base_column<Coercion>& column)
+{
     return column.storage_->template can_coerce_to<T>();
 }
 
