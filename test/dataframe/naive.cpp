@@ -2,47 +2,64 @@
 
 #include "catch.hpp"
 
-#include <algorithm>
-#include <stdexcept>
-#include <string>
-#include <unordered_map>
-#include <valarray>
+#include <dataframe/dataframe.hpp>
+#include <formula/formula.hpp>
 
-template <typename Dataframe> class GaussianNaiveBayes
+using namespace jules;
+
+class GaussianNaiveBayes
 {
   public:
-    using dataframe_t = Dataframe;
-    using column_t = typename dataframe_t::column_t;
-
-    GaussianNaiveBayes(const formula& f, const Dataframe& data)
+    GaussianNaiveBayes(const formula& f, const dataframe& data)
     {
         auto response = f.response(data);
         auto terms = f.terms(data);
 
-        for (auto& col : terms.columns())
-            col.template coerce_to<double>();
-        response.template coerce_to<std::string>();
+        features = terms.colnames();
 
-        const auto& predictive = response.template as_array<std::string>();
-        const auto& features = terms.template as_array<double>();
+        auto predictive = make_view<std::string>(response); // predictive is array_view of string
+        auto features = make_view<double>(terms); // features is array_view of array_view of double
 
-        init(predictive, features);
-    }
+        classes = unique(predictive);
 
-  private:
-    void init(const vector<std::string>& predictive, const matrix<double>& features)
-    {
-        auto classes = unique(predictive);
+        auto m = classes.size();
+        mu.resize(m);
+        sigma.resize(m);
+        priori.resize(m);
 
+        auto n = predictive.size();
+
+        std::size_t i = 0;
         for (auto& cl : classes) {
             auto ix = predictive == cl;
 
-            mu.cbind(column_t{cl, colapply(features[ix], [](const auto& x) { return mean(x); })});
-            sigma.cbind(column_t{cl, colapply(features[ix], [](const auto& x) { return sd(x); })});
+            mu[i] = apply(features[ix], [](const auto& x) { return mean(x); });
+            sigma[i] = apply(features[ix], [](const auto& x) { return sd(x); });
+            priori[i] = count(ix) / n;
+
+            ++i;
         }
     }
 
-    Dataframe mu, sigma;
+    std::string classify(const vector<double>& sample) {
+        if (sample.size() != nfeatures_)
+            throw std::runtime_error{"invalid sample"};
+
+        auto likelihood = ...;
+
+        auto posteriori = likelihood * priori;
+
+        return classes[which_max(posteriori)];
+    }
+
+
+  private:
+    vector<std::string> features;
+    vector<std::string> classes;
+
+    vector<vector<double>> mu;
+    vector<vector<double>> sigma;
+    vector<double> priori;
 };
 
 TEST_CASE("Naïve Bayes", "[naive]")
