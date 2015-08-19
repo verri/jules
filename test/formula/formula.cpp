@@ -6,7 +6,7 @@
 
 #include <algorithm>
 
-//TEST_CASE("Formula", "[formula]")
+// TEST_CASE("Formula", "[formula]")
 int main()
 {
     using jules::dataframe;
@@ -14,14 +14,16 @@ int main()
     using jules::response;
     using jules::term;
 
-    auto f = (response<double>("z") = {2 * term<double>("x"), term<>("y")});
+    auto f(response<double>("z") = {2 * term<double>("x"), term<>("y")});
 
     dataframe test{{"x", {1, 2, 3}}, {"y", {3, 4, 0}}, {"z", {5, 8, 6}}};
+
 
     auto z = f.response(test).template as_array<double>();
     auto xy = f.terms(test).template as_array<double>();
 
+    // auto z = as_array(f.response(test));
+    // auto xy = as_array(f.terms(test));
     // auto z_ = rowapply(xy, [](auto&& row) { return sum(row); });
-
     // CHECK(all(z_ == z));
 }

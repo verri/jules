@@ -1,79 +1,69 @@
 #ifndef JULES_DATAFRAME_COLUMN_H
 #define JULES_DATAFRAME_COLUMN_H
 
-#include "core/type.hpp"
-#include "array/array.hpp"
-#include "dataframe/detail/storage.hpp"
-
-#include <initializer_list>
-#include <memory>
-#include <typeindex>
-
-// XXX resize must be private!
+#include "dataframe/column_decl.hpp"
 
 namespace jules
 {
-template <typename Coercion> class base_dataframe;
 
-template <typename Coercion> class base_column
+template <typename Coercion>
+template <typename T>
+base_column<Coercion>::base_column(const std::string& name, std::initializer_list<T> values)
+    : name_{name}, storage_{new storage_t<T>(values)}
 {
-    friend class base_dataframe<Coercion>;
+}
 
-  private:
-    template <typename T> using storage_t = dataframe_detail::storage<T, Coercion>;
-    using storage_eraser_t = dataframe_detail::storage_eraser<Coercion>;
+template <typename Coercion>
+template <typename T>
+base_column<Coercion>::base_column(std::initializer_list<T> values)
+    : storage_{new storage_t<T>(values)}
+{
+}
 
-  public:
-    template <typename T>
-    base_column(const std::string& name, std::initializer_list<T> values)
-        : name_{name}, storage_{new storage_t<T>(values)}
-    {
-    }
+template <typename Coercion>
+base_column<Coercion>::base_column(const std::string& name, std::unique_ptr<storage_eraser_t>&& storage) :
+    name_{name}, storage_{std::move(storage)}
+{
+}
 
-    template <typename T> base_column(std::initializer_list<T> values) : storage_{new storage_t<T>(values)} {}
+template <typename Coercion>
+base_column<Coercion>::base_column(const base_column& source)
+    : name_{source.name_}, storage_{std::move(source.storage_->clone())}
+{
+}
 
-    base_column(const base_column& source)
-        : name_{source.name_}, storage_{std::move(source.storage_->clone())}
-    {
-    }
-    base_column(base_column&& source) = default;
+template <typename Coercion>
+auto base_column<Coercion>::operator=(const base_column& source) -> base_column&
+{
+    name_ = source.name_;
+    storage_ = std::move(source.storage_->clone());
 
-    base_column& operator=(const base_column& source)
-    {
-        name_ = std::move(source.name_);
-        storage_ = std::move(source.storage_);
+    return *this;
+}
 
-        return *this;
-    }
+template <typename Coercion>
+template <typename T> auto base_column<Coercion>::coerce_to() -> base_column&
+{
+    storage_ = storage_->template coerce_to<T>();
+    return *this;
+}
 
-    base_column& operator=(base_column&& source) = default;
+template <typename T, typename Coercion>
+base_column<Coercion> coerce_to(const base_column<Coercion>& source)
+{
+    return base_column<Coercion>{source.name(), source.storage_->template coerce_to<T>()};
+}
 
-    template <typename T> base_column& coerce_to()
-    {
-        storage_ = storage_->template coerce_to<T>();
-        return *this;
-    }
+template <typename T, typename Coercion>
+bool can_coerce_to(const base_column<Coercion>& column) {
+    return column.storage_->template can_coerce_to<T>();
+}
 
-    template <typename T> bool can_coerce_to() const { return storage_->template can_coerce_to<T>(); }
-    std::type_index elements_type() const { return storage_->elements_type(); }
-
-    template <typename T> auto as_array() const
-    {
-        auto& st = storage_->template downcast<T>();
-        return vector<T>{st.data(), st.size()};
-    }
-
-    auto size() const { return storage_->size(); }
-
-    auto& name() { return name_; }
-    const auto& name() const { return name_; }
-
-  private:
-    std::string name_;
-    std::unique_ptr<storage_eraser_t> storage_;
-};
-
-using column = base_column<default_coercion_rules>;
+template <typename T, typename Coercion>
+array_view<dataframe_detail::storage<T, Coercion>> make_view(base_column<Coercion>& column)
+{
+    return array_view<dataframe_detail::storage<T, Coercion>>{column.storage_->template downcast<T>()};
+}
 
 } // namespace jules
 

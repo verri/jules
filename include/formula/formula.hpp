@@ -133,7 +133,8 @@ template <typename Coercion> class base_formula
     }
 
     column_t response(const dataframe_t& data) { return response_->extract_from(data); }
-    dataframe_t terms(const dataframe_t& data) {
+    dataframe_t terms(const dataframe_t& data)
+    {
         dataframe_t result;
         for (auto&& term : terms_)
             result.cbind(term->extract_from(data));

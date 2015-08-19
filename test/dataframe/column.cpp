@@ -28,6 +28,17 @@ TEST_CASE("column constructor using initializer list", "[constructor]")
 
     REQUIRE(!toy_column.can_coerce_to<double>());
     REQUIRE(!toy_column.can_coerce_to<std::string>());
+
+    using jules::coerce_to;
+    using jules::make_view;
+
+    auto string_numbers = column{"1.0", "2.4", "3.3"};
+    auto double_numbers = coerce_to<double>(string_numbers);
+
+    auto v = make_view<double>(double_numbers);
+    CHECK(v[0] == 1.0);
+    CHECK(v[1] == 2.4);
+    CHECK(v[2] == 3.3);
 }
 
 TEST_CASE("column constructor inference", "[constructor]")
