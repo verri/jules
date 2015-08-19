@@ -6,12 +6,17 @@
 TEST_CASE("tutorial", "[tutorial]")
 {
     using jules::dataframe;
+    using jules::column;
 
-    dataframe df{{"int", {1, 2}}, {"const char*", {"hello", " ", "world", "!"}}};
+    dataframe some_df{{"int", {1, 2, 3, 4}}, {"const char*", {"hello", " ", "world", "!"}}};
+    dataframe null_df;
 
-    for (auto&& rows : df.rows()) {
-    }
+    auto create_invalid_dataframe = []() { return dataframe{{1, 2, 3, 4}, {1, 2}}; };
+    CHECK_THROWS(create_invalid_dataframe());
 
-    for (auto&& rows : df.rows<int, const char*>()) {
-    }
+    CHECK(some_df != nullptr);
+    CHECK(null_df == nullptr);
+
+    some_df = nullptr;
+    CHECK(some_df == nullptr);
 }

@@ -20,15 +20,12 @@ template <typename Coercion> class base_dataframe
 
     base_dataframe() = default;
     base_dataframe(std::nullptr_t) : base_dataframe() {}
-    base_dataframe(std::initializer_list<column_t> columns) : columns_(columns) {}
+    base_dataframe(std::initializer_list<column_t> columns);
 
     base_dataframe& cbind(const column_t& column);
     base_dataframe& cbind(column_t&& column);
 
-    column_t& col(std::size_t i) { return columns_.at(i); }
     const column_t& col(std::size_t i) const { return columns_.at(i); }
-
-    column_t& col(const std::string& name);
     const column_t& col(const std::string& name) const;
 
     bool operator==(std::nullptr_t) { return ncol() == 0; }
