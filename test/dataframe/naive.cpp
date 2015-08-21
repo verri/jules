@@ -10,7 +10,7 @@ using namespace jules;
 class gaussian_naive_bayes
 {
   public:
-    gaussian_naive_bayes(const formula& f, const dataframe& data)
+    gaussian_naive_bayes(const expr& response, const expr_list& terms, const dataframe& data)
     {
         auto response = f.lhs(data).col(1); // response is a column
         auto terms = f.rhs(data);  // terms is a dataframe
@@ -71,10 +71,9 @@ TEST_CASE("Naïve Bayes", "[naive]")
     loo.threads(8);
 
     auto indexes = range(iris.nrow());
-    auto f = formula{term<std::string>{"Species"}, remaining<double>{}}
 
     auto error = loo.foreach(indexes)([&iris, formula](auto i) {
-        auto model = gaussian_naive_bayes{f, iris[-i]};
+        auto model = gaussian_naive_bayes{"Species" = ~remaining<double>{}, iris[-i]};
         return model.classify(iris[i][all_except("Species")]) == iris[i]["Species"];
     });
 

@@ -62,7 +62,7 @@ auto base_dataframe<Coercion>::col(const std::string& name) const -> const colum
     auto it = colindexes_.find(name);
     if (it == colindexes_.end())
         throw std::out_of_range{"column does not exists"};
-    return columns_.at(*it);
+    return columns_.at(it->second);
 }
 
 } // namespace jules

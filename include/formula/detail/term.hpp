@@ -8,10 +8,6 @@ namespace jules
 namespace detail
 {
 
-template <typename Coercion>
-auto term_eraser<Coercion>::extract_from(const dataframe_t& data) const -> column_t {
-    return coerce_and_apply_modifiers(data);
-}
 
 } // namespace detail
 } // namespace jules

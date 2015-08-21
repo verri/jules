@@ -14,8 +14,22 @@ base_column<Coercion>::base_column(const std::string& name, std::initializer_lis
 
 template <typename Coercion>
 template <typename T>
+base_column<Coercion>::base_column(const std::string& name, const T& value, std::size_t size)
+    : name_{name}, storage_{new storage_t<T>(size, value)}
+{
+}
+
+template <typename Coercion>
+template <typename T>
 base_column<Coercion>::base_column(std::initializer_list<T> values)
     : storage_{new storage_t<T>(values)}
+{
+}
+
+template <typename Coercion>
+template <typename T>
+base_column<Coercion>::base_column(const T& value, std::size_t size)
+    : storage_{new storage_t<T>(size, value)}
 {
 }
 

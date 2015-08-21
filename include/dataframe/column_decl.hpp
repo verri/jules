@@ -23,7 +23,9 @@ template <typename Coercion> class base_column
 
   public:
     template <typename T> base_column(const std::string& name, std::initializer_list<T> values);
+    template <typename T> base_column(const std::string& name, const T& value, std::size_t size = 0);
     template <typename T> base_column(std::initializer_list<T> values);
+    template <typename T> base_column(const T& value, std::size_t size = 0);
 
     base_column(const base_column& source);
     base_column(base_column&& source) = default;
