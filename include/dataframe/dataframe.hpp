@@ -7,7 +7,6 @@
 
 namespace jules
 {
-
 template <typename Coercion> base_dataframe<Coercion>::base_dataframe(std::initializer_list<column_t> columns)
 {
     auto size = columns.begin()->size();
@@ -24,7 +23,6 @@ template <typename Coercion> base_dataframe<Coercion>::base_dataframe(std::initi
     nrow_ = size;
     columns_.assign(columns.begin(), columns.end());
 }
-
 
 template <typename Coercion> base_dataframe<Coercion>& base_dataframe<Coercion>::cbind(const column_t& column)
 {
