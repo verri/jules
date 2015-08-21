@@ -33,6 +33,11 @@ template <typename Coercion, typename T = void> class base_expr
     template <typename U> auto operator*(const U& operand) const;
     template <typename U> auto operator-() const;
 
+    template <typename C, typename V, typename U> friend base_expr<C, decltype(U{} + V{})> operator+(const U& operand, const base_expr<C, V>& expr);
+    template <typename C, typename V, typename U> friend base_expr<C, decltype(U{} - V{})> operator-(const U& operand, const base_expr<C, V>& expr);
+    template <typename C, typename V, typename U> friend base_expr<C, decltype(U{} / V{})> operator/(const U& operand, const base_expr<C, V>& expr);
+    template <typename C, typename V, typename U> friend base_expr<C, decltype(U{} * V{})> operator*(const U& operand, const base_expr<C, V>& expr);
+
     template <typename U> auto operator+(const base_expr<Coercion, U>& operand) const;
     template <typename U> auto operator-(const base_expr<Coercion, U>& operand) const;
     template <typename U> auto operator/(const base_expr<Coercion, U>& operand) const;
@@ -87,29 +92,29 @@ template <typename Coercion> class base_expr<Coercion, void>
     std::string colname_;
 };
 
-template  <typename Coercion> class base_formula
+template  <typename Coercion, typename T, typename U> class base_formula
 {
   private:
     using dataframe_t = base_dataframe<Coercion>;
-    using expr_t = base_expr<Coercion, void>;
+    template <typename X> using expr_t = base_expr<Coercion, X>;
 
   public:
-    base_formula(const expr_t& lhs, const expr_t& rhs) : lhs_{lhs}, rhs_{rhs} {}
+    base_formula(const expr_t<T>& lhs, const expr_t<U>& rhs) : lhs_{lhs}, rhs_{rhs} {}
 
     const auto& lhs() const { return lhs_; }
     const auto& rhs() const { return rhs_; }
 
   private:
-    expr_t lhs_, rhs_;
+    expr_t<T> lhs_;
+    expr_t<U> rhs_;
 };
 
 template <typename Coercion, typename T, typename U>
-base_formula<Coercion> operator==(const base_expr<Coercion, T>& lhs, const base_expr<Coercion, U>& rhs) {
+base_formula<Coercion, T, U> operator==(const base_expr<Coercion, T>& lhs, const base_expr<Coercion, U>& rhs) {
     return {lhs, rhs};
 }
 
 template <typename T = void> using expr = base_expr<default_coercion_rules, T>;
-using formula = base_formula<default_coercion_rules>;
 
 } // namespace jules
 

@@ -65,7 +65,7 @@ template <typename U> auto base_expr<Coercion, T>::operator+(const U& operand) c
         auto result_view = make_view<R>(result);
 
         for (std::size_t i = 0; i < size; ++i)
-            result_view[i] = result_view[i] + view[i];
+            result_view[i] = view[i] + operand;
 
         return col;
     }};
@@ -107,7 +107,27 @@ template <typename U> auto base_expr<Coercion, T>::operator*(const U& operand) c
         auto result_view = make_view<R>(result);
 
         for (std::size_t i = 0; i < size; ++i)
-            result_view[i] = result_view[i] * view[i];
+            result_view[i] = view[i] * operand;
+
+        return col;
+    }};
+}
+
+template <typename C, typename V, typename U>
+base_expr<C, decltype(U{} * V{})> operator*(const U& operand, const base_expr<C, V>& expr) {
+    using R = decltype(U{} * V{});
+
+    return base_expr<C, R>{[parent = expr, operand](const base_dataframe<C>& data) {
+        auto col = parent.extract_from(data);
+
+        auto size = col.size();
+        auto result = base_column<C>(col.name() + "*" + typeid(U).name(), R{}, size);
+
+        auto view = make_view<V>(col);
+        auto result_view = make_view<R>(result);
+
+        for (std::size_t i = 0; i < size; ++i)
+            result_view[i] = operand * view[i];
 
         return col;
     }};
