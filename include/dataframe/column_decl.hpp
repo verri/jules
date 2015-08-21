@@ -3,7 +3,7 @@
 
 #include "core/type.hpp"
 #include "array/view.hpp"
-#include "dataframe/detail/storage.hpp"
+#include "dataframe/detail/column.hpp"
 
 #include <initializer_list>
 #include <memory>
@@ -18,8 +18,8 @@ template <typename Coercion> class base_column
     friend class base_dataframe<Coercion>;
 
   private:
-    template <typename T> using storage_t = dataframe_detail::storage<T, Coercion>;
-    using storage_eraser_t = dataframe_detail::storage_eraser<Coercion>;
+    template <typename T> using column_model_t = detail::column_model<T, Coercion>;
+    using column_concept_t = detail::column_concept<Coercion>;
 
   public:
     template <typename T> base_column(const std::string& name, std::initializer_list<T> values);
@@ -37,24 +37,24 @@ template <typename Coercion> class base_column
     template <typename T, typename Coercion_>
     friend base_column<Coercion_> coerce_to(const base_column<Coercion_>& source);
 
-    template <typename T> bool can_coerce_to() const { return storage_->template can_coerce_to<T>(); }
+    template <typename T> bool can_coerce_to() const { return column_model_->template can_coerce_to<T>(); }
     template <typename T, typename Coercion_> friend bool can_coerce_to(const base_column<Coercion_>& column);
 
-    std::type_index elements_type() const { return storage_->elements_type(); }
+    std::type_index elements_type() const { return column_model_->elements_type(); }
 
     template <typename T, typename Coercion_>
-    friend array_view<dataframe_detail::storage<T, Coercion_>> make_view(base_column<Coercion_>& column);
+    friend array_view<detail::column_model<T, Coercion_>> make_view(base_column<Coercion_>& column);
 
-    auto size() const { return storage_->size(); }
+    auto size() const { return column_model_->size(); }
 
     auto& name() { return name_; }
     const auto& name() const { return name_; }
 
   private:
-    base_column(const std::string& name, std::unique_ptr<storage_eraser_t>&& storage);
+    base_column(const std::string& name, std::unique_ptr<column_concept_t>&& column_model);
 
     std::string name_;
-    std::unique_ptr<storage_eraser_t> storage_;
+    std::unique_ptr<column_concept_t> column_model_;
 };
 
 using column = base_column<default_coercion_rules>;

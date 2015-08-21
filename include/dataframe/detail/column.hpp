@@ -13,15 +13,15 @@
 
 namespace jules
 {
-namespace dataframe_detail
+namespace detail
 {
-template <typename T, typename Coercion> class storage;
+template <typename T, typename Coercion> class column_model;
 
 template <typename Eraser, typename Coercion, size_t I>
 class generate_virtual_coercions : public generate_virtual_coercions<Eraser, Coercion, I - 1>
 {
   private:
-    using storage_eraser_ptr = std::unique_ptr<Eraser>;
+    using column_concept_ptr = std::unique_ptr<Eraser>;
     using type = typename Coercion::template type<I>;
     using base = generate_virtual_coercions<Eraser, Coercion, I - 1>;
 
@@ -29,7 +29,7 @@ class generate_virtual_coercions : public generate_virtual_coercions<Eraser, Coe
     using base::coerce_to_;
     using base::can_coerce_to_;
 
-    virtual storage_eraser_ptr coerce_to_(tag<type>) const = 0;
+    virtual column_concept_ptr coerce_to_(tag<type>) const = 0;
     virtual bool can_coerce_to_(tag<type>) const = 0;
 
   public:
@@ -39,11 +39,11 @@ class generate_virtual_coercions : public generate_virtual_coercions<Eraser, Coe
 template <typename Eraser, typename Coercion> class generate_virtual_coercions<Eraser, Coercion, 0>
 {
   private:
-    using storage_eraser_ptr = std::unique_ptr<Eraser>;
+    using column_concept_ptr = std::unique_ptr<Eraser>;
     using type = typename Coercion::template type<0>;
 
   protected:
-    virtual storage_eraser_ptr coerce_to_(tag<type>) const = 0;
+    virtual column_concept_ptr coerce_to_(tag<type>) const = 0;
     virtual bool can_coerce_to_(tag<type>) const = 0;
 
   public:
@@ -51,43 +51,43 @@ template <typename Eraser, typename Coercion> class generate_virtual_coercions<E
 };
 
 template <typename Coercion>
-class storage_eraser
-    : public generate_virtual_coercions<storage_eraser<Coercion>, Coercion, Coercion::ntypes() - 1>
+class column_concept
+    : public generate_virtual_coercions<column_concept<Coercion>, Coercion, Coercion::ntypes() - 1>
 {
   private:
-    using storage_eraser_ptr = std::unique_ptr<storage_eraser>;
+    using column_concept_ptr = std::unique_ptr<column_concept>;
     using coercion_rules = Coercion;
-    using base = generate_virtual_coercions<storage_eraser<Coercion>, Coercion, Coercion::ntypes() - 1>;
+    using base = generate_virtual_coercions<column_concept<Coercion>, Coercion, Coercion::ntypes() - 1>;
 
   public:
-    storage_eraser() = default;
-    storage_eraser(const storage_eraser&) = default;
-    storage_eraser(storage_eraser&&) = default;
+    column_concept() = default;
+    column_concept(const column_concept&) = default;
+    column_concept(column_concept&&) = default;
 
-    virtual ~storage_eraser(){};
+    virtual ~column_concept(){};
 
-    storage_eraser& operator=(const storage_eraser&) = delete;
-    storage_eraser& operator=(storage_eraser&&) = delete;
+    column_concept& operator=(const column_concept&) = delete;
+    column_concept& operator=(column_concept&&) = delete;
 
-    virtual storage_eraser_ptr clone() const = 0;
+    virtual column_concept_ptr clone() const = 0;
     virtual std::size_t size() const = 0;
 
-    template <typename T> storage_eraser_ptr coerce_to() const { return this->coerce_to_(tag<T>{}); }
+    template <typename T> column_concept_ptr coerce_to() const { return this->coerce_to_(tag<T>{}); }
     template <typename T> bool can_coerce_to() const { return this->can_coerce_to_(tag<T>{}); }
 
     virtual std::type_index elements_type() const = 0;
 
-    template <typename T> auto& downcast() { return dynamic_cast<storage<T, coercion_rules>&>(*this); }
+    template <typename T> auto& downcast() { return dynamic_cast<column_model<T, coercion_rules>&>(*this); }
     template <typename T> const auto& downcast() const
     {
-        return dynamic_cast<const storage<T, coercion_rules>&>(*this);
+        return dynamic_cast<const column_model<T, coercion_rules>&>(*this);
     }
 
   protected:
     using base::coerce_to_;
     using base::can_coerce_to_;
 
-    template <typename T> storage_eraser_ptr coerce_to_(T) const { return nullptr; }
+    template <typename T> column_concept_ptr coerce_to_(T) const { return nullptr; }
     template <typename T> bool can_coerce_to_(T) const { return false; }
 };
 
@@ -98,10 +98,10 @@ class specific_concrete_coercion
 {
   private:
     using type = typename Coercion::template type<I>;
-    using storage_eraser_ptr = std::unique_ptr<storage_eraser<Coercion>>;
+    using column_concept_ptr = std::unique_ptr<column_concept<Coercion>>;
 
   protected:
-    template <typename Iter> storage_eraser_ptr coerce_to_(Iter, Iter, tag<type>) const { return nullptr; }
+    template <typename Iter> column_concept_ptr coerce_to_(Iter, Iter, tag<type>) const { return nullptr; }
 
     constexpr bool can_coerce_to_(tag<type>) const { return false; }
 };
@@ -117,19 +117,19 @@ class specific_concrete_coercion<
 {
   private:
     using type = typename Coercion::template type<I>;
-    using storage_eraser_ptr = std::unique_ptr<storage_eraser<Coercion>>;
+    using column_concept_ptr = std::unique_ptr<column_concept<Coercion>>;
 
   protected:
-    template <typename Iter> storage_eraser_ptr coerce_to_(Iter begin, Iter end, tag<type>) const
+    template <typename Iter> column_concept_ptr coerce_to_(Iter begin, Iter end, tag<type>) const
     {
-        auto result = new storage<type, Coercion>;
+        auto result = new column_model<type, Coercion>;
         auto d = defer([&result] { delete result; });
 
         result->reserve(end - begin);
         std::transform(begin, end, std::back_inserter(*result),
                        [](const T& value) { return Coercion::template rule<I>::coerce_from(value); });
 
-        return storage_eraser_ptr{move_ptr(result)};
+        return column_concept_ptr{move_ptr(result)};
     }
 
     constexpr bool can_coerce_to_(tag<type>) const { return true; }
@@ -142,18 +142,18 @@ class specific_concrete_coercion<T, U, Coercion, I, std::enable_if_t<std::is_con
 {
   private:
     using type = typename Coercion::template type<I>;
-    using storage_eraser_ptr = std::unique_ptr<storage_eraser<Coercion>>;
+    using column_concept_ptr = std::unique_ptr<column_concept<Coercion>>;
 
   protected:
-    template <typename Iter> storage_eraser_ptr coerce_to_(Iter begin, Iter end, tag<type>) const
+    template <typename Iter> column_concept_ptr coerce_to_(Iter begin, Iter end, tag<type>) const
     {
-        auto result = new storage<type, Coercion>;
+        auto result = new column_model<type, Coercion>;
         auto d = defer([&result] { delete result; });
 
         result->reserve(end - begin);
         std::transform(begin, end, std::back_inserter(*result), [](const T& value) -> type { return value; });
 
-        return storage_eraser_ptr{move_ptr(result)};
+        return column_concept_ptr{move_ptr(result)};
     }
 
     constexpr bool can_coerce_to_(tag<type>) const { return true; }
@@ -163,21 +163,21 @@ template <typename T, typename Coercion, std::size_t I>
 class generate_concrete_coercions
     : public specific_concrete_coercion<T, typename Coercion::template type<I>, Coercion, I>,
       public generate_concrete_coercions<T, Coercion, I - 1>,
-      public virtual storage_eraser<Coercion>
+      public virtual column_concept<Coercion>
 {
   private:
     using type = typename Coercion::template type<I>;
-    using storage_eraser_ptr = std::unique_ptr<storage_eraser<Coercion>>;
+    using column_concept_ptr = std::unique_ptr<column_concept<Coercion>>;
     using base = generate_concrete_coercions<T, Coercion, I - 1>;
     using specific = specific_concrete_coercion<T, typename Coercion::template type<I>, Coercion, I>;
 
   protected:
     using base::coerce_to_;
     using base::can_coerce_to_;
-    using storage_eraser<Coercion>::coerce_to_;
-    using storage_eraser<Coercion>::can_coerce_to_;
+    using column_concept<Coercion>::coerce_to_;
+    using column_concept<Coercion>::can_coerce_to_;
 
-    virtual storage_eraser_ptr coerce_to_(tag<type> tag) const override final
+    virtual column_concept_ptr coerce_to_(tag<type> tag) const override final
     {
         return specific::coerce_to_(this->begin(), this->end(), tag);
     }
@@ -196,18 +196,18 @@ template <typename T, typename Coercion>
 class generate_concrete_coercions<T, Coercion, 0>
     : public specific_concrete_coercion<T, typename Coercion::template type<0>, Coercion, 0>,
       public std::vector<T>,
-      public virtual storage_eraser<Coercion>
+      public virtual column_concept<Coercion>
 {
   private:
     using type = typename Coercion::template type<0>;
-    using storage_eraser_ptr = std::unique_ptr<storage_eraser<Coercion>>;
+    using column_concept_ptr = std::unique_ptr<column_concept<Coercion>>;
     using specific = specific_concrete_coercion<T, typename Coercion::template type<0>, Coercion, 0>;
 
   protected:
-    using storage_eraser<Coercion>::coerce_to_;
-    using storage_eraser<Coercion>::can_coerce_to_;
+    using column_concept<Coercion>::coerce_to_;
+    using column_concept<Coercion>::can_coerce_to_;
 
-    virtual storage_eraser_ptr coerce_to_(tag<type> tag) const override final
+    virtual column_concept_ptr coerce_to_(tag<type> tag) const override final
     {
         return specific::coerce_to_(this->begin(), this->end(), tag);
     }
@@ -223,31 +223,31 @@ class generate_concrete_coercions<T, Coercion, 0>
 };
 
 template <typename T, typename Coercion>
-class storage : public generate_concrete_coercions<T, Coercion, Coercion::ntypes() - 1>
+class column_model : public generate_concrete_coercions<T, Coercion, Coercion::ntypes() - 1>
 {
-    static_assert(!std::is_reference<T>::value, "storage type can not be a reference");
+    static_assert(!std::is_reference<T>::value, "column_model type can not be a reference");
 
   public:
     using generate_concrete_coercions<T, Coercion, Coercion::ntypes() - 1>::generate_concrete_coercions;
 
-    storage() = default;
+    column_model() = default;
 
-    storage(const storage&) = default;
-    storage(storage&&) = default;
+    column_model(const column_model&) = default;
+    column_model(column_model&&) = default;
 
-    storage& operator=(const storage&) = delete;
-    storage& operator=(storage&&) = delete;
+    column_model& operator=(const column_model&) = delete;
+    column_model& operator=(column_model&&) = delete;
 
     virtual std::type_index elements_type() const override final { return typeid(T); }
-    virtual std::unique_ptr<storage_eraser<Coercion>> clone() const override final
+    virtual std::unique_ptr<column_concept<Coercion>> clone() const override final
     {
-        return std::unique_ptr<storage_eraser<Coercion>>{new storage{*this}};
+        return std::unique_ptr<column_concept<Coercion>>{new column_model{*this}};
     }
 
     virtual std::size_t size() const override final { return std::vector<T>::size(); }
 };
 
-} // namespace dataframe_detail
+} // namespace detail
 } // namespace jules
 
 #endif // JULES_DATAFRAME_DETAIL_STORAGE_H
