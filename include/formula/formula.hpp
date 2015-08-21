@@ -1,180 +1,71 @@
 #ifndef JULES_FORMULA_FORMULA_H
 #define JULES_FORMULA_FORMULA_H
 
-#include "dataframe/dataframe.hpp"
-#include "util/algorithm.hpp"
+#include "formula/formula_decl.hpp"
 
-#include <functional>
-#include <memory>
-#include <string>
-#include <vector>
+#include <stdexcept>
 
 namespace jules
 {
-namespace detail
-{
-template <typename Coercion> class term_eraser
-{
-  public:
-    using dataframe_t = base_dataframe<Coercion>;
-    using column_t = base_column<Coercion>;
 
-    explicit term_eraser(const std::string& name) : name_{name} {}
+template <typename Coercion, typename T>
+base_term<Coercion, T>::base_term(const std::string& colname) {
+    f_ = [colname](const dataframe_t& data) {
+        auto col = data.col(colname);
+        if (col.elements_type() != typeid(T))
+            col.template coerce_to<T>;
+        return col;
+    };
+}
 
-    column_t extract_from(const dataframe_t& data)
-    {
-        auto col = data.col(name_);
-        return coerce_and_apply_modifiers(col);
-    }
+template <typename Coercion, typename T>
+auto base_term<Coercion, T>::clone() const -> std::unique_ptr<term_eraser_t> {
+    return std::unique_ptr<term_eraser_t>{new base_term{*this}};
+}
 
-    virtual column_t& coerce_and_apply_modifiers(column_t& col) = 0;
-    virtual std::unique_ptr<term_eraser> clone() = 0;
+template <typename Coercion, typename T>
+auto base_term<Coercion, T>::coerce_and_apply_modifiers(const dataframe_t& data) const -> column_t& {
+    return f_(data);
+}
 
-    auto& name() { return name; }
-    const auto& name() const { return name; }
+template <typename Coercion, typename T>
+template <typename U> auto base_term<Coercion, T>::operator+(const U& operand) const -> base_term {
+    return base_term{[parent = *this, operand](const dataframe_t& data) {
+        auto col = parent.extract_from(data);
 
-  protected:
-    std::string name_;
-};
-
-template <typename Coercion> struct term_erased_list {
-    template <typename... Args> term_erased_list(Args&&... args)
-    {
-        for_each_arg([this](auto&& x) { terms.push_back(&x); }, args...);
-    }
-
-    auto begin() const { return terms.begin(); }
-    auto end() const { return terms.end(); }
-    std::vector<term_eraser<Coercion>*> terms;
-};
-
-} // namespace detail
-
-template <typename Coercion, typename T = void> class base_term : public detail::term_eraser<Coercion>
-{
-  private:
-    using column_t = typename detail::term_eraser<Coercion>::column_t;
-
-  public:
-    explicit base_term(const std::string& name) : detail::term_eraser<Coercion>{name} {}
-
-    base_term(const base_term& source) = default;
-    base_term(base_term&& source) = default;
-
-    base_term& operator=(const base_term& source) = delete;
-    base_term& operator=(base_term&& source) = delete;
-
-    virtual column_t& coerce_and_apply_modifiers(column_t& col) override final
-    {
-        col.template coerce_to<T>();
-        if (f_)
-            col.template as_array<T>().apply(f_);
+        auto view = make_view<T>(col);
+        for (auto& v : view)
+            v = v + operand;
 
         return col;
-    }
+    }};
+}
 
-    virtual std::unique_ptr<detail::term_eraser<Coercion>> clone() override final
-    {
-        return std::unique_ptr<detail::term_eraser<Coercion>>{new base_term{*this}};
-    }
+template <typename Coercion, typename T>
+template <typename U> auto base_term<Coercion, T>::operator+(const base_term<Coercion, U>& operand) const -> base_term {
+    return base_term{[parent1 = *this, parent2 = operand](const dataframe_t& data) {
+        auto lhs = parent1.extract_from(data);
+        auto rhs = parent2.extract_from(data);
 
-    // TODO automatically generate other operators
-    template <typename U> base_term friend operator*(const U& operand, const base_term& other)
-    {
-        return base_term{other, [operand](const T& value) { return value * operand; }};
-    }
+        std::size_t size;
+        if ((size = lhs.size()) != rhs.size())
+            throw std::runtime_error{"columns' size differ"};
 
-  private:
-    explicit base_term(const base_term& source, const std::function<T(const T&)>& g)
-        : detail::term_eraser<Coercion>{source.name_}
-    {
-        if (source.f_)
-            f_ = [ g = g, h = source.f_ ](const T& value) { return g(h(value)); };
-        else
-            f_ = [g = g](const T& value) { return g(value); };
-    }
+        auto lhs_view = make_view<T>(lhs);
+        auto rhs_view = make_view<U>(rhs);
 
-    std::function<T(const T&)> f_;
-};
+        auto value = T{} + U{};
+        auto result = column_t(lhs.name() + "+" + rhs.name(), {value});
+        result.resize(size);
 
-template <typename Coercion> class base_term<Coercion, void> : public detail::term_eraser<Coercion>
-{
-  private:
-    using column_t = typename detail::term_eraser<Coercion>::column_t;
+        auto result_view = make_view<decltype(value)>(result);
 
-  public:
-    explicit base_term(const std::string& name) : detail::term_eraser<Coercion>{name} {}
+        for (std::size_t i = 0; i < size; ++i)
+            result_view[i] = lhs_view[i] + rhs_view[i];
 
-    base_term(const base_term& source) = default;
-    base_term(base_term&& source) = default;
-
-    base_term& operator=(const base_term& source) = delete;
-    base_term& operator=(base_term&& source) = delete;
-
-    virtual column_t& coerce_and_apply_modifiers(column_t& col) override final { return col; }
-
-    virtual std::unique_ptr<detail::term_eraser<Coercion>> clone() override final
-    {
-        return std::unique_ptr<detail::term_eraser<Coercion>>{new base_term{*this}};
-    }
-};
-
-template <typename Coercion> class base_formula
-{
-  private:
-    using dataframe_t = base_dataframe<Coercion>;
-    using column_t = base_column<Coercion>;
-
-  public:
-    base_formula(std::unique_ptr<detail::term_eraser<Coercion>>&& response,
-                 std::vector<std::unique_ptr<detail::term_eraser<Coercion>>>&& terms)
-        : response_{std::move(response)}, terms_{std::move(terms)}
-    {
-    }
-
-    column_t response(const dataframe_t& data) { return response_->extract_from(data); }
-    dataframe_t terms(const dataframe_t& data)
-    {
-        dataframe_t result;
-        for (auto&& term : terms_)
-            result.cbind(term->extract_from(data));
         return result;
-    }
-
-  private:
-    std::unique_ptr<detail::term_eraser<Coercion>> response_;
-    std::vector<std::unique_ptr<detail::term_eraser<Coercion>>> terms_;
-};
-
-template <typename Coercion, typename T> class base_response : public base_term<Coercion, T>
-{
-  private:
-    using base_term = base_term<Coercion, T>;
-    using term_eraser = detail::term_eraser<Coercion>;
-    using term_ptr = std::unique_ptr<term_eraser>;
-
-  public:
-    using base_term::base_term;
-
-    base_response(const base_response& source) = delete;
-    base_response(base_response&& source) = delete;
-    base_response& operator=(const base_response& source) = delete;
-    base_response& operator=(base_response&& source) = delete;
-
-    base_formula<Coercion> operator=(const detail::term_erased_list<Coercion>& terms)
-    {
-        std::vector<term_ptr> terms_vector;
-        for (auto&& term : terms)
-            terms_vector.push_back(term->clone());
-
-        return base_formula<Coercion>{std::move(term_ptr{new base_term{*dynamic_cast<base_term*>(this)}}),
-                                      std::move(terms_vector)};
-    }
-};
-
-template <typename T = void> using term = base_term<default_coercion_rules, T>;
-template <typename T = void> using response = base_response<default_coercion_rules, T>;
-using formula = base_formula<default_coercion_rules>;
+    }};
+}
 
 } // namespace jules
 

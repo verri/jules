@@ -71,10 +71,10 @@ TEST_CASE("Naïve Bayes", "[naive]")
     loo.threads(8);
 
     auto indexes = range(iris.nrow());
-    auto formula = term<std::string>{"Species"}, remaining<double>{}
+    auto f = formula{term<std::string>{"Species"}, remaining<double>{}}
 
     auto error = loo.foreach(indexes)([&iris, formula](auto i) {
-        auto model = gaussian_naive_bayes{formula, iris[-i]};
+        auto model = gaussian_naive_bayes{f, iris[-i]};
         return model.classify(iris[i][all_except("Species")]) == iris[i]["Species"];
     });
 

@@ -9,8 +9,6 @@
 #include <memory>
 #include <typeindex>
 
-// XXX resize must be private!
-
 namespace jules
 {
 template <typename Coercion> class base_dataframe;
