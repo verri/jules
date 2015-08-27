@@ -69,10 +69,14 @@ template <typename T, typename Coercion> bool can_coerce_to(const base_column<Co
     return column.column_model_->template can_coerce_to<T>();
 }
 
-template <typename T, typename Coercion>
-array_view<detail::column_model<T, Coercion>> make_view(base_column<Coercion>& column)
+template <typename T, typename C> base_column_view<T, C> make_view(base_column<C>& column)
 {
-    return array_view<detail::column_model<T, Coercion>>{column.column_model_->template downcast<T>()};
+    return {column.column_model_->template downcast<T>()};
+}
+
+template <typename T, typename C> base_const_column_view<T, C> make_view(const base_column<C>& column)
+{
+    return {column.column_model_->template downcast<T>()};
 }
 
 } // namespace jules

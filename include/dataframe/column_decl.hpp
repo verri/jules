@@ -2,7 +2,7 @@
 #define JULES_DATAFRAME_COLUMN_DECL_H
 
 #include "core/type.hpp"
-#include "array/view.hpp"
+#include "dataframe/column_view.hpp"
 #include "dataframe/detail/column.hpp"
 
 #include <initializer_list>
@@ -42,8 +42,9 @@ template <typename Coercion> class base_column
 
     std::type_index elements_type() const { return column_model_->elements_type(); }
 
-    template <typename T, typename Coercion_>
-    friend array_view<detail::column_model<T, Coercion_>> make_view(base_column<Coercion_>& column);
+    template <typename T, typename C> friend base_column_view<T, C> make_view(base_column<C>& column);
+    template <typename T, typename C>
+    friend base_const_column_view<T, C> make_view(const base_column<C>& column);
 
     auto size() const { return column_model_->size(); }
 

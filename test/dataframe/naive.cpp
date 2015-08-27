@@ -13,7 +13,7 @@ class gaussian_naive_bayes
     gaussian_naive_bayes(const expr& response, const expr_list& terms, const dataframe& data)
     {
         auto response = f.lhs(data).col(1); // response is a column
-        auto terms = f.rhs(data);  // terms is a dataframe
+        auto terms = f.rhs(data);           // terms is a dataframe
 
         features = terms.colnames();
 
@@ -72,7 +72,7 @@ TEST_CASE("Naïve Bayes", "[naive]")
 
     auto indexes = range(iris.nrow());
 
-    auto error = loo.foreach(indexes)([&iris, formula](auto i) {
+    auto error = loo.foreach (indexes)([&iris, formula](auto i) {
         auto model = gaussian_naive_bayes{"Species" = ~remaining<double>{}, iris[-i]};
         return model.classify(iris[i][all_except("Species")]) == iris[i]["Species"];
     });
