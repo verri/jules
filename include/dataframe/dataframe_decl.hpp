@@ -10,6 +10,7 @@
 #include <unordered_map>
 #include <vector>
 #include <stdexcept>
+#include <iostream>
 
 namespace jules
 {
@@ -33,6 +34,12 @@ template <typename Coercion> class base_dataframe
 
     std::size_t nrow() const { return nrow_; }
     std::size_t ncol() const { return columns_.size(); }
+
+    static std::enable_if_t<std::is_same<Coercion, default_coercion_rules>::value,
+                            base_dataframe<default_coercion_rules>>
+    read(std::istream& is);
+    static std::enable_if_t<std::is_same<Coercion, default_coercion_rules>::value>
+    write(const base_dataframe<default_coercion_rules>& df, std::ostream& os);
 
   private:
     std::size_t nrow_;

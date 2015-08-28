@@ -42,6 +42,9 @@ template <typename Coercion> base_dataframe<Coercion>& base_dataframe<Coercion>:
     if (*this != nullptr && nrow() != tmp.size())
         throw std::runtime_error{"invalid column size"};
 
+    if (*this == nullptr)
+        nrow_ = tmp.size();
+
     colindexes_[name] = columns_.size();
     columns_.push_back(std::move(tmp));
 
@@ -61,6 +64,9 @@ template <typename Coercion> base_dataframe<Coercion>& base_dataframe<Coercion>:
     if (*this != nullptr && nrow() != column.size())
         throw std::runtime_error{"invalid column size"};
 
+    if (*this == nullptr)
+        nrow_ = column.size();
+
     colindexes_[name] = columns_.size();
     columns_.push_back(std::move(column));
 
@@ -74,6 +80,58 @@ auto base_dataframe<Coercion>::col(const std::string& name) const -> const colum
     if (it == colindexes_.end())
         throw std::out_of_range{"column does not exists"};
     return columns_.at(it->second);
+}
+
+template <> dataframe dataframe::read(std::istream& is)
+{
+    const auto split = [](const std::string& string, auto out, const char* sep) {
+        std::size_t ini = 0, pos = 0;
+        while (pos != string.npos) {
+            pos = string.find_first_of(sep, ini);
+            *out++ = string.substr(ini, pos - ini);
+            ini = pos + 1;
+        }
+        return out;
+    };
+
+    std::vector<std::string> header, data;
+
+    std::string header_line;
+    std::getline(is, header_line);
+    split(header_line, std::back_inserter(header), "\t");
+
+    auto ncol = header.size();
+
+    std::string data_line;
+    while (std::getline(is, data_line)) {
+        split(data_line, std::back_inserter(data), "\t");
+        if (data.size() % ncol != 0)
+            throw std::runtime_error{"number of columns differ"};
+    }
+
+    auto nrow = data.size() / ncol;
+
+    std::vector<column> columns;
+    columns.reserve(ncol);
+
+    for (std::size_t j = 0; j < ncol; ++j) {
+        column col(header[j], std::string{}, nrow);
+        auto view = make_view<std::string>(col);
+        for (std::size_t i = 0; i < nrow; ++i)
+            view[i] = data[i * ncol + j];
+        columns.push_back(std::move(col));
+    }
+
+    dataframe df;
+    for (auto& col : columns)
+        df.cbind(std::move(col));
+
+    return df;
+}
+
+template <> void dataframe::write(const dataframe&, std::ostream&)
+{
+    throw std::logic_error{"not yet implemented"};
 }
 
 } // namespace jules
