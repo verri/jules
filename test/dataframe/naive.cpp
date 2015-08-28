@@ -67,14 +67,15 @@ TEST_CASE("Naïve Bayes", "[naive]")
     const auto iris = dataframe::read("iris.csv");
 
     // Leave one out
-    experiment<std::size_t, bool> loo{[](auto acc, auto v) { return acc + (v ? 0 : 1); }};
+    experiment<std::size_t, bool> loo(0, [](auto acc, auto v) { return acc + (v ? 0 : 1); });
+    // Settings
     loo.threads(8);
 
-    auto indexes = range(iris.nrow());
+    auto indexes = range(0, iris.nrow());
 
-    auto error = loo.foreach (indexes)([&iris, formula](auto i) {
+    auto error = loo.expand(indexes)([&iris](auto i) {
         auto model = gaussian_naive_bayes{"Species" = ~remaining<double>{}, iris[-i]};
-        return model.classify(iris[i][all_except("Species")]) == iris[i]["Species"];
+        return model.classify(iris[i][all_except("Species")]) == iris.at<std::string>(i, "Species");
     });
 
     std::cout << "the classifier misclassified " << error << " of " << iris.nrow() << " samples."
