@@ -38,6 +38,9 @@ template <typename T, typename Coercion> class base_column_view : public base_co
     base_column_view(column_model_t& column_model) : base_const_column_view<T, Coercion>(column_model) {}
 };
 
+template <typename T> using column_view = base_column_view<T, default_coercion_rules>;
+template <typename T> using const_column_view = base_const_column_view<T, default_coercion_rules>;
+
 } // namespace jules
 
 #endif // JULES_DATAFRAME_COLUMN_VIEW_DECL_H

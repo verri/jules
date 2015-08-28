@@ -129,9 +129,42 @@ template <> dataframe dataframe::read(std::istream& is)
     return df;
 }
 
-template <> void dataframe::write(const dataframe&, std::ostream&)
+template <> void dataframe::write(const dataframe& df, std::ostream& os)
 {
-    throw std::logic_error{"not yet implemented"};
+    if (df.nrow() == 0 || df.ncol() == 0)
+        return;
+
+    std::vector<column*> to_delete;
+    std::vector<const_column_view<std::string>> data;
+
+    for (std::size_t j = 0; j < df.ncol(); ++j) {
+        const auto& col = df.col(j);
+
+        if (col.elements_type() == typeid(std::string)) {
+            data.push_back(make_view<std::string>(col));
+        } else {
+            auto coerced = new column(col);
+            coerced->template coerce_to<std::string>();
+
+            to_delete.push_back(coerced);
+            data.push_back(make_view<std::string>(*coerced));
+        }
+    }
+
+    os << df.col(0).name();
+    for (std::size_t j = 1; j < df.ncol(); ++j)
+        os << "\t" << df.col(j).name();
+    os << "\n";
+
+    for (std::size_t i = 0; i < df.nrow(); ++i) {
+        os << data[0][i];
+        for (std::size_t j = 1; j < df.ncol(); ++j)
+            os << "\t" << data[j][i];
+        os << "\n";
+    }
+
+    for (auto col : to_delete)
+        delete col;
 }
 
 } // namespace jules
