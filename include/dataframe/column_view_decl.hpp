@@ -16,6 +16,12 @@ template <typename T, typename Coercion> class base_const_column_view
     using column_model_t = detail::column_model<T, Coercion>;
 
   public:
+    base_const_column_view(const base_const_column_view& source) = default;
+    base_const_column_view(base_const_column_view&& source) = default;
+
+    base_const_column_view& operator=(const base_const_column_view& source) = default;
+    base_const_column_view& operator=(base_const_column_view&& source) = default;
+
     const auto& operator[](std::size_t i) const { return column_model_[i]; }
 
   protected:
@@ -32,6 +38,12 @@ template <typename T, typename Coercion> class base_column_view : public base_co
     using column_model_t = detail::column_model<T, Coercion>;
 
   public:
+    base_column_view(const base_column_view& source) = default;
+    base_column_view(base_column_view&& source) = default;
+
+    base_column_view& operator=(const base_column_view& source) = default;
+    base_column_view& operator=(base_column_view&& source) = default;
+
     auto& operator[](std::size_t i) { return this->column_model_[i]; }
 
   private:

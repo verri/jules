@@ -143,9 +143,7 @@ template <> void dataframe::write(const dataframe& df, std::ostream& os)
         if (col.elements_type() == typeid(std::string)) {
             data.push_back(make_view<std::string>(col));
         } else {
-            auto coerced = new column(col);
-            coerced->template coerce_to<std::string>();
-
+            auto coerced = new column(std::move(coerce_to<std::string>(col)));
             to_delete.push_back(coerced);
             data.push_back(make_view<std::string>(*coerced));
         }

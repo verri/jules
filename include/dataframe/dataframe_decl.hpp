@@ -23,6 +23,12 @@ template <typename Coercion> class base_dataframe
     base_dataframe(std::nullptr_t) : base_dataframe() {}
     base_dataframe(std::initializer_list<column_t> columns);
 
+    base_dataframe(const base_dataframe& source) = default;
+    base_dataframe(base_dataframe&& source) = default;
+
+    base_dataframe& operator=(const base_dataframe& source) = default;
+    base_dataframe& operator=(base_dataframe&& source) = default;
+
     base_dataframe& cbind(const column_t& column);
     base_dataframe& cbind(column_t&& column);
 
