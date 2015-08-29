@@ -39,6 +39,10 @@ TEST_CASE("column constructor using initializer list", "[constructor]")
     CHECK(v[0] == 1.0);
     CHECK(v[1] == 2.4);
     CHECK(v[2] == 3.3);
+
+    std::vector<double> tmp = {1.0, 2.0, 3.0};
+    column range_column(tmp);
+    CHECK(range_column.elements_type() == typeid(double));
 }
 
 TEST_CASE("column constructor inference", "[constructor]")

@@ -111,20 +111,15 @@ template <> dataframe dataframe::read(std::istream& is)
 
     auto nrow = data.size() / ncol;
 
-    std::vector<column> columns;
-    columns.reserve(ncol);
+    dataframe df;
 
     for (std::size_t j = 0; j < ncol; ++j) {
         column col(header[j], std::string{}, nrow);
         auto view = make_view<std::string>(col);
         for (std::size_t i = 0; i < nrow; ++i)
             view[i] = data[i * ncol + j];
-        columns.push_back(std::move(col));
-    }
-
-    dataframe df;
-    for (auto& col : columns)
         df.cbind(std::move(col));
+    }
 
     return df;
 }

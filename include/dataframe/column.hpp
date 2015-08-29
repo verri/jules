@@ -40,6 +40,20 @@ base_column<Coercion>::base_column(const std::string& name, std::unique_ptr<colu
 }
 
 template <typename Coercion>
+template <typename Range, typename T>
+base_column<Coercion>::base_column(const std::string& name, const Range& range)
+    : name_{name}, column_model_{new column_model_t<T>(std::begin(range), std::end(range))}
+{
+}
+
+template <typename Coercion>
+template <typename Range, typename T>
+base_column<Coercion>::base_column(const Range& range)
+    : column_model_{new column_model_t<T>(std::begin(range), std::end(range))}
+{
+}
+
+template <typename Coercion>
 base_column<Coercion>::base_column(const base_column& source)
     : name_{source.name_}, column_model_{std::move(source.column_model_->clone())}
 {
