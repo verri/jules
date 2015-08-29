@@ -134,7 +134,7 @@ template <> void dataframe::write(const dataframe& df, std::ostream& os)
     if (df.nrow() == 0 || df.ncol() == 0)
         return;
 
-    std::vector<column*> to_delete;
+    std::vector<column> coerced;
     std::vector<const_column_view<std::string>> data;
 
     for (std::size_t j = 0; j < df.ncol(); ++j) {
@@ -143,9 +143,8 @@ template <> void dataframe::write(const dataframe& df, std::ostream& os)
         if (col.elements_type() == typeid(std::string)) {
             data.push_back(make_view<std::string>(col));
         } else {
-            auto coerced = new column(std::move(coerce_to<std::string>(col)));
-            to_delete.push_back(coerced);
-            data.push_back(make_view<std::string>(*coerced));
+            coerced.push_back(std::move(coerce_to<std::string>(col)));
+            data.push_back(make_view<std::string>(coerced.back()));
         }
     }
 
@@ -160,9 +159,6 @@ template <> void dataframe::write(const dataframe& df, std::ostream& os)
             os << "\t" << data[j][i];
         os << "\n";
     }
-
-    for (auto col : to_delete)
-        delete col;
 }
 
 } // namespace jules
