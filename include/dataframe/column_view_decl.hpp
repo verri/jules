@@ -9,7 +9,6 @@ template <typename Coercion> class base_column;
 
 template <typename T, typename Coercion> class base_const_column_view
 {
-  public:
     friend class base_column<Coercion>;
 
   private:
@@ -31,7 +30,6 @@ template <typename T, typename Coercion> class base_const_column_view
 
 template <typename T, typename Coercion> class base_column_view : public base_const_column_view<T, Coercion>
 {
-  public:
     friend class base_column<Coercion>;
 
   private:

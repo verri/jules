@@ -47,6 +47,9 @@ template <typename Coercion> class base_column
 
     std::type_index elements_type() const { return column_model_->elements_type(); }
 
+    template <typename T> base_column_view<T, Coercion> view();
+    template <typename T> base_const_column_view<T, Coercion> view() const;
+
     template <typename T, typename C> friend base_column_view<T, C> make_view(base_column<C>& column);
     template <typename T, typename C>
     friend base_const_column_view<T, C> make_view(const base_column<C>& column);

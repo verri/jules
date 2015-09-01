@@ -1,7 +1,7 @@
 SRC = dataframe/column.cpp dataframe/dataframe.cpp
 OBJ := $(SRC:.cpp=.o)
 
-CXXFLAGS += -std=c++14 -Wall -Wextra -I../include -I../third_party/Catch/include
+CXXFLAGS += -std=c++14 -Wall -Wextra -I../include -isystem../third_party/Catch/include
 
 all: test
 
