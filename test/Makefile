@@ -1,10 +1,14 @@
-CXX = clang++
-CXXFLAGS = -std=c++14 -Wall -Wextra -I../include -I../third_party/Catch/include
+SRC = dataframe/column.cpp dataframe/dataframe.cpp
+OBJ := $(SRC:.cpp=.o)
 
-all: column.test dataframe.test
+CXXFLAGS += -std=c++14 -Wall -Wextra -I../include -I../third_party/Catch/include
 
-column.test: dataframe/column.cpp
-	$(CXX) $(CXXFLAGS) -o column.test $<
+all: test
 
-dataframe.test: dataframe/dataframe.cpp
-	$(CXX) $(CXXFLAGS) -o dataframe.test $<
+test: test_suite
+
+test_suite: test_suite.cpp $(OBJ)
+	$(CXX) $(CXXFLAGS) $(LDFLAGS) -o $@ $^
+
+%.o: %.cpp
+	$(CXX) $(CXXFLAGS) -c -o $@ $<
