@@ -3,10 +3,13 @@ SRC = $(shell find include test -iname \*.[ch]pp)
 all: format test
 
 test:
-	$(MAKE) -C test test
+	@$(MAKE) --no-print-directory -C test test
 
 format:
-	@echo Formatting $(SRC)
+	@echo Formatting source...
 	@clang-format -i -style=file $(SRC)
 
-.PHONY: format test
+clean:
+	@$(MAKE) --no-print-directory -C test clean
+
+.PHONY: format test clean

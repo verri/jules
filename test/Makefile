@@ -15,18 +15,23 @@ ifeq (0, $(words $(findstring $(MAKECMDGOALS), $(NODEPS))))
 endif
 
 test: test_suite
-	./test_suite
+	@echo "Running test suite..."
+	@./test_suite -d yes
 
 test_suite: $(OBJ)
-	$(CXX) $(CXXFLAGS) $(LDFLAGS) -o $@ $(OBJ)
+	@echo "Linking test suite..."
+	@$(CXX) $(CXXFLAGS) $(LDFLAGS) -o $@ $(OBJ)
 
 %.o: %.cpp
-	$(CXX) $(CXXFLAGS) -c -o $@ $<
+	@echo "Compiling ($<)..."
+	@$(CXX) $(CXXFLAGS) -c -o $@ $<
 
 %.d: %.cpp
-	$(CXX) $(CXXFLAGS) -MM -MT '$(patsubst %.cpp,%.o,$<)' $< -MF $@
+	@echo "Finding dependencies ($<)..."
+	@$(CXX) $(CXXFLAGS) -MM -MT '$(patsubst %.cpp,%.o,$<)' $< -MF $@
 
 clean:
-	rm -f dataframe/*.o dataframe/*.d test_suite
+	@echo "Cleaning test..."
+	@rm -f dataframe/*.o dataframe/*.d test_suite.d test_suite.o test_suite
 
 .PHONY: test clean
