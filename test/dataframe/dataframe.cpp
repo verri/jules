@@ -3,7 +3,7 @@
 
 #include <sstream>
 
-TEST_CASE("tutorial", "[tutorial]")
+TEST_CASE("dataframe", "[dataframe]")
 {
     using jules::dataframe;
     using jules::column;

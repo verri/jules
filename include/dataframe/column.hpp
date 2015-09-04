@@ -34,7 +34,8 @@ base_column<Coercion>::base_column(const T& value, std::size_t size)
 }
 
 template <typename Coercion>
-base_column<Coercion>::base_column(const std::string& name, std::unique_ptr<column_concept_t>&& column_model)
+base_column<Coercion>::base_column(const std::string& name,
+                                   std::unique_ptr<column_interface_t>&& column_model)
     : name_{name}, column_model_{std::move(column_model)}
 {
 }

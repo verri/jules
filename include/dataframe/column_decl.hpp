@@ -19,7 +19,7 @@ template <typename Coercion> class base_column
 
   private:
     template <typename T> using column_model_t = detail::column_model<T, Coercion>;
-    using column_concept_t = detail::column_concept<Coercion>;
+    using column_interface_t = detail::column_interface<Coercion>;
 
   public:
     template <typename T> base_column(const std::string& name, std::initializer_list<T> values);
@@ -60,10 +60,10 @@ template <typename Coercion> class base_column
     const auto& name() const { return name_; }
 
   private:
-    base_column(const std::string& name, std::unique_ptr<column_concept_t>&& column_model);
+    base_column(const std::string& name, std::unique_ptr<column_interface_t>&& column_model);
 
     std::string name_;
-    std::unique_ptr<column_concept_t> column_model_;
+    std::unique_ptr<column_interface_t> column_model_;
 };
 
 using column = base_column<default_coercion_rules>;
