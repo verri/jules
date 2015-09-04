@@ -1,10 +1,10 @@
 SUFFIXES += .d
 
-SRC = dataframe/column.cpp dataframe/dataframe.cpp dataframe/column_detail.cpp
+SRC = dataframe/column.cpp dataframe/dataframe.cpp dataframe/column_detail.cpp tutorial/naive.cpp
 OBJ := $(SRC:.cpp=.o) test_suite.o
 DEP := $(SRC:.cpp=.d) test_suite.d
 
-CXXFLAGS += -std=c++14 -Wall -Wextra -I../include -isystem../third_party/Catch/include
+CXXFLAGS += -std=c++14 -g -O3 -Wall -Wextra -I../include -isystem../third_party/Catch/include
 
 NODEPS = clean
 
@@ -16,7 +16,7 @@ endif
 
 test: test_suite
 	@echo "Running test suite..."
-	@./test_suite -d yes
+	@valgrind --leak-check=full ./test_suite -d yes
 
 test_suite: $(OBJ)
 	@echo "Linking test suite..."
@@ -32,6 +32,6 @@ test_suite: $(OBJ)
 
 clean:
 	@echo "Cleaning test..."
-	@rm -f dataframe/*.o dataframe/*.d test_suite.d test_suite.o test_suite
+	@rm -f {dataframe,tutorial}/*.{o,d} test_suite{,.o,.d}
 
 .PHONY: test clean

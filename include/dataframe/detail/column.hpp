@@ -15,6 +15,7 @@ namespace jules
 {
 namespace detail
 {
+// TODO: change template parameter order
 template <typename T, typename Coercion> class column_model;
 
 template <typename Eraser, typename Coercion, size_t I>

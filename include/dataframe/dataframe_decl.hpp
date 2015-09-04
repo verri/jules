@@ -1,8 +1,8 @@
 #ifndef JULES_DATAFRAME_DATAFRAME_DECL_H
 #define JULES_DATAFRAME_DATAFRAME_DECL_H
 
-#include "array/array.hpp"
 #include "dataframe/column.hpp"
+#include "formula/expression_decl.hpp"
 
 #include <cstddef>
 #include <initializer_list>
@@ -16,6 +16,10 @@ namespace jules
 {
 template <typename Coercion> class base_dataframe
 {
+  private:
+    using expr_t = base_expr<Coercion, void>;
+    using expr_list_t = base_expr_list<Coercion>;
+
   public:
     using column_t = base_column<Coercion>;
 
@@ -32,8 +36,11 @@ template <typename Coercion> class base_dataframe
     base_dataframe& cbind(const column_t& column);
     base_dataframe& cbind(column_t&& column);
 
-    const column_t& col(std::size_t i) const { return columns_.at(i); }
-    const column_t& col(const std::string& name) const;
+    [[deprecated]] const column_t& col(std::size_t i) const { return columns_.at(i); }
+    [[deprecated]] const column_t& col(const std::string& name) const;
+
+    column_t select(const expr_t& expression) const;
+    base_dataframe select(const expr_list_t& expression_list) const;
 
     bool operator==(std::nullptr_t) { return ncol() == 0; }
     bool operator!=(std::nullptr_t) { return ncol() != 0; }
@@ -41,11 +48,8 @@ template <typename Coercion> class base_dataframe
     std::size_t nrow() const { return nrow_; }
     std::size_t ncol() const { return columns_.size(); }
 
-    static std::enable_if_t<std::is_same<Coercion, default_coercion_rules>::value,
-                            base_dataframe<default_coercion_rules>>
-    read(std::istream& is);
-    static std::enable_if_t<std::is_same<Coercion, default_coercion_rules>::value>
-    write(const base_dataframe<default_coercion_rules>& df, std::ostream& os);
+    static base_dataframe read(std::istream& is);
+    static void write(const base_dataframe& df, std::ostream& os);
 
   private:
     std::size_t nrow_;

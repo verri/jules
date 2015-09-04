@@ -82,7 +82,7 @@ auto base_dataframe<Coercion>::col(const std::string& name) const -> const colum
     return columns_.at(it->second);
 }
 
-template <> dataframe dataframe::read(std::istream& is)
+template <typename Coercion> base_dataframe<Coercion> base_dataframe<Coercion>::read(std::istream& is)
 {
     const auto split = [](const std::string& string, auto out, const char* sep) {
         std::size_t ini = 0, pos = 0;
@@ -111,7 +111,7 @@ template <> dataframe dataframe::read(std::istream& is)
 
     auto nrow = data.size() / ncol;
 
-    dataframe df;
+    base_dataframe<Coercion> df;
 
     for (std::size_t j = 0; j < ncol; ++j) {
         column col(header[j], std::string{}, nrow);
@@ -124,7 +124,8 @@ template <> dataframe dataframe::read(std::istream& is)
     return df;
 }
 
-template <> void dataframe::write(const dataframe& df, std::ostream& os)
+template <typename Coercion>
+void base_dataframe<Coercion>::write(const base_dataframe<Coercion>& df, std::ostream& os)
 {
     if (df.nrow() == 0 || df.ncol() == 0)
         return;
