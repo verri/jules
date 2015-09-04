@@ -9,7 +9,7 @@ namespace jules
 template <typename Coercion, typename T> base_expr<Coercion, T>::base_expr(const std::string& colname)
 {
     f_ = [colname](const dataframe_t& data) {
-        auto col = data.col(colname);
+        auto col = data.select(colname);
         if (col.elements_type() != typeid(T))
             col.template coerce_to<T>();
         return col;
@@ -46,7 +46,7 @@ auto base_expr<Coercion, T>::extract_from(const dataframe_t& data) const -> colu
 template <typename Coercion>
 auto base_expr<Coercion, void>::extract_from(const dataframe_t& data) const -> column_t
 {
-    return child_ ? child_->extract_from(data) : data.col(colname_);
+    return child_ ? child_->extract_from(data) : data.select(colname_);
 }
 
 template <typename Coercion, typename T>

@@ -12,11 +12,11 @@ class gaussian_naive_bayes
   public:
     gaussian_naive_bayes(const expr<>& response, const expr_list& terms, const dataframe& data)
     {
-        (void)response;
-        (void)terms;
-        (void)data;
-        // auto response_column = data.select(response);
-        // auto terms_dataframe = data.select(terms);
+        auto response_column = data.select(response);
+        auto terms_dataframe = data.select(terms);
+
+        (void)response_column;
+        (void)terms_dataframe;
 
         // static_assert(std::is_same<decltype(response_column), column>);
         // static_assert(std::is_same<decltype(terms_dataframe), dataframe>);
