@@ -15,14 +15,11 @@ class gaussian_naive_bayes
         auto response_column = data.select(response);
         auto terms_dataframe = data.select(terms);
 
+        static_assert(std::is_same<decltype(response_column), column>::value, "?");
+        static_assert(std::is_same<decltype(terms_dataframe), dataframe>::value, "?");
+
         (void)response_column;
         (void)terms_dataframe;
-
-        // static_assert(std::is_same<decltype(response_column), column>);
-        // static_assert(std::is_same<decltype(terms_dataframe), dataframe>);
-
-        // auto response = f.lhs(data).col(1); // response is a column
-        // auto terms = f.rhs(data);           // terms is a dataframe
 
         // features = terms.colnames();
 
@@ -79,7 +76,14 @@ TEST_CASE("Naïve Bayes", "[naive]")
     CHECK(iris.nrow() == 150);
     CHECK(iris.ncol() == 5);
 
-    (void)iris;
+    expr<std::string> species{"Species"};
+    expr_list features;
+
+    for (auto&& colname : {"Sepal.Length", "Sepal.Width", "Petal.Length", "Petal.Width"})
+        features.insert_right(expr<double>(colname));
+
+    gaussian_naive_bayes model(species, features, iris);
+
     // Leave one out
     // experiment<std::size_t, bool> loo(0, [](auto acc, auto v) { return acc + (v ? 0 : 1); });
     // // Settings

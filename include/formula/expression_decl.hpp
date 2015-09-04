@@ -108,19 +108,20 @@ template <typename Coercion> class base_expr_list
     using dataframe_t = base_dataframe<Coercion>;
 
   public:
+    base_expr_list() = default;
+
+    dataframe_t extract_from(const dataframe_t& data) const;
+
+    void insert_left(const expr_t& expr) { expressions_.push_front(expr); }
+    void insert_right(const expr_t& expr) { expressions_.push_back(expr); }
+
     template <typename C> friend base_expr_list<C> operator, (const expr_t& lhs, const expr_t& rhs);
     template <typename C>
     friend base_expr_list<C> operator, (const expr_t& lhs, const base_expr_list<C>& rhs);
     template <typename C>
     friend base_expr_list<C> operator, (const base_expr_list<C>& lhs, const expr_t& rhs);
 
-    dataframe_t extract_from(const dataframe_t& data) const;
-
   private:
-    base_expr_list(const expr_t& expr1, const expr_t& expr2);
-    void insert_left(const expr_t& expr);
-    void insert_right(const expr_t& expr);
-
     std::deque<expr_t> expressions_;
 };
 
