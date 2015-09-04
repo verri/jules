@@ -1,5 +1,6 @@
 #include "catch.hpp"
 
+#include <array/array.hpp>
 #include <dataframe/dataframe.hpp>
 #include <formula/formula.hpp>
 
@@ -60,12 +61,12 @@ class gaussian_naive_bayes
     // }
 
   private:
-    // vector<std::string> features;
-    // vector<std::string> classes;
+    vector<std::string> features;
+    vector<std::string> classes;
 
-    // vector<vector<double>> mu;
-    // vector<vector<double>> sigma2;
-    // vector<double> priori;
+    vector<vector<double>> mu;
+    vector<vector<double>> sigma2;
+    vector<double> priori;
 };
 
 TEST_CASE("Naïve Bayes", "[naive]")
