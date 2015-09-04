@@ -14,11 +14,11 @@ TEST_CASE("dataframe", "[dataframe]")
     auto create_invalid_dataframe = [] { return dataframe{{1, 2, 3, 4}, {1, 2}}; };
     CHECK_THROWS(create_invalid_dataframe());
 
-    CHECK(some_df != nullptr);
-    CHECK(null_df == nullptr);
+    CHECK(!some_df.empty());
+    CHECK(null_df.empty());
 
-    some_df = nullptr;
-    CHECK(some_df == nullptr);
+    some_df = {};
+    CHECK(some_df.empty());
 
     std::string data = "x\ty\tz\n" + std::to_string(0.0) + "\t" + std::to_string(1.0) + "\t" +
                        std::to_string(2.0) + "\n" + std::to_string(3.0) + "\t" + std::to_string(4.0) + "\t" +

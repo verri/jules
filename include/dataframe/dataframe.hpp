@@ -39,10 +39,10 @@ template <typename Coercion> base_dataframe<Coercion>& base_dataframe<Coercion>:
     if (it != colindexes_.end())
         throw std::runtime_error{"column already exists"};
 
-    if (*this != nullptr && nrow() != tmp.size())
+    if (!empty() && nrow() != tmp.size())
         throw std::runtime_error{"invalid column size"};
 
-    if (*this == nullptr)
+    if (empty())
         nrow_ = tmp.size();
 
     colindexes_[name] = columns_.size();
@@ -61,10 +61,10 @@ template <typename Coercion> base_dataframe<Coercion>& base_dataframe<Coercion>:
     if (it != colindexes_.end())
         throw std::runtime_error{"column already exists"};
 
-    if (*this != nullptr && nrow() != column.size())
+    if (!empty() && nrow() != column.size())
         throw std::runtime_error{"invalid column size"};
 
-    if (*this == nullptr)
+    if (empty())
         nrow_ = column.size();
 
     colindexes_[name] = columns_.size();
