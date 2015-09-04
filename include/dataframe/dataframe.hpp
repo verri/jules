@@ -74,12 +74,23 @@ template <typename Coercion> base_dataframe<Coercion>& base_dataframe<Coercion>:
 }
 
 template <typename Coercion>
-auto base_dataframe<Coercion>::col(const std::string& name) const -> const column_t &
+auto base_dataframe<Coercion>::select(const std::string& name) const -> const column_t &
 {
     auto it = colindexes_.find(name);
     if (it == colindexes_.end())
         throw std::out_of_range{"column does not exists"};
     return columns_.at(it->second);
+}
+
+template <typename Coercion> auto base_dataframe<Coercion>::select(const expr_t& expression) const -> column_t
+{
+    return expression.extract_from(*this);
+}
+
+template <typename Coercion>
+auto base_dataframe<Coercion>::select(const expr_list_t& expression_list) const -> base_dataframe
+{
+    return expression_list.extract_from(*this);
 }
 
 template <typename Coercion> base_dataframe<Coercion> base_dataframe<Coercion>::read(std::istream& is)
@@ -114,7 +125,7 @@ template <typename Coercion> base_dataframe<Coercion> base_dataframe<Coercion>::
     base_dataframe<Coercion> df;
 
     for (std::size_t j = 0; j < ncol; ++j) {
-        column col(header[j], std::string{}, nrow);
+        base_column<Coercion> col(header[j], std::string{}, nrow);
         auto view = make_view<std::string>(col);
         for (std::size_t i = 0; i < nrow; ++i)
             view[i] = data[i * ncol + j];
@@ -130,11 +141,11 @@ void base_dataframe<Coercion>::write(const base_dataframe<Coercion>& df, std::os
     if (df.nrow() == 0 || df.ncol() == 0)
         return;
 
-    std::vector<column> coerced;
+    std::vector<base_column<Coercion>> coerced;
     std::vector<const_column_view<std::string>> data;
 
     for (std::size_t j = 0; j < df.ncol(); ++j) {
-        const auto& col = df.col(j);
+        const auto& col = df.select(j);
 
         if (col.elements_type() == typeid(std::string)) {
             data.push_back(make_view<std::string>(col));
@@ -144,9 +155,9 @@ void base_dataframe<Coercion>::write(const base_dataframe<Coercion>& df, std::os
         }
     }
 
-    os << df.col(0).name();
+    os << df.select(0).name();
     for (std::size_t j = 1; j < df.ncol(); ++j)
-        os << "\t" << df.col(j).name();
+        os << "\t" << df.select(j).name();
     os << "\n";
 
     for (std::size_t i = 0; i < df.nrow(); ++i) {

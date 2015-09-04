@@ -12,6 +12,9 @@ class gaussian_naive_bayes
   public:
     gaussian_naive_bayes(const expr<>& response, const expr_list& terms, const dataframe& data)
     {
+        (void)response;
+        (void)terms;
+        (void)data;
         // auto response_column = data.select(response);
         // auto terms_dataframe = data.select(terms);
 
@@ -73,6 +76,7 @@ TEST_CASE("Naïve Bayes", "[naive]")
     std::ifstream file{"data/iris.csv"};
     const auto iris = dataframe::read(file);
 
+    (void)iris;
     // Leave one out
     // experiment<std::size_t, bool> loo(0, [](auto acc, auto v) { return acc + (v ? 0 : 1); });
     // // Settings

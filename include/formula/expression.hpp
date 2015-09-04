@@ -161,6 +161,15 @@ auto base_expr<Coercion, T>::operator*(const base_expr<Coercion, U>& operand) co
     });
 }
 
+template <typename Coercion>
+auto base_expr_list<Coercion>::extract_from(const dataframe_t& data) const -> dataframe_t
+{
+    dataframe_t df;
+    for (auto&& expr : expressions_)
+        df.cbind(expr.extract_from(data));
+    return df;
+}
+
 } // namespace jules
 
 #endif // JULES_FORMULA_EXPRESSION_H
