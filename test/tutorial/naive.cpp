@@ -76,6 +76,9 @@ TEST_CASE("Naïve Bayes", "[naive]")
     std::ifstream file{"data/iris.csv"};
     const auto iris = dataframe::read(file);
 
+    CHECK(iris.nrow() == 150);
+    CHECK(iris.ncol() == 5);
+
     (void)iris;
     // Leave one out
     // experiment<std::size_t, bool> loo(0, [](auto acc, auto v) { return acc + (v ? 0 : 1); });

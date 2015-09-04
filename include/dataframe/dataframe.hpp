@@ -105,6 +105,9 @@ template <typename Coercion> base_dataframe<Coercion> base_dataframe<Coercion>::
         return out;
     };
 
+    if (!is)
+        return {};
+
     std::vector<std::string> header, data;
 
     std::string header_line;
