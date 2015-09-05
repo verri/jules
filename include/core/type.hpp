@@ -39,7 +39,8 @@ template <typename... Rules> class coercion_rules
 using default_coercion_rules = coercion_rules<numeric_rules, string_rules>;
 
 template <typename R, typename I = decltype(std::begin(R{}))>
-struct range_traits : public std::iterator_traits<I> {
+struct[[deprecated("Use Boost Range instead.")]] range_traits : public std::iterator_traits<I>
+{
     using iterator_type = I;
     using value_type = typename I::value_type;
 
