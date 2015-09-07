@@ -44,16 +44,15 @@ base_column<Coercion>::base_column(const std::string& name,
 template <typename Coercion>
 template <typename Range>
 base_column<Coercion>::base_column(const std::string& name, const Range& range)
-    : name_{name}, column_model_{new column_model_t<typename range_value<Range>::type>(
-                       std::begin(range), std::end(range))}
+    : name_{name},
+      column_model_{new column_model_t<typename range_value<Range>::type>(std::begin(range), std::end(range))}
 {
 }
 
 template <typename Coercion>
 template <typename Range>
 base_column<Coercion>::base_column(const Range& range)
-    : column_model_{
-          new column_model_t<typename range_value<Range>::type>(std::begin(range), std::end(range))}
+    : column_model_{new column_model_t<typename range_value<Range>::type>(std::begin(range), std::end(range))}
 {
 }
 

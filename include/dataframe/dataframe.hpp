@@ -100,36 +100,26 @@ template <typename Coercion>
 base_dataframe<Coercion> base_dataframe<Coercion>::read(std::istream& is,
                                                         const dataframe_storage_options& opt)
 {
-    const auto as_string = [](std::istream& is) {
-        std::string buffer;
-        is.seekg(0, std::ios::end);
-        buffer.reserve(is.tellg());
-        is.seekg(0);
-        buffer.assign(std::istreambuf_iterator<char>(is),
-                      std::istreambuf_iterator<char>());
-        return buffer;
-    };
-
-    const auto as_range = [](auto&& match) {
-        return make_iterator_range<std::string::iterator>(match.first, match.second);
-    };
-
     if (!is)
         return {};
 
-    std::string raw_data = as_string(is);
+    const auto as_range =
+        [](auto&& match) { return make_iterator_range<std::string::iterator>(match.first, match.second); };
+
+    std::string raw_data;
+    raw_data.assign(std::istreambuf_iterator<char>(is), std::istreambuf_iterator<char>());
 
     std::regex eol{opt.eol};
     std::regex sep{opt.separator};
 
-    using namespace adaptors;
-    auto line_range = raw_data | tokenized(eol, -1);
-
     std::vector<std::sub_match<std::string::iterator>> data;
     std::size_t ncol = 0, nrow = 0;
 
+    using namespace adaptors;
+    auto line_range = raw_data | tokenized(eol, -1);
+
     std::size_t size = 0;
-    for (auto&& line: line_range) {
+    for (auto&& line : line_range) {
         copy(as_range(line) | tokenized(sep, -1), std::back_inserter(data));
 
         if (ncol == 0)
@@ -143,21 +133,22 @@ base_dataframe<Coercion> base_dataframe<Coercion>::read(std::istream& is,
     nrow = data.size() / ncol;
 
     base_dataframe<Coercion> df;
-
     for (std::size_t j = 0; j < ncol; ++j) {
         auto column_data = make_iterator_range(data.begin() + j + (opt.header ? ncol : 0), data.end()) |
-                           strided(ncol) |
-                           transformed([](auto&& match) { return std::move(std::string{match.first, match.second}); });
+                           strided(ncol) | transformed([](auto&& match) {
+                               return std::move(std::string{match.first, match.second});
+                           });
+
         base_column<Coercion> col(opt.header ? std::string{data[j].first, data[j].second} : std::string{},
                                   column_data);
         df.cbind(std::move(col));
     }
-
     return df;
 }
 
 template <typename Coercion>
-void base_dataframe<Coercion>::write(const base_dataframe<Coercion>& df, std::ostream& os)
+void base_dataframe<Coercion>::write(const base_dataframe<Coercion>& df, std::ostream& os,
+                                     const dataframe_storage_options& opt)
 {
     if (df.nrow() == 0 || df.ncol() == 0)
         return;
@@ -176,16 +167,18 @@ void base_dataframe<Coercion>::write(const base_dataframe<Coercion>& df, std::os
         }
     }
 
-    os << df.select(0).name();
-    for (std::size_t j = 1; j < df.ncol(); ++j)
-        os << "\t" << df.select(j).name();
-    os << "\n";
+    if (opt.header) {
+        os << df.select(0).name();
+        for (std::size_t j = 1; j < df.ncol(); ++j)
+            os << opt.separator << df.select(j).name();
+        os << opt.eol;
+    }
 
     for (std::size_t i = 0; i < df.nrow(); ++i) {
         os << data[0][i];
         for (std::size_t j = 1; j < df.ncol(); ++j)
-            os << "\t" << data[j][i];
-        os << "\n";
+            os << opt.separator << data[j][i];
+        os << opt.eol;
     }
 }
 

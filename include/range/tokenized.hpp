@@ -22,26 +22,25 @@ template <class Submatch> struct regex_holder {
 };
 
 struct regex_forwarder {
-    regex_holder<int>
-    operator()(const std::regex& re, int submatch = 0, regex_flag f = std::regex_constants::match_default) const
+    regex_holder<int> operator()(const std::regex& re, int submatch = 0,
+                                 regex_flag f = std::regex_constants::match_default) const
     {
         return regex_holder<int>(re, submatch, f);
     }
 
-    regex_holder<int>
-    operator()(const std::regex&& re, int submatch = 0, regex_flag f = std::regex_constants::match_default) const = delete;
+    regex_holder<int> operator()(const std::regex&& re, int submatch = 0,
+                                 regex_flag f = std::regex_constants::match_default) const = delete;
 
     template <class Submatch>
-    regex_holder<Submatch>
-    operator()(const std::regex& re, const Submatch& sub,
-               regex_flag f = std::regex_constants::match_default) const
+    regex_holder<Submatch> operator()(const std::regex& re, const Submatch& sub,
+                                      regex_flag f = std::regex_constants::match_default) const
     {
         return regex_holder<Submatch>(re, sub, f);
     }
 
-    template <class Submatch> regex_holder<Submatch> operator()(const std::regex&& re,
-            const Submatch& sub, regex_flag f = std::regex_constants::match_default) const
-        = delete;
+    template <class Submatch>
+    regex_holder<Submatch> operator()(const std::regex&& re, const Submatch& sub,
+                                      regex_flag f = std::regex_constants::match_default) const = delete;
 };
 } // namespace detail
 
