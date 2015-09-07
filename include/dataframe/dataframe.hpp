@@ -2,8 +2,11 @@
 #define JULES_DATAFRAME_DATAFRAME_H
 
 #include "dataframe/dataframe_decl.hpp"
+#include "range/range.hpp"
 
 #include <algorithm>
+#include <iterator>
+#include <regex>
 
 namespace jules
 {
@@ -93,45 +96,60 @@ auto base_dataframe<Coercion>::select(const expr_list_t& expression_list) const 
     return expression_list.extract_from(*this);
 }
 
-template <typename Coercion> base_dataframe<Coercion> base_dataframe<Coercion>::read(std::istream& is)
+template <typename Coercion>
+base_dataframe<Coercion> base_dataframe<Coercion>::read(std::istream& is,
+                                                        const dataframe_storage_options& opt)
 {
-    const auto split = [](const std::string& string, auto out, const char* sep) {
-        std::size_t ini = 0, pos = 0;
-        while (pos != string.npos) {
-            pos = string.find_first_of(sep, ini);
-            *out++ = string.substr(ini, pos - ini);
-            ini = pos + 1;
-        }
-        return out;
+    const auto as_string = [](std::istream& is) {
+        std::string buffer;
+        is.seekg(0, std::ios::end);
+        buffer.reserve(is.tellg());
+        is.seekg(0);
+        buffer.assign(std::istreambuf_iterator<char>(is),
+                      std::istreambuf_iterator<char>());
+        return buffer;
+    };
+
+    const auto as_range = [](auto&& match) {
+        return make_iterator_range<std::string::iterator>(match.first, match.second);
     };
 
     if (!is)
         return {};
 
-    std::vector<std::string> header, data;
+    std::string raw_data = as_string(is);
 
-    std::string header_line;
-    std::getline(is, header_line);
-    split(header_line, std::back_inserter(header), "\t");
+    std::regex eol{opt.eol};
+    std::regex sep{opt.separator};
 
-    auto ncol = header.size();
+    using namespace adaptors;
+    auto line_range = raw_data | tokenized(eol, -1);
 
-    std::string data_line;
-    while (std::getline(is, data_line)) {
-        split(data_line, std::back_inserter(data), "\t");
-        if (data.size() % ncol != 0)
+    std::vector<std::sub_match<std::string::iterator>> data;
+    std::size_t ncol = 0, nrow = 0;
+
+    std::size_t size = 0;
+    for (auto&& line: line_range) {
+        copy(as_range(line) | tokenized(sep, -1), std::back_inserter(data));
+
+        if (ncol == 0)
+            ncol = data.size() - size;
+
+        if (ncol != 0 && data.size() - size != ncol)
             throw std::runtime_error{"number of columns differ"};
-    }
 
-    auto nrow = data.size() / ncol;
+        size = data.size();
+    }
+    nrow = data.size() / ncol;
 
     base_dataframe<Coercion> df;
 
     for (std::size_t j = 0; j < ncol; ++j) {
-        base_column<Coercion> col(header[j], std::string{}, nrow);
-        auto view = make_view<std::string>(col);
-        for (std::size_t i = 0; i < nrow; ++i)
-            view[i] = data[i * ncol + j];
+        auto column_data = make_iterator_range(data.begin() + j + (opt.header ? ncol : 0), data.end()) |
+                           strided(ncol) |
+                           transformed([](auto&& match) { return std::move(std::string{match.first, match.second}); });
+        base_column<Coercion> col(opt.header ? std::string{data[j].first, data[j].second} : std::string{},
+                                  column_data);
         df.cbind(std::move(col));
     }
 

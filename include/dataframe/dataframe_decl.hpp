@@ -2,6 +2,7 @@
 #define JULES_DATAFRAME_DATAFRAME_DECL_H
 
 #include "dataframe/column.hpp"
+#include "dataframe/io_decl.hpp"
 #include "formula/expression_decl.hpp"
 
 #include <initializer_list>
@@ -48,7 +49,7 @@ template <typename Coercion> class base_dataframe
     std::size_t nrow() const { return nrow_; }
     std::size_t ncol() const { return columns_.size(); }
 
-    static base_dataframe read(std::istream& is);
+    static base_dataframe read(std::istream& is, const dataframe_storage_options& opt = {});
     static void write(const base_dataframe& df, std::ostream& os);
 
   private:

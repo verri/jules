@@ -16,7 +16,7 @@ endif
 
 test: test_suite
 	@echo "Running test suite..."
-	@valgrind --leak-check=full --quiet ./test_suite -d yes
+	@valgrind --leak-check=full ./test_suite -d yes
 
 test_suite: $(OBJ)
 	@echo "Linking test suite..."

@@ -27,10 +27,8 @@ template <typename Coercion> class base_column
     template <typename T> base_column(std::initializer_list<T> values);
     template <typename T> base_column(const T& value, std::size_t size);
 
-    template <typename Range, typename T = typename range_traits<Range>::value_type>
-    base_column(const std::string& name, const Range& range);
-    template <typename Range, typename T = typename range_traits<Range>::value_type>
-    base_column(const Range& range);
+    template <typename Range> base_column(const std::string& name, const Range& range);
+    template <typename Range> base_column(const Range& range);
 
     base_column(const base_column& source);
     base_column(base_column&& source) = default;

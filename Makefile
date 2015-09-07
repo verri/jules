@@ -1,6 +1,6 @@
 SRC = $(shell find include test -iname \*.[ch]pp)
 
-all: format test
+all: test
 
 test:
 	@$(MAKE) --no-print-directory -C test test

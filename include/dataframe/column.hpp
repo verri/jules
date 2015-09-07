@@ -2,6 +2,7 @@
 #define JULES_DATAFRAME_COLUMN_H
 
 #include "dataframe/column_decl.hpp"
+#include "range/range.hpp"
 
 namespace jules
 {
@@ -41,16 +42,18 @@ base_column<Coercion>::base_column(const std::string& name,
 }
 
 template <typename Coercion>
-template <typename Range, typename T>
+template <typename Range>
 base_column<Coercion>::base_column(const std::string& name, const Range& range)
-    : name_{name}, column_model_{new column_model_t<T>(std::begin(range), std::end(range))}
+    : name_{name}, column_model_{new column_model_t<typename range_value<Range>::type>(
+                       std::begin(range), std::end(range))}
 {
 }
 
 template <typename Coercion>
-template <typename Range, typename T>
+template <typename Range>
 base_column<Coercion>::base_column(const Range& range)
-    : column_model_{new column_model_t<T>(std::begin(range), std::end(range))}
+    : column_model_{
+          new column_model_t<typename range_value<Range>::type>(std::begin(range), std::end(range))}
 {
 }
 
@@ -76,7 +79,7 @@ template <typename Coercion> template <typename T> auto base_column<Coercion>::c
 
 template <typename T, typename Coercion> base_column<Coercion> coerce_to(const base_column<Coercion>& source)
 {
-    return base_column<Coercion>{source.name(), source.column_model_->template coerce_to<T>()};
+    return {source.name(), source.column_model_->template coerce_to<T>()};
 }
 
 template <typename T, typename Coercion> bool can_coerce_to(const base_column<Coercion>& column)
