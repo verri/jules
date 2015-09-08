@@ -10,6 +10,7 @@
 using namespace jules;
 
 constexpr auto FEATURES = {"Sepal.Length", "Sepal.Width", "Petal.Length", "Petal.Width"};
+constexpr auto CLASSES = {"setosa", "versicolor", "virginica"};
 
 class gaussian_naive_bayes
 {
@@ -34,16 +35,28 @@ class gaussian_naive_bayes
 
         CHECK(all(features, FEATURES));
 
+        auto predictive = make_view<std::string>(response_column); // predictive is an array_view of string
 
-        // auto predictive = make_view<std::string>(response); // predictive is an array_view of string
         // auto features = make_view<all<double>>(terms); // features is an array_view of array_view of double
 
-        // classes = unique(predictive);
+        classes = range::unique(predictive);
 
-        // mu.resize(classes.size());
-        // sigma2.resize(classes.size());
-        // priori.resize(classes.size());
+        CHECK(all(classes, CLASSES));
 
+        mu = sigma2 = matrix<double>(classes.size(), features.size());
+        priori = vector<double>(classes.size());
+
+        CHECK(mu.nrow() == classes.size());
+        CHECK(sigma2.nrow() == classes.size());
+
+        CHECK(mu.ncol() == features.size());
+        CHECK(sigma2.ncol() == features.size());
+
+        CHECK(priori.size() == classes.size());
+
+        for (auto&& class_ : classes | adaptors::indexed()) {
+            // TODO
+        }
         // std::size_t i = 0;
         // for (auto& cl : classes) {
         //     auto ix = predictive == cl;
@@ -56,8 +69,8 @@ class gaussian_naive_bayes
         // }
     }
 
-    // std::string classify(const vector<double>& sample)
-    // {
+    std::string classify(const vector<double>& sample) const
+    {
     //     // if (sample.size() != nfeatures_)
     //     //     throw std::runtime_error{"invalid sample"};
 
@@ -69,14 +82,14 @@ class gaussian_naive_bayes
     //     // }
 
     //     // return classes[which_max(posteriori)];
-    // }
+    }
 
   private:
     vector<std::string> features;
     vector<std::string> classes;
 
-    vector<vector<double>> mu;
-    vector<vector<double>> sigma2;
+    matrix<double> mu;
+    matrix<double> sigma2;
     vector<double> priori;
 };
 

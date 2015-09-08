@@ -11,13 +11,21 @@ template <typename T, typename Coercion> class base_const_column_view
 {
     friend class base_column<Coercion>;
 
-  public:
-    using value_type = T;
-
   private:
     using column_model_t = detail::column_model<T, Coercion>;
 
   public:
+    using value_type = T;
+    using size_type = typename column_model_t::size_type;
+    using difference_type = typename column_model_t::difference_type;
+
+    using reference = typename column_model_t::reference;
+    using const_reference = typename column_model_t::const_reference;
+    using pointer = typename column_model_t::pointer;
+    using const_pointer = typename column_model_t::const_pointer;
+    using iterator = typename column_model_t::iterator;
+    using const_iterator = typename column_model_t::const_iterator;
+
     base_const_column_view(const base_const_column_view& source) = default;
     base_const_column_view(base_const_column_view&& source) = default;
 
@@ -25,6 +33,9 @@ template <typename T, typename Coercion> class base_const_column_view
     base_const_column_view& operator=(base_const_column_view&& source) = default;
 
     const auto& operator[](std::size_t i) const { return column_model_[i]; }
+
+    auto begin() const { return column_model_.begin(); }
+    auto end() const { return column_model_.end(); }
 
   protected:
     base_const_column_view(const column_model_t& column_model);
@@ -34,9 +45,6 @@ template <typename T, typename Coercion> class base_const_column_view
 template <typename T, typename Coercion> class base_column_view : public base_const_column_view<T, Coercion>
 {
     friend class base_column<Coercion>;
-
-  public:
-    using value_type = T;
 
   private:
     using column_model_t = detail::column_model<T, Coercion>;
@@ -48,7 +56,14 @@ template <typename T, typename Coercion> class base_column_view : public base_co
     base_column_view& operator=(const base_column_view& source) = default;
     base_column_view& operator=(base_column_view&& source) = default;
 
+    using base_const_column_view<T, Coercion>::operator[];
     auto& operator[](std::size_t i) { return this->column_model_[i]; }
+
+    auto begin() { return this->column_model_.begin(); }
+    auto end() { return this->column_model_.end(); }
+
+    using base_const_column_view<T, Coercion>::begin;
+    using base_const_column_view<T, Coercion>::end;
 
   private:
     base_column_view(column_model_t& column_model) : base_const_column_view<T, Coercion>(column_model) {}

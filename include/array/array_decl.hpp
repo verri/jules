@@ -19,6 +19,29 @@ template <typename T, std::size_t N> class ndarray : public detail::base_ndarray
     ndarray& operator=(ndarray&& source) = default;
 };
 
+// matrix
+template <typename T> class ndarray<T, 2> : public detail::base_ndarray<T, 2>
+{
+  public:
+    ndarray() = default;
+    explicit ndarray(std::size_t nrow, std::size_t ncol);
+
+    ndarray(const T* data, std::size_t nrow, std::size_t ncol);
+    ndarray(const T& value, std::size_t nrow, std::size_t ncol);
+
+    auto nrow() const { return this->template size<0>(); };
+    auto ncol() const { return this->template size<1>(); };
+
+    ~ndarray() = default;
+
+    ndarray(const ndarray& source) = default;
+    ndarray(ndarray&& source) = default;
+
+    ndarray& operator=(const ndarray& source) = default;
+    ndarray& operator=(ndarray&& source) = default;
+};
+
+// vector
 template <typename T> class ndarray<T, 1> : public detail::base_ndarray<T, 1>
 {
   public:
@@ -38,9 +61,9 @@ template <typename T> class ndarray<T, 1> : public detail::base_ndarray<T, 1>
 
     ndarray& operator=(const ndarray& source) = default;
     ndarray& operator=(ndarray&& source) = default;
-
 };
 
+// scalar
 template <typename T> class ndarray<T, 0>
 {
   public:
