@@ -3,10 +3,13 @@
 #include <array/array.hpp>
 #include <dataframe/dataframe.hpp>
 #include <formula/formula.hpp>
+#include <util/numeric.hpp>
 
 #include <fstream>
 
 using namespace jules;
+
+constexpr auto FEATURES = {"Sepal.Length", "Sepal.Width", "Petal.Length", "Petal.Width"};
 
 class gaussian_naive_bayes
 {
@@ -25,10 +28,12 @@ class gaussian_naive_bayes
         CHECK(terms_dataframe.nrow() == 150);
         CHECK(terms_dataframe.ncol() == 4);
 
-        (void)response_column;
-        (void)terms_dataframe;
+        CHECK(response_column.name() == "Species");
 
         features = terms_dataframe.colnames();
+
+        CHECK(all(features, FEATURES));
+
 
         // auto predictive = make_view<std::string>(response); // predictive is an array_view of string
         // auto features = make_view<all<double>>(terms); // features is an array_view of array_view of double
@@ -80,13 +85,13 @@ TEST_CASE("Naïve Bayes", "[naive]")
     std::ifstream file{"data/iris.csv"};
     const auto iris = dataframe::read(file);
 
-    CHECK(iris.nrow() == 150);
-    CHECK(iris.ncol() == 5);
+    REQUIRE(iris.nrow() == 150);
+    REQUIRE(iris.ncol() == 5);
 
     expr<std::string> species{"Species"};
     expr_list features;
 
-    for (auto&& colname : {"Sepal.Length", "Sepal.Width", "Petal.Length", "Petal.Width"})
+    for (auto&& colname : FEATURES)
         features.insert_right(expr<double>(colname));
 
     gaussian_naive_bayes model(species, features, iris);

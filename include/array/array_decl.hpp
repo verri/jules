@@ -38,11 +38,14 @@ template <typename T> class ndarray<T, 1> : public detail::base_ndarray<T, 1>
 
     ndarray& operator=(const ndarray& source) = default;
     ndarray& operator=(ndarray&& source) = default;
+
 };
 
 template <typename T> class ndarray<T, 0>
 {
   public:
+    using value_type = T;
+
     ndarray() = default;
 
     ndarray(const T& data) : data_{data} {}

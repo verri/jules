@@ -32,6 +32,11 @@ template <typename Coercion> base_dataframe<Coercion>::base_dataframe(std::initi
 
 template <typename Coercion> base_dataframe<Coercion>& base_dataframe<Coercion>::cbind(const column_t& column)
 {
+    return colbind(column);
+}
+
+template <typename Coercion> base_dataframe<Coercion>& base_dataframe<Coercion>::colbind(const column_t& column)
+{
     auto tmp = column;
 
     auto& name = tmp.name();
@@ -56,6 +61,11 @@ template <typename Coercion> base_dataframe<Coercion>& base_dataframe<Coercion>:
 
 template <typename Coercion> base_dataframe<Coercion>& base_dataframe<Coercion>::cbind(column_t&& column)
 {
+    return colbind(std::move(column));
+}
+
+template <typename Coercion> base_dataframe<Coercion>& base_dataframe<Coercion>::colbind(column_t&& column)
+{
     auto& name = column.name();
     if (name.empty())
         name = std::to_string(columns_.size());
@@ -78,8 +88,7 @@ template <typename Coercion> base_dataframe<Coercion>& base_dataframe<Coercion>:
 
 template <typename Coercion> vector<std::string> base_dataframe<Coercion>::colnames() const
 {
-    return vector<std::string>{columns_ | adaptors::transformed([](const auto& col) { return col.name(); }),
-                               {ncol()}};
+    return {columns_ | adaptors::transformed([](const column_t& col) { return col.name(); })};
 }
 
 template <typename Coercion>
@@ -106,6 +115,9 @@ template <typename Coercion>
 base_dataframe<Coercion> base_dataframe<Coercion>::read(std::istream& is,
                                                         const dataframe_storage_options& opt)
 {
+    using namespace adaptors;
+    using namespace range;
+
     if (!is)
         return {};
 
@@ -121,7 +133,6 @@ base_dataframe<Coercion> base_dataframe<Coercion>::read(std::istream& is,
     std::vector<std::sub_match<std::string::iterator>> data;
     std::size_t ncol = 0, nrow = 0;
 
-    using namespace adaptors;
     auto line_range = raw_data | tokenized(eol, -1);
 
     std::size_t size = 0;
@@ -147,7 +158,7 @@ base_dataframe<Coercion> base_dataframe<Coercion>::read(std::istream& is,
 
         base_column<Coercion> col(opt.header ? std::string{data[j].first, data[j].second} : std::string{},
                                   column_data);
-        df.cbind(std::move(col));
+        df.colbind(std::move(col));
     }
     return df;
 }

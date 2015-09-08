@@ -4,6 +4,7 @@
 #include "core/type.hpp"
 #include "dataframe/column_view.hpp"
 #include "dataframe/detail/column.hpp"
+#include "range/range.hpp"
 
 #include <initializer_list>
 #include <memory>
@@ -27,8 +28,11 @@ template <typename Coercion> class base_column
     template <typename T> base_column(std::initializer_list<T> values);
     template <typename T> base_column(const T& value, std::size_t size);
 
-    template <typename Range> base_column(const std::string& name, const Range& range);
-    template <typename Range> base_column(const Range& range);
+    template <typename Range, typename R = typename std::remove_reference<Range>::type::value_type>
+    base_column(const std::string& name, Range&& rng);
+
+    template <typename Range, typename R = typename std::remove_reference<Range>::type::value_type>
+    base_column(Range&& rng);
 
     base_column(const base_column& source);
     base_column(base_column&& source) = default;
@@ -37,11 +41,11 @@ template <typename Coercion> class base_column
     base_column& operator=(base_column&& source) = default;
 
     template <typename T> base_column& coerce_to();
-    template <typename T, typename Coercion_>
-    friend base_column<Coercion_> coerce_to(const base_column<Coercion_>& source);
+    template <typename T, typename C>
+    friend base_column<C> coerce_to(const base_column<C>& source);
 
     template <typename T> bool can_coerce_to() const { return column_model_->template can_coerce_to<T>(); }
-    template <typename T, typename Coercion_> friend bool can_coerce_to(const base_column<Coercion_>& column);
+    template <typename T, typename C> friend bool can_coerce_to(const base_column<C>& column);
 
     std::type_index elements_type() const { return column_model_->elements_type(); }
 
@@ -54,8 +58,8 @@ template <typename Coercion> class base_column
 
     auto size() const { return column_model_->size(); }
 
-    auto& name() { return name_; }
-    const auto& name() const { return name_; }
+    std::string& name() { return name_; }
+    const std::string& name() const { return name_; }
 
   private:
     base_column(const std::string& name, std::unique_ptr<column_interface_t>&& column_model);

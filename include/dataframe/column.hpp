@@ -2,7 +2,6 @@
 #define JULES_DATAFRAME_COLUMN_H
 
 #include "dataframe/column_decl.hpp"
-#include "range/range.hpp"
 
 namespace jules
 {
@@ -42,17 +41,19 @@ base_column<Coercion>::base_column(const std::string& name,
 }
 
 template <typename Coercion>
-template <typename Range>
-base_column<Coercion>::base_column(const std::string& name, const Range& range)
+template <typename Range, typename R>
+base_column<Coercion>::base_column(const std::string& name, Range&& rng)
     : name_{name},
-      column_model_{new column_model_t<typename range_value<Range>::type>(std::begin(range), std::end(range))}
+      column_model_{new column_model_t<R>(range::begin(std::forward<Range>(rng)),
+                                          range::end(std::forward<Range>(rng)))}
 {
 }
 
 template <typename Coercion>
-template <typename Range>
-base_column<Coercion>::base_column(const Range& range)
-    : column_model_{new column_model_t<typename range_value<Range>::type>(std::begin(range), std::end(range))}
+template <typename Range, typename R>
+base_column<Coercion>::base_column(Range&& rng)
+    : column_model_{new column_model_t<R>(range::begin(std::forward<Range>(rng)),
+                                          range::end(std::forward<Range>(rng)))}
 {
 }
 

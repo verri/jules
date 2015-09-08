@@ -11,6 +11,14 @@ namespace detail
 template <typename T, std::size_t N> class base_ndarray
 {
   public:
+    using value_type = typename std::valarray<T>::value_type;
+    using reference = value_type&;
+    using const_reference = const value_type&;
+    using pointer = value_type*;
+    using const_pointer = const value_type*;
+    using iterator = value_type*;
+    using const_iterator = const value_type*;
+
     ~base_ndarray() = default;
 
     base_ndarray(const base_ndarray& source) = default;
@@ -31,6 +39,9 @@ template <typename T, std::size_t N> class base_ndarray
 
     auto begin() { return std::begin(data_); }
     auto end() { return std::end(data_); }
+
+    auto begin() const { return std::begin(data_); }
+    auto end() const { return std::end(data_); }
 
     auto cbegin() const { return std::begin(data_); }
     auto cend() const { return std::end(data_); }

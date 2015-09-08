@@ -16,6 +16,8 @@ using boost::make_iterator_range;
 using boost::copy;
 using boost::range_value;
 using boost::size;
+using boost::begin;
+using boost::end;
 } // namespace range
 
 namespace adaptors

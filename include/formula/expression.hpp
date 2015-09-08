@@ -166,7 +166,7 @@ auto base_expr_list<Coercion>::extract_from(const dataframe_t& data) const -> da
 {
     dataframe_t df;
     for (auto&& expr : expressions_)
-        df.cbind(expr.extract_from(data));
+        df.colbind(expr.extract_from(data));
     return df;
 }
 

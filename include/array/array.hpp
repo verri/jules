@@ -16,7 +16,10 @@ template <typename Range, typename R>
 ndarray<T, 1>::ndarray(Range&& rng)
     : detail::base_ndarray<T, 1>(std::array<std::size_t, 1>{{static_cast<std::size_t>(range::size(rng))}})
 {
-    range::copy(rng, std::begin(this->data_));
+    static_assert(std::is_assignable<T&, R>::value, "invalid values type");
+    if (this->data_.size() != range::size(rng))
+        throw std::runtime_error{"data is not initialized"};
+    range::copy(std::forward<Range>(rng), std::begin(this->data_));
 }
 
 template <typename T>

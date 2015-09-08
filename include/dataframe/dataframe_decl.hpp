@@ -36,6 +36,9 @@ template <typename Coercion> class base_dataframe
     [[deprecated("use colbind")]] base_dataframe& cbind(const column_t& column);
     [[deprecated("use colbind")]] base_dataframe& cbind(column_t&& column);
 
+    base_dataframe& colbind(const column_t& column);
+    base_dataframe& colbind(column_t&& column);
+
     vector<std::string> colnames() const;
 
     const column_t& select(std::size_t i) const { return columns_.at(i); }
