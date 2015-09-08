@@ -1,69 +1,63 @@
 #ifndef JULES_ARRAY_ARRAY_DECL_H
 #define JULES_ARRAY_ARRAY_DECL_H
 
-#include "core/type.hpp"
-
-#include <array>
-#include <valarray>
+#include <array/detail/array.hpp>
 
 namespace jules
 {
-template <typename T, std::size_t N> class array
+template <typename T, std::size_t N> class ndarray : public detail::base_ndarray<T, N>
 {
   public:
-    array() = default;
+    ndarray() = default;
+    ~ndarray() = default;
 
-    explicit array(const std::array<std::size_t, N>& dim);
+    ndarray(const ndarray& source) = default;
+    ndarray(ndarray&& source) = default;
 
-    explicit array(const T* data, const std::array<std::size_t, N>& dim);
-    template <typename Range, typename R = typename range_traits<Range>::value_type>
-    explicit array(Range&& range, const std::array<std::size_t, N>& dim);
-
-    ~array() = default;
-
-    array(const array& source) = default;
-    array(array&& source) = default;
-
-    array& operator=(const array& source) = default;
-    array& operator=(array&& source) = default;
-
-    std::size_t size() const { return data_.size(); }
-    std::size_t size(std::size_t i) const { return dim_.at(i); }
-
-    // XXX
-    // std::enable_if_t<N==1, std::size_t> length() const { return size(); }
-    // std::enable_if_t<N>=2, std::size_t> nrow() const { return size(0); }
-    // std::enable_if_t<N>=2, std::size_t> ncol() const { return size(1); }
-
-    T* data() { return data_.data(); }
-    const T* data() const { return data_.data(); }
-
-  private:
-    std::array<std::size_t, N> dim_;
-    std::valarray<T> data_;
+    ndarray& operator=(const ndarray& source) = default;
+    ndarray& operator=(ndarray&& source) = default;
 };
 
-template <typename T> class array<T, 0>
+template <typename T> class ndarray<T, 1> : public detail::base_ndarray<T, 1>
 {
   public:
-    array() = default;
+    ndarray() = default;
+    explicit ndarray(std::size_t size);
 
-    array(const T& data) : data_{data} {}
-    array(T&& data) : data_{std::move(data)} {}
+    explicit ndarray(const T* data, std::size_t size);
+    explicit ndarray(const T& data, std::size_t size);
+    template <typename Range> explicit ndarray(Range&& range, std::size_t size);
 
-    ~array() = default;
+    ~ndarray() = default;
 
-    array(const array& source) = default;
-    array(array&& source) = default;
+    ndarray(const ndarray& source) = default;
+    ndarray(ndarray&& source) = default;
 
-    array& operator=(const array& source) = default;
-    array& operator=(array&& source) = default;
+    ndarray& operator=(const ndarray& source) = default;
+    ndarray& operator=(ndarray&& source) = default;
+};
 
-    array& operator=(const T& source) { data_ = source; }
-    array& operator=(T&& source) { data_ = std::move(source); }
+template <typename T> class ndarray<T, 0>
+{
+  public:
+    ndarray() = default;
+
+    ndarray(const T& data) : data_{data} {}
+    ndarray(T&& data) : data_{std::move(data)} {}
+
+    ~ndarray() = default;
+
+    ndarray(const ndarray& source) = default;
+    ndarray(ndarray&& source) = default;
+
+    ndarray& operator=(const ndarray& source) = default;
+    ndarray& operator=(ndarray&& source) = default;
+
+    ndarray& operator=(const T& source) { data_ = source; }
+    ndarray& operator=(T&& source) { data_ = std::move(source); }
 
     operator T&() { return data_; }
-    operator const T&() { return data_; }
+    operator const T&() const { return data_; }
 
     constexpr std::size_t size() const { return 0; }
 
@@ -74,9 +68,9 @@ template <typename T> class array<T, 0>
     T data_;
 };
 
-template <typename T> using matrix = array<T, 2>;
-template <typename T> using vector = array<T, 1>;
-template <typename T> using scalar = array<T, 0>;
+template <typename T> using matrix = ndarray<T, 2>;
+template <typename T> using vector = ndarray<T, 1>;
+template <typename T> using scalar = ndarray<T, 0>;
 
 } // namespace jules
 

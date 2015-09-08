@@ -76,6 +76,12 @@ template <typename Coercion> base_dataframe<Coercion>& base_dataframe<Coercion>:
     return *this;
 }
 
+template <typename Coercion> vector<std::string> base_dataframe<Coercion>::colnames() const
+{
+    return vector<std::string>{columns_ | adaptors::transformed([](const auto& col) { return col.name(); }),
+                               {ncol()}};
+}
+
 template <typename Coercion>
 auto base_dataframe<Coercion>::select(const std::string& name) const -> const column_t &
 {

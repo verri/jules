@@ -1,6 +1,6 @@
 SUFFIXES += .d
 
-SRC = dataframe/column.cpp dataframe/dataframe.cpp dataframe/column_detail.cpp tutorial/naive.cpp
+SRC = array/array.cpp #dataframe/column.cpp dataframe/dataframe.cpp dataframe/column_detail.cpp tutorial/naive.cpp
 OBJ := $(SRC:.cpp=.o) test_suite.o
 DEP := $(SRC:.cpp=.d) test_suite.d
 

@@ -8,7 +8,6 @@ namespace jules
 struct dataframe_storage_options {
     std::string separator;
     std::string eol;
-    ;
     bool header;
 };
 }

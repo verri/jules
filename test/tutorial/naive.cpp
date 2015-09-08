@@ -19,10 +19,16 @@ class gaussian_naive_bayes
         static_assert(std::is_same<decltype(response_column), column>::value, "?");
         static_assert(std::is_same<decltype(terms_dataframe), dataframe>::value, "?");
 
+        CHECK(response_column.size() == 150);
+        CHECK(response_column.elements_type() == typeid(std::string));
+
+        CHECK(terms_dataframe.nrow() == 150);
+        CHECK(terms_dataframe.ncol() == 4);
+
         (void)response_column;
         (void)terms_dataframe;
 
-        // features = terms.colnames();
+        features = terms_dataframe.colnames();
 
         // auto predictive = make_view<std::string>(response); // predictive is an array_view of string
         // auto features = make_view<all<double>>(terms); // features is an array_view of array_view of double
