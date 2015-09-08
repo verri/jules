@@ -11,6 +11,9 @@ template <typename T, typename Coercion> class base_const_column_view
 {
     friend class base_column<Coercion>;
 
+  public:
+    using value_type = T;
+
   private:
     using column_model_t = detail::column_model<T, Coercion>;
 
@@ -31,6 +34,9 @@ template <typename T, typename Coercion> class base_const_column_view
 template <typename T, typename Coercion> class base_column_view : public base_const_column_view<T, Coercion>
 {
     friend class base_column<Coercion>;
+
+  public:
+    using value_type = T;
 
   private:
     using column_model_t = detail::column_model<T, Coercion>;

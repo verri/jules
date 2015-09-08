@@ -2,6 +2,7 @@
 #define JULES_ARRAY_ARRAY_DECL_H
 
 #include <array/detail/array.hpp>
+#include "range/range.hpp"
 
 namespace jules
 {
@@ -24,9 +25,11 @@ template <typename T> class ndarray<T, 1> : public detail::base_ndarray<T, 1>
     ndarray() = default;
     explicit ndarray(std::size_t size);
 
-    explicit ndarray(const T* data, std::size_t size);
-    explicit ndarray(const T& data, std::size_t size);
-    template <typename Range> explicit ndarray(Range&& range, std::size_t size);
+    ndarray(const T* data, std::size_t size);
+    ndarray(const T& value, std::size_t size);
+
+    template <typename Range, typename R = typename std::remove_reference<Range>::type::value_type>
+    ndarray(Range&& rng);
 
     ~ndarray() = default;
 

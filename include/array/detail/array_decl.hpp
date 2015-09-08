@@ -11,15 +11,6 @@ namespace detail
 template <typename T, std::size_t N> class base_ndarray
 {
   public:
-    base_ndarray() = default;
-
-    explicit base_ndarray(const std::array<std::size_t, N>& dim);
-
-    explicit base_ndarray(const T* data, const std::array<std::size_t, N>& dim);
-    explicit base_ndarray(const T& value, const std::array<std::size_t, N>& dim);
-    template <typename Range>
-    explicit base_ndarray(Range&& range, const std::array<std::size_t, N>& dim);
-
     ~base_ndarray() = default;
 
     base_ndarray(const base_ndarray& source) = default;
@@ -29,7 +20,8 @@ template <typename T, std::size_t N> class base_ndarray
     base_ndarray& operator=(base_ndarray&& source) = default;
 
     std::size_t size() const { return data_.size(); }
-    template <std::size_t i> std::size_t size() const {
+    template <std::size_t i> std::size_t size() const
+    {
         static_assert(i < N, "invalid dimension");
         return dim_.at(i);
     }
@@ -44,6 +36,11 @@ template <typename T, std::size_t N> class base_ndarray
     auto cend() const { return std::end(data_); }
 
   protected:
+    base_ndarray() = default;
+    template <typename... Args> base_ndarray(const std::array<std::size_t, N>& dim, Args&&... args);
+    base_ndarray(const std::array<std::size_t, N>& dim);
+    // TODO: initializer list constructor: see implementation in Stroustrup's book.
+
     std::array<std::size_t, N> dim_;
     std::valarray<T> data_;
 };

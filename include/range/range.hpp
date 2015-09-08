@@ -10,9 +10,13 @@
 
 namespace jules
 {
+namespace range
+{
 using boost::make_iterator_range;
 using boost::copy;
 using boost::range_value;
+using boost::size;
+} // namespace range
 
 namespace adaptors
 {
