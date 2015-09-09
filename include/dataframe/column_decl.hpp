@@ -41,8 +41,7 @@ template <typename Coercion> class base_column
     base_column& operator=(base_column&& source) = default;
 
     template <typename T> base_column& coerce_to();
-    template <typename T, typename C>
-    friend base_column<C> coerce_to(const base_column<C>& source);
+    template <typename T, typename C> friend base_column<C> coerce_to(const base_column<C>& source);
 
     template <typename T> bool can_coerce_to() const { return column_model_->template can_coerce_to<T>(); }
     template <typename T, typename C> friend bool can_coerce_to(const base_column<C>& column);

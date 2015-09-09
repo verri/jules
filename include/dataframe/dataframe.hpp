@@ -35,7 +35,8 @@ template <typename Coercion> base_dataframe<Coercion>& base_dataframe<Coercion>:
     return colbind(column);
 }
 
-template <typename Coercion> base_dataframe<Coercion>& base_dataframe<Coercion>::colbind(const column_t& column)
+template <typename Coercion>
+base_dataframe<Coercion>& base_dataframe<Coercion>::colbind(const column_t& column)
 {
     auto tmp = column;
 
@@ -197,6 +198,30 @@ void base_dataframe<Coercion>::write(const base_dataframe<Coercion>& df, std::os
             os << opt.separator << data[j][i];
         os << opt.eol;
     }
+}
+
+template <typename Coercion>
+template <typename T>
+base_const_dataframe_colview<T, Coercion> base_dataframe<Coercion>::colview() const
+{
+    return {columns_};
+}
+
+template <typename Coercion>
+template <typename T>
+base_dataframe_colview<T, Coercion> base_dataframe<Coercion>::colview()
+{
+    return {columns_};
+}
+
+template <typename T, typename C> base_const_dataframe_colview<T, C> make_colview(const base_dataframe<C>& df)
+{
+    return df.template colview<T>();
+}
+
+template <typename T, typename C> base_dataframe_colview<T, C> make_colview(base_dataframe<C>& df)
+{
+    return df.template colview<T>();
 }
 
 } // namespace jules

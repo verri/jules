@@ -3,6 +3,7 @@
 
 #include "array/array.hpp"
 #include "dataframe/column.hpp"
+#include "dataframe/dataframe_colview.hpp"
 #include "dataframe/io_decl.hpp"
 #include "formula/expression_decl.hpp"
 
@@ -56,6 +57,13 @@ template <typename Coercion> class base_dataframe
                                const dataframe_storage_options& opt = {R"(\t)", R"(\n)", true});
     static void write(const base_dataframe& df, std::ostream& os,
                       const dataframe_storage_options& opt = {"\t", "\n", true});
+
+    template <typename T> base_const_dataframe_colview<T, Coercion> colview() const;
+    template <typename T> base_dataframe_colview<T, Coercion> colview();
+
+    template <typename T, typename C>
+    friend base_const_dataframe_colview<T, C> make_colview(const base_dataframe<C>& df);
+    template <typename T, typename C> friend base_dataframe_colview<T, C> make_colview(base_dataframe<C>& df);
 
   private:
     std::size_t nrow_;

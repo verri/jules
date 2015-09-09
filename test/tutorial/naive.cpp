@@ -35,11 +35,10 @@ class gaussian_naive_bayes
 
         CHECK(all(features, FEATURES));
 
-        auto predictive = make_view<std::string>(response_column); // predictive is an array_view of string
+        auto y = make_view<std::string>(response_column);
+        auto X = make_colview<double>(terms_dataframe);
 
-        // auto features = make_view<all<double>>(terms); // features is an array_view of array_view of double
-
-        classes = range::unique(predictive);
+        classes = range::unique(y);
 
         CHECK(all(classes, CLASSES));
 
@@ -71,17 +70,17 @@ class gaussian_naive_bayes
 
     std::string classify(const vector<double>& sample) const
     {
-    //     // if (sample.size() != nfeatures_)
-    //     //     throw std::runtime_error{"invalid sample"};
+        //     // if (sample.size() != nfeatures_)
+        //     //     throw std::runtime_error{"invalid sample"};
 
-    //     // vector<double> log_posteriori(classes.size());
+        //     // vector<double> log_posteriori(classes.size());
 
-    //     // for (auto i : range(classes.size())) {
-    //     //     auto likelihood = exp(-pow(sample - mu) / (2 * sigma2)) / sqrt(2 * k::pi * sigma2);
-    //     //     log_posteriori[i] = sum(log(likelihood)) + log(priori[i]);
-    //     // }
+        //     // for (auto i : range(classes.size())) {
+        //     //     auto likelihood = exp(-pow(sample - mu) / (2 * sigma2)) / sqrt(2 * k::pi * sigma2);
+        //     //     log_posteriori[i] = sum(log(likelihood)) + log(priori[i]);
+        //     // }
 
-    //     // return classes[which_max(posteriori)];
+        //     // return classes[which_max(posteriori)];
     }
 
   private:

@@ -14,14 +14,16 @@ template <typename Range, typename R = typename std::remove_reference<Range>::ty
 auto prod(Range&& rng)
 {
     static_assert(std::is_arithmetic<R>::value, "value type must be arithmetic");
-    return std::accumulate(range::begin(std::forward<Range>(rng)), range::end(std::forward<Range>(rng)), 1, std::multiplies<R>{});
+    return std::accumulate(range::begin(std::forward<Range>(rng)), range::end(std::forward<Range>(rng)), 1,
+                           std::multiplies<R>{});
 }
 
 template <typename Range, typename R = typename std::remove_reference<Range>::type::value_type>
 auto all(Range&& rng)
 {
     static_assert(std::is_convertible<R, bool>::value, "value type must be convertible to boolean");
-    return std::accumulate(range::begin(std::forward<Range>(rng)), range::end(std::forward<Range>(rng)), true, [](auto&& acc, auto&& value) { return acc && value; });
+    return std::accumulate(range::begin(std::forward<Range>(rng)), range::end(std::forward<Range>(rng)), true,
+                           [](auto&& acc, auto&& value) { return acc && value; });
 }
 
 template <typename Range1, typename R1 = typename std::remove_reference<Range1>::type::value_type,
@@ -33,8 +35,7 @@ auto all(Range1&& rng1, Range2&& rng2)
     auto rng1_end = range::end(std::forward<Range1>(rng1));
     auto rng2_end = range::end(std::forward<Range2>(rng2));
 
-    auto result = std::mismatch(rng1_begin, rng1_end,
-                                rng2_begin, rng2_end);
+    auto result = std::mismatch(rng1_begin, rng1_end, rng2_begin, rng2_end);
 
     return result.first == rng1_end && result.second == rng2_end;
 }
@@ -49,8 +50,7 @@ auto all(Range1&& rng1, Range2&& rng2, BinaryPredicate p)
     auto rng1_end = range::end(std::forward<Range1>(rng1));
     auto rng2_end = range::end(std::forward<Range2>(rng2));
 
-    auto result = std::mismatch(rng1_begin, rng1_end,
-                                rng2_begin, rng2_end, p);
+    auto result = std::mismatch(rng1_begin, rng1_end, rng2_begin, rng2_end, p);
 
     return result.first == rng1_end && result.second == rng2_end;
 }
