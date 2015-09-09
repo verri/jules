@@ -1,13 +1,21 @@
 #ifndef JULES_ARRAY_DETAIL_ARRAY_DECL_H
 #define JULES_ARRAY_DETAIL_ARRAY_DECL_H
 
-#include <array>
 #include <valarray>
 
 namespace jules
 {
 namespace detail
 {
+template <typename Type, typename... Types> struct all_size_helper : public std::false_type {};
+template <typename... Types> struct all_size_helper<std::size_t, Types...> : public all_size_helper<Types...> {};
+template <> struct all_size_helper<std::size_t> : public std::true_type {};
+template <typename... Types> using all_size_t = std::enable_if_t<all_size_helper<Types...>::value>;
+
+
+template <std::size_t N> class base_slice {};
+template <typename T, std::size_t N> class base_ref_ndarray {};
+
 template <typename T, std::size_t N> class base_ndarray
 {
   public:
@@ -19,7 +27,19 @@ template <typename T, std::size_t N> class base_ndarray
     using iterator = value_type*;
     using const_iterator = const value_type*;
 
+    static constexpr auto order = N;
+
+    base_ndarray() = default;
     ~base_ndarray() = default;
+
+    template <typename... Dims, typename E = all_size_t<Dims...>>
+    explicit base_ndarray(Dims... dims);
+
+    template <typename... Dims, typename E = all_size_t<Dims...>>
+    base_ndarray(const T& value, Dims... dims);
+
+    template <typename... Dims, typename E = all_size_t<Dims...>>
+    base_ndarray(const T* data, Dims... dims);
 
     base_ndarray(const base_ndarray& source) = default;
     base_ndarray(base_ndarray&& source) = default;
@@ -27,12 +47,9 @@ template <typename T, std::size_t N> class base_ndarray
     base_ndarray& operator=(const base_ndarray& source) = default;
     base_ndarray& operator=(base_ndarray&& source) = default;
 
-    std::size_t size() const { return data_.size(); }
-    template <std::size_t i> std::size_t size() const
-    {
-        static_assert(i < N, "invalid dimension");
-        return dim_.at(i);
-    }
+    // std::size_t size() const { return data_.size(); }
+    // std::size_t size(std::size_t i) const { return dim_.at(i); }
+    // template <std::size_t i> [[deprecated]] std::size_t size() const;
 
     T* data() { return data_.data(); }
     const T* data() const { return data_.data(); }
@@ -46,22 +63,8 @@ template <typename T, std::size_t N> class base_ndarray
     auto cbegin() const { return std::begin(data_); }
     auto cend() const { return std::end(data_); }
 
-    template <typename R, typename S, std::size_t M>
-    friend base_ndarray<bool, M> operator==(const base_ndarray<R, M>& lhs, const base_ndarray<S, M>& rhs);
-
-    template <typename R, typename S, std::size_t M>
-    friend base_ndarray<bool, M> operator==(const base_ndarray<R, M>& lhs, const S& rhs);
-
-    template <typename R, typename S, std::size_t M>
-    friend base_ndarray<bool, M> operator==(const R& lhs, const base_ndarray<S, M>& rhs);
-
   protected:
-    base_ndarray() = default;
-    template <typename... Args> base_ndarray(const std::array<std::size_t, N>& dim, Args&&... args);
-    base_ndarray(const std::array<std::size_t, N>& dim);
-    // TODO: initializer list constructor: see implementation in Stroustrup's book.
-
-    std::array<std::size_t, N> dim_;
+    base_slice<N> descriptor_;
     std::valarray<T> data_;
 };
 
