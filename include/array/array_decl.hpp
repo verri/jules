@@ -39,6 +39,9 @@ template <typename T> class ndarray<T, 2> : public detail::base_ndarray<T, 2>
 
     ndarray& operator=(const ndarray& source) = default;
     ndarray& operator=(ndarray&& source) = default;
+
+    ndarray(const detail::base_ndarray<T, 2>& source) : detail::base_ndarray<T, 2>(source) {}
+    ndarray(detail::base_ndarray<T, 2>&& source) : detail::base_ndarray<T, 2>(std::move(source)) {}
 };
 
 // vector

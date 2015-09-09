@@ -46,6 +46,15 @@ template <typename T, std::size_t N> class base_ndarray
     auto cbegin() const { return std::begin(data_); }
     auto cend() const { return std::end(data_); }
 
+    template <typename R, typename S, std::size_t M>
+    friend base_ndarray<bool, M> operator==(const base_ndarray<R, M>& lhs, const base_ndarray<S, M>& rhs);
+
+    template <typename R, typename S, std::size_t M>
+    friend base_ndarray<bool, M> operator==(const base_ndarray<R, M>& lhs, const S& rhs);
+
+    template <typename R, typename S, std::size_t M>
+    friend base_ndarray<bool, M> operator==(const R& lhs, const base_ndarray<S, M>& rhs);
+
   protected:
     base_ndarray() = default;
     template <typename... Args> base_ndarray(const std::array<std::size_t, N>& dim, Args&&... args);

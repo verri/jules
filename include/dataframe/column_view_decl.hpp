@@ -1,6 +1,7 @@
 #ifndef JULES_DATAFRAME_COLUMN_VIEW_DECL_H
 #define JULES_DATAFRAME_COLUMN_VIEW_DECL_H
 
+#include "array/array.hpp"
 #include "dataframe/detail/column.hpp"
 
 namespace jules
@@ -36,6 +37,17 @@ template <typename T, typename Coercion> class base_const_column_view
 
     auto begin() const { return column_model_.begin(); }
     auto end() const { return column_model_.end(); }
+
+    template <typename R, typename S, typename C>
+    friend vector<bool> operator==(const base_const_column_view<R, C>& lhs, const base_const_column_view<S, C>& rhs);
+
+    template <typename R, typename S, typename C>
+    friend vector<bool> operator==(const R& lhs, const base_const_column_view<T, C>& rhs);
+
+    template <typename R, typename S, typename C>
+    friend vector<bool> operator==(const base_const_column_view<R, C>& lhs, const S& rhs);
+
+    auto size() const { return column_model_.size(); }
 
   protected:
     base_const_column_view(const column_model_t& column_model);
