@@ -1,19 +1,40 @@
 #ifndef JULES_ARRAY_DETAIL_ARRAY_DECL_H
 #define JULES_ARRAY_DETAIL_ARRAY_DECL_H
 
+#include <array>
 #include <valarray>
 
 namespace jules
 {
 namespace detail
 {
-template <typename Type, typename... Types> struct all_size_helper : public std::false_type {};
-template <typename... Types> struct all_size_helper<std::size_t, Types...> : public all_size_helper<Types...> {};
-template <> struct all_size_helper<std::size_t> : public std::true_type {};
-template <typename... Types> using all_size_t = std::enable_if_t<all_size_helper<Types...>::value>;
+template <typename... Tail> constexpr bool all(bool head, Tail... tail) { return head && all(tail...); }
+constexpr bool all() { return true; }
+template <typename... Types> using all_size_t = std::enable_if_t<All(std::is_convertible<Types, std::size_t>::value...)>;
 
+template <std::size_t N> class base_slice
+{
+  public:
+    base_slice() = default;
 
-template <std::size_t N> class base_slice {};
+    base_slice(std::size_t start, std::initializer_list<std::size_t> extents);
+    base_slice(std::size_t start, std::initializer_list<std::size_t> extents, std::initializer_list<std::size_t> strides);
+
+    base_slice(const base_slice& source) = default;
+    base_slice(base_slice&& source) = default;
+
+    base_slice& operator=(const base_slice& source) = default;
+    base_slice& operator=(base_slice&& source) = default;
+
+    template <typename... Dims, typename = all_size_t<Dims...>>
+    std::size_t operator()(Dims... dims) const;
+
+  private:
+    std::size_t start_;
+    std::array<std::size_t, N> extents_;
+    std::array<std::size_t, N> strides_;
+};
+
 template <typename T, std::size_t N> class base_ref_ndarray {};
 
 template <typename T, std::size_t N> class base_ndarray
@@ -32,10 +53,10 @@ template <typename T, std::size_t N> class base_ndarray
     base_ndarray() = default;
     ~base_ndarray() = default;
 
-    template <typename... Dims, typename E = all_size_t<Dims...>>
+    template <typename... Dims, typename = all_size_t<Dims...>>
     explicit base_ndarray(Dims... dims);
 
-    template <typename... Dims, typename E = all_size_t<Dims...>>
+    template <typename... Dims, typename = all_size_t<Dims...>>
     base_ndarray(const T& value, Dims... dims);
 
     template <typename... Dims, typename E = all_size_t<Dims...>>
