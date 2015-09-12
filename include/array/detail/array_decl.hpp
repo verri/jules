@@ -10,7 +10,11 @@ namespace detail
 {
 template <typename... Tail> constexpr bool all(bool head, Tail... tail) { return head && all(tail...); }
 constexpr bool all() { return true; }
-template <typename... Types> using all_size_t = std::enable_if_t<All(std::is_convertible<Types, std::size_t>::value...)>;
+template <typename... Types>
+using all_size_enabler = std::enable_if_t<All(std::is_convertible<Types, std::size_t>::value...)>;
+
+template <typename Range, typename R, typename T = void>
+using check_range_t = std::enable_if_t<std::is_same<std::remove_reference<Range>::type::value_type, R>, T>;
 
 template <std::size_t N> class base_slice
 {
@@ -18,7 +22,8 @@ template <std::size_t N> class base_slice
     base_slice() = default;
 
     base_slice(std::size_t start, std::initializer_list<std::size_t> extents);
-    base_slice(std::size_t start, std::initializer_list<std::size_t> extents, std::initializer_list<std::size_t> strides);
+    base_slice(std::size_t start, std::initializer_list<std::size_t> extents,
+               std::initializer_list<std::size_t> strides);
 
     base_slice(const base_slice& source) = default;
     base_slice(base_slice&& source) = default;
@@ -26,7 +31,7 @@ template <std::size_t N> class base_slice
     base_slice& operator=(const base_slice& source) = default;
     base_slice& operator=(base_slice&& source) = default;
 
-    template <typename... Dims, typename = all_size_t<Dims...>>
+    template <typename... Dims, typename = all_size_enabler<Dims...>>
     std::size_t operator()(Dims... dims) const;
 
   private:
@@ -35,31 +40,63 @@ template <std::size_t N> class base_slice
     std::array<std::size_t, N> strides_;
 };
 
-template <typename T, std::size_t N> class base_ref_ndarray {};
+template <typename T, std::size_t N, std::size_t M> class mask_ndarray
+{
+    static_assert(M < N, "invalid mask array.");
+};
 
-template <typename T, std::size_t N> class base_ndarray
+template <typename T, std::size_t N, std::size_t M> class indirect_ndarray
+{
+    static_assert(M < N, "invalid mask array.");
+};
+
+template <typename T, std::size_t N> class ref_ndarray
 {
   public:
     using value_type = typename std::valarray<T>::value_type;
-    using reference = value_type&;
-    using const_reference = const value_type&;
-    using pointer = value_type*;
-    using const_pointer = const value_type*;
-    using iterator = value_type*;
-    using const_iterator = const value_type*;
-
     static constexpr auto order = N;
 
+    ref_ndarray() = delete;
+    ~ref_ndarray() = default;
+
+    ref_ndarray(const ref_ndarray& source) = delete;
+    ref_ndarray(ref_ndarray&& source) = delete;
+
+    ref_ndarray& operator=(const ref_ndarray& source) = delete;
+    ref_ndarray& operator=(ref_ndarray&& source) = delete;
+
+    ref_ndarray<T, N - 1> operator[](std::size_t i);
+    ref_ndarray<const T, N - 1> operator[](std::size_t i) const;
+
+    template <typename Range>
+    check_range_t<Range, bool, mask_ndarray<T, N, N - 1>> operator[](const Range& mask);
+    template <typename Range>
+    check_range_t<Range, bool, mask_ndarray<const T, N, N - 1>> operator[](const Range& mask) const;
+
+    template <typename Range>
+    check_range_t<Range, std::size_t, indirect_ndarray<T, N, N - 1>> operator[](const Range& indexes);
+    template <typename Range>
+    check_range_t<Range, std::size_t, indirect_ndarray<const T, N, N - 1>> operator[](const Range& indexes) const;
+
+  protected:
+    ref_ndarray(T* data, const descriptor_& descriptor) : data_{data}, descriptor_{descriptor} {}
+
+  private:
+    T* data_;
+    slice<N> descriptor_;
+};
+
+template <typename T, std::size_t N> class base_ndarray : public ref_ndarray<T, N>
+{
     base_ndarray() = default;
     ~base_ndarray() = default;
 
-    template <typename... Dims, typename = all_size_t<Dims...>>
-    explicit base_ndarray(Dims... dims);
+    template <typename... Dims, typename = all_size_enabler<Dims...>> explicit base_ndarray(Dims... dims);
 
-    template <typename... Dims, typename = all_size_t<Dims...>>
+    template <typename... Dims, typename = all_size_enabler<Dims...>>
     base_ndarray(const T& value, Dims... dims);
 
-    template <typename... Dims, typename E = all_size_t<Dims...>>
+    template <typename... Dims, typename E = all_size_enabler<Dims...>>
     base_ndarray(const T* data, Dims... dims);
 
     base_ndarray(const base_ndarray& source) = default;
