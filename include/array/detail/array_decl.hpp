@@ -40,14 +40,8 @@ template <std::size_t N> class base_slice
     std::array<std::size_t, N> strides_;
 };
 
-template <typename T, std::size_t N, std::size_t M> class mask_ndarray
+template <typename T, std::size_t N> class indirect_ndarray
 {
-    static_assert(M < N, "invalid mask array.");
-};
-
-template <typename T, std::size_t N, std::size_t M> class indirect_ndarray
-{
-    static_assert(M < N, "invalid mask array.");
 };
 
 template <typename T, std::size_t N> class ref_ndarray
@@ -68,15 +62,9 @@ template <typename T, std::size_t N> class ref_ndarray
     ref_ndarray<T, N - 1> operator[](std::size_t i);
     ref_ndarray<const T, N - 1> operator[](std::size_t i) const;
 
-    template <typename Range>
-    check_range_t<Range, bool, mask_ndarray<T, N, N - 1>> operator[](const Range& mask);
-    template <typename Range>
-    check_range_t<Range, bool, mask_ndarray<const T, N, N - 1>> operator[](const Range& mask) const;
+    template <typename... Args> indirect_request<indirect_ndarray<T, N>, Args...> operator()(Args...&& args);
+    template <typename... Args> slice_request<ref_ndarray<T, N>, Args...> operator()(Args...&& args);
 
-    template <typename Range>
-    check_range_t<Range, std::size_t, indirect_ndarray<T, N, N - 1>> operator[](const Range& indexes);
-    template <typename Range>
-    check_range_t<Range, std::size_t, indirect_ndarray<const T, N, N - 1>> operator[](const Range& indexes) const;
 
   protected:
     ref_ndarray(T* data, const descriptor_& descriptor) : data_{data}, descriptor_{descriptor} {}
