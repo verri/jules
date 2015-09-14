@@ -14,10 +14,12 @@ template <typename... Types>
 using all_size_enabler = std::enable_if_t<All(std::is_convertible<Types, std::size_t>::value...)>;
 
 template <typename Range, typename R, typename T = void>
-using check_range_t = std::enable_if_t<std::is_same<std::remove_reference<Range>::type::value_type, R>, T>;
+using check_range_t = std::enable_if_t<std::is_same<typename std::remove_reference<Range>::type::value_type, R>::value, T>;
 
 template <std::size_t N> class base_slice
 {
+    static_assert(N > 0, "invalid slice dimension");
+
   public:
     base_slice() = default;
 
@@ -62,16 +64,20 @@ template <typename T, std::size_t N> class ref_ndarray
     ref_ndarray<T, N - 1> operator[](std::size_t i);
     ref_ndarray<const T, N - 1> operator[](std::size_t i) const;
 
-    template <typename... Args> indirect_request<indirect_ndarray<T, N>, Args...> operator()(Args...&& args);
-    template <typename... Args> slice_request<ref_ndarray<T, N>, Args...> operator()(Args...&& args);
+    // template <typename... Args> indirect_request<indirect_ndarray<T, N>, Args...> operator()(Args...&& args);
+    // template <typename... Args> slice_request<ref_ndarray<T, N>, Args...> operator()(Args...&& args);
+    // template <typename... Args> element_request<T&, Args...> operator()(Args...&& args);
 
+    // template <typename... Args> indirect_request<indirect_ndarray<const T, N>, Args...> operator()(Args...&& args) const;
+    // template <typename... Args> slice_request<ref_ndarray<const T, N>, Args...> operator()(Args...&& args) const;
+    // template <typename... Args> element_request<const T&, Args...> operator()(Args...&& args) const;
 
   protected:
-    ref_ndarray(T* data, const descriptor_& descriptor) : data_{data}, descriptor_{descriptor} {}
+    ref_ndarray(T* data, const base_slice<N>& descriptor) : data_{data}, descriptor_{descriptor} {}
 
   private:
     T* data_;
-    slice<N> descriptor_;
+    base_slice<N> descriptor_;
 };
 
 template <typename T, std::size_t N> class base_ndarray : public ref_ndarray<T, N>

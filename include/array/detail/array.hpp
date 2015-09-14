@@ -10,10 +10,10 @@ namespace detail
 {
 template <std::size_t N>
 template <typename... Dims, typename>
-std::size_t base_slice::operator()(Dims... dims) const
+std::size_t base_slice<N>::operator()(Dims... dims) const
 {
-    std::array<std::size_t, N> indexes{{std::size_t{dims}...}};
-    return std::inner_product(std::begin(indexes), std::end(indexes), std::begin(strides_))
+    std::size_t indexes[] = {dims...};
+    return std::inner_product(std::begin(indexes), std::end(indexes), std::begin(strides_), start_);
 }
 
 } // namespace detail
