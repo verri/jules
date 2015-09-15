@@ -2,15 +2,33 @@
 #define JULES_ARRAY_DETAIL_ARRAY_H
 
 #include "array/detail/array_decl.hpp"
-#include "util/numeric.hpp"
-
-// TODO: remover
-#include <iostream>
 
 namespace jules
 {
 namespace detail
 {
+// Slice Iterator
+
+template <std::size_t N> auto base_slice<N>::iterator::operator++() -> iterator &
+{
+    for (auto i = N; i != 0; --i) {
+        indexes[i - 1] = (indexes[i - 1] + 1) % slice->extents()[i - 1];
+        if (indexes[i - 1] != 0)
+            break;
+    }
+
+    return *this;
+}
+
+template <std::size_t N> auto base_slice<N>::iterator::operator++(int) const -> iterator
+{
+    iterator c = *this;
+    ++(*this);
+    return c;
+}
+
+// Slice
+
 template <std::size_t N>
 base_slice<N>::base_slice(std::size_t start, std::initializer_list<std::size_t> extents)
     : start_{start}
@@ -58,6 +76,10 @@ template <typename T, std::size_t N> base_ndarray<T, N>::~base_ndarray()
     delete[] reinterpret_cast<storage_t*>(data());
 }
 
+// Reference Array
+
+// Base Array
+
 template <typename T, std::size_t N>
 template <typename... Dims, typename>
 base_ndarray<T, N>::base_ndarray(Dims... dims)
@@ -79,7 +101,7 @@ base_ndarray<T, N>::base_ndarray(const T& value, Dims... dims)
 template <typename T, std::size_t N>
 template <typename... Dims, typename>
 base_ndarray<T, N>::base_ndarray(const T* data, Dims... dims)
-    : ref_ndarray<T, N>{new T[prod_args(dims...)], {0, {std::size_t(dims)...}}}
+    : ref_ndarray<T, N>{reinterpret_cast<T*>(new storage_t[prod_args(dims...)]), {0, {std::size_t(dims)...}}}
 {
     std::copy(data, data + this->size(), this->data_);
 }

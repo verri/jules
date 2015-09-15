@@ -1,7 +1,11 @@
 #ifndef JULES_ARRAY_DETAIL_ARRAY_DECL_H
 #define JULES_ARRAY_DETAIL_ARRAY_DECL_H
 
+#include "util/numeric.hpp"
+
 #include <array>
+#include <utility>
+#include <vector>
 
 namespace jules
 {
@@ -21,6 +25,23 @@ using range_type_enabler =
 template <std::size_t N> class base_slice
 {
     static_assert(N > 0, "invalid slice dimension");
+
+  public:
+    class iterator
+    {
+      public:
+        std::size_t operator*() const { return index(std::make_index_sequence<N>{}); }
+
+        iterator& operator++();
+        iterator operator++(int) const;
+        bool operator==(const iterator& other) { return all(indexes, other.indexes); }
+
+      private:
+        template <std::size_t... I> auto index(std::index_sequence<I...>) { return (*slice)(indexes[I]...); }
+
+        std::array<std::size_t, N> indexes = {{0}};
+        base_slice<N>* slice;
+    };
 
   public:
     base_slice() = default;
@@ -64,8 +85,18 @@ using slice_request = std::enable_if_t<All(size_or_slice<Args, sizeof...(Args)>(
 template <typename Return, typename... Args>
 using indirect_request = std::enable_if_t<!All(size_or_slice<Args, sizeof...(Args)>()...), Return>;
 
+template <typename T, std::size_t N> class base_ndarray;
+template <typename T, std::size_t N> class ref_ndarray;
+
 template <typename T, std::size_t N> class indirect_ndarray
 {
+    template <typename U, std::size_t M> friend class base_ndarray;
+    template <typename U, std::size_t M> friend class ref_ndarray;
+
+  public:
+  private:
+    base_ndarray<T, N>* array_;
+    std::vector<std::size_t> indexes[N];
 };
 
 template <typename T, std::size_t N> class ref_ndarray
@@ -80,8 +111,17 @@ template <typename T, std::size_t N> class ref_ndarray
     ref_ndarray(const ref_ndarray& source) = delete;
     ref_ndarray(ref_ndarray&& source) = delete;
 
-    ref_ndarray& operator=(const ref_ndarray& source) = delete;
-    ref_ndarray& operator=(ref_ndarray&& source) = delete;
+    template <typename U> ref_ndarray& operator=(const base_ndarray<U, N>& source);
+    template <typename U> ref_ndarray& operator=(base_ndarray<U, N>&& source);
+
+    template <typename U> ref_ndarray& operator=(const ref_ndarray<U, N>& source);
+    template <typename U> ref_ndarray& operator=(ref_ndarray<U, N>&& source);
+
+    template <typename U> ref_ndarray& operator=(const indirect_ndarray<U, N>& source);
+    template <typename U> ref_ndarray& operator=(indirect_ndarray<U, N>&& source);
+
+    template <typename U> ref_ndarray& operator=(const U& source);
+    template <typename U> ref_ndarray& operator=(U&& source);
 
     ref_ndarray<T, N - 1> operator[](std::size_t i);
     ref_ndarray<const T, N - 1> operator[](std::size_t i) const;
@@ -123,8 +163,17 @@ template <typename T, std::size_t N> class base_ndarray : public ref_ndarray<T, 
     base_ndarray(const base_ndarray& source) = default;
     base_ndarray(base_ndarray&& source) = default;
 
-    base_ndarray& operator=(const base_ndarray& source) = default;
-    base_ndarray& operator=(base_ndarray&& source) = default;
+    template <typename U> base_ndarray& operator=(const base_ndarray<U, N>& source);
+    template <typename U> base_ndarray& operator=(base_ndarray<U, N>&& source);
+
+    template <typename U> base_ndarray& operator=(const ref_ndarray<U, N>& source);
+    template <typename U> base_ndarray& operator=(ref_ndarray<U, N>&& source);
+
+    template <typename U> base_ndarray& operator=(const indirect_ndarray<U, N>& source);
+    template <typename U> base_ndarray& operator=(indirect_ndarray<U, N>&& source);
+
+    template <typename U> base_ndarray& operator=(const U& source);
+    template <typename U> base_ndarray& operator=(U&& source);
 
     std::size_t size() const { return this->descriptor_.size(); }
     std::size_t size(std::size_t i) const { return this->descriptor_.extents()[i]; }
