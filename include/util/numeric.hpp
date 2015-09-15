@@ -18,6 +18,12 @@ auto prod(Range&& rng)
                            std::multiplies<R>{});
 }
 
+constexpr auto prod_args() { return 1; }
+template <typename Head, typename... Tail> constexpr auto prod_args(const Head& head, const Tail&... tail)
+{
+    return head * prod_args(tail...);
+}
+
 template <typename Range, typename R = typename std::remove_reference<Range>::type::value_type>
 auto all(Range&& rng)
 {

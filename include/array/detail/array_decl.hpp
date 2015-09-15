@@ -2,19 +2,21 @@
 #define JULES_ARRAY_DETAIL_ARRAY_DECL_H
 
 #include <array>
-#include <valarray>
 
 namespace jules
 {
 namespace detail
 {
-template <typename... Tail> constexpr bool all(bool head, Tail... tail) { return head && all(tail...); }
-constexpr bool all() { return true; }
-template <typename... Types>
-using all_size_enabler = std::enable_if_t<All(std::is_convertible<Types, std::size_t>::value...)>;
+constexpr bool All() { return true; }
+template <typename... Tail> constexpr bool All(bool head, Tail... tail) { return head && All(tail...); }
+
+template <std::size_t N, typename... Types>
+using all_size_enabler =
+    std::enable_if_t<N == sizeof...(Types) && All(std::is_convertible<Types, std::size_t>::value...)>;
 
 template <typename Range, typename R, typename T = void>
-using check_range_t = std::enable_if_t<std::is_same<typename std::remove_reference<Range>::type::value_type, R>::value, T>;
+using range_type_enabler =
+    std::enable_if_t<std::is_same<typename std::remove_reference<Range>::type::value_type, R>::value, T>;
 
 template <std::size_t N> class base_slice
 {
@@ -33,14 +35,34 @@ template <std::size_t N> class base_slice
     base_slice& operator=(const base_slice& source) = default;
     base_slice& operator=(base_slice&& source) = default;
 
-    template <typename... Dims, typename = all_size_enabler<Dims...>>
+    template <typename... Dims, typename = all_size_enabler<N, Dims...>>
     std::size_t operator()(Dims... dims) const;
 
+    auto start() const { return start_; }
+    auto size() const { return size_; }
+    const auto& extents() const { return extents_; }
+    const auto& strides() const { return strides_; }
+
   private:
-    std::size_t start_;
-    std::array<std::size_t, N> extents_;
-    std::array<std::size_t, N> strides_;
+    std::size_t start_ = 0;
+    std::size_t size_ = 0;
+    std::array<std::size_t, N> extents_ = {{0}};
+    std::array<std::size_t, N> strides_ = {{0}};
 };
+
+template <typename T, std::size_t N> constexpr bool size_or_slice()
+{
+    return std::is_convertible<T, std::size_t>::value || std::is_convertible<T, base_slice<N>>::value;
+}
+
+template <typename Return, typename... Args>
+using element_request = std::enable_if_t<All(std::is_convertible<Args, std::size_t>::value...), Return>;
+template <typename Return, typename... Args>
+using slice_request = std::enable_if_t<All(size_or_slice<Args, sizeof...(Args)>()...) &&
+                                           !All(std::is_convertible<Args, std::size_t>::value...),
+                                       Return>;
+template <typename Return, typename... Args>
+using indirect_request = std::enable_if_t<!All(size_or_slice<Args, sizeof...(Args)>()...), Return>;
 
 template <typename T, std::size_t N> class indirect_ndarray
 {
@@ -49,7 +71,7 @@ template <typename T, std::size_t N> class indirect_ndarray
 template <typename T, std::size_t N> class ref_ndarray
 {
   public:
-    using value_type = typename std::valarray<T>::value_type;
+    using value_type = T;
     static constexpr auto order = N;
 
     ref_ndarray() = delete;
@@ -64,33 +86,38 @@ template <typename T, std::size_t N> class ref_ndarray
     ref_ndarray<T, N - 1> operator[](std::size_t i);
     ref_ndarray<const T, N - 1> operator[](std::size_t i) const;
 
-    // template <typename... Args> indirect_request<indirect_ndarray<T, N>, Args...> operator()(Args...&& args);
-    // template <typename... Args> slice_request<ref_ndarray<T, N>, Args...> operator()(Args...&& args);
-    // template <typename... Args> element_request<T&, Args...> operator()(Args...&& args);
+    template <typename... Args> indirect_request<indirect_ndarray<T, N>, Args...> operator()(Args&&... args);
+    template <typename... Args> slice_request<ref_ndarray<T, N>, Args...> operator()(Args&&... args);
+    template <typename... Args> element_request<T&, Args...> operator()(Args&&... args);
 
-    // template <typename... Args> indirect_request<indirect_ndarray<const T, N>, Args...> operator()(Args...&& args) const;
-    // template <typename... Args> slice_request<ref_ndarray<const T, N>, Args...> operator()(Args...&& args) const;
-    // template <typename... Args> element_request<const T&, Args...> operator()(Args...&& args) const;
+    template <typename... Args>
+    indirect_request<indirect_ndarray<const T, N>, Args...> operator()(Args&&... args) const;
+    template <typename... Args>
+    slice_request<ref_ndarray<const T, N>, Args...> operator()(Args&&... args) const;
+    template <typename... Args> element_request<const T&, Args...> operator()(Args&&... args) const;
 
   protected:
     ref_ndarray(T* data, const base_slice<N>& descriptor) : data_{data}, descriptor_{descriptor} {}
 
-  private:
     T* data_;
     base_slice<N> descriptor_;
 };
 
 template <typename T, std::size_t N> class base_ndarray : public ref_ndarray<T, N>
 {
-    base_ndarray() = default;
-    ~base_ndarray() = default;
+  private:
+    using storage_t = std::aligned_storage_t<sizeof(T), alignof(T)>;
 
-    template <typename... Dims, typename = all_size_enabler<Dims...>> explicit base_ndarray(Dims... dims);
+  public:
+    base_ndarray();
+    ~base_ndarray();
 
-    template <typename... Dims, typename = all_size_enabler<Dims...>>
+    template <typename... Dims, typename = all_size_enabler<N, Dims...>> explicit base_ndarray(Dims... dims);
+
+    template <typename... Dims, typename = all_size_enabler<N, Dims...>>
     base_ndarray(const T& value, Dims... dims);
 
-    template <typename... Dims, typename E = all_size_enabler<Dims...>>
+    template <typename... Dims, typename = all_size_enabler<N, Dims...>>
     base_ndarray(const T* data, Dims... dims);
 
     base_ndarray(const base_ndarray& source) = default;
@@ -99,25 +126,11 @@ template <typename T, std::size_t N> class base_ndarray : public ref_ndarray<T, 
     base_ndarray& operator=(const base_ndarray& source) = default;
     base_ndarray& operator=(base_ndarray&& source) = default;
 
-    // std::size_t size() const { return data_.size(); }
-    // std::size_t size(std::size_t i) const { return dim_.at(i); }
-    // template <std::size_t i> [[deprecated]] std::size_t size() const;
+    std::size_t size() const { return this->descriptor_.size(); }
+    std::size_t size(std::size_t i) const { return this->descriptor_.extents()[i]; }
 
-    T* data() { return data_.data(); }
-    const T* data() const { return data_.data(); }
-
-    auto begin() { return std::begin(data_); }
-    auto end() { return std::end(data_); }
-
-    auto begin() const { return std::begin(data_); }
-    auto end() const { return std::end(data_); }
-
-    auto cbegin() const { return std::begin(data_); }
-    auto cend() const { return std::end(data_); }
-
-  protected:
-    base_slice<N> descriptor_;
-    std::valarray<T> data_;
+    T* data() { return this->data_; }
+    const T* data() const { return this->data_; }
 };
 
 } // namespace detail
