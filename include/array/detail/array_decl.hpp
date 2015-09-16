@@ -25,9 +25,27 @@ template <typename T, std::size_t N> class indirect_ndarray
     std::vector<std::size_t> indexes[N];
 };
 
+template <typename T, std::size_t N> class ref_ndarray_iterator
+{
+  public:
+    ref_ndarray_iterator(const ref_ndarray<T, N>& array, std::size_t index) : array_{array}, index_{index} {}
+
+    ref_ndarray<T, N - 1> operator*() { return array_[index_]; }
+
+    ref_ndarray_iterator& operator++();
+    ref_ndarray_iterator operator++(int);
+    bool operator==(const ref_ndarray_iterator& other) const { return index_ == other.index_; }
+    bool operator!=(const ref_ndarray_iterator& other) const { return index_ != other.index_; }
+
+  private:
+    ref_ndarray<T, N> array_;
+    std::size_t index_;
+};
+
 template <typename T, std::size_t N> class ref_ndarray
 {
     template <typename U, std::size_t M> friend class ref_ndarray;
+    template <typename U, std::size_t M> friend class ref_ndarray_iterator;
 
   public:
     using value_type = T;
@@ -35,9 +53,6 @@ template <typename T, std::size_t N> class ref_ndarray
 
     ref_ndarray() = delete;
     ~ref_ndarray() = default;
-
-    ref_ndarray(const ref_ndarray& source) = delete;
-    ref_ndarray(ref_ndarray&& source) = delete;
 
     template <typename U> ref_ndarray& operator=(const base_ndarray<U, N>& source);
     template <typename U> ref_ndarray& operator=(base_ndarray<U, N>&& source);
@@ -49,6 +64,8 @@ template <typename T, std::size_t N> class ref_ndarray
     template <typename U> ref_ndarray& operator=(indirect_ndarray<U, N>&& source);
 
     template <typename U> ref_ndarray& operator=(const U& source);
+
+    operator ref_ndarray<const T, N>() const { return {this->data_, descriptor_}; }
 
     ref_ndarray<T, N - 1> operator[](std::size_t i);
     ref_ndarray<const T, N - 1> operator[](std::size_t i) const;
@@ -63,8 +80,20 @@ template <typename T, std::size_t N> class ref_ndarray
     slice_request<ref_ndarray<const T, N>, Args...> operator()(Args&&... args) const;
     template <typename... Args> element_request<const T&, Args...> operator()(Args&&... args) const;
 
+    ref_ndarray_iterator<T, N> begin() { return {*this, 0}; }
+    ref_ndarray_iterator<T, N> end() { return {*this, descriptor_.extents(0)}; }
+
+    ref_ndarray_iterator<const T, N> begin() const { return {*this, 0}; }
+    ref_ndarray_iterator<const T, N> end() const { return {*this, descriptor_.extents(0)}; }
+
+    ref_ndarray_iterator<const T, N> cbegin() const { return {*this, 0}; }
+    ref_ndarray_iterator<const T, N> cend() const { return {*this, descriptor_.extents(0)}; }
+
   protected:
     ref_ndarray(T* data, const base_slice<N>& descriptor) : data_{data}, descriptor_{descriptor} {}
+
+    ref_ndarray(const ref_ndarray& source) = default;
+    ref_ndarray(ref_ndarray&& source) = default;
 
     T* data_;
     base_slice<N> descriptor_;

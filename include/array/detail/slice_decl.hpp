@@ -21,7 +21,7 @@ template <std::size_t N> class base_slice_iterator
     std::size_t operator*() const { return index(std::make_index_sequence<N>{}); }
 
     base_slice_iterator& operator++();
-    base_slice_iterator operator++(int) const;
+    base_slice_iterator operator++(int);
     bool operator==(const base_slice_iterator& other) const { return indexes_ == other.indexes_; }
     bool operator!=(const base_slice_iterator& other) const { return !(*this == other); }
 

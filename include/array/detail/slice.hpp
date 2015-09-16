@@ -37,7 +37,7 @@ template <std::size_t N> auto base_slice_iterator<N>::operator++() -> base_slice
     return *this;
 }
 
-template <std::size_t N> auto base_slice_iterator<N>::operator++(int) const -> base_slice_iterator
+template <std::size_t N> auto base_slice_iterator<N>::operator++(int) -> base_slice_iterator
 {
     base_slice_iterator c = *this;
     ++(*this);

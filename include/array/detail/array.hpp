@@ -7,6 +7,24 @@ namespace jules
 {
 namespace detail
 {
+// Iterator
+
+
+template <typename T, std::size_t N>
+auto ref_ndarray_iterator<T, N>::operator++() -> ref_ndarray_iterator&
+{
+    ++index_;
+    return *this;
+}
+
+template <typename T, std::size_t N>
+auto ref_ndarray_iterator<T, N>::operator++(int) -> ref_ndarray_iterator
+{
+    ref_ndarray_iterator copy = *this;
+    ++index_;
+    return copy;
+}
+
 // Reference Array
 
 template <typename T, std::size_t N>
