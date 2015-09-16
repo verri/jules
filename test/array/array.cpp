@@ -1,4 +1,4 @@
-#include "catch.hpp"
+#include <catch.hpp>
 
 #include "array/array.hpp"
 
@@ -19,6 +19,19 @@ TEST_CASE("array", "[array]")
     vector<double> a(1.0, 30); // 30 elements with value 1.0
     vector<double> b(values.begin(), values.size());
     vector<double> c(values);
+
+    matrix<double> M(1.0, 10, 10);
+    CHECK(M[0][0] == 1.0);
+    M[0][0] = 2.0;
+    CHECK(M[0][0] == 2.0);
+
+    // usage:
+    // x(1, 2, 3); // element access (no copy)
+    // x[1][2][3]; // element access (no copy)
+
+    // y(slice(0, 3), 1, slice(...));          // slicing access (no copy unless explicit indicated)
+    // y({true, false, true}, 1, slice(0, 3)); // mask->indirect access (will copy if operated)
+    // y({0, 2, 4}, 1, 2);                     // indirect access (will copy if operated)
 
     // TODO: initializer list
 }
