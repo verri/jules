@@ -14,8 +14,8 @@ template <typename Range, typename R = typename std::remove_reference<Range>::ty
 auto prod(Range&& rng)
 {
     static_assert(std::is_arithmetic<R>::value, "value type must be arithmetic");
-    return std::accumulate(range::begin(std::forward<Range>(rng)), range::end(std::forward<Range>(rng)), static_cast<R>(1),
-                           std::multiplies<R>{});
+    return std::accumulate(range::begin(std::forward<Range>(rng)), range::end(std::forward<Range>(rng)),
+                           static_cast<R>(1), std::multiplies<R>{});
 }
 
 constexpr auto prod_args() { return 1u; }

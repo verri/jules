@@ -122,8 +122,7 @@ base_dataframe<Coercion> base_dataframe<Coercion>::read(std::istream& is,
     if (!is)
         return {};
 
-    const auto as_range =
-        [](auto&& match) { return make_iterator_range(match.first, match.second); };
+    const auto as_range = [](auto&& match) { return make_iterator_range(match.first, match.second); };
 
     std::string raw_data;
     raw_data.assign(std::istreambuf_iterator<char>(is), std::istreambuf_iterator<char>());

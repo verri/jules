@@ -10,11 +10,11 @@ namespace jules
 {
 namespace detail
 {
-
 // Reference Array
 
 template <typename T, std::size_t N>
-template <typename U> ref_ndarray<T, N>& ref_ndarray<T, N>::operator=(const U& source)
+template <typename U>
+ref_ndarray<T, N>& ref_ndarray<T, N>::operator=(const U& source)
 {
     for (std::size_t i : descriptor_) {
         std::cerr << "indexes: " << i << std::endl;
@@ -23,8 +23,7 @@ template <typename U> ref_ndarray<T, N>& ref_ndarray<T, N>::operator=(const U& s
     return *this;
 }
 
-template <typename T, std::size_t N>
-ref_ndarray<T, N - 1> ref_ndarray<T, N>::operator[](std::size_t i)
+template <typename T, std::size_t N> ref_ndarray<T, N - 1> ref_ndarray<T, N>::operator[](std::size_t i)
 {
     auto start = descriptor_.start() + descriptor_.extents(0) * i;
     std::array<std::size_t, N - 1> extents, strides;

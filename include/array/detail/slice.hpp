@@ -7,23 +7,23 @@ namespace jules
 {
 namespace detail
 {
-
 // Slice Iterator
 
 template <std::size_t N>
 template <typename... Dims, typename>
-base_slice_iterator<N>::base_slice_iterator(const base_slice<N>& slice, Dims... indexes)  :
-    slice_{slice}, indexes_{{indexes...}}
+base_slice_iterator<N>::base_slice_iterator(const base_slice<N>& slice, Dims... indexes)
+    : slice_{slice}, indexes_{{indexes...}}
 {
 }
 
 template <std::size_t N>
-base_slice_iterator<N>::base_slice_iterator(const base_slice<N>& slice, const std::array<std::size_t, N>& indexes)  :
-    slice_{slice}, indexes_(indexes)
+base_slice_iterator<N>::base_slice_iterator(const base_slice<N>& slice,
+                                            const std::array<std::size_t, N>& indexes)
+    : slice_{slice}, indexes_(indexes)
 {
 }
 
-template <std::size_t N> auto base_slice_iterator<N>::operator++() -> base_slice_iterator&
+template <std::size_t N> auto base_slice_iterator<N>::operator++() -> base_slice_iterator &
 {
     auto i = N - 1;
     for (; i != 0; --i) {
@@ -31,7 +31,8 @@ template <std::size_t N> auto base_slice_iterator<N>::operator++() -> base_slice
         if (indexes_[i] != 0)
             break;
     }
-    if (i == 0) ++indexes_[0];
+    if (i == 0)
+        ++indexes_[0];
 
     return *this;
 }
@@ -77,8 +78,10 @@ base_slice<N>::base_slice(std::size_t start, std::initializer_list<std::size_t> 
 
 template <std::size_t N>
 base_slice<N>::base_slice(std::size_t start, const std::array<std::size_t, N>& extents,
-               const std::array<std::size_t, N>& strides) :
-    start_{start}, size_{prod(extents)}, extents_(extents), strides_(strides) {}
+                          const std::array<std::size_t, N>& strides)
+    : start_{start}, size_{prod(extents)}, extents_(extents), strides_(strides)
+{
+}
 
 template <std::size_t N>
 template <typename... Dims, typename>

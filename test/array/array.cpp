@@ -21,12 +21,12 @@ TEST_CASE("array", "[array]")
     vector<double> c(values);
 
     // usage:
-    x(1, 2, 3); // element access (no copy)
-    x[1][2][3]; // element access (no copy)
+    // x(1, 2, 3); // element access (no copy)
+    // x[1][2][3]; // element access (no copy)
 
-    y(slice(0, 3), 1, slice(...));          // slicing access (no copy unless explicit indicated)
-    y({true, false, true}, 1, slice(0, 3)); // mask->indirect access (will copy if operated)
-    y({0, 2, 4}, 1, 2);                     // indirect access (will copy if operated)
+    // y(slice(0, 3), 1, slice(...));          // slicing access (no copy unless explicit indicated)
+    // y({true, false, true}, 1, slice(0, 3)); // mask->indirect access (will copy if operated)
+    // y({0, 2, 4}, 1, 2);                     // indirect access (will copy if operated)
 
     // TODO: initializer list
 }
