@@ -13,6 +13,7 @@ namespace detail
 {
 template <typename T, std::size_t N> class base_ndarray;
 template <typename T, std::size_t N> class ref_ndarray;
+template <typename T, std::size_t N> class ref_ndarray_iterator;
 
 template <typename T, std::size_t N> class indirect_ndarray
 {
@@ -25,23 +26,6 @@ template <typename T, std::size_t N> class indirect_ndarray
     std::vector<std::size_t> indexes[N];
 };
 
-template <typename T, std::size_t N> class ref_ndarray_iterator
-{
-  public:
-    ref_ndarray_iterator(const ref_ndarray<T, N>& array, std::size_t index) : array_{array}, index_{index} {}
-
-    ref_ndarray<T, N - 1> operator*() { return array_[index_]; }
-
-    ref_ndarray_iterator& operator++();
-    ref_ndarray_iterator operator++(int);
-    bool operator==(const ref_ndarray_iterator& other) const { return index_ == other.index_; }
-    bool operator!=(const ref_ndarray_iterator& other) const { return index_ != other.index_; }
-
-  private:
-    ref_ndarray<T, N> array_;
-    std::size_t index_;
-};
-
 template <typename T, std::size_t N> class ref_ndarray
 {
     template <typename U, std::size_t M> friend class ref_ndarray;
@@ -50,6 +34,12 @@ template <typename T, std::size_t N> class ref_ndarray
   public:
     using value_type = T;
     static constexpr auto order = N;
+
+    using iterator = ref_ndarray_iterator<T, N>;
+    using const_iterator = ref_ndarray_iterator<const T, N>;
+
+    using size_type = std::size_t;
+    using difference_type = std::size_t;
 
     ref_ndarray() = delete;
     ~ref_ndarray() = default;
@@ -97,6 +87,25 @@ template <typename T, std::size_t N> class ref_ndarray
 
     T* data_;
     base_slice<N> descriptor_;
+};
+
+template <typename T, std::size_t N> class ref_ndarray_iterator
+{
+  public:
+    ref_ndarray_iterator(const ref_ndarray<T, N>& array, std::size_t index) : array_{array}, index_{index} {}
+
+    ref_ndarray<T, N - 1> operator*() { return array_[index_]; }
+
+    ref_ndarray_iterator& operator++();
+    ref_ndarray_iterator operator++(int);
+    bool operator==(const ref_ndarray_iterator& other) const { return index_ == other.index_; }
+    bool operator!=(const ref_ndarray_iterator& other) const { return index_ != other.index_; }
+
+    std::size_t operator-(const ref_ndarray_iterator& other) const { return index_ - other.index_; }
+
+  private:
+    ref_ndarray<T, N> array_;
+    std::size_t index_;
 };
 
 template <typename T, std::size_t N> class base_ndarray : public ref_ndarray<T, N>
