@@ -29,4 +29,12 @@ TEST_CASE("base array", "[base array]")
     CHECK(result.second == matrix3.data() + matrix3.size());
 
     // base_ndarray<int, 2> matrix3(3, 4, 5, 4); // do not compile
+
+    auto&& vector1 = matrix3[0]; // first line
+    vector1 = 0;
+
+    int y[5] = {0};
+    result = std::mismatch(std::begin(y), std::end(y), matrix3.data());
+    CHECK(result.first == std::end(y));
+    CHECK(result.second == matrix3.data() + 5);
 }

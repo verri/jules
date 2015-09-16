@@ -27,6 +27,8 @@ template <typename T, std::size_t N> class indirect_ndarray
 
 template <typename T, std::size_t N> class ref_ndarray
 {
+    template <typename U, std::size_t M> friend class ref_ndarray;
+
   public:
     using value_type = T;
     static constexpr auto order = N;
@@ -47,7 +49,6 @@ template <typename T, std::size_t N> class ref_ndarray
     template <typename U> ref_ndarray& operator=(indirect_ndarray<U, N>&& source);
 
     template <typename U> ref_ndarray& operator=(const U& source);
-    template <typename U> ref_ndarray& operator=(U&& source);
 
     ref_ndarray<T, N - 1> operator[](std::size_t i);
     ref_ndarray<const T, N - 1> operator[](std::size_t i) const;

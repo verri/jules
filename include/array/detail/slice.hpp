@@ -19,7 +19,7 @@ base_slice_iterator<N>::base_slice_iterator(const base_slice<N>& slice, Dims... 
 
 template <std::size_t N>
 base_slice_iterator<N>::base_slice_iterator(const base_slice<N>& slice, const std::array<std::size_t, N>& indexes)  :
-    slice_{slice}, indexes_{indexes}
+    slice_{slice}, indexes_(indexes)
 {
 }
 
@@ -66,7 +66,7 @@ base_slice<N>::base_slice(std::size_t start, std::initializer_list<std::size_t> 
 template <std::size_t N>
 base_slice<N>::base_slice(std::size_t start, std::initializer_list<std::size_t> extents,
                           std::initializer_list<std::size_t> strides)
-    : start_{start}, size_{prod(extents_)}
+    : start_{start}, size_{prod(extents)}
 {
     if (extents.size() != N || strides.size() != N)
         throw std::runtime_error{"invalid extents or strides"};
@@ -74,6 +74,11 @@ base_slice<N>::base_slice(std::size_t start, std::initializer_list<std::size_t> 
     std::copy(extents.begin(), extents.end(), std::begin(extents_));
     std::copy(strides.begin(), strides.end(), std::begin(strides_));
 }
+
+template <std::size_t N>
+base_slice<N>::base_slice(std::size_t start, const std::array<std::size_t, N>& extents,
+               const std::array<std::size_t, N>& strides) :
+    start_{start}, size_{prod(extents)}, extents_(extents), strides_(strides) {}
 
 template <std::size_t N>
 template <typename... Dims, typename>

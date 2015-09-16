@@ -22,11 +22,11 @@ template <std::size_t N> class base_slice_iterator
 
     base_slice_iterator& operator++();
     base_slice_iterator operator++(int) const;
-    bool operator==(const base_slice_iterator& other) const { return all(indexes_, other.indexes_); }
+    bool operator==(const base_slice_iterator& other) const { return indexes_ == other.indexes_; }
     bool operator!=(const base_slice_iterator& other) const { return !(*this == other); }
 
   private:
-    template <std::size_t... I> auto index(std::index_sequence<I...>) { return slice_(indexes_[I]...); }
+    template <std::size_t... I> auto index(std::index_sequence<I...>) const { return slice_(indexes_[I]...); }
 
     const base_slice<N>& slice_;
     std::array<std::size_t, N> indexes_;
@@ -42,6 +42,8 @@ template <std::size_t N> class base_slice
     base_slice(std::size_t start, std::initializer_list<std::size_t> extents);
     base_slice(std::size_t start, std::initializer_list<std::size_t> extents,
                std::initializer_list<std::size_t> strides);
+    base_slice(std::size_t start, const std::array<std::size_t, N>& extents,
+               const std::array<std::size_t, N>& strides);
 
     base_slice(const base_slice& source) = default;
     base_slice(base_slice&& source) = default;
@@ -57,18 +59,19 @@ template <std::size_t N> class base_slice
     const auto& extents() const { return extents_; }
     const auto& strides() const { return strides_; }
 
-    auto start(std::size_t i) const { return start_[i]; }
-    auto size(std::size_t i) const { return size_[i]; }
     const auto& extents(std::size_t i) const { return extents_[i]; }
     const auto& strides(std::size_t i) const { return strides_[i]; }
 
-    base_slice_iterator<N> begin() const { return {*this, {}}; }
-    base_slice_iterator<N> end() const { return {*this, {extents_[0], 0}}; }
+    base_slice_iterator<N> begin() const { return {*this, begin_index()}; }
+    base_slice_iterator<N> end() const { return {*this, end_index()}; }
 
-    base_slice_iterator<N> cbegin() const { return {*this, {}}; }
-    base_slice_iterator<N> cend() const { return {*this, {extents_[0], 0}}; }
+    base_slice_iterator<N> cbegin() const { return {*this, begin_index()}; }
+    base_slice_iterator<N> cend() const { return {*this, end_index()}; }
 
   private:
+    std::array<std::size_t, N> begin_index() const { return {}; }
+    std::array<std::size_t, N> end_index() const { return {{extents_[0]}}; }
+
     std::size_t start_ = 0;
     std::size_t size_ = 0;
     std::array<std::size_t, N> extents_ = {};

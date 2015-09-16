@@ -14,11 +14,11 @@ template <typename Range, typename R = typename std::remove_reference<Range>::ty
 auto prod(Range&& rng)
 {
     static_assert(std::is_arithmetic<R>::value, "value type must be arithmetic");
-    return std::accumulate(range::begin(std::forward<Range>(rng)), range::end(std::forward<Range>(rng)), 1,
+    return std::accumulate(range::begin(std::forward<Range>(rng)), range::end(std::forward<Range>(rng)), static_cast<R>(1),
                            std::multiplies<R>{});
 }
 
-constexpr auto prod_args() { return 1; }
+constexpr auto prod_args() { return 1u; }
 template <typename Head, typename... Tail> constexpr auto prod_args(const Head& head, const Tail&... tail)
 {
     return head * prod_args(tail...);

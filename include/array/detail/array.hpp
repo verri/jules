@@ -3,12 +3,55 @@
 
 #include "array/detail/array_decl.hpp"
 
+// TODO remove
+#include <iostream>
+
 namespace jules
 {
 namespace detail
 {
 
 // Reference Array
+
+template <typename T, std::size_t N>
+template <typename U> ref_ndarray<T, N>& ref_ndarray<T, N>::operator=(const U& source)
+{
+    for (std::size_t i : descriptor_) {
+        std::cerr << "indexes: " << i << std::endl;
+        data_[i] = source;
+    }
+    return *this;
+}
+
+template <typename T, std::size_t N>
+ref_ndarray<T, N - 1> ref_ndarray<T, N>::operator[](std::size_t i)
+{
+    auto start = descriptor_.start() + descriptor_.extents(0) * i;
+    std::array<std::size_t, N - 1> extents, strides;
+
+    const auto& e = descriptor_.extents();
+    const auto& s = descriptor_.strides();
+
+    std::copy(e.begin() + 1, e.end(), extents.begin());
+    std::copy(s.begin() + 1, s.end(), strides.begin());
+
+    return {data_, {start, extents, strides}};
+}
+
+template <typename T, std::size_t N>
+ref_ndarray<const T, N - 1> ref_ndarray<T, N>::operator[](std::size_t i) const
+{
+    auto start = descriptor_.start() + descriptor_.extents(0) * i;
+    std::array<std::size_t, N - 1> extents, strides;
+
+    const auto& e = descriptor_.extents();
+    const auto& s = descriptor_.strides();
+
+    std::copy(e.begin() + 1, e.end(), extents.begin());
+    std::copy(s.begin() + 1, s.end(), strides.begin());
+
+    return {data_, {start, extents, strides}};
+}
 
 // Base Array
 
