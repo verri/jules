@@ -33,6 +33,6 @@ test_suite: $(OBJ)
 
 clean:
 	@echo "Cleaning test..."
-	@rm -f {dataframe,tutorial}/*.{o,d} test_suite{,.o,.d}
+	@rm -f {array,dataframe,tutorial}/*.{o,d} test_suite{,.o,.d}
 
 .PHONY: test clean

@@ -123,7 +123,7 @@ base_dataframe<Coercion> base_dataframe<Coercion>::read(std::istream& is,
         return {};
 
     const auto as_range =
-        [](auto&& match) { return make_iterator_range<std::string::iterator>(match.first, match.second); };
+        [](auto&& match) { return make_iterator_range(match.first, match.second); };
 
     std::string raw_data;
     raw_data.assign(std::istreambuf_iterator<char>(is), std::istreambuf_iterator<char>());
@@ -132,7 +132,7 @@ base_dataframe<Coercion> base_dataframe<Coercion>::read(std::istream& is,
     std::regex sep{opt.separator};
 
     std::vector<std::sub_match<std::string::iterator>> data;
-    std::size_t ncol = 0, nrow = 0;
+    std::size_t ncol = 0;
 
     auto line_range = raw_data | tokenized(eol, -1);
 
@@ -148,7 +148,6 @@ base_dataframe<Coercion> base_dataframe<Coercion>::read(std::istream& is,
 
         size = data.size();
     }
-    nrow = data.size() / ncol;
 
     base_dataframe<Coercion> df;
     for (std::size_t j = 0; j < ncol; ++j) {
