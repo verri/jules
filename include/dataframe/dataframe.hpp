@@ -137,6 +137,9 @@ base_dataframe<Coercion> base_dataframe<Coercion>::read(std::istream& is,
 
     std::size_t size = 0;
     for (auto&& line : line_range) {
+        if (line.first == line.second)
+            continue;
+
         copy(as_range(line) | tokenized(sep, -1), std::back_inserter(data));
 
         if (ncol == 0)
@@ -147,6 +150,9 @@ base_dataframe<Coercion> base_dataframe<Coercion>::read(std::istream& is,
 
         size = data.size();
     }
+
+    if (ncol == 0)
+        return {};
 
     base_dataframe<Coercion> df;
     if (opt.header && data.size() / ncol == 1) {
