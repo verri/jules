@@ -1,7 +1,7 @@
 #ifndef JULES_ARRAY_DETAIL_SLICE_DECL_H
 #define JULES_ARRAY_DETAIL_SLICE_DECL_H
 
-#include "util/numeric.hpp"
+#include "array/detail/utility.hpp"
 
 #include <array>
 
@@ -9,14 +9,6 @@ namespace jules
 {
 namespace detail
 {
-template <std::size_t N, typename... Types>
-using all_size_enabler =
-    std::enable_if_t<N == sizeof...(Types) && all_args(std::is_convertible<Types, std::size_t>::value...)>;
-
-template <typename Range, typename R, typename T = void>
-using range_type_enabler =
-    std::enable_if_t<std::is_same<typename std::remove_reference<Range>::type::value_type, R>::value, T>;
-
 template <std::size_t N> class base_slice
 {
     static_assert(N > 0, "invalid slice dimension");
@@ -65,20 +57,6 @@ template <std::size_t N> class base_slice
     std::array<std::size_t, N> extents_ = {{0}};
     std::array<std::size_t, N> strides_ = {{0}};
 };
-
-template <typename T, std::size_t N> constexpr bool size_or_slice()
-{
-    return std::is_convertible<T, std::size_t>::value || std::is_convertible<T, base_slice<N>>::value;
-}
-
-template <typename Return, typename... Args>
-using element_request = std::enable_if_t<all_args(std::is_convertible<Args, std::size_t>::value...), Return>;
-template <typename Return, typename... Args>
-using slice_request = std::enable_if_t<all_args(size_or_slice<Args, sizeof...(Args)>()...) &&
-                                           !all_args(std::is_convertible<Args, std::size_t>::value...),
-                                       Return>;
-template <typename Return, typename... Args>
-using indirect_request = std::enable_if_t<!all_args(size_or_slice<Args, sizeof...(Args)>()...), Return>;
 
 } // namespace detail
 } // namespace jules

@@ -64,7 +64,7 @@ template <std::size_t N>
 template <typename... Dims, typename>
 std::size_t base_slice<N>::operator()(Dims... dims) const
 {
-    std::size_t indexes[] = {dims...};
+    std::size_t indexes[N] = {dims...};
     return std::inner_product(std::begin(indexes), std::end(indexes), std::begin(strides_), start_);
 }
 

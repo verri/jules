@@ -2,7 +2,6 @@
 #define JULES_ARRAY_DETAIL_ARRAY_DECL_H
 
 #include "array/detail/slice.hpp"
-#include "util/numeric.hpp"
 
 #include <array>
 #include <utility>
