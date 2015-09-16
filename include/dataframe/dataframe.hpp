@@ -48,10 +48,10 @@ base_dataframe<Coercion>& base_dataframe<Coercion>::colbind(const column_t& colu
     if (it != colindexes_.end())
         throw std::runtime_error{"column already exists"};
 
-    if (!empty() && nrow() != tmp.size())
+    if (!null() && nrow() != tmp.size())
         throw std::runtime_error{"invalid column size"};
 
-    if (empty())
+    if (null())
         nrow_ = tmp.size();
 
     colindexes_[name] = columns_.size();
@@ -75,10 +75,10 @@ template <typename Coercion> base_dataframe<Coercion>& base_dataframe<Coercion>:
     if (it != colindexes_.end())
         throw std::runtime_error{"column already exists"};
 
-    if (!empty() && nrow() != column.size())
+    if (!null() && nrow() != column.size())
         throw std::runtime_error{"invalid column size"};
 
-    if (empty())
+    if (null())
         nrow_ = column.size();
 
     colindexes_[name] = columns_.size();
@@ -122,8 +122,7 @@ base_dataframe<Coercion> base_dataframe<Coercion>::read(std::istream& is,
     if (!is)
         return {};
 
-    const auto as_range =
-        [](auto&& match) { return make_iterator_range(match.first, match.second); };
+    const auto as_range = [](auto&& match) { return make_iterator_range(match.first, match.second); };
 
     std::string raw_data;
     raw_data.assign(std::istreambuf_iterator<char>(is), std::istreambuf_iterator<char>());
@@ -150,12 +149,19 @@ base_dataframe<Coercion> base_dataframe<Coercion>::read(std::istream& is,
     }
 
     base_dataframe<Coercion> df;
+    if (opt.header && data.size() / ncol == 1) {
+        for (std::size_t j = 0; j < ncol; ++j) {
+            base_column<Coercion> col(std::string{data[j].first, data[j].second}, std::string{}, 0);
+            df.colbind(std::move(col));
+        }
+        return df;
+    }
+
     for (std::size_t j = 0; j < ncol; ++j) {
         auto column_data = make_iterator_range(data.begin() + j + (opt.header ? ncol : 0), data.end()) |
                            strided(ncol) | transformed([](auto&& match) {
                                return std::move(std::string{match.first, match.second});
                            });
-
         base_column<Coercion> col(opt.header ? std::string{data[j].first, data[j].second} : std::string{},
                                   column_data);
         df.colbind(std::move(col));

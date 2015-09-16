@@ -10,6 +10,7 @@ TEST_CASE("null dataframe", "[dataframe]")
     dataframe df;
 
     CHECK(df.empty());
+    CHECK(df.null());
     CHECK(df.nrow() == 0);
     CHECK(df.ncol() == 0);
 }
@@ -127,4 +128,3 @@ TEST_CASE("reading and writing a well-formed dataframe", "[dataframe]")
     dataframe::write({{"x", {0, 3}}, {"y", {1, 4}}, {"z", {2, 5}}}, os2);
     CHECK(data == os2.str());
 }
-
