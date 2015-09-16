@@ -6,77 +6,79 @@
 
 namespace jules
 {
-template <typename T, std::size_t N> class ndarray : public detail::base_ndarray<T, N>
-{
-  public:
-    using detail::base_ndarray<T, N>::base_ndarray;
-    using detail::base_ndarray<T, N>::operator=;
+// template <typename T, std::size_t N> class ndarray : public detail::base_ndarray<T, N>
+// {
+//   public:
+//     using detail::base_ndarray<T, N>::base_ndarray;
+//     using detail::base_ndarray<T, N>::operator=;
+//
+//     ndarray() = default;
+//     ~ndarray() = default;
+// };
+//
+// // matrix
+// template <typename T> class ndarray<T, 2> : public detail::base_ndarray<T, 2>
+// {
+//   public:
+//     using detail::base_ndarray<T, 2>::base_ndarray;
+//     using detail::base_ndarray<T, 2>::operator=;
+//
+//     ndarray() = default;
+//     ~ndarray() = default;
+//
+//     auto nrow() const { return this->size(0); };
+//     auto ncol() const { return this->size(1); };
+// };
+//
+// // vector
+// template <typename T> class ndarray<T, 1> : public detail::base_ndarray<T, 1>
+// {
+//   public:
+//     using detail::base_ndarray<T, 1>::base_ndarray;
+//     using detail::base_ndarray<T, 1>::operator=;
+//
+//     ndarray() = default;
+//     ~ndarray() = default;
+//
+//     template <typename Range, typename R = typename std::remove_reference<Range>::type::value_type>
+//     ndarray(Range&& rng);
+// };
+//
+// // scalar
+// template <typename T> class ndarray<T, 0>
+// {
+//   public:
+//     using value_type = T;
+//
+//     ndarray() = default;
+//
+//     ndarray(const T& data) : data_{data} {}
+//     ndarray(T&& data) : data_{std::move(data)} {}
+//
+//     ~ndarray() = default;
+//
+//     ndarray(const ndarray& source) = default;
+//     ndarray(ndarray&& source) = default;
+//
+//     ndarray& operator=(const ndarray& source) = default;
+//     ndarray& operator=(ndarray&& source) = default;
+//
+//     ndarray& operator=(const T& source) { data_ = source; }
+//     ndarray& operator=(T&& source) { data_ = std::move(source); }
+//
+//     operator T&() { return data_; }
+//     operator const T&() const { return data_; }
+//
+//     constexpr std::size_t size() const { return 0; }
+//
+//     T* data() { return &data_; }
+//     const T* data() const { return &data_; }
+//
+//   private:
+//     T data_;
+// };
 
-    ndarray() = default;
-    ~ndarray() = default;
-};
-
-// matrix
-template <typename T> class ndarray<T, 2> : public detail::base_ndarray<T, 2>
-{
-  public:
-    using detail::base_ndarray<T, 2>::base_ndarray;
-    using detail::base_ndarray<T, 2>::operator=;
-
-    ndarray() = default;
-    ~ndarray() = default;
-
-    auto nrow() const { return this->size(0); };
-    auto ncol() const { return this->size(1); };
-};
-
-// vector
-template <typename T> class ndarray<T, 1> : public detail::base_ndarray<T, 1>
-{
-  public:
-    using detail::base_ndarray<T, 1>::base_ndarray;
-    using detail::base_ndarray<T, 1>::operator=;
-
-    ndarray() = default;
-    ~ndarray() = default;
-
-    template <typename Range, typename R = typename std::remove_reference<Range>::type::value_type>
-    ndarray(Range&& rng);
-};
-
-// scalar
-template <typename T> class ndarray<T, 0>
-{
-  public:
-    using value_type = T;
-
-    ndarray() = default;
-
-    ndarray(const T& data) : data_{data} {}
-    ndarray(T&& data) : data_{std::move(data)} {}
-
-    ~ndarray() = default;
-
-    ndarray(const ndarray& source) = default;
-    ndarray(ndarray&& source) = default;
-
-    ndarray& operator=(const ndarray& source) = default;
-    ndarray& operator=(ndarray&& source) = default;
-
-    ndarray& operator=(const T& source) { data_ = source; }
-    ndarray& operator=(T&& source) { data_ = std::move(source); }
-
-    operator T&() { return data_; }
-    operator const T&() const { return data_; }
-
-    constexpr std::size_t size() const { return 0; }
-
-    T* data() { return &data_; }
-    const T* data() const { return &data_; }
-
-  private:
-    T data_;
-};
+template <typename T, std::size_t N> using ndarray = detail::base_ndarray<T, N>;
 
 template <typename T> using matrix = ndarray<T, 2>;
 template <typename T> using vector = ndarray<T, 1>;

@@ -53,7 +53,8 @@ base_dataframe<Coercion>& base_dataframe<Coercion>::colbind(const column_t& colu
         nrow_ = column.size();
 
     columns_.push_back(column);
-    if (!name.empty()) colindexes_[name] = columns_.size();
+    if (!name.empty())
+        colindexes_[name] = columns_.size();
 
     return *this;
 }
@@ -78,7 +79,8 @@ template <typename Coercion> base_dataframe<Coercion>& base_dataframe<Coercion>:
     if (null())
         nrow_ = column.size();
 
-    if (!name.empty()) colindexes_[name] = columns_.size();
+    if (!name.empty())
+        colindexes_[name] = columns_.size();
     columns_.push_back(std::move(column));
 
     return *this;

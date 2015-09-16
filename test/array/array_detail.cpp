@@ -38,7 +38,7 @@ TEST_CASE("base array", "[base array]")
     CHECK(result.first == std::end(y));
     CHECK(result.second == matrix3.data() + 5);
 
-    int i = 0;
+    std::size_t i = 0;
     for (auto&& line : matrix3)
         ++i;
 
