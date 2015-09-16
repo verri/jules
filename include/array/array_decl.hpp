@@ -9,61 +9,39 @@ namespace jules
 template <typename T, std::size_t N> class ndarray : public detail::base_ndarray<T, N>
 {
   public:
+    using detail::base_ndarray<T, N>::base_ndarray;
+    using detail::base_ndarray<T, N>::operator=;
+
     ndarray() = default;
     ~ndarray() = default;
-
-    ndarray(const ndarray& source) = default;
-    ndarray(ndarray&& source) = default;
-
-    ndarray& operator=(const ndarray& source) = default;
-    ndarray& operator=(ndarray&& source) = default;
 };
 
 // matrix
 template <typename T> class ndarray<T, 2> : public detail::base_ndarray<T, 2>
 {
   public:
+    using detail::base_ndarray<T, 2>::base_ndarray;
+    using detail::base_ndarray<T, 2>::operator=;
+
     ndarray() = default;
-    explicit ndarray(std::size_t nrow, std::size_t ncol);
-
-    ndarray(const T* data, std::size_t nrow, std::size_t ncol);
-    ndarray(const T& value, std::size_t nrow, std::size_t ncol);
-
-    auto nrow() const { return this->template size<0>(); };
-    auto ncol() const { return this->template size<1>(); };
-
     ~ndarray() = default;
 
-    ndarray(const ndarray& source) = default;
-    ndarray(ndarray&& source) = default;
-
-    ndarray& operator=(const ndarray& source) = default;
-    ndarray& operator=(ndarray&& source) = default;
-
-    ndarray(const detail::base_ndarray<T, 2>& source) : detail::base_ndarray<T, 2>(source) {}
-    ndarray(detail::base_ndarray<T, 2>&& source) : detail::base_ndarray<T, 2>(std::move(source)) {}
+    auto nrow() const { return this->size(0); };
+    auto ncol() const { return this->size(1); };
 };
 
 // vector
 template <typename T> class ndarray<T, 1> : public detail::base_ndarray<T, 1>
 {
   public:
-    ndarray() = default;
-    explicit ndarray(std::size_t size);
+    using detail::base_ndarray<T, 1>::base_ndarray;
+    using detail::base_ndarray<T, 1>::operator=;
 
-    ndarray(const T* data, std::size_t size);
-    ndarray(const T& value, std::size_t size);
+    ndarray() = default;
+    ~ndarray() = default;
 
     template <typename Range, typename R = typename std::remove_reference<Range>::type::value_type>
     ndarray(Range&& rng);
-
-    ~ndarray() = default;
-
-    ndarray(const ndarray& source) = default;
-    ndarray(ndarray&& source) = default;
-
-    ndarray& operator=(const ndarray& source) = default;
-    ndarray& operator=(ndarray&& source) = default;
 };
 
 // scalar

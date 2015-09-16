@@ -103,7 +103,7 @@ template <typename T, std::size_t N> class base_ndarray : public ref_ndarray<T, 
     template <typename U> base_ndarray& operator=(U&& source);
 
     std::size_t size() const { return this->descriptor_.size(); }
-    std::size_t size(std::size_t i) const { return this->descriptor_.extents()[i]; }
+    std::size_t size(std::size_t i) const { return this->descriptor_.extents(i); }
 
     T* data() { return this->data_; }
     const T* data() const { return this->data_; }

@@ -3,9 +3,6 @@
 
 #include "array/detail/array_decl.hpp"
 
-// TODO remove
-#include <iostream>
-
 namespace jules
 {
 namespace detail
@@ -16,10 +13,8 @@ template <typename T, std::size_t N>
 template <typename U>
 ref_ndarray<T, N>& ref_ndarray<T, N>::operator=(const U& source)
 {
-    for (std::size_t i : descriptor_) {
-        std::cerr << "indexes: " << i << std::endl;
+    for (std::size_t i : descriptor_)
         data_[i] = source;
-    }
     return *this;
 }
 
