@@ -10,20 +10,35 @@ namespace detail
 
 // Slice Iterator
 
-template <std::size_t N> auto base_slice<N>::iterator::operator++() -> iterator &
+template <std::size_t N>
+template <typename... Dims, typename>
+base_slice_iterator<N>::base_slice_iterator(const base_slice<N>& slice, Dims... indexes)  :
+    slice_{slice}, indexes_{{indexes...}}
 {
-    for (auto i = N; i != 0; --i) {
-        indexes[i - 1] = (indexes[i - 1] + 1) % slice->extents()[i - 1];
-        if (indexes[i - 1] != 0)
+}
+
+template <std::size_t N>
+base_slice_iterator<N>::base_slice_iterator(const base_slice<N>& slice, const std::array<std::size_t, N>& indexes)  :
+    slice_{slice}, indexes_{indexes}
+{
+}
+
+template <std::size_t N> auto base_slice_iterator<N>::operator++() -> base_slice_iterator&
+{
+    auto i = N - 1;
+    for (; i != 0; --i) {
+        indexes_[i] = (indexes_[i] + 1) % slice_.extents(i);
+        if (indexes_[i] != 0)
             break;
     }
+    if (i == 0) ++indexes_[0];
 
     return *this;
 }
 
-template <std::size_t N> auto base_slice<N>::iterator::operator++(int) const -> iterator
+template <std::size_t N> auto base_slice_iterator<N>::operator++(int) const -> base_slice_iterator
 {
-    iterator c = *this;
+    base_slice_iterator c = *this;
     ++(*this);
     return c;
 }

@@ -9,26 +9,32 @@ namespace jules
 {
 namespace detail
 {
+template <std::size_t N> class base_slice;
+
+template <std::size_t N> class base_slice_iterator
+{
+  public:
+    template <typename... Dims, typename = all_size_enabler<N, Dims...>>
+    base_slice_iterator(const base_slice<N>& slice, Dims... indexes);
+    base_slice_iterator(const base_slice<N>& slice, const std::array<std::size_t, N>& indexes);
+
+    std::size_t operator*() const { return index(std::make_index_sequence<N>{}); }
+
+    base_slice_iterator& operator++();
+    base_slice_iterator operator++(int) const;
+    bool operator==(const base_slice_iterator& other) const { return all(indexes_, other.indexes_); }
+    bool operator!=(const base_slice_iterator& other) const { return !(*this == other); }
+
+  private:
+    template <std::size_t... I> auto index(std::index_sequence<I...>) { return slice_(indexes_[I]...); }
+
+    const base_slice<N>& slice_;
+    std::array<std::size_t, N> indexes_;
+};
+
 template <std::size_t N> class base_slice
 {
     static_assert(N > 0, "invalid slice dimension");
-
-  public:
-    class iterator
-    {
-      public:
-        std::size_t operator*() const { return index(std::make_index_sequence<N>{}); }
-
-        iterator& operator++();
-        iterator operator++(int) const;
-        bool operator==(const iterator& other) { return all(indexes, other.indexes); }
-
-      private:
-        template <std::size_t... I> auto index(std::index_sequence<I...>) { return (*slice)(indexes[I]...); }
-
-        std::array<std::size_t, N> indexes = {{0}};
-        base_slice<N>* slice;
-    };
 
   public:
     base_slice() = default;
@@ -51,11 +57,22 @@ template <std::size_t N> class base_slice
     const auto& extents() const { return extents_; }
     const auto& strides() const { return strides_; }
 
+    auto start(std::size_t i) const { return start_[i]; }
+    auto size(std::size_t i) const { return size_[i]; }
+    const auto& extents(std::size_t i) const { return extents_[i]; }
+    const auto& strides(std::size_t i) const { return strides_[i]; }
+
+    base_slice_iterator<N> begin() const { return {*this, {}}; }
+    base_slice_iterator<N> end() const { return {*this, {extents_[0], 0}}; }
+
+    base_slice_iterator<N> cbegin() const { return {*this, {}}; }
+    base_slice_iterator<N> cend() const { return {*this, {extents_[0], 0}}; }
+
   private:
     std::size_t start_ = 0;
     std::size_t size_ = 0;
-    std::array<std::size_t, N> extents_ = {{0}};
-    std::array<std::size_t, N> strides_ = {{0}};
+    std::array<std::size_t, N> extents_ = {};
+    std::array<std::size_t, N> strides_ = {};
 };
 
 } // namespace detail
