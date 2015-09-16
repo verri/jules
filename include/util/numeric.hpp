@@ -24,6 +24,12 @@ template <typename Head, typename... Tail> constexpr auto prod_args(const Head& 
     return head * prod_args(tail...);
 }
 
+constexpr bool all_args() { return true; }
+template <typename Head, typename... Tail> constexpr bool all_args(const Head& head, const Tail&... tail)
+{
+    return head && all_args(tail...);
+}
+
 template <typename Range, typename R = typename std::remove_reference<Range>::type::value_type>
 auto all(Range&& rng)
 {
