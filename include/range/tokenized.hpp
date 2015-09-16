@@ -15,7 +15,10 @@ template <class Submatch> struct regex_holder {
     Submatch sub;
     match_flag_type flag;
 
-    regex_holder(const std::regex& re, const Submatch& sub, match_flag_type flag) : re(re), sub(sub), flag(flag) {}
+    regex_holder(const std::regex& re, const Submatch& sub, match_flag_type flag)
+        : re(re), sub(sub), flag(flag)
+    {
+    }
 
   private:
     void operator=(const regex_holder&);
@@ -61,7 +64,8 @@ auto tokenize(BidirectionalRange& rng, const std::regex& re, const Submatch& sub
 }
 
 template <typename BidirectionalRange, class Submatch>
-auto tokenize(const BidirectionalRange& rng, const std::regex& re, const Submatch& sub, detail::match_flag_type f)
+auto tokenize(const BidirectionalRange& rng, const std::regex& re, const Submatch& sub,
+              detail::match_flag_type f)
 {
     using BidirIt = typename boost::range_iterator<const BidirectionalRange>::type;
     using TokenIt = std::regex_token_iterator<BidirIt>;

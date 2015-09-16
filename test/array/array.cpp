@@ -20,6 +20,11 @@ TEST_CASE("array", "[array]")
     vector<double> b(values.begin(), values.size());
     vector<double> c(values);
 
+    matrix<double> M(1.0, 10, 10);
+    CHECK(M[0][0] == 1.0);
+    M[0][0] = 2.0;
+    CHECK(M[0][0] == 2.0);
+
     // usage:
     // x(1, 2, 3); // element access (no copy)
     // x[1][2][3]; // element access (no copy)

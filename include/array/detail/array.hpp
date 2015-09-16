@@ -47,18 +47,31 @@ ref_ndarray<const T, N - 1> ref_ndarray<T, N>::operator[](std::size_t i) const
     return {data_, {start, extents, strides}};
 }
 
+// Reference Array Specialization
+
+template <typename T> template <typename U> ref_ndarray<T, 1>& ref_ndarray<T, 1>::operator=(const U& source)
+{
+    for (std::size_t i : descriptor_)
+        data_[i] = source;
+    return *this;
+}
+
+template <typename T> T& ref_ndarray<T, 1>::operator[](std::size_t i) { return data_[descriptor_(i)]; }
+
+template <typename T> const T& ref_ndarray<T, 1>::operator[](std::size_t i) const
+{
+    return data_[descriptor_(i)];
+}
+
 // Iterator
 
-
-template <typename T, std::size_t N>
-auto ref_ndarray_iterator<T, N>::operator++() -> ref_ndarray_iterator&
+template <typename T, std::size_t N> auto ref_ndarray_iterator<T, N>::operator++() -> ref_ndarray_iterator &
 {
     ++index_;
     return *this;
 }
 
-template <typename T, std::size_t N>
-auto ref_ndarray_iterator<T, N>::operator++(int) -> ref_ndarray_iterator
+template <typename T, std::size_t N> auto ref_ndarray_iterator<T, N>::operator++(int) -> ref_ndarray_iterator
 {
     ref_ndarray_iterator copy = *this;
     ++index_;

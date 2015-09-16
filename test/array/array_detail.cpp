@@ -39,7 +39,8 @@ TEST_CASE("base array", "[base array]")
     CHECK(result.second == matrix3.data() + 5);
 
     int i = 0;
-    for (auto&& line : matrix3) ++i;
+    for (auto&& line : matrix3)
+        ++i;
 
     CHECK(i == matrix3.size(0));
 }
