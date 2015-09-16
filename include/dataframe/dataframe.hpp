@@ -113,8 +113,7 @@ auto base_dataframe<Coercion>::select(const expr_list_t& expression_list) const 
 }
 
 template <typename Coercion>
-base_dataframe<Coercion> base_dataframe<Coercion>::read(std::istream& is,
-                                                        const dataframe_storage_options& opt)
+base_dataframe<Coercion> base_dataframe<Coercion>::read(std::istream& is, const dataframe_read_options& opt)
 {
     using namespace adaptors;
     using namespace range;
@@ -127,20 +126,18 @@ base_dataframe<Coercion> base_dataframe<Coercion>::read(std::istream& is,
     std::string raw_data;
     raw_data.assign(std::istreambuf_iterator<char>(is), std::istreambuf_iterator<char>());
 
-    std::regex eol{opt.eol};
-    std::regex sep{opt.separator};
-
     std::vector<std::sub_match<std::string::iterator>> data;
     std::size_t ncol = 0;
 
-    auto line_range = raw_data | tokenized(eol, -1);
+    auto line_range = raw_data | tokenized(opt.line.regex, opt.line.separator ? -1 : 0, opt.line.flag);
 
     std::size_t size = 0;
     for (auto&& line : line_range) {
         if (line.first == line.second)
             continue;
 
-        copy(as_range(line) | tokenized(sep, -1), std::back_inserter(data));
+        copy(as_range(line) | tokenized(opt.cell.regex, opt.cell.separator ? -1 : 0, opt.cell.flag),
+             std::back_inserter(data));
 
         if (ncol == 0)
             ncol = data.size() - size;
@@ -177,7 +174,7 @@ base_dataframe<Coercion> base_dataframe<Coercion>::read(std::istream& is,
 
 template <typename Coercion>
 void base_dataframe<Coercion>::write(const base_dataframe<Coercion>& df, std::ostream& os,
-                                     const dataframe_storage_options& opt)
+                                     const dataframe_write_options& opt)
 {
     if (df.nrow() == 0 || df.ncol() == 0)
         return;
@@ -197,17 +194,17 @@ void base_dataframe<Coercion>::write(const base_dataframe<Coercion>& df, std::os
     }
 
     if (opt.header) {
-        os << df.select(0).name();
+        opt.cell.data(os, df.select(0).name());
         for (std::size_t j = 1; j < df.ncol(); ++j)
-            os << opt.separator << df.select(j).name();
-        os << opt.eol;
+            opt.cell.data(opt.cell.separator(os), df.select(j).name());
+        opt.line.separator(os);
     }
 
     for (std::size_t i = 0; i < df.nrow(); ++i) {
-        os << data[0][i];
+        opt.cell.data(os, data[0][i]);
         for (std::size_t j = 1; j < df.ncol(); ++j)
-            os << opt.separator << data[j][i];
-        os << opt.eol;
+            opt.cell.data(opt.cell.separator(os), data[j][i]);
+        opt.line.separator(os);
     }
 }
 

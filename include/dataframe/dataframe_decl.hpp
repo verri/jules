@@ -54,10 +54,8 @@ template <typename Coercion> class base_dataframe
     std::size_t nrow() const { return nrow_; }
     std::size_t ncol() const { return columns_.size(); }
 
-    static base_dataframe read(std::istream& is,
-                               const dataframe_storage_options& opt = {R"(\t)", R"(\n)", true});
-    static void write(const base_dataframe& df, std::ostream& os,
-                      const dataframe_storage_options& opt = {"\t", "\n", true});
+    static base_dataframe read(std::istream& is, const dataframe_read_options& opt = {});
+    static void write(const base_dataframe& df, std::ostream& os, const dataframe_write_options& opt = {});
 
     template <typename T> base_const_dataframe_colview<T, Coercion> colview() const;
     template <typename T> base_dataframe_colview<T, Coercion> colview();
