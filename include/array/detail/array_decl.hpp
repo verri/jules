@@ -39,20 +39,18 @@ template <typename T, std::size_t N> class ref_ndarray
     using const_iterator = ref_ndarray_iterator<const T, N>;
 
     using size_type = std::size_t;
-    using difference_type = std::size_t;
+    using difference_type = std::ptrdiff_t;
 
     ref_ndarray() = delete;
     ~ref_ndarray() = default;
 
-    template <typename U> ref_ndarray& operator=(const base_ndarray<U, N>& source);
-    template <typename U> ref_ndarray& operator=(base_ndarray<U, N>&& source);
+    ref_ndarray& operator=(const ref_ndarray& source);
+
+    // TODO: template <typename U> ref_ndarray& operator=(const base_ndarray<U, N>& source);
+    // TODO: template <typename U> ref_ndarray& operator=(base_ndarray<U, N>&& source);
 
     template <typename U> ref_ndarray& operator=(const ref_ndarray<U, N>& source);
-    template <typename U> ref_ndarray& operator=(ref_ndarray<U, N>&& source);
-
     template <typename U> ref_ndarray& operator=(const indirect_ndarray<U, N>& source);
-    template <typename U> ref_ndarray& operator=(indirect_ndarray<U, N>&& source);
-
     template <typename U> ref_ndarray& operator=(const U& source);
 
     operator ref_ndarray<const T, N>() const { return {this->data_, descriptor_}; }
@@ -87,6 +85,9 @@ template <typename T, std::size_t N> class ref_ndarray
 
     T* data_;
     base_slice<N> descriptor_;
+
+  private:
+    void check_assignment(const T* data, const base_slice<N> descriptor);
 };
 
 template <typename T> class ref_ndarray<T, 1>
@@ -102,20 +103,18 @@ template <typename T> class ref_ndarray<T, 1>
     using const_iterator = ref_ndarray_iterator<const T, 1>;
 
     using size_type = std::size_t;
-    using difference_type = std::size_t;
+    using difference_type = std::ptrdiff_t;
 
     ref_ndarray() = delete;
     ~ref_ndarray() = default;
 
-    template <typename U> ref_ndarray& operator=(const base_ndarray<U, 1>& source);
-    template <typename U> ref_ndarray& operator=(base_ndarray<U, 1>&& source);
+    ref_ndarray& operator=(const ref_ndarray& source);
+
+    // TODO: template <typename U> ref_ndarray& operator=(const base_ndarray<U, 1>& source);
+    // TODO: template <typename U> ref_ndarray& operator=(base_ndarray<U, 1>&& source);
 
     template <typename U> ref_ndarray& operator=(const ref_ndarray<U, 1>& source);
-    template <typename U> ref_ndarray& operator=(ref_ndarray<U, 1>&& source);
-
     template <typename U> ref_ndarray& operator=(const indirect_ndarray<U, 1>& source);
-    template <typename U> ref_ndarray& operator=(indirect_ndarray<U, 1>&& source);
-
     template <typename U> ref_ndarray& operator=(const U& source);
 
     operator ref_ndarray<const T, 1>() const { return {this->data_, descriptor_}; }
@@ -150,43 +149,62 @@ template <typename T> class ref_ndarray<T, 1>
 
     T* data_;
     base_slice<1> descriptor_;
+
+  private:
+    void check_assignment(const T* data, const base_slice<1> descriptor);
 };
 
 template <typename T, std::size_t N> class ref_ndarray_iterator
 {
   public:
+    using value_type = ref_ndarray<T, N - 1>;
+    using difference_type = std::ptrdiff_t;
+    using reference = ref_ndarray<T, N - 1>&;
+    using pointer = ref_ndarray<T, N - 1>*;
+    using iterator_category = std::random_access_iterator_tag;
+
     ref_ndarray_iterator(const ref_ndarray<T, N>& array, std::size_t index) : array_{array}, index_{index} {}
 
-    ref_ndarray<T, N - 1> operator*() { return array_[index_]; }
+    ref_ndarray<T, N - 1> operator*() const { return array_[index_]; }
 
     ref_ndarray_iterator& operator++();
     ref_ndarray_iterator operator++(int);
     bool operator==(const ref_ndarray_iterator& other) const { return index_ == other.index_; }
     bool operator!=(const ref_ndarray_iterator& other) const { return index_ != other.index_; }
 
-    std::size_t operator-(const ref_ndarray_iterator& other) const { return index_ - other.index_; }
+    // TODO other random access operations
+
+    std::ptrdiff_t operator-(const ref_ndarray_iterator& other) const { return index_ - other.index_; }
 
   private:
-    ref_ndarray<T, N> array_;
+    mutable ref_ndarray<T, N> array_;
     std::size_t index_;
 };
 
 template <typename T> class ref_ndarray_iterator<T, 1>
 {
   public:
+    using value_type = T;
+    using difference_type = std::ptrdiff_t;
+    using reference = T&;
+    using pointer = T*;
+    using iterator_category = std::random_access_iterator_tag;
+
     ref_ndarray_iterator(const ref_ndarray<T, 1>& array, std::size_t index) : array_{array}, index_{index} {}
 
-    T& operator*() { return array_[index_]; }
+    T& operator*() const { return array_[index_]; }
 
     ref_ndarray_iterator& operator++();
     ref_ndarray_iterator operator++(int);
     bool operator==(const ref_ndarray_iterator& other) const { return index_ == other.index_; }
     bool operator!=(const ref_ndarray_iterator& other) const { return index_ != other.index_; }
 
-    std::size_t operator-(const ref_ndarray_iterator& other) const { return index_ - other.index_; }
+    // TODO other random access operations
+
+    std::ptrdiff_t operator-(const ref_ndarray_iterator& other) const { return index_ - other.index_; }
 
   private:
-    ref_ndarray<T, 1> array_;
+    mutable ref_ndarray<T, 1> array_;
     std::size_t index_;
 };
 
@@ -218,9 +236,6 @@ template <typename T, std::size_t N> class base_ndarray : public ref_ndarray<T, 
 
     template <typename U> base_ndarray& operator=(const indirect_ndarray<U, N>& source);
     template <typename U> base_ndarray& operator=(indirect_ndarray<U, N>&& source);
-
-    template <typename U> base_ndarray& operator=(const U& source);
-    template <typename U> base_ndarray& operator=(U&& source);
 
     std::size_t size() const { return this->descriptor_.size(); }
     std::size_t size(std::size_t i) const { return this->descriptor_.extents(i); }

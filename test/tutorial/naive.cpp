@@ -35,10 +35,8 @@ class gaussian_naive_bayes
 
         CHECK(all(features, FEATURES));
 
-        auto y = make_view<std::string>(response_column).as_vector();
-        // we convert y to use operator==
-
-        auto X = make_colview<double>(terms_dataframe);
+        auto y = make_view<std::string>(response_column); // TODO must be a vector
+        auto X = make_colview<double>(terms_dataframe); // TODO must act as a matrix
 
         classes = range::unique(y);
 
@@ -70,8 +68,9 @@ class gaussian_naive_bayes
         // }
     }
 
-    std::string classify(const vector<double>& sample) const
+    std::string classify(const vector<double>& /* TODO sample */) const
     {
+        return {};
         //     // if (sample.size() != nfeatures_)
         //     //     throw std::runtime_error{"invalid sample"};
 

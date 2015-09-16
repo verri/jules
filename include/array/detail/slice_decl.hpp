@@ -14,6 +14,11 @@ template <std::size_t N> class base_slice;
 template <std::size_t N> class base_slice_iterator
 {
   public:
+    using value_type = std::size_t;
+    using reference = std::size_t&;
+    using pointer = std::size_t*;
+    using iterator_category = std::forward_iterator_tag;
+
     template <typename... Dims, typename = all_size_enabler<N, Dims...>>
     base_slice_iterator(const base_slice<N>& slice, Dims... indexes);
     base_slice_iterator(const base_slice<N>& slice, const std::array<std::size_t, N>& indexes);

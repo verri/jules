@@ -7,7 +7,46 @@ namespace jules
 {
 namespace detail
 {
+
 // Reference Array
+
+#ifndef NDEBUG
+template <typename T, std::size_t N>
+void ref_ndarray<T, N>::check_assignment(const T* data, const base_slice<N> descriptor)
+{
+    if (this->data_ == data)
+        throw std::runtime_error{"self-assignment is not supported"};
+
+    if (!all(this->descriptor_.extents(), descriptor.extents()))
+        throw std::out_of_range{"extents do not match"};
+}
+#else
+template <typename T, std::size_t N>
+void ref_ndarray<T, N>::check_assignment(const T*, const base_slice<N>) {}
+#endif // NDEBUG
+
+template <typename T, std::size_t N>
+ref_ndarray<T, N>& ref_ndarray<T, N>::operator=(const ref_ndarray& source)
+{
+    check_assignment(source.data_, source.descriptor_);
+
+    auto it = source.descriptor_.begin();
+    for (std::size_t i : this->descriptor_)
+        data_[i] = source.data_[*it++];
+    return *this;
+}
+
+template <typename T, std::size_t N>
+template <typename U>
+ref_ndarray<T, N>& ref_ndarray<T, N>::operator=(const ref_ndarray<U, N>& source)
+{
+    check_assignment(nullptr, source.descriptor_);
+
+    auto it = source.descriptor_.begin();
+    for (std::size_t i : this->descriptor_)
+        data_[i] = source.data_[*it++];
+    return *this;
+}
 
 template <typename T, std::size_t N>
 template <typename U>
@@ -48,6 +87,43 @@ ref_ndarray<const T, N - 1> ref_ndarray<T, N>::operator[](std::size_t i) const
 }
 
 // Reference Array Specialization
+#ifndef NDEBUG
+template <typename T>
+void ref_ndarray<T, 1>::check_assignment(const T* data, const base_slice<1> descriptor)
+{
+    if (this->data_ == data)
+        throw std::runtime_error{"self-assignment is not supported"};
+
+    if (!all(this->descriptor_.extents(), descriptor.extents()))
+        throw std::out_of_range{"extents do not match"};
+}
+#else
+template <typename T>
+void ref_ndarray<T, 1>::check_assignment(const T*, const base_slice<1>) {}
+#endif // 1DEBUG
+
+template <typename T>
+ref_ndarray<T, 1>& ref_ndarray<T, 1>::operator=(const ref_ndarray& source)
+{
+    check_assignment(source.data_, source.descriptor_);
+
+    auto it = source.descriptor_.begin();
+    for (std::size_t i : this->descriptor_)
+        data_[i] = source.data_[*it++];
+    return *this;
+}
+
+template <typename T>
+template <typename U>
+ref_ndarray<T, 1>& ref_ndarray<T, 1>::operator=(const ref_ndarray<U, 1>& source)
+{
+    check_assignment(nullptr, source.descriptor_);
+
+    auto it = source.descriptor_.begin();
+    for (std::size_t i : this->descriptor_)
+        data_[i] = source.data_[*it++];
+    return *this;
+}
 
 template <typename T> template <typename U> ref_ndarray<T, 1>& ref_ndarray<T, 1>::operator=(const U& source)
 {
@@ -72,6 +148,21 @@ template <typename T, std::size_t N> auto ref_ndarray_iterator<T, N>::operator++
 }
 
 template <typename T, std::size_t N> auto ref_ndarray_iterator<T, N>::operator++(int) -> ref_ndarray_iterator
+{
+    ref_ndarray_iterator copy = *this;
+    ++index_;
+    return copy;
+}
+
+// Iterator
+
+template <typename T> auto ref_ndarray_iterator<T, 1>::operator++() -> ref_ndarray_iterator &
+{
+    ++index_;
+    return *this;
+}
+
+template <typename T> auto ref_ndarray_iterator<T, 1>::operator++(int) -> ref_ndarray_iterator
 {
     ref_ndarray_iterator copy = *this;
     ++index_;
