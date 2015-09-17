@@ -14,10 +14,11 @@ namespace detail
 {
 template <typename T, std::size_t N> class base_ndarray : public ref_ndarray<T, N>
 {
-  private:
-    using storage_t = std::aligned_storage_t<sizeof(T), alignof(T)>;
+    template <typename U, std::size_t M> friend class base_ndarray;
 
   public:
+    using storage_t = std::aligned_storage_t<sizeof(T), alignof(T)>;
+
     base_ndarray();
     ~base_ndarray();
 
@@ -32,20 +33,26 @@ template <typename T, std::size_t N> class base_ndarray : public ref_ndarray<T, 
     base_ndarray(const base_ndarray& source);
     base_ndarray(base_ndarray&& source);
 
+    template <typename U> base_ndarray(const base_ndarray<U, N>& source);
+
     base_ndarray& operator=(const base_ndarray& source);
     base_ndarray& operator=(base_ndarray&& source);
 
-    // TODO(optimization): template <typename U> base_ndarray& operator=(const base_ndarray<U, N>& source);
-    // TODO(optimization): template <typename U> base_ndarray& operator=(base_ndarray<U, N>&& source);
-
+    template <typename U> base_ndarray& operator=(const base_ndarray<U, N>& source);
     template <typename U> base_ndarray& operator=(const ref_ndarray<U, N>& source);
-    template <typename U> base_ndarray& operator=(const indirect_ndarray<U, N>& source);
+    // TODO: template <typename U> base_ndarray& operator=(const indirect_ndarray<U, N>& source);
     template <typename U> base_ndarray& operator=(const U& source);
 
     T* data() { return this->data_; }
     const T* data() const { return this->data_; }
 
   private:
+    static T* allocate(std::size_t size) { return reinterpret_cast<T*>(new storage_t[size]); }
+    static void deallocate(T* data, std::size_t) { delete[] reinterpret_cast<storage_t*>(data); }
+
+    template <typename... Args> static void create(T* data, std::size_t size, Args&&... args);
+    static void destroy(T* data, std::size_t size);
+
     void clear();
 };
 
