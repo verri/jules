@@ -45,9 +45,10 @@ template <typename T, std::size_t N> class base_ndarray;
 template <typename T, std::size_t N> class ref_ndarray;
 template <typename T, std::size_t N> class indirect_ndarray;
 template <typename T, std::size_t N> class ref_ndarray_iterator;
-template <typename IndexesLeft, typename IndexesRight, typename TypeLeft, typename TypeRight, typename F> class binary_expr_ndarray;
+template <typename T, std::size_t N> class ref_ndarray_data_iterator;
+template <typename IndexesLeft, typename IndexesRight, typename TypeLeft, typename TypeRight, typename F>
+class binary_expr_ndarray;
 template <typename Indexes, typename T, typename F> class unary_expr_ndarray;
-
 
 } // namespace detail
 } // namespace jules

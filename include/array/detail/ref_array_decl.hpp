@@ -80,6 +80,12 @@ template <typename T, std::size_t N> class ref_ndarray
     std::size_t nrow() const { return size(0); }
     std::size_t ncol() const { return size(1); }
 
+    ref_ndarray_data_iterator<T, N> data_begin() { return {data_, descriptor_.begin()}; }
+    ref_ndarray_data_iterator<T, N> data_end() { return {data_, descriptor_.end()}; }
+
+    ref_ndarray_data_iterator<const T, N> data_begin() const { return {data_, descriptor_.begin()}; }
+    ref_ndarray_data_iterator<const T, N> data_end() const { return {data_, descriptor_.end()}; }
+
   protected:
     ref_ndarray(T* data, const base_slice<N>& descriptor) : data_{data}, descriptor_{descriptor} {}
 
@@ -142,6 +148,12 @@ template <typename T> class ref_ndarray<T, 1>
     ref_ndarray_iterator<const T, 1> cend() const { return {*this, descriptor_.extents(0)}; }
 
     std::size_t size() const { return descriptor_.size(); }
+
+    ref_ndarray_data_iterator<T, 1> data_begin() { return {data_, descriptor_.begin()}; }
+    ref_ndarray_data_iterator<T, 1> data_end() { return {data_, descriptor_.end()}; }
+
+    ref_ndarray_data_iterator<const T, 1> data_begin() const { return {data_, descriptor_.begin()}; }
+    ref_ndarray_data_iterator<const T, 1> data_end() const { return {data_, descriptor_.end()}; }
 
   protected:
     ref_ndarray(T* data, const base_slice<1>& descriptor) : data_{data}, descriptor_{descriptor} {}
@@ -208,6 +220,31 @@ template <typename T> class ref_ndarray_iterator<T, 1>
   private:
     mutable ref_ndarray<T, 1> array_;
     std::size_t index_;
+};
+
+template <typename T, std::size_t N> class ref_ndarray_data_iterator
+{
+  public:
+    using value_type = T;
+    using difference_type = std::ptrdiff_t;
+    using reference = T&;
+    using pointer = T*;
+    using iterator_category = std::forward_iterator_tag;
+
+    ref_ndarray_data_iterator(T* data, const base_slice_iterator<N>& it) : data_{data}, it_{it} {}
+
+    T& operator*() const { return data_[*it_]; }
+
+    ref_ndarray_data_iterator& operator++();
+    ref_ndarray_data_iterator operator++(int);
+    bool operator==(const ref_ndarray_data_iterator& other) const { return it_ == other.it_; }
+    bool operator!=(const ref_ndarray_data_iterator& other) const { return it_ != other.it_; }
+
+    std::ptrdiff_t operator-(const ref_ndarray_data_iterator& other) const { return it_ - other.it_; }
+
+  private:
+    T* data_;
+    base_slice_iterator<N> it_;
 };
 
 } // namespace detail
