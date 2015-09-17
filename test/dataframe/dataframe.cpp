@@ -95,15 +95,17 @@ TEST_CASE("reading a dataframe", "[dataframe]")
     // CHECK(cols.at(2) == " ")
 }
 
-TEST_CASE("reading an inconsistent dataframe (no line-break)", "[dataframe]")
+TEST_CASE("reading an inconsistent dataframe", "[dataframe]")
 {
     std::string input = "\ty \t\n1 \t 2\t  3";
 
     std::stringstream stream(input);
 
-    auto df = jules::dataframe::read(stream);
-    CHECK(df.nrow() == 1);
-    CHECK(df.ncol() == 3);
+    jules::dataframe df;
+    CHECK_THROWS(df = jules::dataframe::read(stream));
+
+    CHECK(df.nrow() == 0);
+    CHECK(df.ncol() == 0);
 }
 
 TEST_CASE("reading and writing a well-formed dataframe", "[dataframe]")
