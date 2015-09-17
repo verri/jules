@@ -9,9 +9,15 @@ namespace jules
 {
 namespace detail
 {
+struct empty {
+    empty(empty&&) = default;
+};
+
 template <typename LhsIt, typename RhsIt, typename LhsContainer, typename RhsContainer, typename Op>
 class binary_expr_ndarray
 {
+    static_assert(!std::is_reference<LhsContainer>::value && !std::is_reference<RhsContainer>::value, "?");
+
   public:
     class iterator
     {
@@ -56,6 +62,8 @@ class binary_expr_ndarray
 
 template <typename It, typename Container, typename Op> class unary_expr_ndarray
 {
+    static_assert(!std::is_reference<Container>::value, "?");
+
   public:
     class iterator
     {
@@ -99,13 +107,13 @@ template <typename It, typename Container, typename Op> class unary_expr_ndarray
 };
 
 template <typename T, std::size_t N>
-std::tuple<const T*, const T*, const base_ndarray<T, N>&> get_expr_info(const base_ndarray<T, N>& array);
+std::tuple<const T*, const T*, empty&&> get_expr_info(const base_ndarray<T, N>& array);
 
 template <typename T, std::size_t N>
 std::tuple<const T*, const T*, base_ndarray<T, N>&&> get_expr_info(base_ndarray<T, N>&& array);
 
 template <typename LhsIt, typename RhsIt, typename LhsContainer, typename RhsContainer, typename Op>
-binary_expr_ndarray<LhsIt, RhsIt, LhsContainer, RhsContainer, Op>
+binary_expr_ndarray<LhsIt, RhsIt, std::decay_t<LhsContainer>, std::decay_t<RhsContainer>, Op>
 make_expr_ndarray(const LhsIt& lhs_begin, const LhsIt& lhs_end, const RhsIt& rhs_begin, const RhsIt& rhs_end,
                   LhsContainer&& lhs, RhsContainer&& rhs, const Op& op);
 

@@ -31,7 +31,7 @@ binary_expr_ndarray<LhsIt, RhsIt, LhsContainer, RhsContainer, Op>::binary_expr_n
     const LhsIt& lhs_begin, const LhsIt& lhs_end, const RhsIt& rhs_begin, const RhsIt& rhs_end,
     LhsContainer&& lhs, RhsContainer&& rhs, const Op& op)
     : lhs_begin_{lhs_begin}, lhs_end_{lhs_end}, rhs_begin_{rhs_begin}, rhs_end_{rhs_end},
-      lhs_{std::move(lhs)}, rhs_{std::move(rhs)}, op_{op}
+      lhs_(std::move(lhs)), rhs_(std::move(rhs)), op_{op}
 {
 }
 
@@ -45,9 +45,9 @@ unary_expr_ndarray<It, Container, Op>::unary_expr_ndarray(const It& it_begin, co
 // Utilities
 
 template <typename T, std::size_t N>
-std::tuple<const T*, const T*, const base_ndarray<T, N>&> get_expr_info(const base_ndarray<T, N>& array)
+std::tuple<const T*, const T*, empty&&> get_expr_info(const base_ndarray<T, N>& array)
 {
-    return {array.data_begin(), array.data_end(), array};
+    return {array.data_begin(), array.data_end(), empty{}};
 }
 
 template <typename T, std::size_t N>
@@ -57,7 +57,7 @@ std::tuple<const T*, const T*, base_ndarray<T, N>&&> get_expr_info(base_ndarray<
 }
 
 template <typename LhsIt, typename RhsIt, typename LhsContainer, typename RhsContainer, typename Op>
-binary_expr_ndarray<LhsIt, RhsIt, LhsContainer, RhsContainer, Op>
+binary_expr_ndarray<LhsIt, RhsIt, std::decay_t<LhsContainer>, std::decay_t<RhsContainer>, Op>
 make_expr_ndarray(const LhsIt& lhs_begin, const LhsIt& lhs_end, const RhsIt& rhs_begin, const RhsIt& rhs_end,
                   LhsContainer&& lhs, RhsContainer&& rhs, const Op& op)
 {
