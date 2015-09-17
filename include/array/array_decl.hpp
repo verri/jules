@@ -6,7 +6,6 @@
 
 namespace jules
 {
-
 template <typename T, std::size_t N> using ndarray = detail::base_ndarray<T, N>;
 
 template <typename T> using matrix = ndarray<T, 2>;

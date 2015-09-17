@@ -5,8 +5,7 @@
 
 namespace jules
 {
-template <typename T, typename Range, typename>
-vector<T> to_vector(const Range& rng)
+template <typename T, typename Range, typename> vector<T> to_vector(const Range& rng)
 {
     vector<T> vec(range::size(rng));
     range::copy(rng, vec.begin());
@@ -14,11 +13,7 @@ vector<T> to_vector(const Range& rng)
     return vec;
 }
 
-template <typename Range, typename R>
-vector<R> as_vector(const Range& rng)
-{
-    return to_vector<R>(rng);
-}
+template <typename Range, typename R> vector<R> as_vector(const Range& rng) { return to_vector<R>(rng); }
 
 } // namespace jules
 

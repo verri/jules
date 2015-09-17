@@ -50,7 +50,7 @@ template <std::size_t N>
 base_slice<N>::base_slice(std::size_t start, std::initializer_list<std::size_t> extents)
     : start_{start}
 {
-    if (extents.size() >= N)
+    if (extents.size() > N)
         throw std::runtime_error{"invalid extents"};
 
     std::copy(extents.begin(), extents.end(), std::begin(extents_));
@@ -69,7 +69,7 @@ base_slice<N>::base_slice(std::size_t start, std::initializer_list<std::size_t> 
                           std::initializer_list<std::size_t> strides)
     : start_{start}, size_{prod(extents)}
 {
-    if (extents.size() >= N || strides.size() >= N)
+    if (extents.size() > N || strides.size() > N)
         throw std::runtime_error{"invalid extents or strides"};
 
     std::copy(extents.begin(), extents.end(), std::begin(extents_));

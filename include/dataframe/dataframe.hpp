@@ -88,7 +88,8 @@ template <typename Coercion> base_dataframe<Coercion>& base_dataframe<Coercion>:
 
 template <typename Coercion> vector<std::string> base_dataframe<Coercion>::colnames() const
 {
-    return to_vector<std::string>(columns_ | adaptors::transformed([](const column_t& col) { return col.name(); }));
+    return to_vector<std::string>(columns_ |
+                                  adaptors::transformed([](const column_t& col) { return col.name(); }));
 }
 
 template <typename Coercion>
