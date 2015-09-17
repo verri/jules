@@ -45,11 +45,11 @@ template <typename T, std::size_t N> class ref_ndarray
 
     ref_ndarray& operator=(const ref_ndarray& source);
 
-    // TODO(optimization): template <typename U> ref_ndarray& operator=(const base_ndarray<U, N>& source);
-    // TODO(optimization): template <typename U> ref_ndarray& operator=(base_ndarray<U, N>&& source);
+    template <typename U> ref_ndarray& operator=(const base_ndarray<U, N>& source);
+    template <typename U> ref_ndarray& operator=(base_ndarray<U, N>&& source);
 
     template <typename U> ref_ndarray& operator=(const ref_ndarray<U, N>& source);
-    template <typename U> ref_ndarray& operator=(const indirect_ndarray<U, N>& source);
+    // TODO: template <typename U> ref_ndarray& operator=(const indirect_ndarray<U, N>& source);
     template <typename U> ref_ndarray& operator=(const U& source);
 
     operator ref_ndarray<const T, N>() const { return {this->data_, descriptor_}; }
@@ -90,9 +90,6 @@ template <typename T, std::size_t N> class ref_ndarray
 
     T* data_;
     base_slice<N> descriptor_;
-
-  private:
-    void check_assignment(const T* data, const base_slice<N> descriptor);
 };
 
 template <typename T> class ref_ndarray<T, 1>
@@ -115,11 +112,11 @@ template <typename T> class ref_ndarray<T, 1>
 
     ref_ndarray& operator=(const ref_ndarray& source);
 
-    // TODO(optimization): template <typename U> ref_ndarray& operator=(const base_ndarray<U, 1>& source);
-    // TODO(optimization): template <typename U> ref_ndarray& operator=(base_ndarray<U, 1>&& source);
+    template <typename U> ref_ndarray& operator=(const base_ndarray<U, 1>& source);
+    template <typename U> ref_ndarray& operator=(base_ndarray<U, 1>&& source);
 
     template <typename U> ref_ndarray& operator=(const ref_ndarray<U, 1>& source);
-    template <typename U> ref_ndarray& operator=(const indirect_ndarray<U, 1>& source);
+    // TODO: template <typename U> ref_ndarray& operator=(const indirect_ndarray<U, 1>& source);
     template <typename U> ref_ndarray& operator=(const U& source);
 
     operator ref_ndarray<const T, 1>() const { return {this->data_, descriptor_}; }
