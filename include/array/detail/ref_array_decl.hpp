@@ -242,6 +242,8 @@ template <typename T, std::size_t N> class ref_ndarray_data_iterator
 
     std::ptrdiff_t operator-(const ref_ndarray_data_iterator& other) const { return it_ - other.it_; }
 
+    operator ref_ndarray_data_iterator<const T, N>() const { return {data_, it_}; }
+
   private:
     T* data_;
     base_slice_iterator<N> it_;

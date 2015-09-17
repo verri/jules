@@ -46,11 +46,11 @@ template <typename T, std::size_t N> class base_ndarray : public ref_ndarray<T, 
     T* data() { return this->data_; }
     const T* data() const { return this->data_; }
 
-    T* begin_data() { return this->data_; }
-    T* end_data() { return this->data_ + this->size(); }
+    T* data_begin() { return this->data_; }
+    T* data_end() { return this->data_ + this->size(); }
 
-    const T* begin_data() const { return this->data_; }
-    const T* end_data() const { return this->data_ + this->size(); }
+    const T* data_begin() const { return this->data_; }
+    const T* data_end() const { return this->data_ + this->size(); }
 
   private:
     static T* allocate(std::size_t size) { return reinterpret_cast<T*>(new storage_t[size]); }

@@ -44,4 +44,6 @@ TEST_CASE("base array", "[base array]")
         ++i;
 
     CHECK(i == matrix3.size(0));
+
+    auto&& expr = matrix1 + matrix2;
 }

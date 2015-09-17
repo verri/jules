@@ -3,6 +3,8 @@
 
 #include "array/detail/array.hpp"
 
+#include <tuple>
+
 namespace jules
 {
 namespace detail
@@ -37,7 +39,7 @@ class binary_expr_ndarray
     };
 
     binary_expr_ndarray(const LhsIt& lhs_begin, const LhsIt& lhs_end, const RhsIt& rhs_begin,
-                        LhsContainer lhs, RhsContainer rhs, const Op& op);
+                        const RhsIt& rhs_end, LhsContainer&& lhs, RhsContainer&& rhs, const Op& op);
 
     iterator data_begin() const { return {lhs_begin_, rhs_begin_}; }
     iterator data_end() const { return {lhs_end_, rhs_end_}; }
@@ -79,7 +81,13 @@ template <typename It, typename Container, typename Op> class unary_expr_ndarray
         Op op_;
     };
 
-    unary_expr_ndarray(const It& it_begin, const It& it_end, Container c, const Op& op);
+    unary_expr_ndarray(const It& it_begin, const It& it_end, Container&& c, const Op& op);
+
+    unary_expr_ndarray(const unary_expr_ndarray& source) = delete;
+    unary_expr_ndarray(unary_expr_ndarray&& source) = default;
+
+    unary_expr_ndarray& operator=(const unary_expr_ndarray& source) = delete;
+    unary_expr_ndarray& operator=(unary_expr_ndarray&& source) = default;
 
     iterator data_begin() const { return {it_begin_}; }
     iterator data_end() const { return {it_end_}; }
@@ -89,6 +97,17 @@ template <typename It, typename Container, typename Op> class unary_expr_ndarray
     Container c_; // to properly destroy object if it was moved
     Op op_;
 };
+
+template <typename T, std::size_t N>
+std::tuple<const T*, const T*, const base_ndarray<T, N>&> get_expr_info(const base_ndarray<T, N>& array);
+
+template <typename T, std::size_t N>
+std::tuple<const T*, const T*, base_ndarray<T, N>&&> get_expr_info(base_ndarray<T, N>&& array);
+
+template <typename LhsIt, typename RhsIt, typename LhsContainer, typename RhsContainer, typename Op>
+binary_expr_ndarray<LhsIt, RhsIt, LhsContainer, RhsContainer, Op>
+make_expr_ndarray(const LhsIt& lhs_begin, const LhsIt& lhs_end, const RhsIt& rhs_begin, const RhsIt& rhs_end,
+                  LhsContainer&& lhs, RhsContainer&& rhs, const Op& op);
 
 } // namespace detail
 } // namespace jules
