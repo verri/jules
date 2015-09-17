@@ -29,17 +29,14 @@ template <typename T, std::size_t N> class base_ndarray : public ref_ndarray<T, 
     template <typename... Dims, typename = all_size_enabler<N, Dims...>>
     base_ndarray(const T* data, Dims... dims);
 
-    template <typename Range, typename R = typename std::remove_reference<Range>::type::value_type>
-    base_ndarray(const Range& rng);
-
     base_ndarray(const base_ndarray& source);
     base_ndarray(base_ndarray&& source);
 
     base_ndarray& operator=(const base_ndarray& source);
     base_ndarray& operator=(base_ndarray&& source);
 
-    // TODO(optimation): template <typename U> base_ndarray& operator=(const base_ndarray<U, N>& source);
-    // TODO(optimation): template <typename U> base_ndarray& operator=(base_ndarray<U, N>&& source);
+    // TODO(optimization): template <typename U> base_ndarray& operator=(const base_ndarray<U, N>& source);
+    // TODO(optimization): template <typename U> base_ndarray& operator=(base_ndarray<U, N>&& source);
 
     template <typename U> base_ndarray& operator=(const ref_ndarray<U, N>& source);
     template <typename U> base_ndarray& operator=(const indirect_ndarray<U, N>& source);

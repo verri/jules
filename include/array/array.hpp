@@ -5,15 +5,21 @@
 
 namespace jules
 {
-// template <typename T>
-// template <typename Range, typename R>
-// ndarray<T, 1>::ndarray(Range&& rng)
-//    : detail::base_ndarray<T, 1>(range::size(rng))
-//{
-//    static_assert(std::is_assignable<T&, R>::value, "invalid values type");
-//    range::copy(std::forward<Range>(rng), this->data());
-//}
-//
+template <typename T, typename Range, typename>
+vector<T> to_vector(const Range& rng)
+{
+    vector<T> vec(range::size(rng));
+    range::copy(rng, vec.begin());
+
+    return vec;
+}
+
+template <typename Range, typename R>
+vector<R> as_vector(const Range& rng)
+{
+    return to_vector<R>(rng);
+}
+
 } // namespace jules
 
 #endif // JULES_ARRAY_ARRAY_H

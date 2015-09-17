@@ -48,7 +48,7 @@ template <typename T, std::size_t N>
 template <typename U>
 ref_ndarray<T, N>& ref_ndarray<T, N>::operator=(const ref_ndarray<U, N>& source)
 {
-    static_assert(std::is_assignable<T&, const U&>::value, "invalid values type");
+    static_assert(std::is_assignable<T&, U>::value, "invalid values type");
     check_assignment(nullptr, source.descriptor_);
     COPY_FROM_SOURCE;
 }
@@ -57,7 +57,7 @@ template <typename T, std::size_t N>
 template <typename U>
 ref_ndarray<T, N>& ref_ndarray<T, N>::operator=(const U& source)
 {
-    static_assert(std::is_assignable<T&, const U&>::value, "invalid values type");
+    static_assert(std::is_assignable<T&, U>::value, "invalid values type");
     for (std::size_t i : descriptor_)
         data_[i] = source;
     return *this;

@@ -18,7 +18,7 @@ TEST_CASE("array", "[array]")
     vector<double> z(20);      // 20 default elements
     vector<double> a(1.0, 30); // 30 elements with value 1.0
     vector<double> b(values.begin(), values.size());
-    vector<double> c(values);
+    vector<double> c = jules::as_vector(values);
 
     matrix<double> M(1.0, 10, 10);
     CHECK(M[0][0] == 1.0);

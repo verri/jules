@@ -12,9 +12,12 @@ template <std::size_t N, typename... Types>
 using all_size_enabler =
     std::enable_if_t<N == sizeof...(Types) && all_args(std::is_convertible<Types, std::size_t>::value...)>;
 
-template <typename Range, typename R, typename T = void>
+template <typename Range, typename R, typename T = R>
 using range_type_enabler =
-    std::enable_if_t<std::is_same<typename std::remove_reference<Range>::type::value_type, R>::value, T>;
+    std::enable_if_t<std::is_assignable<R&, typename std::remove_reference<Range>::type::value_type>::value, T>;
+
+template <typename T, typename U, typename R = void>
+using assignable_enabler = std::enable_if_t<std::is_assignable<T&, U>::value, R>;
 
 // Request check
 

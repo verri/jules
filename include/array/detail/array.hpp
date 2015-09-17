@@ -12,6 +12,8 @@
         return *this;                                                                                        \
     } while (false)
 
+// TODO: operator= debug checks
+
 namespace jules
 {
 namespace detail
@@ -52,23 +54,17 @@ template <typename... Dims, typename>
 base_ndarray<T, N>::base_ndarray(const T* data, Dims... dims)
     : ref_ndarray<T, N>{reinterpret_cast<T*>(new storage_t[prod_args(dims...)]), {0, {std::size_t(dims)...}}}
 {
-    std::copy(data, data + this->size(), this->data_);
-}
-
-template <typename T, std::size_t N>
-template <typename Range, typename R>
-base_ndarray<T, N>::base_ndarray(const Range& rng)
-    : ref_ndarray<T, N>{reinterpret_cast<T*>(new storage_t[range::size(rng)]), {0, {range::size(rng)}}}
-{
-    static_assert(N == 1, "only vector supports range constructor");
-    static_assert(std::is_assignable<T&, R>::value, "invalid values type");
-    range::copy(rng, this->data());
+    for (auto it = this->data(); it != this->data() + this->size(); ++it)
+        new (it) T(*data++);
 }
 
 template <typename T, std::size_t N>
 base_ndarray<T, N>::base_ndarray(const base_ndarray& source)
     : ref_ndarray<T, N>{reinterpret_cast<T*>(new storage_t[source.size()]), source.descriptor_}
 {
+    auto data = source.data();
+    for (auto it = data(); it != data() + this->size(); ++it)
+        new (it) T(*data++);
 }
 
 template <typename T, std::size_t N>
@@ -83,9 +79,11 @@ auto base_ndarray<T, N>::operator=(const base_ndarray& source) -> base_ndarray &
     clear();
 
     this->data_ = reinterpret_cast<T*>(new storage_t[source.size()]);
-    std::copy(source.data(), source.data() + source.size(), data());
+    auto data = source.data();
+    for (auto it = this->data(); it != this->data() + this->size(); ++it)
+        new (it) T(*data++);
 
-    this->descriptor = source.descriptor_;
+    this->descriptor_ = source.descriptor_;
 
     return *this;
 }
@@ -105,7 +103,7 @@ template <typename T, std::size_t N>
 template <typename U>
 auto base_ndarray<T, N>::operator=(const ref_ndarray<U, N>& source) -> base_ndarray &
 {
-    static_assert(std::is_assignable<T&, const U&>::value, "invalid values type");
+    static_assert(std::is_assignable<T&, U>::value, "invalid values type");
     COPY_FROM_SOURCE;
 }
 
@@ -117,11 +115,8 @@ template <typename T, std::size_t N>
 template <typename U>
 auto base_ndarray<T, N>::operator=(const U& source) -> base_ndarray &
 {
-    static_assert(std::is_assignable<T&, const U&>::value, "invalid values type");
-
     for (std::size_t i = 0; i < this->size(); ++i)
         this->data_[i] = source;
-
     return *this;
 }
 
