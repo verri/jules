@@ -1,5 +1,6 @@
 #include <catch.hpp>
 #include "array/detail/array.hpp"
+#include "array/detail/expression.hpp"
 
 TEST_CASE("base array", "[base array]")
 {

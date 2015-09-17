@@ -10,10 +10,6 @@ namespace jules
 {
 namespace detail
 {
-template <typename T, std::size_t N> class base_ndarray;
-template <typename T, std::size_t N> class ref_ndarray;
-template <typename T, std::size_t N> class ref_ndarray_iterator;
-
 template <typename T, std::size_t N> class indirect_ndarray
 {
     template <typename U, std::size_t M> friend class base_ndarray;
@@ -29,6 +25,8 @@ template <typename T, std::size_t N> class ref_ndarray
 {
     template <typename U, std::size_t M> friend class ref_ndarray;
     template <typename U, std::size_t M> friend class ref_ndarray_iterator;
+    template <typename, typename, typename, typename, typename> friend class binary_expr_ndarray;
+    template <typename, typename, typename> friend class unary_expr_ndarray;
 
   public:
     using value_type = T;
