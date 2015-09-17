@@ -37,7 +37,7 @@ class binary_expr_ndarray
     };
 
     binary_expr_ndarray(const LhsIt& lhs_begin, const LhsIt& lhs_end, const RhsIt& rhs_begin,
-                        LhsContainer lhs, RhsContainer rhs, Op op);
+                        LhsContainer lhs, RhsContainer rhs, const Op& op);
 
     iterator data_begin() const { return {lhs_begin_, rhs_begin_}; }
     iterator data_end() const { return {lhs_end_, rhs_end_}; }
@@ -52,12 +52,42 @@ class binary_expr_ndarray
     Op op_;
 };
 
-template <typename Indexes, typename T, typename F> class unary_expr_ndarray
+template <typename It, typename Container, typename Op> class unary_expr_ndarray
 {
+  public:
+    class iterator
+    {
+        using value_type = decltype(std::declval<Op>()(*std::declval<It>()));
+        using difference_type = std::ptrdiff_t;
+        using reference = value_type&;
+        using pointer = value_type*;
+        using iterator_category = std::forward_iterator_tag;
+
+        iterator(const It& it) : it_{it} {}
+
+        auto operator*() const { return op_(*it_); }
+
+        iterator& operator++();
+        iterator operator++(int);
+        bool operator==(const iterator& other) const { return it_ == other.it_; }
+        bool operator!=(const iterator& other) const { return it_ == other.it_; }
+
+        std::ptrdiff_t operator-(const iterator& other) const { return it_ - other.it_; }
+
+      private:
+        It it_;
+        Op op_;
+    };
+
+    unary_expr_ndarray(const It& it_begin, const It& it_end, Container c, const Op& op);
+
+    iterator data_begin() const { return {it_begin_}; }
+    iterator data_end() const { return {it_end_}; }
+
   private:
-    Indexes begin_, end_;
-    T* data_;
-    F f_;
+    It it_begin_, it_end_;
+    Container c_; // to properly destroy object if it was moved
+    Op op_;
 };
 
 } // namespace detail
