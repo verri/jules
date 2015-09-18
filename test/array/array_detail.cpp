@@ -45,7 +45,11 @@ TEST_CASE("base array", "[base array]")
 
     CHECK(i == matrix3.size(0));
 
+    auto&& expr0 = jules::detail::make_expr_ndarray(
+        matrix1.data_begin(), matrix1.data_end(), matrix2.data_begin(), matrix2.data_end(),
+        [](const int& a, const int& b) { return a + b; }, matrix1.extents());
+
     auto&& expr1 = matrix1 + matrix2;
     auto&& expr2 = matrix1[0] + matrix2[1];
-    //auto&& expr3 = matrix1 + 1.0;
+    // auto&& expr3 = matrix1 + 1.0;
 }

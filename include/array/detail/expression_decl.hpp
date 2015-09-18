@@ -7,8 +7,7 @@ namespace jules
 {
 namespace detail
 {
-template <typename LhsIt, typename RhsIt, typename Op, size_t N>
-class binary_expr_ndarray
+template <typename LhsIt, typename RhsIt, typename Op, size_t N> class binary_expr_ndarray
 {
   private:
     using extent_t = std::array<std::size_t, N>;
@@ -40,13 +39,24 @@ class binary_expr_ndarray
     };
 
     binary_expr_ndarray(const LhsIt& lhs_begin, const LhsIt& lhs_end, const RhsIt& rhs_begin,
-                        const RhsIt& rhs_end, const Op& op,
-                        const extent_t& extents);
+                        const RhsIt& rhs_end, const Op& op, const extent_t& extents);
+
+    // XXX: how to keep private without hiding operator
+    binary_expr_ndarray(const binary_expr_ndarray& source) = delete;
+    binary_expr_ndarray(binary_expr_ndarray&& source) = default;
+
+    binary_expr_ndarray& operator=(const binary_expr_ndarray& source) = delete;
+    binary_expr_ndarray& operator=(binary_expr_ndarray&& source) = default;
 
     iterator data_begin() const { return {lhs_begin_, rhs_begin_}; }
     iterator data_end() const { return {lhs_end_, rhs_end_}; }
 
     const auto& extents() const { return extents_; }
+
+    template <typename LhsI, typename RhsI, typename F, std::size_t M>
+    friend binary_expr_ndarray<LhsI, RhsI, F, M>
+    make_expr_ndarray(const LhsI& lhs_begin, const LhsI& lhs_end, const RhsI& rhs_begin, const RhsI& rhs_end,
+                      const F& op, const std::array<std::size_t, M>& extents);
 
   private:
     LhsIt lhs_begin_, lhs_end_;
@@ -89,10 +99,7 @@ template <typename It, typename Op, std::size_t N> class unary_expr_ndarray
     unary_expr_ndarray(const It& it_begin, const It& it_end, const Op& op, const extent_t& extents);
 
     unary_expr_ndarray(const unary_expr_ndarray& source) = delete;
-    unary_expr_ndarray(unary_expr_ndarray&& source) = default;
-
     unary_expr_ndarray& operator=(const unary_expr_ndarray& source) = delete;
-    unary_expr_ndarray& operator=(unary_expr_ndarray&& source) = default;
 
     iterator data_begin() const { return {it_begin_}; }
     iterator data_end() const { return {it_end_}; }
@@ -100,15 +107,13 @@ template <typename It, typename Op, std::size_t N> class unary_expr_ndarray
     const auto& extents() const { return extents_; }
 
   private:
+    unary_expr_ndarray(unary_expr_ndarray&& source) = default;
+    unary_expr_ndarray& operator=(unary_expr_ndarray&& source) = default;
+
     It it_begin_, it_end_;
     Op op_;
     extent_t extents_;
 };
-
-template <typename LhsIt, typename RhsIt, typename Op, std::size_t N>
-binary_expr_ndarray<LhsIt, RhsIt, Op, N>
-make_expr_ndarray(const LhsIt& lhs_begin, const LhsIt& lhs_end, const RhsIt& rhs_begin, const RhsIt& rhs_end,
-                  const Op& op, const std::array<std::size_t, N>& extents);
 
 } // namespace detail
 } // namespace jules
