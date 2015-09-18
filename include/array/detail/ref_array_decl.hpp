@@ -25,8 +25,6 @@ template <typename T, std::size_t N> class ref_ndarray
 {
     template <typename U, std::size_t M> friend class ref_ndarray;
     template <typename U, std::size_t M> friend class ref_ndarray_iterator;
-    template <typename, typename, typename, typename, typename> friend class binary_expr_ndarray;
-    template <typename, typename, typename> friend class unary_expr_ndarray;
 
   public:
     using value_type = T;
@@ -76,6 +74,8 @@ template <typename T, std::size_t N> class ref_ndarray
 
     std::size_t size() const { return descriptor_.size(); }
     std::size_t size(std::size_t i) const { return descriptor_.extents(i); }
+
+    const auto& extents() const { return descriptor_.extents(); }
 
     std::size_t nrow() const { return size(0); }
     std::size_t ncol() const { return size(1); }
@@ -148,6 +148,7 @@ template <typename T> class ref_ndarray<T, 1>
     ref_ndarray_iterator<const T, 1> cend() const { return {*this, descriptor_.extents(0)}; }
 
     std::size_t size() const { return descriptor_.size(); }
+    const auto& extents() const { return descriptor_.extents(); }
 
     ref_ndarray_data_iterator<T, 1> data_begin() { return {data_, descriptor_.begin()}; }
     ref_ndarray_data_iterator<T, 1> data_end() { return {data_, descriptor_.end()}; }

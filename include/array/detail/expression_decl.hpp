@@ -3,20 +3,15 @@
 
 #include "array/detail/array.hpp"
 
-#include <tuple>
-
 namespace jules
 {
 namespace detail
 {
-struct empty {
-    empty(empty&&) = default;
-};
-
-template <typename LhsIt, typename RhsIt, typename LhsContainer, typename RhsContainer, typename Op>
+template <typename LhsIt, typename RhsIt, typename Op, size_t N>
 class binary_expr_ndarray
 {
-    static_assert(!std::is_reference<LhsContainer>::value && !std::is_reference<RhsContainer>::value, "?");
+  private:
+    using extent_t = std::array<std::size_t, N>;
 
   public:
     class iterator
@@ -45,24 +40,26 @@ class binary_expr_ndarray
     };
 
     binary_expr_ndarray(const LhsIt& lhs_begin, const LhsIt& lhs_end, const RhsIt& rhs_begin,
-                        const RhsIt& rhs_end, LhsContainer&& lhs, RhsContainer&& rhs, const Op& op);
+                        const RhsIt& rhs_end, const Op& op,
+                        const extent_t& extents);
 
     iterator data_begin() const { return {lhs_begin_, rhs_begin_}; }
     iterator data_end() const { return {lhs_end_, rhs_end_}; }
+
+    const auto& extents() const { return extents_; }
 
   private:
     LhsIt lhs_begin_, lhs_end_;
     RhsIt rhs_begin_, rhs_end_;
 
-    LhsContainer lhs_; // to properly destroy object if it was moved
-    RhsContainer rhs_;
-
     Op op_;
+    extent_t extents_;
 };
 
-template <typename It, typename Container, typename Op> class unary_expr_ndarray
+template <typename It, typename Op, std::size_t N> class unary_expr_ndarray
 {
-    static_assert(!std::is_reference<Container>::value, "?");
+  private:
+    using extent_t = std::array<std::size_t, N>;
 
   public:
     class iterator
@@ -89,7 +86,7 @@ template <typename It, typename Container, typename Op> class unary_expr_ndarray
         Op op_;
     };
 
-    unary_expr_ndarray(const It& it_begin, const It& it_end, Container&& c, const Op& op);
+    unary_expr_ndarray(const It& it_begin, const It& it_end, const Op& op, const extent_t& extents);
 
     unary_expr_ndarray(const unary_expr_ndarray& source) = delete;
     unary_expr_ndarray(unary_expr_ndarray&& source) = default;
@@ -100,22 +97,18 @@ template <typename It, typename Container, typename Op> class unary_expr_ndarray
     iterator data_begin() const { return {it_begin_}; }
     iterator data_end() const { return {it_end_}; }
 
+    const auto& extents() const { return extents_; }
+
   private:
     It it_begin_, it_end_;
-    Container c_; // to properly destroy object if it was moved
     Op op_;
+    extent_t extents_;
 };
 
-template <typename T, std::size_t N>
-std::tuple<const T*, const T*, empty&&> get_expr_info(const base_ndarray<T, N>& array);
-
-template <typename T, std::size_t N>
-std::tuple<const T*, const T*, base_ndarray<T, N>&&> get_expr_info(base_ndarray<T, N>&& array);
-
-template <typename LhsIt, typename RhsIt, typename LhsContainer, typename RhsContainer, typename Op>
-binary_expr_ndarray<LhsIt, RhsIt, std::decay_t<LhsContainer>, std::decay_t<RhsContainer>, Op>
+template <typename LhsIt, typename RhsIt, typename Op, std::size_t N>
+binary_expr_ndarray<LhsIt, RhsIt, Op, N>
 make_expr_ndarray(const LhsIt& lhs_begin, const LhsIt& lhs_end, const RhsIt& rhs_begin, const RhsIt& rhs_end,
-                  LhsContainer&& lhs, RhsContainer&& rhs, const Op& op);
+                  const Op& op, const std::array<std::size_t, N>& extents);
 
 } // namespace detail
 } // namespace jules
