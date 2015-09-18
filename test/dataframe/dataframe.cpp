@@ -59,7 +59,7 @@ TEST_CASE("dataframe colbind", "[dataframe]")
 
     auto cols = df.colnames();
     auto nullcols = null.colnames();
-    std::array<std::string, 3> names = {"c", "a", "b"};
+    std::array<std::string, 3> names{{"c", "a", "b"}};
 
     REQUIRE(cols.size() == 3);
     auto mm = std::mismatch(cols.begin(), cols.end(), names.begin());
@@ -78,8 +78,9 @@ TEST_CASE("dataframe colbind", "[dataframe]")
 TEST_CASE("dataframe select by name", "[dataframe]")
 {
     using jules::dataframe;
+    using namespace std::literals::string_literals;
 
-    dataframe df{{"int", {1, 2, 3, 4}}, {"str", {"h", " ", "w", "0"}}};
+    dataframe df{{"int", {1, 2, 3, 4}}, {"str", {"h"s, " "s, "w"s, "0"s}}};
     CHECK_THROWS(df.select(""));
     CHECK_THROWS(df.select("h"));
     CHECK(df.select("int").elements_type() == typeid(int));
@@ -216,7 +217,7 @@ TEST_CASE("reading and writing a well-formed dataframe", "[dataframe]")
     CHECK(data == os2.str());
 
     auto cols = df.colnames();
-    std::array<std::string, 3> names = {"y", "x", "z"};
+    std::array<std::string, 3> names{{"y", "x", "z"}};
     // CHECK(cols == names);
 
     REQUIRE(cols.size() == 3);

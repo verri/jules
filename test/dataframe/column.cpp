@@ -47,10 +47,11 @@ TEST_CASE("column constructor using initializer list", "[constructor]")
 TEST_CASE("column constructor inference", "[constructor]")
 {
     using jules::column;
+    using namespace std::literals::string_literals;
 
     auto check_column = [](const column& col, const auto& value) { REQUIRE(col.elements_type() == value); };
 
     check_column({"int", {1, 2, 3}}, typeid(int));
     check_column({1.0, 2.0, 3.0, 1.0}, typeid(double));
-    check_column({"1.0", "2.0", "3.0", "1.0"}, typeid(std::string));
+    check_column({"1.0"s, "2.0"s, "3.0"s, "1.0"s}, typeid(std::string));
 }
