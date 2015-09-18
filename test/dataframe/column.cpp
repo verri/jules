@@ -1,6 +1,7 @@
 #include "catch.hpp"
 #include "dataframe/column.hpp"
 
+#include <string>
 #include <typeindex>
 
 TEST_CASE("column constructor using initializer list", "[constructor]")
@@ -51,4 +52,5 @@ TEST_CASE("column constructor inference", "[constructor]")
 
     check_column({"int", {1, 2, 3}}, typeid(int));
     check_column({1.0, 2.0, 3.0, 1.0}, typeid(double));
+    check_column({"1.0", "2.0", "3.0", "1.0"}, typeid(std::string));
 }

@@ -150,6 +150,7 @@ TEST_CASE("reading an empty dataframe from an empty string", "[dataframe]")
     CHECK(df.nrow() == 0);
     CHECK(df.ncol() == 0);
     CHECK(df.empty());
+    CHECK(df.null());
 
     std::stringstream null_stream;
 
@@ -157,6 +158,7 @@ TEST_CASE("reading an empty dataframe from an empty string", "[dataframe]")
     CHECK(df2.nrow() == 0);
     CHECK(df2.ncol() == 0);
     CHECK(df2.empty());
+    CHECK(df.null());
 }
 
 TEST_CASE("reading a dataframe", "[dataframe]")
@@ -195,7 +197,7 @@ TEST_CASE("reading and writing a well-formed dataframe", "[dataframe]")
 {
     using jules::dataframe;
 
-    std::string data = "x\ty\tz\n" + std::to_string(0.0) + "\t" + std::to_string(1.0) + "\t" +
+    std::string data = "y\tx\tz\n" + std::to_string(0.0) + "\t" + std::to_string(1.0) + "\t" +
                        std::to_string(2.0) + "\n" + std::to_string(3.0) + "\t" + std::to_string(4.0) + "\t" +
                        std::to_string(5.0) + "\n";
 
@@ -210,11 +212,11 @@ TEST_CASE("reading and writing a well-formed dataframe", "[dataframe]")
     CHECK(data == os1.str());
 
     std::stringstream os2;
-    dataframe::write({{"x", {0, 3}}, {"y", {1, 4}}, {"z", {2, 5}}}, os2);
+    dataframe::write({{"y", {0, 3}}, {"x", {1, 4}}, {"z", {2, 5}}}, os2);
     CHECK(data == os2.str());
 
     auto cols = df.colnames();
-    std::array<std::string, 3> names = {"x", "y", "z"};
+    std::array<std::string, 3> names = {"y", "x", "z"};
     // CHECK(cols == names);
 
     REQUIRE(cols.size() == 3);
@@ -225,10 +227,10 @@ TEST_CASE("reading and writing a well-formed dataframe", "[dataframe]")
     CHECK_THROWS(df.select(4));
 
     auto c1 = df.select(0);
-    CHECK(c1.name() == "x");
+    CHECK(c1.name() == "y");
 
     auto c2 = df.select(1);
-    CHECK(c2.name() == "y");
+    CHECK(c2.name() == "x");
 
     auto c3 = df.select(2);
     CHECK(c3.name() == "z");
