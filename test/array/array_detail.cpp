@@ -51,5 +51,5 @@ TEST_CASE("base array", "[base array]")
 
     auto&& expr1 = matrix1 + matrix2;
     auto&& expr2 = matrix1[0] + matrix2[1];
-    // auto&& expr3 = matrix1 + 1.0;
+    auto&& expr3 = matrix1 + 1.0;
 }

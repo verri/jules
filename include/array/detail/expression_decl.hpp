@@ -7,6 +7,40 @@ namespace jules
 {
 namespace detail
 {
+template <typename T> class scalar_iterator
+{
+  public:
+    using value_type = T;
+    using difference_type = std::ptrdiff_t;
+    using reference = value_type&;
+    using pointer = value_type*;
+    using iterator_category = std::forward_iterator_tag;
+
+    scalar_iterator(T& value, std::size_t current) : value_{value}, current_{current} {}
+
+    T& operator*() const { return value_; }
+
+    scalar_iterator& operator++()
+    {
+        ++current_;
+        return *this;
+    }
+    scalar_iterator operator++(int)
+    {
+        auto c = *this;
+        ++(*this);
+        return c;
+    }
+    bool operator==(const scalar_iterator& other) const { return current_ == other.current_; }
+    bool operator!=(const scalar_iterator& other) const { return current_ == other.current_; }
+
+    std::ptrdiff_t operator-(const scalar_iterator& other) const { return current_ - other.current_; }
+
+  private:
+    T& value_;
+    std::size_t current_;
+};
+
 template <typename LhsIt, typename RhsIt, typename Op, size_t N> class binary_expr_ndarray
 {
   private:
@@ -52,6 +86,7 @@ template <typename LhsIt, typename RhsIt, typename Op, size_t N> class binary_ex
     iterator data_end() const { return {lhs_end_, rhs_end_}; }
 
     const auto& extents() const { return extents_; }
+    std::size_t size() const { return prod(extents_); }
 
     template <typename LhsI, typename RhsI, typename F, std::size_t M>
     friend binary_expr_ndarray<LhsI, RhsI, F, M>

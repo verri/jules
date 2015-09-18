@@ -70,13 +70,38 @@ make_expr_ndarray(const LhsI& lhs_begin, const LhsI& lhs_end, const RhsI& rhs_be
                                  [](A & a, B & b) { return a OP__ b; }, lhs.extents());                      \
     }
 
+#define BINARY_LEFT_SCALAR_OPERATION(TY__, Y__, OP__)                                                        \
+    template <typename U, UNPACK TY__, std::size_t M> auto operator OP__(const U& lhs, UNPACK Y__ rhs)       \
+    {                                                                                                        \
+        using A = decltype(lhs);                                                                             \
+        using B = decltype(*rhs.data_begin());                                                               \
+        return make_expr_ndarray(scalar_iterator<const U>(lhs, 0),                                           \
+                                 scalar_iterator<const U>(lhs, rhs.size()), rhs.data_begin(),                \
+                                 rhs.data_end(), [](A & a, B & b) { return a OP__ b; }, rhs.extents());      \
+    }
+
+#define BINARY_RIGHT_SCALAR_OPERATION(TX__, X__, OP__)                                                       \
+    template <UNPACK TX__, typename U, std::size_t M> auto operator OP__(UNPACK X__ lhs, const U& rhs)       \
+    {                                                                                                        \
+        using A = decltype(*lhs.data_begin());                                                               \
+        using B = decltype(rhs);                                                                             \
+        return make_expr_ndarray(lhs.data_begin(), lhs.data_end(), scalar_iterator<const U>(rhs, 0),         \
+                                 scalar_iterator<const U>(rhs, lhs.size()),                                  \
+                                 [](A & a, B & b) { return a OP__ b; }, lhs.extents());                      \
+    }
+
 #define EXPAND_BINARY_COMBINATIONS(TX__, X__, OP__)                                                          \
     BINARY_OPERATION(TX__, X__, (typename U), (BASE_NDARRAY(U)), OP__)                                       \
-    BINARY_OPERATION(TX__, X__, (typename U), (REF_NDARRAY(U)), OP__)
+    BINARY_OPERATION(TX__, X__, (typename U), (REF_NDARRAY(U)), OP__)                                        \
+    BINARY_LEFT_SCALAR_OPERATION(TX__, X__, OP__)
+
+#define BINARY_COMBINATIONS(TX__, X__, OP__)                                                                 \
+    EXPAND_BINARY_COMBINATIONS(TX__, X__, OP__)                                                              \
+    BINARY_RIGHT_SCALAR_OPERATION(TX__, X__, OP__)
 
 #define BINARY_POSSIBILITIES(OP__)                                                                           \
-    EXPAND_BINARY_COMBINATIONS((typename T), (BASE_NDARRAY(T)), OP__)                                        \
-    EXPAND_BINARY_COMBINATIONS((typename T), (REF_NDARRAY(T)), OP__)
+    BINARY_COMBINATIONS((typename T), (BASE_NDARRAY(T)), OP__)                                               \
+    BINARY_COMBINATIONS((typename T), (REF_NDARRAY(T)), OP__)
 
 #define BINARY_OPERATIONS_LIST                                                                               \
     BINARY_POSSIBILITIES(+)                                                                                  \
