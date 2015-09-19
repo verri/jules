@@ -12,6 +12,24 @@ namespace jules
 {
 namespace detail
 {
+struct trivial_tag {
+};
+struct non_trivial_tag {
+};
+
+template <typename T, typename = void> struct trivial_dispatch_helper {
+    using type = non_trivial_tag;
+};
+
+template <typename T> struct trivial_dispatch_helper<T, std::enable_if_t<std::is_trivial<T>::value>> {
+    using type = trivial_tag;
+};
+
+static_assert(std::is_same<typename trivial_dispatch_helper<double>::type, trivial_tag>::value, "");
+static_assert(std::is_same<typename trivial_dispatch_helper<std::string>::type, non_trivial_tag>::value, "");
+
+template <typename T> auto trivial_dispatch() { return typename trivial_dispatch_helper<T>::type{}; }
+
 template <typename T, std::size_t N> class base_ndarray : public ref_ndarray<T, N>
 {
     template <typename U, std::size_t M> friend class base_ndarray;
@@ -41,7 +59,6 @@ template <typename T, std::size_t N> class base_ndarray : public ref_ndarray<T, 
     template <typename U> base_ndarray& operator=(const base_ndarray<U, N>& source);
     template <typename U> base_ndarray& operator=(const ref_ndarray<U, N>& source);
     // TODO: template <typename U> base_ndarray& operator=(const indirect_ndarray<U, N>& source);
-    template <typename U> base_ndarray& operator=(const U& source);
 
     T* data() { return this->data_; }
     const T* data() const { return this->data_; }
@@ -56,8 +73,18 @@ template <typename T, std::size_t N> class base_ndarray : public ref_ndarray<T, 
     static T* allocate(std::size_t size) { return reinterpret_cast<T*>(new storage_t[size]); }
     static void deallocate(T* data, std::size_t) { delete[] reinterpret_cast<storage_t*>(data); }
 
-    template <typename... Args> static void create(T* data, std::size_t size, Args&&... args);
-    static void destroy(T* data, std::size_t size);
+    static void create(trivial_tag, T* data, std::size_t size);
+    template <typename... Args> static void create(trivial_tag, T* data, std::size_t size, Args&&... args);
+    template <typename... Args>
+    static void create(non_trivial_tag, T* data, std::size_t size, Args&&... args);
+
+    template <typename It> static void create(trivial_tag, T* to, It from, std::size_t size);
+    static void create(trivial_tag, T* to, T* from, std::size_t size);
+
+    template <typename It> static void create(non_trivial_tag, T* to, It from, std::size_t size);
+
+    static void destroy(trivial_tag, T* data, std::size_t size);
+    static void destroy(non_trivial_tag, T* data, std::size_t size);
 
     void clear();
 };

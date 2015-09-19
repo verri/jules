@@ -8,9 +8,7 @@
     do {                                                                                                     \
         clear();                                                                                             \
         this->data_ = allocate(source.size());                                                               \
-        auto data = source.data();                                                                           \
-        for (auto it = this->data(); it != this->data() + this->size(); ++it)                                \
-            new (it) T(*data++);                                                                             \
+        create(trivial_dispatch<T>(), this->data(), source.data(), source.size());                           \
         this->descriptor_ = source.descriptor_;                                                              \
         return *this;                                                                                        \
     } while (false)
@@ -25,9 +23,10 @@
 
 #define COPY_FROM_REF                                                                                        \
     do {                                                                                                     \
-        auto it = source.descriptor_.begin();                                                                \
-        for (std::size_t i = 0; i < this->size(); ++i)                                                       \
-            this->data_[i] = source.data_[*it++];                                                            \
+        clear();                                                                                             \
+        this->data_ = allocate(source.size());                                                               \
+        create(trivial_dispatch<T>(), this->data(), source.data_begin(), source.size());                     \
+        this->descriptor_ = {0, source.extents()};                                                           \
         return *this;                                                                                        \
     } while (false)
 
@@ -45,7 +44,7 @@ template <typename... Dims, typename>
 base_ndarray<T, N>::base_ndarray(Dims... dims)
     : ref_ndarray<T, N>{allocate(prod_args(dims...)), {0, {std::size_t(dims)...}}}
 {
-    create(data(), this->size());
+    create(trivial_dispatch<T>(), this->data(), this->size());
 }
 
 template <typename T, std::size_t N>
@@ -53,7 +52,7 @@ template <typename... Dims, typename>
 base_ndarray<T, N>::base_ndarray(const T& value, Dims... dims)
     : ref_ndarray<T, N>{allocate(prod_args(dims...)), {0, {std::size_t(dims)...}}}
 {
-    create(data(), this->size(), value);
+    create(trivial_dispatch<T>(), this->data(), this->size(), value);
 }
 
 template <typename T, std::size_t N>
@@ -61,17 +60,14 @@ template <typename... Dims, typename>
 base_ndarray<T, N>::base_ndarray(const T* data, Dims... dims)
     : ref_ndarray<T, N>{allocate(prod_args(dims...)), {0, {std::size_t(dims)...}}}
 {
-    for (auto it = this->data(); it != this->data() + this->size(); ++it)
-        new (it) T(*data++);
+    create(trivial_dispatch<T>(), this->data(), data, this->size());
 }
 
 template <typename T, std::size_t N>
 base_ndarray<T, N>::base_ndarray(const base_ndarray& source)
     : ref_ndarray<T, N>{allocate(source.size()), source.descriptor_}
 {
-    auto data = source.data();
-    for (auto it = this->data(); it != this->data() + this->size(); ++it)
-        new (it) T(*data++);
+    create(trivial_dispatch<T>(), this->data(), source.data(), this->size());
 }
 
 template <typename T, std::size_t N>
@@ -86,9 +82,7 @@ base_ndarray<T, N>::base_ndarray(const base_ndarray<U, N>& source)
     : ref_ndarray<T, N>{allocate(source.size()), source.descriptor_}
 {
     static_assert(std::is_constructible<T, const U&>::value, "invalid values type");
-    auto data = source.data();
-    for (auto it = this->data(); it != this->data() + this->size(); ++it)
-        new (it) T(*data++);
+    create(trivial_dispatch<T>(), this->data(), source.data(), this->size());
 }
 
 template <typename T, std::size_t N>
@@ -123,24 +117,55 @@ auto base_ndarray<T, N>::operator=(const ref_ndarray<U, N>& source) -> base_ndar
 // template <typename U> auto base_ndarray<T, N>::operator=(const indirect_ndarray<U, N>& source) ->
 // base_ndarray& {}
 
+template <typename T, std::size_t N> void base_ndarray<T, N>::create(trivial_tag, T*, std::size_t) {}
+
 template <typename T, std::size_t N>
-template <typename U>
-auto base_ndarray<T, N>::operator=(const U& source) -> base_ndarray &
+template <typename... Args>
+void base_ndarray<T, N>::create(trivial_tag, T* data, std::size_t size, Args&&... args)
 {
-    for (std::size_t i = 0; i < this->size(); ++i)
-        this->data_[i] = source;
-    return *this;
+    create(non_trivial_tag{}, data, size, std::forward<Args>(args)...);
 }
 
 template <typename T, std::size_t N>
 template <typename... Args>
-void base_ndarray<T, N>::create(T* data, std::size_t size, Args&&... args)
+void base_ndarray<T, N>::create(non_trivial_tag, T* data, std::size_t size, Args&&... args)
 {
     for (std::size_t i = 0; i < size; ++i)
         new (data + i) T(std::forward<Args>(args)...);
 }
 
-template <typename T, std::size_t N> void base_ndarray<T, N>::destroy(T* data, std::size_t size)
+template <typename T, std::size_t N>
+template <typename It>
+void base_ndarray<T, N>::create(trivial_tag, T* to, It from, std::size_t size)
+{
+    for (std::size_t i = 0; i != size; ++i) {
+        *to = *from;
+        ++from;
+        ++to;
+    }
+}
+
+template <typename T, std::size_t N>
+void base_ndarray<T, N>::create(trivial_tag, T* to, T* from, std::size_t size)
+{
+    std::memcpy(to, from, size * sizeof(T));
+}
+
+template <typename T, std::size_t N>
+template <typename It>
+void base_ndarray<T, N>::create(non_trivial_tag, T* to, It from, std::size_t size)
+{
+    for (std::size_t i = 0; i != size; ++i) {
+        new (to) T(*from);
+        ++from;
+        ++to;
+    }
+}
+
+template <typename T, std::size_t N> void base_ndarray<T, N>::destroy(trivial_tag, T*, std::size_t) {}
+
+template <typename T, std::size_t N>
+void base_ndarray<T, N>::destroy(non_trivial_tag, T* data, std::size_t size)
 {
     for (std::size_t i = 0; i < size; ++i)
         data[i].~T();
@@ -149,7 +174,7 @@ template <typename T, std::size_t N> void base_ndarray<T, N>::destroy(T* data, s
 template <typename T, std::size_t N> void base_ndarray<T, N>::clear()
 {
     if (data()) {
-        destroy(data(), this->size());
+        destroy(trivial_dispatch<T>(), data(), this->size());
         deallocate(data(), this->size());
     }
 }
