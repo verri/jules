@@ -30,11 +30,6 @@ template <typename Coercion> base_dataframe<Coercion>::base_dataframe(std::initi
     }
 }
 
-template <typename Coercion> base_dataframe<Coercion>& base_dataframe<Coercion>::cbind(const column_t& column)
-{
-    return colbind(column);
-}
-
 template <typename Coercion>
 base_dataframe<Coercion>& base_dataframe<Coercion>::colbind(const column_t& column)
 {
@@ -57,11 +52,6 @@ base_dataframe<Coercion>& base_dataframe<Coercion>::colbind(const column_t& colu
         colindexes_[name] = columns_.size();
 
     return *this;
-}
-
-template <typename Coercion> base_dataframe<Coercion>& base_dataframe<Coercion>::cbind(column_t&& column)
-{
-    return colbind(std::move(column));
 }
 
 template <typename Coercion> base_dataframe<Coercion>& base_dataframe<Coercion>::colbind(column_t&& column)

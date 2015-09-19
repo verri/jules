@@ -38,16 +38,6 @@ template <typename... Rules> class coercion_rules
 
 using default_coercion_rules = coercion_rules<numeric_rules, string_rules>;
 
-template <typename R, typename I = decltype(std::begin(R{}))>
-struct[[deprecated("Use Boost Range instead.")]] range_traits : public std::iterator_traits<I>
-{
-    using iterator_type = I;
-    using value_type = typename I::value_type;
-
-    static_assert(std::is_same<iterator_type, decltype(std::end(R{}))>::value,
-                  "begin and end iteratores do not match");
-};
-
 template <typename F, typename Enabler = void> struct is_callable {
     static constexpr bool value = false;
 };

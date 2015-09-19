@@ -34,9 +34,6 @@ template <typename Coercion> class base_dataframe
     base_dataframe& operator=(const base_dataframe& source) = default;
     base_dataframe& operator=(base_dataframe&& source) = default;
 
-    [[deprecated("use colbind")]] base_dataframe& cbind(const column_t& column);
-    [[deprecated("use colbind")]] base_dataframe& cbind(column_t&& column);
-
     base_dataframe& colbind(const column_t& column);
     base_dataframe& colbind(column_t&& column);
 
