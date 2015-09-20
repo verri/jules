@@ -60,7 +60,8 @@ template <typename Coercion> class base_dataframe
     template <typename T> base_dataframe_colview<const T, Coercion> colview() const;
 
     template <typename T, typename C> friend base_dataframe_colview<T, C> make_colview(base_dataframe<C>& df);
-    template <typename T, typename C> friend base_dataframe_colview<const T, C> make_colview(const base_dataframe<C>& df);
+    template <typename T, typename C>
+    friend base_dataframe_colview<const T, C> make_colview(const base_dataframe<C>& df);
 
   private:
     std::size_t nrow_ = 0;

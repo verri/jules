@@ -8,7 +8,6 @@
 
 namespace jules
 {
-
 template <typename, typename> class base_column_view;
 template <typename, typename, typename> class base_dataframe_colview;
 
@@ -42,7 +41,6 @@ template <typename T, std::size_t N> class ref_ndarray
     using size_type = std::size_t;
     using difference_type = std::ptrdiff_t;
 
-    ref_ndarray() = delete;
     ~ref_ndarray() = default;
 
     ref_ndarray& operator=(const ref_ndarray& source);
@@ -94,12 +92,13 @@ template <typename T, std::size_t N> class ref_ndarray
 
   protected:
     ref_ndarray(T* data, const base_slice<N>& descriptor) : data_{data}, descriptor_{descriptor} {}
+    ref_ndarray() : data_{nullptr} {}
 
     ref_ndarray(const ref_ndarray& source) = default;
     ref_ndarray(ref_ndarray&& source) = default;
 
     // TODO change this name
-    void assign(const ref_ndarray& source) { data_ = source.data_; descriptor_ = source.descriptor_; }
+    void assign(const ref_ndarray& source);
 
     T* data_;
     base_slice<N> descriptor_;
@@ -172,7 +171,7 @@ template <typename T> class ref_ndarray<T, 1>
     ref_ndarray(ref_ndarray&& source) = default;
 
     // TODO change this name
-    void assign(const ref_ndarray& source) { data_ = source.data_; descriptor_ = source.descriptor_; }
+    void assign(const ref_ndarray& source);
 
     T* data_;
     base_slice<1> descriptor_;

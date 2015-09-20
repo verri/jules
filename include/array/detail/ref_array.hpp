@@ -120,6 +120,12 @@ ref_ndarray<const T, N - 1> ref_ndarray<T, N>::operator[](std::size_t i) const
     return {data_, {start, extents, strides}};
 }
 
+template <typename T, std::size_t N> void ref_ndarray<T, N>::assign(const ref_ndarray& source)
+{
+    data_ = source.data_;
+    descriptor_ = source.descriptor_;
+}
+
 // Reference Array Specialization
 
 template <typename T> ref_ndarray<T, 1>& ref_ndarray<T, 1>::operator=(const ref_ndarray& source)
@@ -162,6 +168,12 @@ template <typename T> template <typename U> ref_ndarray<T, 1>& ref_ndarray<T, 1>
     return *this;
 }
 
+template <typename T> void ref_ndarray<T, 1>::assign(const ref_ndarray& source)
+{
+    data_ = source.data_;
+    descriptor_ = source.descriptor_;
+}
+
 // Iterator
 
 template <typename T, std::size_t N> auto ref_ndarray_iterator<T, N>::operator++() -> ref_ndarray_iterator &
@@ -194,15 +206,15 @@ template <typename T> auto ref_ndarray_iterator<T, 1>::operator++(int) -> ref_nd
 
 // Data Iterator
 
-template <typename T, std::size_t N> auto ref_ndarray_data_iterator<T,N>::
- operator++() -> ref_ndarray_data_iterator&
+template <typename T, std::size_t N>
+auto ref_ndarray_data_iterator<T, N>::operator++() -> ref_ndarray_data_iterator &
 {
     ++it_;
     return *this;
 }
 
-template <typename T, std::size_t N> auto ref_ndarray_data_iterator<T,N>::
- operator++(int) -> ref_ndarray_data_iterator
+template <typename T, std::size_t N>
+auto ref_ndarray_data_iterator<T, N>::operator++(int) -> ref_ndarray_data_iterator
 {
     auto c = *this;
     ++it_;

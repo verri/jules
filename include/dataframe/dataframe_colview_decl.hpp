@@ -10,18 +10,16 @@ template <typename Coercion> class base_dataframe;
 
 // TODO: remove parameter V
 template <typename T, typename Coercion, typename V = base_column_view<T, Coercion>>
-    class base_dataframe_colview :
-    public detail::ref_ndarray<V, 1>
+class base_dataframe_colview : public detail::ref_ndarray<V, 1>
 {
     friend class base_dataframe<Coercion>;
 
   public:
-    // TODO criar um construtor protected do ref_ndarray equivalente
-    base_dataframe_colview() : detail::ref_ndarray<V, 1>{nullptr, {0, {0}}} {}
+    base_dataframe_colview() = default;
     ~base_dataframe_colview() = default;
 
-    base_dataframe_colview(const base_dataframe_colview& source) : base_dataframe_colview() { this->assign(source); }
-    base_dataframe_colview(base_dataframe_colview&& source) : base_dataframe_colview()  { this->assign(std::move(source)); }
+    base_dataframe_colview(const base_dataframe_colview& source) { this->assign(source); }
+    base_dataframe_colview(base_dataframe_colview&& source) { this->assign(std::move(source)); }
 
     base_dataframe_colview& operator=(const base_dataframe_colview& source) = delete;
     base_dataframe_colview& operator=(base_dataframe_colview&& source) = delete;
