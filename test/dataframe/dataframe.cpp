@@ -180,6 +180,14 @@ TEST_CASE("reading a dataframe", "[dataframe]")
 
 TEST_CASE("reading matrix of integers", "[dataframe]")
 {
+    struct integer_rules {
+        using type = int;
+        static type coerce_from(const std::string& value) { return std::stoi(value); }
+    };
+
+    using my_coercion_rules = jules::coercion_rules<integer_rules, jules::string_rules>;
+    using my_dataframe = jules::base_dataframe<my_coercion_rules>;
+
     jules::dataframe_read_options opts;
     opts.header = false;
 
@@ -192,10 +200,10 @@ TEST_CASE("reading matrix of integers", "[dataframe]")
         stream << "\n";
     }
 
-    auto df = jules::dataframe::read(stream, opts);
+    auto df = my_dataframe::read(stream, opts);
     REQUIRE(df.ncol() == 10);
     REQUIRE(df.nrow() == 10);
-    jules::dataframe idf;
+    my_dataframe idf;
 
     for (std::size_t i = 0; i < df.ncol(); ++i) {
       idf.colbind(jules::coerce_to<int>(df.select(i)));
