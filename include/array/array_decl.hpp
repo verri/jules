@@ -2,6 +2,7 @@
 #define JULES_ARRAY_ARRAY_DECL_H
 
 #include <array/detail/array.hpp>
+#include <array/detail/expression.hpp> // TODO remover
 #include "range/range.hpp"
 
 namespace jules

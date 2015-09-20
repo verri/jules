@@ -71,9 +71,10 @@ make_expr_ndarray(const LhsI& lhs_begin, const LhsI& lhs_end, const RhsI& rhs_be
     }
 
 #define BINARY_LEFT_SCALAR_OPERATION(TY__, Y__, OP__)                                                        \
-    template <typename U, UNPACK TY__, std::size_t M> auto operator OP__(const U& lhs, UNPACK Y__ rhs)       \
+    template <typename U, UNPACK TY__, std::size_t M>                                                        \
+    auto operator OP__(const base_ndarray<U, 0>& lhs, UNPACK Y__ rhs)                                        \
     {                                                                                                        \
-        using A = decltype(lhs);                                                                             \
+        using A = const U;                                                                                   \
         using B = decltype(*rhs.data_begin());                                                               \
         return make_expr_ndarray(scalar_iterator<const U>(lhs, 0),                                           \
                                  scalar_iterator<const U>(lhs, rhs.size()), rhs.data_begin(),                \
@@ -81,10 +82,11 @@ make_expr_ndarray(const LhsI& lhs_begin, const LhsI& lhs_end, const RhsI& rhs_be
     }
 
 #define BINARY_RIGHT_SCALAR_OPERATION(TX__, X__, OP__)                                                       \
-    template <UNPACK TX__, typename U, std::size_t M> auto operator OP__(UNPACK X__ lhs, const U& rhs)       \
+    template <UNPACK TX__, typename U, std::size_t M>                                                        \
+    auto operator OP__(UNPACK X__ lhs, const base_ndarray<U, 0>& rhs)                                        \
     {                                                                                                        \
         using A = decltype(*lhs.data_begin());                                                               \
-        using B = decltype(rhs);                                                                             \
+        using B = const U;                                                                                   \
         return make_expr_ndarray(lhs.data_begin(), lhs.data_end(), scalar_iterator<const U>(rhs, 0),         \
                                  scalar_iterator<const U>(rhs, lhs.size()),                                  \
                                  [](A & a, B & b) { return a OP__ b; }, lhs.extents());                      \

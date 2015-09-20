@@ -53,8 +53,12 @@ class gaussian_naive_bayes
 
         CHECK(priori.size() == classes.size());
 
-        for (auto&& class_ : classes | adaptors::indexed()) {
-            // vector<bool> ix = y == class_.value();
+        std::size_t i = 0;
+        for (scalar<std::string> class_ : classes) {
+            auto&& ix = y == class_;
+            // vector<bool> ix = y == class_;
+
+            ++i;
         }
         // std::size_t i = 0;
         // for (auto& cl : classes) {
