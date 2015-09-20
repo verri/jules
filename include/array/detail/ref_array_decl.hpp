@@ -88,8 +88,9 @@ template <typename T, std::size_t N> class ref_ndarray
     ref_ndarray(const ref_ndarray& source) = default;
     ref_ndarray(ref_ndarray&& source) = default;
 
-    // TODO change this name
-    void assign(const ref_ndarray& source);
+    void clone_from(const ref_ndarray& source);
+    void clone_from(ref_ndarray&& source);
+    [[deprecated("use clone_from")]] void assign(const ref_ndarray& source);
 
     T* data_;
     base_slice<N> descriptor_;
@@ -161,8 +162,9 @@ template <typename T> class ref_ndarray<T, 1>
     ref_ndarray(const ref_ndarray& source) = default;
     ref_ndarray(ref_ndarray&& source) = default;
 
-    // TODO change this name
-    void assign(const ref_ndarray& source);
+    void clone_from(const ref_ndarray& source);
+    void clone_from(ref_ndarray&& source);
+    [[deprecated("use clone_from")]] void assign(const ref_ndarray& source);
 
     T* data_;
     base_slice<1> descriptor_;

@@ -35,6 +35,19 @@ template <typename T, std::size_t N> class indirect_ndarray
 
     operator indirect_ndarray<const T, N>() const { return {array_, indexes_}; }
 
+    indirect_ndarray<T, N - 1> operator[](std::size_t i);
+    indirect_ndarray<const T, N - 1> operator[](std::size_t i) const;
+
+    template <typename... Args> indirect_request<indirect_ndarray<T, N>, Args...> operator()(Args&&... args);
+    template <typename... Args> slice_request<indirect_ndarray<T, N>, Args...> operator()(Args&&... args);
+    template <typename... Args> element_request<T&, Args...> operator()(Args&&... args);
+
+    template <typename... Args>
+    indirect_request<indirect_ndarray<const T, N>, Args...> operator()(Args&&... args) const;
+    template <typename... Args>
+    slice_request<indirect_ndarray<const T, N>, Args...> operator()(Args&&... args) const;
+    template <typename... Args> element_request<const T&, Args...> operator()(Args&&... args) const;
+
     indirect_ndarray_iterator<T, 1> begin();
     indirect_ndarray_iterator<T, 1> end();
 
@@ -68,6 +81,9 @@ template <typename T, std::size_t N> class indirect_ndarray
 
     indirect_ndarray(const indirect_ndarray& source) = default;
     indirect_ndarray(indirect_ndarray&& source) = default;
+
+    void clone_from(const indirect_ndarray& source);
+    void clone_from(indirect_ndarray&& source);
 
     ref_ndarray<T, N> array_;
     std::vector<std::size_t> indexes_[N];

@@ -120,10 +120,21 @@ ref_ndarray<const T, N - 1> ref_ndarray<T, N>::operator[](std::size_t i) const
     return {data_, {start, extents, strides}};
 }
 
-template <typename T, std::size_t N> void ref_ndarray<T, N>::assign(const ref_ndarray& source)
+template <typename T, std::size_t N> void ref_ndarray<T, N>::clone_from(const ref_ndarray& source)
 {
     data_ = source.data_;
     descriptor_ = source.descriptor_;
+}
+
+template <typename T, std::size_t N> void ref_ndarray<T, N>::clone_from(ref_ndarray&& source)
+{
+    data_ = move_ptr(source.data_);
+    descriptor_ = std::move(source.descriptor_);
+}
+
+template <typename T, std::size_t N> void ref_ndarray<T, N>::assign(const ref_ndarray& source)
+{
+    clone_from(source);
 }
 
 // Reference Array Specialization
@@ -168,11 +179,19 @@ template <typename T> template <typename U> ref_ndarray<T, 1>& ref_ndarray<T, 1>
     return *this;
 }
 
-template <typename T> void ref_ndarray<T, 1>::assign(const ref_ndarray& source)
+template <typename T> void ref_ndarray<T, 1>::clone_from(const ref_ndarray& source)
 {
     data_ = source.data_;
     descriptor_ = source.descriptor_;
 }
+
+template <typename T> void ref_ndarray<T, 1>::clone_from(ref_ndarray&& source)
+{
+    data_ = move_ptr(source.data_);
+    descriptor_ = std::move(source.descriptor_);
+}
+
+template <typename T> void ref_ndarray<T, 1>::assign(const ref_ndarray& source) { clone_from(source); }
 
 // Iterator
 
