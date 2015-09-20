@@ -206,13 +206,14 @@ TEST_CASE("reading matrix of integers", "[dataframe]")
     }
 
     auto df = my_dataframe::read(stream, opts);
-    REQUIRE(df.ncol() == 10);
-    REQUIRE(df.nrow() == 10);
+    REQUIRE(df.ncol() == N);
+    REQUIRE(df.nrow() == N);
     my_dataframe idf;
 
     // std::string -> double: Not OK
     CHECK_FALSE(jules::can_coerce_to<double>(df.select(0)));
     CHECK_THROWS(jules::coerce_to<double>(df.select(0)));
+    CHECK(jules::can_coerce_to<int>(df.select(0)));
 
     for (std::size_t i = 0; i < df.ncol(); ++i) {
         idf.colbind(jules::coerce_to<int>(df.select(i)));
@@ -222,13 +223,14 @@ TEST_CASE("reading matrix of integers", "[dataframe]")
     // int -> double: Not OK
     CHECK_FALSE(jules::can_coerce_to<double>(idf.select(0)));
     CHECK_THROWS(jules::coerce_to<double>(idf.select(0)));
+    CHECK(jules::can_coerce_to<int>(df.select(0)));
 
     // int -> std::string: OK
     CHECK(jules::can_coerce_to<std::string>(idf.select(0)));
     CHECK_NOTHROW(jules::coerce_to<std::string>(idf.select(0)));
 
-    CHECK(idf.ncol() == 10);
-    CHECK(idf.nrow() == 10);
+    CHECK(idf.ncol() == N);
+    CHECK(idf.nrow() == N);
 }
 
 TEST_CASE("reading an inconsistent dataframe", "[dataframe]")
