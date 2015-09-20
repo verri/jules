@@ -2,6 +2,7 @@
 #define JULES_ARRAY_DETAIL_REF_ARRAY_DECL_H
 
 #include "array/detail/slice.hpp"
+#include "array/detail/indirect_array.hpp"
 
 #include <array>
 #include <vector>
@@ -13,21 +14,11 @@ template <typename, typename, typename> class base_dataframe_colview;
 
 namespace detail
 {
-template <typename T, std::size_t N> class indirect_ndarray
-{
-    template <typename U, std::size_t M> friend class base_ndarray;
-    template <typename U, std::size_t M> friend class ref_ndarray;
-
-  public:
-  private:
-    base_ndarray<T, N>* array_;
-    std::vector<std::size_t> indexes[N];
-};
-
 template <typename T, std::size_t N> class ref_ndarray
 {
     template <typename, std::size_t> friend class ref_ndarray;
     template <typename, std::size_t> friend class ref_ndarray_iterator;
+    template <typename, std::size_t> friend class indirect_ndarray;
     template <typename, typename> friend class jules::base_column_view;
     template <typename, typename, typename> friend class jules::base_dataframe_colview;
 
