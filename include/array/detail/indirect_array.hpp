@@ -13,6 +13,12 @@ std::array<std::size_t, N> indirect_ndarray<T, N>::extents_helper(std::index_seq
 {
     return {{indexes_[I].size()...}};
 }
+template <typename T, std::size_t N>
+template <std::size_t... I>
+std::size_t indirect_ndarray<T, N>::size_helper(std::index_sequence<I...>) const
+{
+    return prod_args(indexes_[I].size()...);
+}
 
 } // namespace detail
 } // namespace jules
