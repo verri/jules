@@ -17,13 +17,13 @@ template <typename T, typename Coercion> class base_column_view : public detail:
     base_column_view() {}
     ~base_column_view() = default;
 
-    base_column_view(const base_column_view& source) { this->assign(source); }
-    base_column_view(base_column_view&& source) { this->assign(std::move(source)); }
+    base_column_view(const base_column_view& source) : detail::ref_ndarray<T, 1>{source} {}
+    base_column_view(base_column_view&& source) : detail::ref_ndarray<T, 1>{std::move(source)} {}
 
     base_column_view& operator=(const base_column_view& source) = delete;
     base_column_view& operator=(base_column_view&& source) = delete;
 
-    // TODO idem no colview do dataframe
+    // TODO: idem no colview do dataframe
     operator base_column_view<const T, Coercion>() const;
 
     using detail::ref_ndarray<T, 1>::operator=;

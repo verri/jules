@@ -18,8 +18,8 @@ class base_dataframe_colview : public detail::ref_ndarray<V, 1>
     base_dataframe_colview() = default;
     ~base_dataframe_colview() = default;
 
-    base_dataframe_colview(const base_dataframe_colview& source) { this->assign(source); }
-    base_dataframe_colview(base_dataframe_colview&& source) { this->assign(std::move(source)); }
+    base_dataframe_colview(const base_dataframe_colview& source) : detail::ref_ndarray<V, 1>{source} {}
+    base_dataframe_colview(base_dataframe_colview&& source) : detail::ref_ndarray<V, 1>{std::move(source)} {}
 
     base_dataframe_colview& operator=(const base_dataframe_colview& source) = delete;
     base_dataframe_colview& operator=(base_dataframe_colview&& source) = delete;
