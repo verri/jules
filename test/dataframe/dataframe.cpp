@@ -178,6 +178,34 @@ TEST_CASE("reading a dataframe", "[dataframe]")
     CHECK(cols[2] == " ");
 }
 
+TEST_CASE("reading matrix of integers", "[dataframe]")
+{
+    jules::dataframe_read_options opts;
+    opts.header = false;
+
+    std::stringstream stream;
+    std::size_t N = 10;
+    for (std::size_t i = 0; i < N; ++i) {
+        for (std::size_t j = 0; j < N; ++j) {
+            stream << i * N + j << "\t";
+        }
+        stream << "\n";
+    }
+
+    auto df = jules::dataframe::read(stream, opts);
+    REQUIRE(df.ncol() == 10);
+    REQUIRE(df.nrow() == 10);
+    jules::dataframe idf;
+
+    for (std::size_t i = 0; i < df.ncol(); ++i) {
+      idf.colbind(jules::coerce_to<int>(df.select(i)));
+      REQUIRE(idf.select(idf.ncol() - 1).elements_type() == typeid(int));
+    }
+
+    CHECK(idf.ncol() == 10);
+    CHECK(idf.nrow() == 10);
+}
+
 TEST_CASE("reading an inconsistent dataframe", "[dataframe]")
 {
     std::string input = "\ty \t\n1 \t 2\t  3";
