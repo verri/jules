@@ -8,74 +8,41 @@ namespace jules
 {
 template <typename Coercion> class base_column;
 
-template <typename T, typename Coercion> class base_const_column_view
+template <typename T, typename Coercion> class base_column_view : public detail::ref_ndarray<T, 1>
 {
     friend class base_column<Coercion>;
-
-  private:
-    using column_model_t = detail::column_model<T, Coercion>;
+    template <typename, typename> friend class base_column_view;
 
   public:
-    using value_type = T;
-    using size_type = typename column_model_t::size_type;
-    using difference_type = typename column_model_t::difference_type;
+    base_column_view() : detail::ref_ndarray<T, 1>{nullptr, {0, {0}}} {}
+    ~base_column_view() = default;
 
-    using reference = typename column_model_t::reference;
-    using const_reference = typename column_model_t::const_reference;
-    using pointer = typename column_model_t::pointer;
-    using const_pointer = typename column_model_t::const_pointer;
-    using iterator = typename column_model_t::iterator;
-    using const_iterator = typename column_model_t::const_iterator;
+    base_column_view(const base_column_view& source) : base_column_view() { this->assign(source); }
+    base_column_view(base_column_view&& source) : base_column_view() { this->assign(std::move(source)); }
 
-    base_const_column_view(const base_const_column_view& source) = default;
-    base_const_column_view(base_const_column_view&& source) = default;
+    base_column_view& operator=(const base_column_view& source) = delete;
+    base_column_view& operator=(base_column_view&& source) = delete;
 
-    base_const_column_view& operator=(const base_const_column_view& source) = default;
-    base_const_column_view& operator=(base_const_column_view&& source) = default;
+    // TODO idem no colview do dataframe
+    operator base_column_view<const T, Coercion>() const { return {static_cast<const detail::ref_ndarray<T, 1>&>(*this)}; }
 
-    const auto& operator[](std::size_t i) const { return column_model_[i]; }
+    using detail::ref_ndarray<T, 1>::operator=;
 
-    auto begin() const { return column_model_.begin(); }
-    auto end() const { return column_model_.end(); }
+    T* data() { return this->data_; }
+    const T* data() const { return this->data_; }
 
-    auto size() const { return column_model_.size(); }
+    T* data_begin() { return this->data_; }
+    T* data_end() { return this->data_ + this->size(); }
 
-  protected:
-    base_const_column_view(const column_model_t& column_model);
-    column_model_t& column_model_;
-};
-
-template <typename T, typename Coercion> class base_column_view : public base_const_column_view<T, Coercion>
-{
-    friend class base_column<Coercion>;
+    const T* data_begin() const { return this->data_; }
+    const T* data_end() const { return this->data_ + this->size(); }
 
   private:
-    using column_model_t = detail::column_model<T, Coercion>;
-
-  public:
-    base_column_view(const base_column_view& source) = default;
-    base_column_view(base_column_view&& source) = default;
-
-    base_column_view& operator=(const base_column_view& source) = default;
-    base_column_view& operator=(base_column_view&& source) = default;
-
-    using base_const_column_view<T, Coercion>::operator[];
-    auto& operator[](std::size_t i) { return this->column_model_[i]; }
-
-    auto begin() { return this->column_model_.begin(); }
-    auto end() { return this->column_model_.end(); }
-
-    using base_const_column_view<T, Coercion>::begin;
-    using base_const_column_view<T, Coercion>::end;
-
-  private:
-    base_column_view(const column_model_t& column_model) : base_const_column_view<T, Coercion>(column_model)
-    {
-    }
+    base_column_view(T* data, std::size_t size) : detail::ref_ndarray<T, 1>{data, {0, {size}}} {}
+    base_column_view(const detail::ref_ndarray<T, 1>& source) : detail::ref_ndarray<T, 1>{source} {}
 };
 
 template <typename T> using column_view = base_column_view<T, default_coercion_rules>;
-template <typename T> using const_column_view = base_const_column_view<T, default_coercion_rules>;
 
 } // namespace jules
 

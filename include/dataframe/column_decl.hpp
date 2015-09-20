@@ -13,6 +13,7 @@
 namespace jules
 {
 template <typename Coercion> class base_dataframe;
+template <typename Coercion> class base_column;
 
 template <typename Coercion> class base_column
 {
@@ -21,6 +22,8 @@ template <typename Coercion> class base_column
   private:
     template <typename T> using column_model_t = detail::column_model<T, Coercion>;
     using column_interface_t = detail::column_interface<Coercion>;
+
+    template <typename T> using view_t = base_column_view<T, Coercion>;
 
   public:
     template <typename T> base_column(const std::string& name, std::initializer_list<T> values);
@@ -48,12 +51,11 @@ template <typename Coercion> class base_column
 
     std::type_index elements_type() const { return column_model_->elements_type(); }
 
-    template <typename T> base_column_view<T, Coercion> view();
-    template <typename T> base_const_column_view<T, Coercion> view() const;
+    template <typename T> view_t<T> view();
+    template <typename T> view_t<const T> view() const;
 
     template <typename T, typename C> friend base_column_view<T, C> make_view(base_column<C>& column);
-    template <typename T, typename C>
-    friend base_const_column_view<T, C> make_view(const base_column<C>& column);
+    template <typename T, typename C> friend base_column_view<const T, C> make_view(const base_column<C>& column);
 
     auto size() const { return column_model_->size(); }
 

@@ -192,6 +192,23 @@ template <typename T> auto ref_ndarray_iterator<T, 1>::operator++(int) -> ref_nd
     return copy;
 }
 
+// Data Iterator
+
+template <typename T, std::size_t N> auto ref_ndarray_data_iterator<T,N>::
+ operator++() -> ref_ndarray_data_iterator&
+{
+    ++it_;
+    return *this;
+}
+
+template <typename T, std::size_t N> auto ref_ndarray_data_iterator<T,N>::
+ operator++(int) -> ref_ndarray_data_iterator
+{
+    auto c = *this;
+    ++it_;
+    return c;
+}
+
 } // namespace detail
 } // namespace jules
 

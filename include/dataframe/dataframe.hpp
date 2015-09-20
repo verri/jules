@@ -170,7 +170,7 @@ void base_dataframe<Coercion>::write(const base_dataframe<Coercion>& df, std::os
         return;
 
     std::vector<base_column<Coercion>> coerced;
-    std::vector<const_column_view<std::string>> data;
+    std::vector<column_view<const std::string>> data;
 
     for (std::size_t j = 0; j < df.ncol(); ++j) {
         const auto& col = df.select(j);
@@ -200,19 +200,27 @@ void base_dataframe<Coercion>::write(const base_dataframe<Coercion>& df, std::os
 
 template <typename Coercion>
 template <typename T>
-base_const_dataframe_colview<T, Coercion> base_dataframe<Coercion>::colview() const
+base_dataframe_colview<const T, Coercion> base_dataframe<Coercion>::colview() const
 {
-    return {columns_};
+    std::vector<base_column_view<const T, Coercion>> views;
+    for (const auto& col : columns_)
+        views.push_back(make_view<T>(col));
+
+    return {std::move(views)};
 }
 
 template <typename Coercion>
 template <typename T>
 base_dataframe_colview<T, Coercion> base_dataframe<Coercion>::colview()
 {
-    return {columns_};
+    std::vector<base_column_view<T, Coercion>> views;
+    for (auto& col : columns_)
+        views.push_back(make_view<T>(col));
+
+    return {std::move(views)};
 }
 
-template <typename T, typename C> base_const_dataframe_colview<T, C> make_colview(const base_dataframe<C>& df)
+template <typename T, typename C> base_dataframe_colview<const T, C> make_colview(const base_dataframe<C>& df)
 {
     return df.template colview<T>();
 }

@@ -22,6 +22,8 @@ template <typename Coercion> class base_dataframe
     using expr_t = base_expr<Coercion, void>;
     using expr_list_t = base_expr_list<Coercion>;
 
+    template <typename T> using column_view_t = base_column_view<T, Coercion>;
+
   public:
     using column_t = base_column<Coercion>;
 
@@ -54,12 +56,11 @@ template <typename Coercion> class base_dataframe
     static base_dataframe read(std::istream& is, const dataframe_read_options& opt = {});
     static void write(const base_dataframe& df, std::ostream& os, const dataframe_write_options& opt = {});
 
-    template <typename T> base_const_dataframe_colview<T, Coercion> colview() const;
     template <typename T> base_dataframe_colview<T, Coercion> colview();
+    template <typename T> base_dataframe_colview<const T, Coercion> colview() const;
 
-    template <typename T, typename C>
-    friend base_const_dataframe_colview<T, C> make_colview(const base_dataframe<C>& df);
     template <typename T, typename C> friend base_dataframe_colview<T, C> make_colview(base_dataframe<C>& df);
+    template <typename T, typename C> friend base_dataframe_colview<const T, C> make_colview(const base_dataframe<C>& df);
 
   private:
     std::size_t nrow_ = 0;

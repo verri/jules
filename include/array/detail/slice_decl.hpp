@@ -47,6 +47,8 @@ template <std::size_t N> class base_slice
     base_slice(std::size_t start, std::initializer_list<std::size_t> extents);
     base_slice(std::size_t start, std::initializer_list<std::size_t> extents,
                std::initializer_list<std::size_t> strides);
+
+    base_slice(std::size_t start, const std::array<std::size_t, N>& extents);
     base_slice(std::size_t start, const std::array<std::size_t, N>& extents,
                const std::array<std::size_t, N>& strides);
 

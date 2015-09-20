@@ -86,6 +86,15 @@ base_ndarray<T, N>::base_ndarray(const base_ndarray<U, N>& source)
 }
 
 template <typename T, std::size_t N>
+template <typename U>
+base_ndarray<T, N>::base_ndarray(const ref_ndarray<U, N>& source)
+    : ref_ndarray<T, N>{allocate(source.size()), {0, source.extents()}}
+{
+    static_assert(std::is_constructible<T, const U&>::value, "invalid values type");
+    create(trivial_dispatch<T>(), this->data(), source.data_begin(), source.size());
+}
+
+template <typename T, std::size_t N>
 auto base_ndarray<T, N>::operator=(const base_ndarray& source) -> base_ndarray &
 {
     COPY_FROM_BASE;

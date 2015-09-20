@@ -8,6 +8,10 @@
 
 namespace jules
 {
+
+template <typename, typename> class base_column_view;
+template <typename, typename, typename> class base_dataframe_colview;
+
 namespace detail
 {
 template <typename T, std::size_t N> class indirect_ndarray
@@ -23,8 +27,10 @@ template <typename T, std::size_t N> class indirect_ndarray
 
 template <typename T, std::size_t N> class ref_ndarray
 {
-    template <typename U, std::size_t M> friend class ref_ndarray;
-    template <typename U, std::size_t M> friend class ref_ndarray_iterator;
+    template <typename, std::size_t> friend class ref_ndarray;
+    template <typename, std::size_t> friend class ref_ndarray_iterator;
+    template <typename, typename> friend class jules::base_column_view;
+    template <typename, typename, typename> friend class jules::base_dataframe_colview;
 
   public:
     using value_type = T;
@@ -92,6 +98,9 @@ template <typename T, std::size_t N> class ref_ndarray
     ref_ndarray(const ref_ndarray& source) = default;
     ref_ndarray(ref_ndarray&& source) = default;
 
+    // TODO change this name
+    void assign(const ref_ndarray& source) { data_ = source.data_; descriptor_ = source.descriptor_; }
+
     T* data_;
     base_slice<N> descriptor_;
 };
@@ -111,7 +120,6 @@ template <typename T> class ref_ndarray<T, 1>
     using size_type = std::size_t;
     using difference_type = std::ptrdiff_t;
 
-    ref_ndarray() = delete;
     ~ref_ndarray() = default;
 
     ref_ndarray& operator=(const ref_ndarray& source);
@@ -158,9 +166,13 @@ template <typename T> class ref_ndarray<T, 1>
 
   protected:
     ref_ndarray(T* data, const base_slice<1>& descriptor) : data_{data}, descriptor_{descriptor} {}
+    ref_ndarray() : data_{nullptr} {}
 
     ref_ndarray(const ref_ndarray& source) = default;
     ref_ndarray(ref_ndarray&& source) = default;
+
+    // TODO change this name
+    void assign(const ref_ndarray& source) { data_ = source.data_; descriptor_ = source.descriptor_; }
 
     T* data_;
     base_slice<1> descriptor_;
@@ -178,6 +190,7 @@ template <typename T, std::size_t N> class ref_ndarray_iterator
     using pointer = ref_ndarray<T, N - 1>*;
     using iterator_category = std::random_access_iterator_tag;
 
+    ref_ndarray_iterator() = default;
     ref_ndarray_iterator(const ref_ndarray<T, N>& array, std::size_t index) : array_{array}, index_{index} {}
 
     ref_ndarray<T, N - 1> operator*() const { return array_[index_]; }
@@ -205,6 +218,8 @@ template <typename T> class ref_ndarray_iterator<T, 1>
     using pointer = T*;
     using iterator_category = std::random_access_iterator_tag;
 
+    // TODO iterators must have a default constructor  (check others)
+    ref_ndarray_iterator() = default;
     ref_ndarray_iterator(const ref_ndarray<T, 1>& array, std::size_t index) : array_{array}, index_{index} {}
 
     T& operator*() const { return array_[index_]; }

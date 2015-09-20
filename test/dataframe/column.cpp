@@ -35,6 +35,7 @@ TEST_CASE("column constructor using initializer list", "[constructor]")
     auto double_numbers = coerce_to<double>(string_numbers);
 
     auto v = make_view<double>(double_numbers);
+
     CHECK(v[0] == 1.0);
     CHECK(v[1] == 2.4);
     CHECK(v[2] == 3.3);

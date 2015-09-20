@@ -52,6 +52,7 @@ template <typename T, std::size_t N> class base_ndarray : public ref_ndarray<T, 
     base_ndarray(base_ndarray&& source);
 
     template <typename U> base_ndarray(const base_ndarray<U, N>& source);
+    template <typename U> base_ndarray(const ref_ndarray<U, N>& source);
 
     base_ndarray& operator=(const base_ndarray& source);
     base_ndarray& operator=(base_ndarray&& source);

@@ -86,16 +86,19 @@ template <typename T, typename Coercion> bool can_coerce_to(const base_column<Co
     return column.column_model_->template can_coerce_to<T>();
 }
 
-template <typename Coercion> template <typename T> base_column_view<T, Coercion> base_column<Coercion>::view()
+template <typename Coercion> template <typename T> auto
+base_column<Coercion>::view() -> view_t<T>
 {
-    return {this->column_model_->template downcast<T>()};
+    auto& model = this->column_model_->template downcast<T>();
+    return {model.data(), model.size()};
 }
 
 template <typename Coercion>
 template <typename T>
-base_const_column_view<T, Coercion> base_column<Coercion>::view() const
+auto base_column<Coercion>::view() const -> view_t<const T>
 {
-    return {this->column_model_->template downcast<T>()};
+    const auto& model = this->column_model_->template downcast<T>();
+    return {model.data(), model.size()};
 }
 
 template <typename T, typename C> base_column_view<T, C> make_view(base_column<C>& column)
@@ -103,7 +106,7 @@ template <typename T, typename C> base_column_view<T, C> make_view(base_column<C
     return column.template view<T>();
 }
 
-template <typename T, typename C> base_const_column_view<T, C> make_view(const base_column<C>& column)
+template <typename T, typename C> base_column_view<const T, C> make_view(const base_column<C>& column)
 {
     return column.template view<T>();
 }

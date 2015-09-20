@@ -77,6 +77,17 @@ base_slice<N>::base_slice(std::size_t start, std::initializer_list<std::size_t> 
 }
 
 template <std::size_t N>
+base_slice<N>::base_slice(std::size_t start, const std::array<std::size_t, N>& extents)
+    : start_{start}, size_{prod(extents)}, extents_(extents)
+{
+    auto tmp = size_;
+    for (std::size_t i = 0; i < N; ++i) {
+        tmp /= extents_[i];
+        strides_[i] = tmp;
+    }
+}
+
+template <std::size_t N>
 base_slice<N>::base_slice(std::size_t start, const std::array<std::size_t, N>& extents,
                           const std::array<std::size_t, N>& strides)
     : start_{start}, size_{prod(extents)}, extents_(extents), strides_(strides)
