@@ -223,7 +223,7 @@ TEST_CASE("reading matrix of integers", "[dataframe]")
     // int -> double: Not OK
     CHECK_FALSE(jules::can_coerce_to<double>(idf.select(0)));
     CHECK_THROWS(jules::coerce_to<double>(idf.select(0)));
-    CHECK(jules::can_coerce_to<int>(df.select(0)));
+    CHECK(jules::can_coerce_to<int>(idf.select(0)));
 
     // int -> std::string: OK
     CHECK(jules::can_coerce_to<std::string>(idf.select(0)));
