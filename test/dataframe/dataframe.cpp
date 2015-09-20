@@ -180,12 +180,17 @@ TEST_CASE("reading a dataframe", "[dataframe]")
 
 TEST_CASE("reading matrix of integers", "[dataframe]")
 {
-    struct integer_rules {
+    struct my_integer_rules {
         using type = int;
         static type coerce_from(const std::string& value) { return std::stoi(value); }
     };
 
-    using my_coercion_rules = jules::coercion_rules<integer_rules, jules::string_rules>;
+    struct my_string_rules {
+        using type = std::string;
+        static type coerce_from(int value) { return std::to_string(value); }
+    };
+
+    using my_coercion_rules = jules::coercion_rules<my_integer_rules, my_string_rules>;
     using my_dataframe = jules::base_dataframe<my_coercion_rules>;
 
     jules::dataframe_read_options opts;
@@ -195,7 +200,7 @@ TEST_CASE("reading matrix of integers", "[dataframe]")
     std::size_t N = 10;
     for (std::size_t i = 0; i < N; ++i) {
         for (std::size_t j = 0; j < N; ++j) {
-            stream << i * N + j << "\t";
+            stream << (i * N + j) << "\t";
         }
         stream << "\n";
     }
@@ -205,10 +210,22 @@ TEST_CASE("reading matrix of integers", "[dataframe]")
     REQUIRE(df.nrow() == 10);
     my_dataframe idf;
 
+    // std::string -> double: Not OK
+    CHECK_FALSE(jules::can_coerce_to<double>(df.select(0)));
+    CHECK_THROWS(jules::coerce_to<double>(df.select(0)));
+
     for (std::size_t i = 0; i < df.ncol(); ++i) {
-      idf.colbind(jules::coerce_to<int>(df.select(i)));
-      REQUIRE(idf.select(idf.ncol() - 1).elements_type() == typeid(int));
+        idf.colbind(jules::coerce_to<int>(df.select(i)));
+        REQUIRE(idf.select(idf.ncol() - 1).elements_type() == typeid(int));
     }
+
+    // int -> double: Not OK
+    CHECK_FALSE(jules::can_coerce_to<double>(idf.select(0)));
+    CHECK_THROWS(jules::coerce_to<double>(idf.select(0)));
+
+    // int -> std::string: OK
+    CHECK(jules::can_coerce_to<std::string>(idf.select(0)));
+    CHECK_NOTHROW(jules::coerce_to<std::string>(idf.select(0)));
 
     CHECK(idf.ncol() == 10);
     CHECK(idf.nrow() == 10);

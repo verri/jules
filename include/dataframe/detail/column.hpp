@@ -15,7 +15,6 @@ namespace jules
 {
 namespace detail
 {
-// TODO: change template parameter order
 template <typename T, typename Coercion> class column_model;
 
 template <typename Eraser, typename Coercion, size_t I>
@@ -88,7 +87,7 @@ class column_interface
     using base::coerce_to_;
     using base::can_coerce_to_;
 
-    template <typename T> column_interface_ptr coerce_to_(T) const { return nullptr; }
+    template <typename T>[[noreturn]] column_interface_ptr coerce_to_(T) const { throw std::bad_cast{}; }
     template <typename T> bool can_coerce_to_(T) const { return false; }
 };
 
@@ -102,7 +101,10 @@ class specific_concrete_coercion
     using column_interface_ptr = std::unique_ptr<column_interface<Coercion>>;
 
   protected:
-    template <typename Iter> column_interface_ptr coerce_to_(Iter, Iter, tag<type>) const { return nullptr; }
+    template <typename Iter>[[noreturn]] column_interface_ptr coerce_to_(Iter, Iter, tag<type>) const
+    {
+        throw std::bad_cast{};
+    }
 
     constexpr bool can_coerce_to_(tag<type>) const { return false; }
 };
