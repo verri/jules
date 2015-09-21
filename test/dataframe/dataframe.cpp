@@ -59,6 +59,17 @@ TEST_CASE("dataframe colbind", "[dataframe]")
 
     auto cols = df.colnames();
     auto nullcols = null.colnames();
+    struct bla {
+        std::string unnamed[3];
+    };
+    struct foo {
+        int a;
+        int b;
+        int c;
+    };
+
+    foo f = {.a = 1, .b = 2, .c = 3};
+
     std::array<std::string, 3> names{{"c", "a", "b"}};
 
     REQUIRE(cols.size() == 3);

@@ -6,6 +6,7 @@
 #include "util/async.hpp"
 
 #include <array>
+#include <type_traits>
 #include <vector>
 
 namespace jules
@@ -58,9 +59,21 @@ template <typename, std::size_t> class ref_ndarray_iterator;
 template <typename, std::size_t> class ref_ndarray_data_iterator;
 template <typename, std::size_t> class indirect_ndarray_iterator;
 template <typename, std::size_t> class indirect_ndarray_data_iterator;
+template <typename> class scalar_iterator;
 
 template <typename, typename, typename, std::size_t> class binary_expr_ndarray;
 template <typename, typename, std::size_t> class unary_expr_ndarray;
+
+// Helpers for operators
+
+template <typename It, typename F, std::size_t M>
+unary_expr_ndarray<It, F, M> make_expr_ndarray(const It& lhs_begin, const It& lhs_end, const F& op,
+                                               const std::array<std::size_t, M>& extents);
+
+template <typename LhsI, typename RhsI, typename F, std::size_t M>
+binary_expr_ndarray<LhsI, RhsI, F, M>
+make_expr_ndarray(const LhsI& lhs_begin, const LhsI& lhs_end, const RhsI& rhs_begin, const RhsI& rhs_end,
+                  const F& op, const std::array<std::size_t, M>& extents);
 
 } // namespace detail
 

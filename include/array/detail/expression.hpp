@@ -9,7 +9,22 @@ namespace jules
 {
 namespace detail
 {
-// Expression classes
+// Scalar Iterator
+
+template <typename T> auto scalar_iterator<T>::operator++() -> scalar_iterator &
+{
+    ++current_;
+    return *this;
+}
+
+template <typename T> auto scalar_iterator<T>::operator++(int) -> scalar_iterator
+{
+    auto c = *this;
+    ++(*this);
+    return c;
+}
+
+// Expression Classes
 
 template <typename LhsIt, typename RhsIt, typename Op, std::size_t N>
 auto binary_expr_ndarray<LhsIt, RhsIt, Op, N>::iterator::operator++() -> iterator &
@@ -53,87 +68,6 @@ make_expr_ndarray(const LhsI& lhs_begin, const LhsI& lhs_end, const RhsI& rhs_be
 {
     return {lhs_begin, lhs_end, rhs_begin, rhs_end, op, extents};
 }
-
-// Operations
-
-#define BASE_NDARRAY(X__) const base_ndarray<X__, M> &
-#define REF_NDARRAY(X__) const ref_ndarray<X__, M> &
-
-#define UNPACK(...) __VA_ARGS__
-
-#define BINARY_OPERATION(TX__, X__, TY__, Y__, OP__)                                                         \
-    template <UNPACK TX__, UNPACK TY__, std::size_t M> auto operator OP__(UNPACK X__ lhs, UNPACK Y__ rhs)    \
-    {                                                                                                        \
-        using A = decltype(*lhs.data_begin());                                                               \
-        using B = decltype(*rhs.data_begin());                                                               \
-        return make_expr_ndarray(lhs.data_begin(), lhs.data_end(), rhs.data_begin(), rhs.data_end(),         \
-                                 [](A & a, B & b) { return a OP__ b; }, lhs.extents());                      \
-    }
-
-#define BINARY_LEFT_SCALAR_OPERATION(TY__, Y__, OP__)                                                        \
-    template <typename U, UNPACK TY__, std::size_t M>                                                        \
-    auto operator OP__(const base_ndarray<U, 0>& lhs, UNPACK Y__ rhs)                                        \
-    {                                                                                                        \
-        using A = const U;                                                                                   \
-        using B = decltype(*rhs.data_begin());                                                               \
-        return make_expr_ndarray(scalar_iterator<const U>(lhs, 0),                                           \
-                                 scalar_iterator<const U>(lhs, rhs.size()), rhs.data_begin(),                \
-                                 rhs.data_end(), [](A & a, B & b) { return a OP__ b; }, rhs.extents());      \
-    }
-
-#define BINARY_RIGHT_SCALAR_OPERATION(TX__, X__, OP__)                                                       \
-    template <UNPACK TX__, typename U, std::size_t M>                                                        \
-    auto operator OP__(UNPACK X__ lhs, const base_ndarray<U, 0>& rhs)                                        \
-    {                                                                                                        \
-        using A = decltype(*lhs.data_begin());                                                               \
-        using B = const U;                                                                                   \
-        return make_expr_ndarray(lhs.data_begin(), lhs.data_end(), scalar_iterator<const U>(rhs, 0),         \
-                                 scalar_iterator<const U>(rhs, lhs.size()),                                  \
-                                 [](A & a, B & b) { return a OP__ b; }, lhs.extents());                      \
-    }
-
-#define EXPAND_BINARY_COMBINATIONS(TX__, X__, OP__)                                                          \
-    BINARY_OPERATION(TX__, X__, (typename U), (BASE_NDARRAY(U)), OP__)                                       \
-    BINARY_OPERATION(TX__, X__, (typename U), (REF_NDARRAY(U)), OP__)                                        \
-    BINARY_LEFT_SCALAR_OPERATION(TX__, X__, OP__)
-
-#define BINARY_COMBINATIONS(TX__, X__, OP__)                                                                 \
-    EXPAND_BINARY_COMBINATIONS(TX__, X__, OP__)                                                              \
-    BINARY_RIGHT_SCALAR_OPERATION(TX__, X__, OP__)
-
-#define BINARY_POSSIBILITIES(OP__)                                                                           \
-    BINARY_COMBINATIONS((typename T), (BASE_NDARRAY(T)), OP__)                                               \
-    BINARY_COMBINATIONS((typename T), (REF_NDARRAY(T)), OP__)
-
-#define BINARY_OPERATIONS_LIST                                                                               \
-    BINARY_POSSIBILITIES(+)                                                                                  \
-    BINARY_POSSIBILITIES(-)                                                                                  \
-    BINARY_POSSIBILITIES(*)                                                                                  \
-    BINARY_POSSIBILITIES(/ )                                                                                 \
-    BINARY_POSSIBILITIES(% )                                                                                 \
-    BINARY_POSSIBILITIES(&)                                                                                  \
-    BINARY_POSSIBILITIES(| )                                                                                 \
-    BINARY_POSSIBILITIES (^)                                                                                 \
-    BINARY_POSSIBILITIES(<< )                                                                                \
-    BINARY_POSSIBILITIES(>> )                                                                                \
-    BINARY_POSSIBILITIES(&&)                                                                                 \
-    BINARY_POSSIBILITIES(|| )                                                                                \
-    BINARY_POSSIBILITIES(== )                                                                                \
-    BINARY_POSSIBILITIES(!= )                                                                                \
-    BINARY_POSSIBILITIES(< )                                                                                 \
-    BINARY_POSSIBILITIES(<= )                                                                                \
-    BINARY_POSSIBILITIES(> )                                                                                 \
-    BINARY_POSSIBILITIES(>= )
-
-BINARY_OPERATIONS_LIST
-
-#undef BINARY_POSSIBILITIES
-#undef EXPAND_BINARY_COMBINATIONS
-#undef BINARY_OPERATION
-
-#undef UNPACK
-#undef BASE_NDARRAY
-#undef REF_NDARRAY
 
 } // namespace detail
 } // namespace jules

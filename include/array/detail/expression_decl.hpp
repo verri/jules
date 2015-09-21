@@ -20,17 +20,9 @@ template <typename T> class scalar_iterator
 
     T& operator*() const { return value_; }
 
-    scalar_iterator& operator++()
-    {
-        ++current_;
-        return *this;
-    }
-    scalar_iterator operator++(int)
-    {
-        auto c = *this;
-        ++(*this);
-        return c;
-    }
+    scalar_iterator& operator++();
+    scalar_iterator operator++(int);
+
     bool operator==(const scalar_iterator& other) const { return current_ == other.current_; }
     bool operator!=(const scalar_iterator& other) const { return current_ == other.current_; }
 
