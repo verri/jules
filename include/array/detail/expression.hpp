@@ -9,20 +9,6 @@ namespace jules
 {
 namespace detail
 {
-// Scalar Iterator
-
-template <typename T> auto scalar_iterator<T>::operator++() -> scalar_iterator &
-{
-    ++current_;
-    return *this;
-}
-
-template <typename T> auto scalar_iterator<T>::operator++(int) -> scalar_iterator
-{
-    auto c = *this;
-    ++(*this);
-    return c;
-}
 
 // Expression Classes
 

@@ -7,32 +7,6 @@ namespace jules
 {
 namespace detail
 {
-template <typename T> class scalar_iterator
-{
-  public:
-    using value_type = T;
-    using difference_type = std::ptrdiff_t;
-    using reference = value_type&;
-    using pointer = value_type*;
-    using iterator_category = std::forward_iterator_tag;
-
-    scalar_iterator(T& value, std::size_t current) : value_{value}, current_{current} {}
-
-    T& operator*() const { return value_; }
-
-    scalar_iterator& operator++();
-    scalar_iterator operator++(int);
-
-    bool operator==(const scalar_iterator& other) const { return current_ == other.current_; }
-    bool operator!=(const scalar_iterator& other) const { return current_ == other.current_; }
-
-    std::ptrdiff_t operator-(const scalar_iterator& other) const { return current_ - other.current_; }
-
-  private:
-    T& value_;
-    std::size_t current_;
-};
-
 template <typename LhsIt, typename RhsIt, typename Op, size_t N> class binary_expr_ndarray
 {
   private:
