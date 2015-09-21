@@ -9,29 +9,27 @@
 
 #define UNPACK(...) __VA_ARGS__
 
-#define UNARY_APPLY_OPERATION(TX__, X__, OP)                                                                 \
-    template <UNPACK TY__, typename Operator> auto UNPACK X__::apply(const Operator& op) const               \
+#define UNARY_APPLY_OPERATION(TX__, X__, N__)                                                                \
+    template <typename Operator> auto apply(const Operator& op) const                                        \
     {                                                                                                        \
         return make_expr_ndarray(this->data_begin(), this->data_end(), op, this->extents());                 \
     }
 
-#define UNARY_OPERATION(TX__, X__, OP__)                                                                     \
-    auto UNPACK X__::operator OP__() const                                                                   \
+#define UNARY_OPERATION(TX__, X__, N__, OP__)                                                                \
+    auto operator OP__() const                                                                               \
     {                                                                                                        \
-        using A = const typename UNPACK X__::value_type;                                                     \
-        return this->apply([](A & a) { return OP__ a; });                                                    \
+        return this->apply([](const T& a) { return OP__ a; });                                               \
     }
 
-#define UNARY_OPERATIONS_LIST(TX__, X__)                                                                     \
-    UNARY_APPLY_OPERATION(TX__, X__)                                                                         \
-    UNARY_OPERATION(TX__, X__, +)                                                                            \
-    UNARY_OPERATION(TX__, X__, -)                                                                            \
-    UNARY_OPERATION(TX__, X__, ~)                                                                            \
-    UNARY_OPERATION(TX__, X__, !)
+#define UNARY_OPERATIONS_LIST(TX__, X__, N__)                                                                \
+    UNARY_APPLY_OPERATION(TX__, X__, N__)                                                                    \
+    UNARY_OPERATION(TX__, X__, N__, +)                                                                       \
+    UNARY_OPERATION(TX__, X__, N__, -)                                                                       \
+    UNARY_OPERATION(TX__, X__, N__, ~)                                                                       \
+    UNARY_OPERATION(TX__, X__, N__, !)
 
-#define BINARY_APPLY_OPERATION(TX__, X__, TY__, Y__, OP__)                                                   \
-    template <UNPACK TY__, typename Operator>                                                                \
-    auto UNPACK X__::apply(const Operator& op, UNPACK Y__ rhs) const                                         \
+#define BINARY_APPLY_OPERATION(TX__, X__, TY__, Y__)                                                         \
+    template <UNPACK TY__, typename Operator> auto apply(const Operator& op, UNPACK Y__ rhs) const           \
     {                                                                                                        \
         const auto& lhs = *this;                                                                             \
         return make_expr_ndarray(lhs.data_begin(), lhs.data_end(), rhs.data_begin(), rhs.data_end(), op,     \
@@ -39,34 +37,31 @@
     }
 
 #define BINARY_OPERATION(TX__, X__, TY__, Y__, OP__)                                                         \
-    template <UNPACK TY__> auto UNPACK X__::operator OP__(UNPACK Y__ rhs) const                              \
+    template <UNPACK TY__> auto operator OP__(UNPACK Y__ rhs) const                                          \
     {                                                                                                        \
-        using A = const typename UNPACK X__::value_type;                                                     \
-        using B = const typename UNPACK Y__::value_type;                                                     \
-        return this->apply([](A & a, B & b) { return a OP__ b; }, rhs);                                      \
+        using Value = typename std::decay_t<UNPACK Y__>::value_type;                                         \
+        return this->apply([](const T& a, const Value& b) { return a OP__ b; }, rhs);                        \
     }
 
 #define BINARY_LEFT_TYPE_OPERATION(TY__, Y__, OP__)                                                          \
-    template <typename U,                                                                                    \
+    template <UNPACK TY__, typename U,                                                                       \
               typename E = decltype(std::declval<U>() OP__ std::declval<typename UNPACK Y__::value_type>())> \
     friend auto operator OP__(const U& lhs, UNPACK Y__ rhs)                                                  \
     {                                                                                                        \
-        using B = const typename UNPACK Y__::value_type;                                                     \
-        return rhs.apply([&rhs](B & b) { return lhs OP__ b; });                                              \
+        using Value = typename std::decay_t<UNPACK Y__>::value_type;                                         \
+        return rhs.apply([&lhs](const Value& b) { return lhs OP__ b; });                                     \
     }
 
 #define BINARY_RIGHT_TYPE_OPERATION(TX__, X__, OP__)                                                         \
-    template <typename U,                                                                                    \
-              typename E = decltype(std::declval<typename UNPACK X__::value_type>() OP__ std::declval<U>())> \
-    auto UNPACK X__::operator OP__(const U& rhs) const                                                       \
+    template <typename U, typename E = decltype(std::declval<T>() OP__ std::declval<U>())>                   \
+    auto operator OP__(const U& rhs) const                                                                   \
     {                                                                                                        \
-        using A = const typename UNPACK X__::value_type;                                                     \
-        return this->apply([](A & a) { return a OP__ rhs; });                                                \
+        return this->apply([&rhs](const T& a) { return a OP__ rhs; });                                       \
     }
 
-#define BINARY_TYPE_OPERATION(TX__, X__, TYPE__, OP__)                                                       \
-    BINARY_RIGHT_TYPE_OPERATION(TX__, X__, TYPE__, OP__)                                                     \
-    BINARY_LEFT_TYPE_OPERATION(TX__, X__, TYPE__, OP__)
+#define BINARY_TYPE_OPERATION(TX__, X__, OP__)                                                               \
+    BINARY_RIGHT_TYPE_OPERATION(TX__, X__, OP__)                                                             \
+    BINARY_LEFT_TYPE_OPERATION(TX__, X__, OP__)
 
 #define BINARY_COMBINATIONS(TX__, X__, N__, OP__)                                                            \
     BINARY_OPERATION(TX__, X__, (typename U), (BASE_NDARRAY(U, N__)), OP__)                                  \
@@ -81,9 +76,9 @@
     BINARY_APPLY_OPERATION(TX__, X__, (typename U), (BASE_NDARRAY(U, N__)))                                  \
     BINARY_APPLY_OPERATION(TX__, X__, (typename U), (REF_NDARRAY(U, N__)))                                   \
     BINARY_APPLY_OPERATION(TX__, X__, (typename U), (INDIRECT_NDARRAY(U, N__)))                              \
-    BINARY_APPLY_OPERATION(TX__, X__, (typename A, typename B), (UNARY_EXPR_NDARRAY(A, B, N__)), OP__)       \
+    BINARY_APPLY_OPERATION(TX__, X__, (typename A, typename B), (UNARY_EXPR_NDARRAY(A, B, N__)))             \
     BINARY_APPLY_OPERATION(TX__, X__, (typename A, typename B, typename C),                                  \
-                           (BINARY_EXPR_NDARRAY(A, B, C, N__)), OP__)
+                           (BINARY_EXPR_NDARRAY(A, B, C, N__)))
 
 #define BINARY_OPERATIONS_LIST(TX__, X__, N__)                                                               \
     BINARY_APPLY_COMBINATIONS(TX__, X__, N__)                                                                \

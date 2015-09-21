@@ -2,8 +2,9 @@
 #define JULES_ARRAY_DETAIL_COMMON_DECL_H
 
 #include "range/range.hpp"
-#include "util/numeric.hpp"
 #include "util/async.hpp"
+#include "util/numeric.hpp"
+#include "util/type.hpp"
 
 #include <array>
 #include <type_traits>

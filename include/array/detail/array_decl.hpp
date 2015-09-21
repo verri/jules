@@ -11,30 +11,22 @@ namespace jules
 {
 namespace detail
 {
-struct trivial_tag {
-};
-struct non_trivial_tag {
-};
-
-template <typename T, typename = void> struct trivial_dispatch_helper {
-    using type = non_trivial_tag;
-};
-
-template <typename T> struct trivial_dispatch_helper<T, std::enable_if_t<std::is_trivial<T>::value>> {
-    using type = trivial_tag;
-};
-
-static_assert(std::is_same<typename trivial_dispatch_helper<double>::type, trivial_tag>::value, "");
-static_assert(std::is_same<typename trivial_dispatch_helper<std::string>::type, non_trivial_tag>::value, "");
-
-template <typename T> auto trivial_dispatch() { return typename trivial_dispatch_helper<T>::type{}; }
-
 template <typename T, std::size_t N> class base_ndarray : public ref_ndarray<T, N>
 {
-    template <typename U, std::size_t M> friend class base_ndarray;
+    template <typename, std::size_t> friend class base_ndarray;
+
+  private:
+    using storage_t = std::aligned_storage_t<sizeof(T), alignof(T)>;
 
   public:
-    using storage_t = std::aligned_storage_t<sizeof(T), alignof(T)>;
+    using value_type = T;
+    static constexpr auto order = N;
+
+    using iterator = ref_ndarray_iterator<T, N>;
+    using const_iterator = ref_ndarray_iterator<const T, N>;
+
+    using size_type = std::size_t;
+    using difference_type = std::ptrdiff_t;
 
     base_ndarray();
     ~base_ndarray();
@@ -68,6 +60,8 @@ template <typename T, std::size_t N> class base_ndarray : public ref_ndarray<T, 
 
     const T* data_begin() const { return this->data_; }
     const T* data_end() const { return this->data_ + this->size(); }
+
+    OPERATIONS_LIST((typename R), (base_ndarray<R, N>), N);
 
   private:
     static T* allocate(std::size_t size) { return reinterpret_cast<T*>(new storage_t[size]); }

@@ -9,7 +9,6 @@ namespace jules
 {
 namespace detail
 {
-
 // Expression Classes
 
 template <typename LhsIt, typename RhsIt, typename Op, std::size_t N>

@@ -23,5 +23,7 @@ static_assert(false, "array macros are not defined.");
 #undef BINARY_APPLY_COMBINATIONS
 #undef BINARY_OPERATIONS_LIST
 
+#undef OPERATIONS_LIST
+
 #undef JULES_ARRAY_DETAIL_DEFINE_MACROS_H
 #endif // JULES_ARRAY_DETAIL_DEFINE_MACROS_H
