@@ -1,9 +1,7 @@
 #ifndef JULES_ARRAY_ARRAY_DECL_H
 #define JULES_ARRAY_ARRAY_DECL_H
 
-#include <array/detail/array.hpp>
-#include <array/detail/expression.hpp> // TODO remover
-#include "range/range.hpp"
+#include "array/detail/all.hpp"
 
 namespace jules
 {

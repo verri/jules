@@ -2,7 +2,6 @@
 #define JULES_ARRAY_DETAIL_ARRAY_H
 
 #include "array/detail/array_decl.hpp"
-#include "util/async.hpp"
 
 #define COPY_FROM_BASE                                                                                       \
     do {                                                                                                     \

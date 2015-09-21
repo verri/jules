@@ -1,16 +1,12 @@
 #ifndef JULES_ARRAY_DETAIL_SLICE_DECL_H
 #define JULES_ARRAY_DETAIL_SLICE_DECL_H
 
-#include "array/detail/utility.hpp"
-
-#include <array>
+#include "array/detail/common.hpp"
 
 namespace jules
 {
 namespace detail
 {
-template <std::size_t N> class base_slice;
-
 template <std::size_t N> class base_slice_iterator
 {
   public:

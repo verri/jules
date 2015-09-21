@@ -1,8 +1,8 @@
 #ifndef JULES_ARRAY_DETAIL_REF_ARRAY_DECL_H
 #define JULES_ARRAY_DETAIL_REF_ARRAY_DECL_H
 
-#include "array/detail/slice.hpp"
-#include "array/detail/indirect_array.hpp"
+#include "array/detail/common.hpp"
+#include "array/detail/slice_decl.hpp"
 
 #include <array>
 #include <vector>
