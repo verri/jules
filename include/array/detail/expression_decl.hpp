@@ -9,6 +9,12 @@ namespace detail
 {
 template <typename LhsIt, typename RhsIt, typename Op, size_t N> class binary_expr_ndarray
 {
+    template <typename, std::size_t> friend class base_ndarray;
+    template <typename, std::size_t> friend class ref_ndarray;
+    template <typename, std::size_t> friend class indirect_ndarray;
+    template <typename, typename, typename, std::size_t> friend class binary_expr_ndarray;
+    template <typename, typename, std::size_t> friend class unary_expr_ndarray;
+
   private:
     using extent_t = std::array<std::size_t, N>;
 
@@ -69,6 +75,12 @@ template <typename LhsIt, typename RhsIt, typename Op, size_t N> class binary_ex
 
 template <typename It, typename Op, std::size_t N> class unary_expr_ndarray
 {
+    template <typename, std::size_t> friend class base_ndarray;
+    template <typename, std::size_t> friend class ref_ndarray;
+    template <typename, std::size_t> friend class indirect_ndarray;
+    template <typename, typename, typename, std::size_t> friend class binary_expr_ndarray;
+    template <typename, typename, std::size_t> friend class unary_expr_ndarray;
+
   private:
     using extent_t = std::array<std::size_t, N>;
 

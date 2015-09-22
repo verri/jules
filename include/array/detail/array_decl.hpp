@@ -14,6 +14,10 @@ namespace detail
 template <typename T, std::size_t N> class base_ndarray : public ref_ndarray<T, N>
 {
     template <typename, std::size_t> friend class base_ndarray;
+    template <typename, std::size_t> friend class ref_ndarray;
+    template <typename, std::size_t> friend class indirect_ndarray;
+    template <typename, typename, typename, std::size_t> friend class binary_expr_ndarray;
+    template <typename, typename, std::size_t> friend class unary_expr_ndarray;
 
   private:
     using storage_t = std::aligned_storage_t<sizeof(T), alignof(T)>;
@@ -85,6 +89,12 @@ template <typename T, std::size_t N> class base_ndarray : public ref_ndarray<T, 
 
 template <typename T> class base_ndarray<T, 0>
 {
+    template <typename, std::size_t> friend class base_ndarray;
+    template <typename, std::size_t> friend class ref_ndarray;
+    template <typename, std::size_t> friend class indirect_ndarray;
+    template <typename, typename, typename, std::size_t> friend class binary_expr_ndarray;
+    template <typename, typename, std::size_t> friend class unary_expr_ndarray;
+
   public:
     using value_type = T;
 
@@ -111,6 +121,8 @@ template <typename T> class base_ndarray<T, 0>
 
     T* data() { return &data_; }
     const T* data() const { return &data_; }
+
+    // TODO operations
 
   private:
     T data_;

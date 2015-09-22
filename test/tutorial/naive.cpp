@@ -54,7 +54,7 @@ class gaussian_naive_bayes
         CHECK(priori.size() == classes.size());
 
         std::size_t i = 0;
-        for (scalar<std::string> class_ : classes) {
+        for (std::string& class_ : classes) {
             auto&& ix = y == class_;
             // vector<bool> ix = y == class_;
 

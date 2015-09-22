@@ -54,6 +54,13 @@ make_expr_ndarray(const LhsI& lhs_begin, const LhsI& lhs_end, const RhsI& rhs_be
     return {lhs_begin, lhs_end, rhs_begin, rhs_end, op, extents};
 }
 
+template <typename It, typename F, std::size_t M>
+unary_expr_ndarray<It, F, M> make_expr_ndarray(const It& begin, const It& end, const F& op,
+                                               const std::array<std::size_t, M>& extents)
+{
+    return {begin, end, op, extents};
+}
+
 } // namespace detail
 } // namespace jules
 

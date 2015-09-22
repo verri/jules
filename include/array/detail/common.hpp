@@ -67,13 +67,12 @@ template <typename, typename, std::size_t> class unary_expr_ndarray;
 // Helpers for operators
 
 template <typename It, typename F, std::size_t M>
-unary_expr_ndarray<It, F, M> make_expr_ndarray(const It& lhs_begin, const It& lhs_end, const F& op,
-                                               const std::array<std::size_t, M>& extents);
+unary_expr_ndarray<It, F, M> make_expr_ndarray(const It&, const It&, const F&,
+                                               const std::array<std::size_t, M>&);
 
 template <typename LhsI, typename RhsI, typename F, std::size_t M>
-binary_expr_ndarray<LhsI, RhsI, F, M>
-make_expr_ndarray(const LhsI& lhs_begin, const LhsI& lhs_end, const RhsI& rhs_begin, const RhsI& rhs_end,
-                  const F& op, const std::array<std::size_t, M>& extents);
+binary_expr_ndarray<LhsI, RhsI, F, M> make_expr_ndarray(const LhsI&, const LhsI&, const RhsI&, const RhsI&,
+                                                        const F&, const std::array<std::size_t, M>&);
 
 } // namespace detail
 
