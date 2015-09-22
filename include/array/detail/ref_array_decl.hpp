@@ -11,11 +11,10 @@
 
 namespace jules
 {
-template <typename, typename> class base_column_view;
-template <typename, typename, typename> class base_dataframe_colview;
-
 namespace detail
 {
+FRIEND_OPERATIONS_DECLARATION((typename R, std::size_t M), (const ref_ndarray<R, M>&))
+
 template <typename T, std::size_t N> class ref_ndarray
 {
     template <typename, std::size_t> friend class ref_ndarray;
@@ -83,7 +82,7 @@ template <typename T, std::size_t N> class ref_ndarray
     ref_ndarray_data_iterator<const T, N> data_begin() const { return {data_, descriptor_.begin()}; }
     ref_ndarray_data_iterator<const T, N> data_end() const { return {data_, descriptor_.end()}; }
 
-    OPERATIONS_LIST((typename R), (ref_ndarray<R, N>), N);
+    OPERATIONS_LIST((typename R, std::size_t M), (const ref_ndarray<R, M>&), N)
 
   protected:
     ref_ndarray(T* data, const base_slice<N>& descriptor) : data_{data}, descriptor_{descriptor} {}
@@ -159,7 +158,7 @@ template <typename T> class ref_ndarray<T, 1>
     ref_ndarray_data_iterator<const T, 1> data_begin() const { return {data_, descriptor_.begin()}; }
     ref_ndarray_data_iterator<const T, 1> data_end() const { return {data_, descriptor_.end()}; }
 
-    OPERATIONS_LIST((typename R), (ref_ndarray<R, 1>), 1);
+    OPERATIONS_LIST((typename R, std::size_t M), (const ref_ndarray<R, M>&), 1)
 
   protected:
     ref_ndarray(T* data, const base_slice<1>& descriptor) : data_{data}, descriptor_{descriptor} {}
@@ -262,6 +261,8 @@ template <typename T, std::size_t N> class ref_ndarray_data_iterator
     T* data_;
     base_slice_iterator<N> it_;
 };
+
+FRIEND_OPERATIONS_DEFINITION((typename R, std::size_t M), (const ref_ndarray<R, M>&))
 
 #include "array/detail/undef_macros.hpp"
 

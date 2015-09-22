@@ -12,6 +12,8 @@ namespace jules
 {
 namespace detail
 {
+FRIEND_OPERATIONS_DECLARATION((typename R, std::size_t M), (const base_ndarray<R, M>&))
+
 template <typename T, std::size_t N> class base_ndarray : public ref_ndarray<T, N>
 {
     template <typename, std::size_t> friend class base_ndarray;
@@ -73,7 +75,7 @@ template <typename T, std::size_t N> class base_ndarray : public ref_ndarray<T, 
     const T* data_begin() const { return this->data_; }
     const T* data_end() const { return this->data_ + this->size(); }
 
-    OPERATIONS_LIST((typename R), (base_ndarray<R, N>), N);
+    OPERATIONS_LIST((typename R, std::size_t M), (const base_ndarray<R, M>&), N)
 
   private:
     static T* allocate(std::size_t size) { return reinterpret_cast<T*>(new storage_t[size]); }
@@ -133,6 +135,8 @@ template <typename T> class base_ndarray<T, 0>
   private:
     T data_;
 };
+
+FRIEND_OPERATIONS_DEFINITION((typename R, std::size_t M), (const base_ndarray<R, M>&))
 
 #include "array/detail/undef_macros.hpp"
 

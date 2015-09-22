@@ -2,6 +2,7 @@
 #define JULES_ARRAY_DETAIL_EXPRESSION_DECL_H
 
 #include "array/detail/common.hpp"
+#include "array/detail/define_macros.hpp"
 
 namespace jules
 {
@@ -70,6 +71,9 @@ template <typename LhsIt, typename RhsIt, typename Op, size_t N> class binary_ex
     make_expr_ndarray(const LhsI& lhs_begin, const LhsI& lhs_end, const RhsI& rhs_begin, const RhsI& rhs_end,
                       const F& op, const std::array<std::size_t, M>& extents);
 
+    FRIEND_OPERATIONS((typename R, std::size_t M), (const base_ndarray<R, M>&))
+    FRIEND_OPERATIONS((typename R, std::size_t M), (const ref_ndarray<R, M>&))
+
   private:
     binary_expr_ndarray(binary_expr_ndarray&& source) = default;
     binary_expr_ndarray& operator=(binary_expr_ndarray&& source) = default;
@@ -137,6 +141,9 @@ template <typename It, typename Op, std::size_t N> class unary_expr_ndarray
     const auto& extents() const { return extents_; }
     std::size_t size() const { return prod(extents_); }
 
+    FRIEND_OPERATIONS((typename R, std::size_t M), (const base_ndarray<R, M>&))
+    FRIEND_OPERATIONS((typename R, std::size_t M), (const ref_ndarray<R, M>&))
+
   private:
     unary_expr_ndarray(unary_expr_ndarray&& source) = default;
     unary_expr_ndarray& operator=(unary_expr_ndarray&& source) = default;
@@ -148,5 +155,7 @@ template <typename It, typename Op, std::size_t N> class unary_expr_ndarray
 
 } // namespace detail
 } // namespace jules
+
+#include "array/detail/undef_macros.hpp"
 
 #endif // JULES_ARRAY_DETAIL_EXPRESSION_H

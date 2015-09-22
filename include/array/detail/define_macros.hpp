@@ -46,32 +46,21 @@
     }
 
 #define BINARY_LEFT_TYPE_OPERATION(TY__, Y__, OP__)                                                          \
-    template <UNPACK TY__, typename U,                                                                       \
-              typename E = decltype(std::declval<U>() OP__ std::declval<typename UNPACK Y__::value_type>()), \
-              typename = std::enable_if_t<!is_array<U>()>>                                                   \
-    friend auto operator OP__(const U& lhs, UNPACK Y__ rhs)                                                  \
-    {                                                                                                        \
-        using Value = typename std::decay_t<UNPACK Y__>::value_type;                                         \
-        return rhs.apply([&lhs](const Value& b) { return lhs OP__ b; });                                     \
-    }                                                                                                        \
+    template <UNPACK TY__, typename U, typename, typename>                                                   \
+    friend auto operator OP__(const U& lhs, UNPACK Y__ rhs);                                                 \
                                                                                                              \
-    template <UNPACK TY__, typename U,                                                                       \
-              typename E = decltype(std::declval<U>() OP__ std::declval<typename UNPACK Y__::value_type>())> \
-    friend auto operator OP__(const base_ndarray<U, 0>& lhs, UNPACK Y__ rhs)                                 \
-    {                                                                                                        \
-        using Value = typename std::decay_t<UNPACK Y__>::value_type;                                         \
-        return rhs.apply([&lhs](const Value& b) { return static_cast<const U&>(lhs) OP__ b; });              \
-    }
+    template <UNPACK TY__, typename U, typename, typename>                                                   \
+    friend auto operator OP__(const base_ndarray<U, 0>& lhs, UNPACK Y__ rhs);
 
 #define BINARY_RIGHT_TYPE_OPERATION(TX__, X__, OP__)                                                         \
-    template <typename U, typename E = decltype(std::declval<T>() OP__ std::declval<U>()),                   \
-              typename = std::enable_if_t<!is_array<U>()>>                                                   \
+    template <typename U, typename = std::enable_if_t<!is_array<U>()>,                                       \
+              typename = decltype(std::declval<T>() OP__ std::declval<U>())>                                 \
     auto operator OP__(const U& rhs) const                                                                   \
     {                                                                                                        \
         return this->apply([&rhs](const T& a) { return a OP__ rhs; });                                       \
     }                                                                                                        \
                                                                                                              \
-    template <typename U, typename E = decltype(std::declval<T>() OP__ std::declval<U>())>                   \
+    template <typename U, typename = decltype(std::declval<T>() OP__ std::declval<U>())>                     \
     auto operator OP__(const base_ndarray<U, 0>& rhs) const                                                  \
     {                                                                                                        \
         return this->apply([&rhs](const T& a) { return a OP__ static_cast<const U&>(rhs); });                \
@@ -122,5 +111,90 @@
 #define OPERATIONS_LIST(TX__, X__, N__)                                                                      \
     UNARY_OPERATIONS_LIST(TX__, X__, N__)                                                                    \
     BINARY_OPERATIONS_LIST(TX__, X__, N__)
+
+#define BINARY_LEFT_TYPE_OPERATION_DECLARATION(TY__, Y__, OP__)                                              \
+    template <UNPACK TY__, typename U, typename = std::enable_if_t<!is_array<U>() && (M > 0)>,               \
+              typename = decltype(std::declval<U>()                                                          \
+                                      OP__ std::declval<typename std::decay_t<UNPACK Y__>::value_type>())>   \
+    auto operator OP__(const U& lhs, UNPACK Y__ rhs);                                                        \
+                                                                                                             \
+    template <UNPACK TY__, typename U, typename = std::enable_if_t<(M > 0)>,                                 \
+              typename = decltype(std::declval<U>()                                                          \
+                                      OP__ std::declval<typename std::decay_t<UNPACK Y__>::value_type>())>   \
+    auto operator OP__(const base_ndarray<U, 0>& lhs, UNPACK Y__ rhs);
+
+#define BINARY_LEFT_TYPE_OPERATION_DEFINITION(TY__, Y__, OP__)                                               \
+    template <UNPACK TY__, typename U, typename, typename> auto operator OP__(const U& lhs, UNPACK Y__ rhs)  \
+    {                                                                                                        \
+        using Value = typename std::decay_t<UNPACK Y__>::value_type;                                         \
+        return rhs.apply([&lhs](const Value& b) { return static_cast<const U&>(lhs) OP__ b; });              \
+    }                                                                                                        \
+                                                                                                             \
+    template <UNPACK TY__, typename U, typename, typename>                                                   \
+    auto operator OP__(const base_ndarray<U, 0>& lhs, UNPACK Y__ rhs)                                        \
+    {                                                                                                        \
+        using Value = typename std::decay_t<UNPACK Y__>::value_type;                                         \
+        return rhs.apply([&lhs](const Value& b) { return lhs OP__ b; });                                     \
+    }
+
+#define FRIEND_OPERATIONS_DECLARATION(TX__, X__)                                                             \
+    BINARY_LEFT_TYPE_OPERATION_DECLARATION(TX__, X__, +)                                                     \
+    BINARY_LEFT_TYPE_OPERATION_DECLARATION(TX__, X__, -)                                                     \
+    BINARY_LEFT_TYPE_OPERATION_DECLARATION(TX__, X__, *)                                                     \
+    BINARY_LEFT_TYPE_OPERATION_DECLARATION(TX__, X__, / )                                                    \
+    BINARY_LEFT_TYPE_OPERATION_DECLARATION(TX__, X__, % )                                                    \
+    BINARY_LEFT_TYPE_OPERATION_DECLARATION(TX__, X__, &)                                                     \
+    BINARY_LEFT_TYPE_OPERATION_DECLARATION(TX__, X__, | )                                                    \
+    BINARY_LEFT_TYPE_OPERATION_DECLARATION(TX__, X__, ^)                                                     \
+    BINARY_LEFT_TYPE_OPERATION_DECLARATION(TX__, X__, << )                                                   \
+    BINARY_LEFT_TYPE_OPERATION_DECLARATION(TX__, X__, >> )                                                   \
+    BINARY_LEFT_TYPE_OPERATION_DECLARATION(TX__, X__, &&)                                                    \
+    BINARY_LEFT_TYPE_OPERATION_DECLARATION(TX__, X__, || )                                                   \
+    BINARY_LEFT_TYPE_OPERATION_DECLARATION(TX__, X__, == )                                                   \
+    BINARY_LEFT_TYPE_OPERATION_DECLARATION(TX__, X__, != )                                                   \
+    BINARY_LEFT_TYPE_OPERATION_DECLARATION(TX__, X__, < )                                                    \
+    BINARY_LEFT_TYPE_OPERATION_DECLARATION(TX__, X__, <= )                                                   \
+    BINARY_LEFT_TYPE_OPERATION_DECLARATION(TX__, X__, > )                                                    \
+    BINARY_LEFT_TYPE_OPERATION_DECLARATION(TX__, X__, >= )
+
+#define FRIEND_OPERATIONS_DEFINITION(TX__, X__)                                                              \
+    BINARY_LEFT_TYPE_OPERATION_DEFINITION(TX__, X__, +)                                                      \
+    BINARY_LEFT_TYPE_OPERATION_DEFINITION(TX__, X__, -)                                                      \
+    BINARY_LEFT_TYPE_OPERATION_DEFINITION(TX__, X__, *)                                                      \
+    BINARY_LEFT_TYPE_OPERATION_DEFINITION(TX__, X__, / )                                                     \
+    BINARY_LEFT_TYPE_OPERATION_DEFINITION(TX__, X__, % )                                                     \
+    BINARY_LEFT_TYPE_OPERATION_DEFINITION(TX__, X__, &)                                                      \
+    BINARY_LEFT_TYPE_OPERATION_DEFINITION(TX__, X__, | )                                                     \
+    BINARY_LEFT_TYPE_OPERATION_DEFINITION(TX__, X__, ^)                                                      \
+    BINARY_LEFT_TYPE_OPERATION_DEFINITION(TX__, X__, << )                                                    \
+    BINARY_LEFT_TYPE_OPERATION_DEFINITION(TX__, X__, >> )                                                    \
+    BINARY_LEFT_TYPE_OPERATION_DEFINITION(TX__, X__, &&)                                                     \
+    BINARY_LEFT_TYPE_OPERATION_DEFINITION(TX__, X__, || )                                                    \
+    BINARY_LEFT_TYPE_OPERATION_DEFINITION(TX__, X__, == )                                                    \
+    BINARY_LEFT_TYPE_OPERATION_DEFINITION(TX__, X__, != )                                                    \
+    BINARY_LEFT_TYPE_OPERATION_DEFINITION(TX__, X__, < )                                                     \
+    BINARY_LEFT_TYPE_OPERATION_DEFINITION(TX__, X__, <= )                                                    \
+    BINARY_LEFT_TYPE_OPERATION_DEFINITION(TX__, X__, > )                                                     \
+    BINARY_LEFT_TYPE_OPERATION_DEFINITION(TX__, X__, >= )
+
+#define FRIEND_OPERATIONS(TX__, X__)                                                                         \
+    BINARY_LEFT_TYPE_OPERATION(TX__, X__, +)                                                                 \
+    BINARY_LEFT_TYPE_OPERATION(TX__, X__, -)                                                                 \
+    BINARY_LEFT_TYPE_OPERATION(TX__, X__, *)                                                                 \
+    BINARY_LEFT_TYPE_OPERATION(TX__, X__, / )                                                                \
+    BINARY_LEFT_TYPE_OPERATION(TX__, X__, % )                                                                \
+    BINARY_LEFT_TYPE_OPERATION(TX__, X__, &)                                                                 \
+    BINARY_LEFT_TYPE_OPERATION(TX__, X__, | )                                                                \
+    BINARY_LEFT_TYPE_OPERATION(TX__, X__, ^)                                                                 \
+    BINARY_LEFT_TYPE_OPERATION(TX__, X__, << )                                                               \
+    BINARY_LEFT_TYPE_OPERATION(TX__, X__, >> )                                                               \
+    BINARY_LEFT_TYPE_OPERATION(TX__, X__, &&)                                                                \
+    BINARY_LEFT_TYPE_OPERATION(TX__, X__, || )                                                               \
+    BINARY_LEFT_TYPE_OPERATION(TX__, X__, == )                                                               \
+    BINARY_LEFT_TYPE_OPERATION(TX__, X__, != )                                                               \
+    BINARY_LEFT_TYPE_OPERATION(TX__, X__, < )                                                                \
+    BINARY_LEFT_TYPE_OPERATION(TX__, X__, <= )                                                               \
+    BINARY_LEFT_TYPE_OPERATION(TX__, X__, > )                                                                \
+    BINARY_LEFT_TYPE_OPERATION(TX__, X__, >= )
 
 #endif // JULES_ARRAY_DETAIL_DEFINE_MACROS_H
