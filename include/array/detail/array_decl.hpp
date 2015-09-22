@@ -2,6 +2,7 @@
 #define JULES_ARRAY_DETAIL_ARRAY_DECL_H
 
 #include "array/detail/common.hpp"
+#include "array/detail/define_macros.hpp"
 
 #include <array>
 #include <utility>
@@ -127,6 +128,8 @@ template <typename T> class base_ndarray<T, 0>
   private:
     T data_;
 };
+
+#include "array/detail/undef_macros.hpp"
 
 } // namespace detail
 } // namespace jules

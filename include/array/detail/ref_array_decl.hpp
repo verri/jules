@@ -4,6 +4,8 @@
 #include "array/detail/common.hpp"
 #include "array/detail/slice_decl.hpp"
 
+#include "array/detail/define_macros.hpp"
+
 #include <array>
 #include <vector>
 
@@ -260,6 +262,8 @@ template <typename T, std::size_t N> class ref_ndarray_data_iterator
     T* data_;
     base_slice_iterator<N> it_;
 };
+
+#include "array/detail/undef_macros.hpp"
 
 } // namespace detail
 } // namespace jules

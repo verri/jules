@@ -50,6 +50,14 @@
     {                                                                                                        \
         using Value = typename std::decay_t<UNPACK Y__>::value_type;                                         \
         return rhs.apply([&lhs](const Value& b) { return lhs OP__ b; });                                     \
+    }                                                                                                        \
+                                                                                                             \
+    template <UNPACK TY__, typename U,                                                                       \
+              typename E = decltype(std::declval<U>() OP__ std::declval<typename UNPACK Y__::value_type>())> \
+    friend auto operator OP__(const base_ndarray<U, 0>& lhs, UNPACK Y__ rhs)                                 \
+    {                                                                                                        \
+        using Value = typename std::decay_t<UNPACK Y__>::value_type;                                         \
+        return rhs.apply([&lhs](const Value& b) { return static_cast<const U&>(lhs) OP__ b; });              \
     }
 
 #define BINARY_RIGHT_TYPE_OPERATION(TX__, X__, OP__)                                                         \
@@ -57,6 +65,12 @@
     auto operator OP__(const U& rhs) const                                                                   \
     {                                                                                                        \
         return this->apply([&rhs](const T& a) { return a OP__ rhs; });                                       \
+    }                                                                                                        \
+                                                                                                             \
+    template <typename U, typename E = decltype(std::declval<T>() OP__ std::declval<U>())>                   \
+    auto operator OP__(const base_ndarray<U, 0>& rhs) const                                                  \
+    {                                                                                                        \
+        return this->apply([&rhs](const T& a) { return a OP__ static_cast<const U&>(rhs); });                \
     }
 
 #define BINARY_TYPE_OPERATION(TX__, X__, OP__)                                                               \
