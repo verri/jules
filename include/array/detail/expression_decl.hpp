@@ -21,13 +21,14 @@ template <typename LhsIt, typename RhsIt, typename Op, size_t N> class binary_ex
   public:
     class iterator
     {
+      public:
         using value_type = decltype(std::declval<Op>()(*std::declval<LhsIt>(), *std::declval<RhsIt>()));
         using difference_type = std::ptrdiff_t;
         using reference = value_type&;
         using pointer = value_type*;
         using iterator_category = std::forward_iterator_tag;
 
-        iterator(const LhsIt& lhs, const RhsIt& rhs) : lhs_{lhs}, rhs_{rhs} {}
+        iterator(const LhsIt& lhs, const RhsIt& rhs, const Op& op) : lhs_{lhs}, rhs_{rhs}, op_{op} {}
 
         auto operator*() const { return op_(*lhs_, *rhs_); }
 
@@ -41,18 +42,22 @@ template <typename LhsIt, typename RhsIt, typename Op, size_t N> class binary_ex
       private:
         LhsIt lhs_;
         RhsIt rhs_;
-        Op op_;
+        const Op& op_;
     };
+
+  public:
+    using value_type = typename iterator::value_type;
+    static constexpr auto order = N;
+
+    using const_iterator = iterator;
+    using size_type = std::size_t;
+    using difference_type = std::ptrdiff_t;
 
     binary_expr_ndarray(const LhsIt& lhs_begin, const LhsIt& lhs_end, const RhsIt& rhs_begin,
                         const RhsIt& rhs_end, const Op& op, const extent_t& extents);
 
-    // XXX: how to keep private without hiding operator
     binary_expr_ndarray(const binary_expr_ndarray& source) = delete;
-    binary_expr_ndarray(binary_expr_ndarray&& source) = default;
-
     binary_expr_ndarray& operator=(const binary_expr_ndarray& source) = delete;
-    binary_expr_ndarray& operator=(binary_expr_ndarray&& source) = default;
 
     iterator data_begin() const { return {lhs_begin_, rhs_begin_}; }
     iterator data_end() const { return {lhs_end_, rhs_end_}; }
@@ -66,6 +71,9 @@ template <typename LhsIt, typename RhsIt, typename Op, size_t N> class binary_ex
                       const F& op, const std::array<std::size_t, M>& extents);
 
   private:
+    binary_expr_ndarray(binary_expr_ndarray&& source) = default;
+    binary_expr_ndarray& operator=(binary_expr_ndarray&& source) = default;
+
     LhsIt lhs_begin_, lhs_end_;
     RhsIt rhs_begin_, rhs_end_;
 
@@ -87,13 +95,14 @@ template <typename It, typename Op, std::size_t N> class unary_expr_ndarray
   public:
     class iterator
     {
+      public:
         using value_type = decltype(std::declval<Op>()(*std::declval<It>()));
         using difference_type = std::ptrdiff_t;
         using reference = value_type&;
         using pointer = value_type*;
         using iterator_category = std::forward_iterator_tag;
 
-        iterator(const It& it) : it_{it} {}
+        iterator(const It& it, const Op& op) : it_{it}, op_{op} {}
 
         auto operator*() const { return op_(*it_); }
 
@@ -106,18 +115,27 @@ template <typename It, typename Op, std::size_t N> class unary_expr_ndarray
 
       private:
         It it_;
-        Op op_;
+        const Op& op_;
     };
+
+  public:
+    using value_type = typename iterator::value_type;
+    static constexpr auto order = N;
+
+    using const_iterator = iterator;
+    using size_type = std::size_t;
+    using difference_type = std::ptrdiff_t;
 
     unary_expr_ndarray(const It& it_begin, const It& it_end, const Op& op, const extent_t& extents);
 
     unary_expr_ndarray(const unary_expr_ndarray& source) = delete;
     unary_expr_ndarray& operator=(const unary_expr_ndarray& source) = delete;
 
-    iterator data_begin() const { return {it_begin_}; }
-    iterator data_end() const { return {it_end_}; }
+    iterator data_begin() const { return {it_begin_, op_}; }
+    iterator data_end() const { return {it_end_, op_}; }
 
     const auto& extents() const { return extents_; }
+    std::size_t size() const { return prod(extents_); }
 
   private:
     unary_expr_ndarray(unary_expr_ndarray&& source) = default;

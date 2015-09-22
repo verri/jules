@@ -38,6 +38,21 @@ binary_expr_ndarray<LhsIt, RhsIt, Op, N>::binary_expr_ndarray(const LhsIt& lhs_b
 }
 
 template <typename It, typename Op, std::size_t N>
+auto unary_expr_ndarray<It, Op, N>::iterator::operator++() -> iterator &
+{
+    ++it_;
+    return *this;
+}
+
+template <typename It, typename Op, std::size_t N>
+auto unary_expr_ndarray<It, Op, N>::iterator::operator++(int) -> iterator
+{
+    auto c = *this;
+    ++(*this);
+    return c;
+}
+
+template <typename It, typename Op, std::size_t N>
 unary_expr_ndarray<It, Op, N>::unary_expr_ndarray(const It& it_begin, const It& it_end, const Op& op,
                                                   const extent_t& extents)
     : it_begin_{it_begin}, it_end_{it_end}, op_{op}, extents_(extents)

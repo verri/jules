@@ -49,13 +49,20 @@ template <typename T, std::size_t N> class base_ndarray : public ref_ndarray<T, 
 
     template <typename U> base_ndarray(const base_ndarray<U, N>& source);
     template <typename U> base_ndarray(const ref_ndarray<U, N>& source);
+    template <typename U> base_ndarray(const indirect_ndarray<U, N>& source);
+    template <typename LhsIt, typename RhsIt, typename F>
+    base_ndarray(const binary_expr_ndarray<LhsIt, RhsIt, F, N>& source);
+    template <typename It, typename F> base_ndarray(const unary_expr_ndarray<It, F, N>& source);
 
     base_ndarray& operator=(const base_ndarray& source);
     base_ndarray& operator=(base_ndarray&& source);
 
     template <typename U> base_ndarray& operator=(const base_ndarray<U, N>& source);
     template <typename U> base_ndarray& operator=(const ref_ndarray<U, N>& source);
-    // TODO: template <typename U> base_ndarray& operator=(const indirect_ndarray<U, N>& source);
+    template <typename U> base_ndarray& operator=(const indirect_ndarray<U, N>& source);
+    template <typename LhsIt, typename RhsIt, typename F>
+    base_ndarray& operator=(const binary_expr_ndarray<LhsIt, RhsIt, F, N>& source);
+    template <typename It, typename F> base_ndarray& operator=(const unary_expr_ndarray<It, F, N>& source);
 
     T* data() { return this->data_; }
     const T* data() const { return this->data_; }
@@ -122,8 +129,6 @@ template <typename T> class base_ndarray<T, 0>
 
     T* data() { return &data_; }
     const T* data() const { return &data_; }
-
-    // TODO operations
 
   private:
     T data_;

@@ -64,15 +64,43 @@ template <typename, std::size_t> class indirect_ndarray_data_iterator;
 template <typename, typename, typename, std::size_t> class binary_expr_ndarray;
 template <typename, typename, std::size_t> class unary_expr_ndarray;
 
+template <typename T> struct is_array_helper {
+    static constexpr bool value = false;
+};
+
+template <typename T, std::size_t N> struct is_array_helper<base_ndarray<T, N>> {
+    static constexpr bool value = true;
+};
+
+template <typename T, std::size_t N> struct is_array_helper<ref_ndarray<T, N>> {
+    static constexpr bool value = true;
+};
+
+template <typename T, std::size_t N> struct is_array_helper<indirect_ndarray<T, N>> {
+    static constexpr bool value = true;
+};
+
+template <typename It, typename F, std::size_t N> struct is_array_helper<unary_expr_ndarray<It, F, N>> {
+    static constexpr bool value = true;
+};
+
+template <typename LhsIt, typename RhsIt, typename F, std::size_t N>
+struct is_array_helper<binary_expr_ndarray<LhsIt, RhsIt, F, N>> {
+    static constexpr bool value = true;
+};
+
+template <typename T> constexpr bool is_array() { return is_array_helper<T>::value; }
+
 // Helpers for operators
 
 template <typename It, typename F, std::size_t M>
 unary_expr_ndarray<It, F, M> make_expr_ndarray(const It&, const It&, const F&,
                                                const std::array<std::size_t, M>&);
 
-template <typename LhsI, typename RhsI, typename F, std::size_t M>
-binary_expr_ndarray<LhsI, RhsI, F, M> make_expr_ndarray(const LhsI&, const LhsI&, const RhsI&, const RhsI&,
-                                                        const F&, const std::array<std::size_t, M>&);
+template <typename LhsIt, typename RhsIt, typename F, std::size_t M>
+binary_expr_ndarray<LhsIt, RhsIt, F, M> make_expr_ndarray(const LhsIt&, const LhsIt&, const RhsIt&,
+                                                          const RhsIt&, const F&,
+                                                          const std::array<std::size_t, M>&);
 
 } // namespace detail
 

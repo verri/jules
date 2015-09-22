@@ -55,8 +55,8 @@ class gaussian_naive_bayes
 
         std::size_t i = 0;
         for (std::string& class_ : classes) {
-            auto&& ix = y == class_;
-            // vector<bool> ix = y == class_;
+            vector<bool> ix = y == class_;
+            CHECK(ix.size() == y.size());
 
             ++i;
         }

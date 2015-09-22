@@ -29,8 +29,6 @@
         return *this;                                                                                        \
     } while (false)
 
-// TODO: operator= debug checks
-
 namespace jules
 {
 namespace detail
@@ -80,7 +78,10 @@ template <typename U>
 base_ndarray<T, N>::base_ndarray(const base_ndarray<U, N>& source)
     : ref_ndarray<T, N>{allocate(source.size()), source.descriptor_}
 {
-    static_assert(std::is_constructible<T, const U&>::value, "invalid values type");
+    static_assert(std::is_constructible<T, const U&>::value,
+                  "The elements with type T of the N-dimensional array can not be initialized "
+                  "with values of type U.");
+
     create(trivial_dispatch<T>(), this->data(), source.data(), this->size());
 }
 
@@ -89,7 +90,48 @@ template <typename U>
 base_ndarray<T, N>::base_ndarray(const ref_ndarray<U, N>& source)
     : ref_ndarray<T, N>{allocate(source.size()), {0, source.extents()}}
 {
-    static_assert(std::is_constructible<T, const U&>::value, "invalid values type");
+    static_assert(std::is_constructible<T, const U&>::value,
+                  "The elements with type T of the N-dimensional array can not be initialized "
+                  "with values of type U.");
+
+    create(trivial_dispatch<T>(), this->data(), source.data_begin(), source.size());
+}
+
+template <typename T, std::size_t N>
+template <typename U>
+base_ndarray<T, N>::base_ndarray(const indirect_ndarray<U, N>& source)
+    : ref_ndarray<T, N>{allocate(source.size()), {0, source.extents()}}
+{
+    static_assert(std::is_constructible<T, const U&>::value,
+                  "The elements with type T of the N-dimensional array can not be initialized "
+                  "with values of type U.");
+
+    create(trivial_dispatch<T>(), this->data(), source.data_begin(), source.size());
+}
+
+template <typename T, std::size_t N>
+template <typename LhsIt, typename RhsIt, typename F>
+base_ndarray<T, N>::base_ndarray(const binary_expr_ndarray<LhsIt, RhsIt, F, N>& source)
+    : ref_ndarray<T, N>{allocate(source.size()), {0, source.extents()}}
+{
+    using U = typename binary_expr_ndarray<LhsIt, RhsIt, F, N>::value_type;
+    static_assert(std::is_constructible<T, const U&>::value,
+                  "The elements with type T of the N-dimensional array can not be initialized "
+                  "with values of type U.");
+
+    create(trivial_dispatch<T>(), this->data(), source.data_begin(), source.size());
+}
+
+template <typename T, std::size_t N>
+template <typename It, typename F>
+base_ndarray<T, N>::base_ndarray(const unary_expr_ndarray<It, F, N>& source)
+    : ref_ndarray<T, N>{allocate(source.size()), {0, source.extents()}}
+{
+    using U = typename unary_expr_ndarray<It, F, N>::value_type;
+    static_assert(std::is_constructible<T, const U&>::value,
+                  "The elements with type T of the N-dimensional array can not be initialized "
+                  "with values of type U.");
+
     create(trivial_dispatch<T>(), this->data(), source.data_begin(), source.size());
 }
 

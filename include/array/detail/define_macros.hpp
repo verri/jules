@@ -1,6 +1,8 @@
 #ifndef JULES_ARRAY_DETAIL_DEFINE_MACROS_H
 #define JULES_ARRAY_DETAIL_DEFINE_MACROS_H
 
+#include "array/detail/common.hpp"
+
 #define BASE_NDARRAY(X__, N__) const base_ndarray<X__, N__> &
 #define REF_NDARRAY(X__, N__) const ref_ndarray<X__, N__> &
 #define INDIRECT_NDARRAY(X__, N__) const indirect_ndarray<X__, N__> &
@@ -45,7 +47,8 @@
 
 #define BINARY_LEFT_TYPE_OPERATION(TY__, Y__, OP__)                                                          \
     template <UNPACK TY__, typename U,                                                                       \
-              typename E = decltype(std::declval<U>() OP__ std::declval<typename UNPACK Y__::value_type>())> \
+              typename E = decltype(std::declval<U>() OP__ std::declval<typename UNPACK Y__::value_type>()), \
+              typename = std::enable_if_t<!is_array<U>()>>                                                   \
     friend auto operator OP__(const U& lhs, UNPACK Y__ rhs)                                                  \
     {                                                                                                        \
         using Value = typename std::decay_t<UNPACK Y__>::value_type;                                         \
@@ -61,7 +64,8 @@
     }
 
 #define BINARY_RIGHT_TYPE_OPERATION(TX__, X__, OP__)                                                         \
-    template <typename U, typename E = decltype(std::declval<T>() OP__ std::declval<U>())>                   \
+    template <typename U, typename E = decltype(std::declval<T>() OP__ std::declval<U>()),                   \
+              typename = std::enable_if_t<!is_array<U>()>>                                                   \
     auto operator OP__(const U& rhs) const                                                                   \
     {                                                                                                        \
         return this->apply([&rhs](const T& a) { return a OP__ rhs; });                                       \
