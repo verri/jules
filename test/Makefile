@@ -5,7 +5,7 @@ SRC = array/array_detail.cpp array/array.cpp dataframe/column.cpp dataframe/data
 OBJ := $(SRC:.cpp=.o) test_suite.o
 DEP := $(SRC:.cpp=.d) test_suite.d
 
-CXXFLAGS += -std=c++14 -g -O3 -Wall -Wextra -I../include -isystem../third_party/Catch/include
+CXXFLAGS += -std=c++14 -g -march=native -O3 -Wall -Wextra -I../include -isystem../third_party/Catch/include
 
 NODEPS = clean
 
