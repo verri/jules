@@ -35,8 +35,8 @@ class gaussian_naive_bayes
 
         CHECK(all(features, FEATURES));
 
-        vector<std::string> y = make_view<std::string>(response_column); // TODO must be a vector
-        // auto X = make_colview<double>(terms_dataframe);   // TODO must act as a matrix
+        auto y = make_view<std::string>(response_column);
+        // auto X = make_view<double, double, double, double>(terms_dataframe);
 
         classes = to_vector<std::string>(range::unique(y));
 
@@ -58,34 +58,30 @@ class gaussian_naive_bayes
             vector<bool> ix = y == class_;
             CHECK(ix.size() == y.size());
 
+            // mu[i] = apply(features[ix], [](const auto& x) { return mean(x); });
+            // sigma2[i] = apply(features[ix], [](const auto& x) { return var(x); });
+            // priori[i] = count(ix) / ix.size();
+
             ++i;
         }
-        // std::size_t i = 0;
-        // for (auto& cl : classes) {
-        //     auto ix = predictive == cl;
-
-        //     mu[i] = apply(features[ix], [](const auto& x) { return mean(x); });
-        //     sigma2[i] = apply(features[ix], [](const auto& x) { return var(x); });
-        //     priori[i] = count(ix) / ix.size();
-
-        //     ++i;
-        // }
     }
 
-    std::string classify(const vector<double>& /* TODO sample */) const
+    std::string classify(const vector<double>& sample) const
     {
-        return {};
-        //     // if (sample.size() != nfeatures_)
-        //     //     throw std::runtime_error{"invalid sample"};
+        if (sample.size() != features.size())
+            throw std::runtime_error{"invalid sample"};
 
-        //     // vector<double> log_posteriori(classes.size());
+        vector<double> log_posteriori(classes.size());
 
-        //     // for (auto i : range(classes.size())) {
-        //     //     auto likelihood = exp(-pow(sample - mu) / (2 * sigma2)) / sqrt(2 * k::pi * sigma2);
-        //     //     log_posteriori[i] = sum(log(likelihood)) + log(priori[i]);
-        //     // }
+        for (std::size_t i = 0; i < classes.size(); ++i) {
+            auto&& likelihood = sample - mu[i];
+            log_posteriori[i] = 1.0;
+        //     auto likelihood = exp(-pow(sample - mu) / (2 * sigma2)) / sqrt(2 * k::pi * sigma2);
+        //     log_posteriori[i] = sum(log(likelihood)) + log(priori[i]);
+        }
 
-        //     // return classes[which_max(posteriori)];
+        return classes[0];
+        // return classes[which_max(posteriori)];
     }
 
   private:
