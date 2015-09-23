@@ -6,7 +6,7 @@
 #ifndef NDEBUG
 #define CHECK_ASSIGNMENT(data, descriptor)                                                                   \
     do {                                                                                                     \
-        if (this->data_ == data)                                                                     \
+        if (this->data_ == data)                                                                             \
             throw std::runtime_error{"self-assignment is not supported"};                                    \
         if (!all(this->descriptor_.extents(), descriptor.extents()))                                         \
             throw std::out_of_range{"extents do not match"};                                                 \

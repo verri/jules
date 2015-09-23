@@ -31,21 +31,21 @@ using assignable_enabler = std::enable_if_t<std::is_assignable<T&, U>::value, R>
 // Request checks
 
 template <std::size_t N> class base_slice;
-template <typename T, std::size_t N> constexpr bool size_or_slice()
+template <typename T> constexpr bool size_or_slice()
 {
-    return std::is_convertible<T, std::size_t>::value || std::is_convertible<T, base_slice<N>>::value;
+    return std::is_convertible<T, std::size_t>::value || std::is_convertible<T, base_slice<1>>::value;
 }
 
 template <typename Return, typename... Args>
 using element_request = std::enable_if_t<all_args(std::is_convertible<Args, std::size_t>::value...), Return>;
 
 template <typename Return, typename... Args>
-using slice_request = std::enable_if_t<all_args(size_or_slice<Args, sizeof...(Args)>()...) &&
+using slice_request = std::enable_if_t<all_args(size_or_slice<Args>()...) &&
                                            !all_args(std::is_convertible<Args, std::size_t>::value...),
                                        Return>;
 
 template <typename Return, typename... Args>
-using indirect_request = std::enable_if_t<!all_args(size_or_slice<Args, sizeof...(Args)>()...), Return>;
+using indirect_request = std::enable_if_t<!all_args(size_or_slice<Args>()...), Return>;
 
 // Array classes
 

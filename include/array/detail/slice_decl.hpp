@@ -65,6 +65,14 @@ template <std::size_t N> class base_slice
     const auto& extents(std::size_t i) const { return extents_[i]; }
     const auto& strides(std::size_t i) const { return strides_[i]; }
 
+    base_slice& start(std::size_t start) { start_ = start; return *this; }
+    base_slice& extents(std::size_t i, std::size_t value) {
+        extents_[i] = value;
+        size_ = prod(extents_);
+        return *this;
+    }
+    base_slice& strides(std::size_t i, std::size_t value) { strides_[i] = value; return *this; }
+
     base_slice_iterator<N> begin() const { return {*this, begin_index()}; }
     base_slice_iterator<N> end() const { return {*this, end_index()}; }
 
