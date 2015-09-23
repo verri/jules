@@ -76,8 +76,8 @@ class gaussian_naive_bayes
         for (std::size_t i = 0; i < classes.size(); ++i) {
             auto&& likelihood = sample - mu[i];
             log_posteriori[i] = 1.0;
-        //     auto likelihood = exp(-pow(sample - mu) / (2 * sigma2)) / sqrt(2 * k::pi * sigma2);
-        //     log_posteriori[i] = sum(log(likelihood)) + log(priori[i]);
+            //     auto likelihood = exp(-pow(sample - mu) / (2 * sigma2)) / sqrt(2 * k::pi * sigma2);
+            //     log_posteriori[i] = sum(log(likelihood)) + log(priori[i]);
         }
 
         return classes[0];

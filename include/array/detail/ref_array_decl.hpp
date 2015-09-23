@@ -20,6 +20,9 @@ template <typename T, std::size_t N> class ref_ndarray
     template <typename, std::size_t> friend class ref_ndarray;
     template <typename, std::size_t> friend class ref_ndarray_iterator;
     template <typename, std::size_t> friend class indirect_ndarray;
+    template <typename, typename, typename, std::size_t> friend class binary_expr_ndarray;
+    template <typename, typename, std::size_t> friend class unary_expr_ndarray;
+
     template <typename, typename> friend class jules::base_column_view;
     template <typename, typename, typename> friend class jules::base_dataframe_colview;
 
@@ -41,7 +44,12 @@ template <typename T, std::size_t N> class ref_ndarray
     template <typename U> ref_ndarray& operator=(base_ndarray<U, N>&& source);
 
     template <typename U> ref_ndarray& operator=(const ref_ndarray<U, N>& source);
-    // TODO: template <typename U> ref_ndarray& operator=(const indirect_ndarray<U, N>& source);
+    template <typename U> ref_ndarray& operator=(const indirect_ndarray<U, N>& source);
+
+    template <typename It, typename F> ref_ndarray& operator=(const unary_expr_ndarray<It, F, N>& source);
+    template <typename LhsIt, typename RhsIt, typename F>
+    ref_ndarray& operator=(const binary_expr_ndarray<LhsIt, RhsIt, F, N>& source);
+
     template <typename U> ref_ndarray& operator=(const U& source);
 
     operator ref_ndarray<const T, N>() const { return {this->data_, descriptor_}; }
@@ -60,13 +68,13 @@ template <typename T, std::size_t N> class ref_ndarray
     template <typename... Args> element_request<const T&, Args...> operator()(Args&&... args) const;
 
     ref_ndarray_iterator<T, N> begin() { return {*this, 0}; }
-    ref_ndarray_iterator<T, N> end() { return {*this, descriptor_.extents(0)}; }
+    ref_ndarray_iterator<T, N> end() { return {*this, this->size(0)}; }
 
     ref_ndarray_iterator<const T, N> begin() const { return {*this, 0}; }
-    ref_ndarray_iterator<const T, N> end() const { return {*this, descriptor_.extents(0)}; }
+    ref_ndarray_iterator<const T, N> end() const { return {*this, this->size(0)}; }
 
     ref_ndarray_iterator<const T, N> cbegin() const { return {*this, 0}; }
-    ref_ndarray_iterator<const T, N> cend() const { return {*this, descriptor_.extents(0)}; }
+    ref_ndarray_iterator<const T, N> cend() const { return {*this, this->size(0)}; }
 
     std::size_t size() const { return descriptor_.size(); }
     std::size_t size(std::size_t i) const { return descriptor_.extents(i); }
@@ -244,6 +252,7 @@ template <typename T, std::size_t N> class ref_ndarray_data_iterator
     using pointer = T*;
     using iterator_category = std::forward_iterator_tag;
 
+    ref_ndarray_data_iterator() = default;
     ref_ndarray_data_iterator(T* data, const base_slice_iterator<N>& it) : data_{data}, it_{it} {}
 
     T& operator*() const { return data_[*it_]; }
@@ -258,7 +267,7 @@ template <typename T, std::size_t N> class ref_ndarray_data_iterator
     operator ref_ndarray_data_iterator<const T, N>() const { return {data_, it_}; }
 
   private:
-    T* data_;
+    T* data_ = nullptr;
     base_slice_iterator<N> it_;
 };
 
