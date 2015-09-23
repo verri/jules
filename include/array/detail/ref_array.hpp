@@ -6,15 +6,13 @@
 #ifndef NDEBUG
 #define CHECK_ASSIGNMENT(data, descriptor)                                                                   \
     do {                                                                                                     \
-        if (data && this->data_ == data)                                                                     \
+        if (this->data_ == data)                                                                     \
             throw std::runtime_error{"self-assignment is not supported"};                                    \
         if (!all(this->descriptor_.extents(), descriptor.extents()))                                         \
             throw std::out_of_range{"extents do not match"};                                                 \
     } while (false)
 #else
-#define CHECK_ASSIGNMENT(data, descriptor)                                                                   \
-    do {                                                                                                     \
-    } while (false)
+#define CHECK_ASSIGNMENT(data, descriptor)
 #endif // NDEBUG
 
 #define COPY_FROM_REFERENCE                                                                                  \
@@ -59,7 +57,7 @@ template <typename U>
 ref_ndarray<T, N>& ref_ndarray<T, N>::operator=(const base_ndarray<U, N>& source)
 {
     static_assert(std::is_assignable<T&, U>::value, "invalid values type");
-    CHECK_ASSIGNMENT(nullptr, source.descriptor_);
+    CHECK_ASSIGNMENT(source.data_, source.descriptor_);
     COPY_FROM_BASE;
 }
 
@@ -68,7 +66,7 @@ template <typename U>
 ref_ndarray<T, N>& ref_ndarray<T, N>::operator=(base_ndarray<U, N>&& source)
 {
     static_assert(std::is_assignable<T&, U>::value, "invalid values type");
-    CHECK_ASSIGNMENT(nullptr, source.descriptor_);
+    CHECK_ASSIGNMENT(source.data_, source.descriptor_);
     MOVE_FROM_BASE;
 }
 
@@ -77,7 +75,7 @@ template <typename U>
 ref_ndarray<T, N>& ref_ndarray<T, N>::operator=(const ref_ndarray<U, N>& source)
 {
     static_assert(std::is_assignable<T&, U>::value, "invalid values type");
-    CHECK_ASSIGNMENT(nullptr, source.descriptor_);
+    CHECK_ASSIGNMENT(source.data_, source.descriptor_);
     COPY_FROM_REFERENCE;
 }
 
@@ -150,7 +148,7 @@ template <typename U>
 ref_ndarray<T, 1>& ref_ndarray<T, 1>::operator=(const base_ndarray<U, 1>& source)
 {
     static_assert(std::is_assignable<T&, U>::value, "invalid values type");
-    CHECK_ASSIGNMENT(nullptr, source.descriptor_);
+    CHECK_ASSIGNMENT(source.data_, source.descriptor_);
     COPY_FROM_BASE;
 }
 
@@ -159,7 +157,7 @@ template <typename U>
 ref_ndarray<T, 1>& ref_ndarray<T, 1>::operator=(base_ndarray<U, 1>&& source)
 {
     static_assert(std::is_assignable<T&, U>::value, "invalid values type");
-    CHECK_ASSIGNMENT(nullptr, source.descriptor_);
+    CHECK_ASSIGNMENT(source.data_, source.descriptor_);
     MOVE_FROM_BASE;
 }
 
@@ -167,7 +165,7 @@ template <typename T>
 template <typename U>
 ref_ndarray<T, 1>& ref_ndarray<T, 1>::operator=(const ref_ndarray<U, 1>& source)
 {
-    CHECK_ASSIGNMENT(nullptr, source.descriptor_);
+    CHECK_ASSIGNMENT(source.data_, source.descriptor_);
     COPY_FROM_REFERENCE;
 }
 

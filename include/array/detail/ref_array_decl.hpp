@@ -17,6 +17,8 @@ FRIEND_OPERATIONS_DECLARATION((typename R, std::size_t M), (const ref_ndarray<R,
 
 template <typename T, std::size_t N> class ref_ndarray
 {
+    static_assert(N > 1, "Invalid array dimension.");
+
     template <typename, std::size_t> friend class ref_ndarray;
     template <typename, std::size_t> friend class ref_ndarray_iterator;
     template <typename, std::size_t> friend class indirect_ndarray;
@@ -191,7 +193,7 @@ template <typename T, std::size_t N> class ref_ndarray_iterator
   public:
     using value_type = ref_ndarray<T, N - 1>;
     using difference_type = std::ptrdiff_t;
-    using reference = ref_ndarray<T, N - 1>&;
+    using reference = ref_ndarray<T, N - 1>;
     using pointer = ref_ndarray<T, N - 1>*;
     using iterator_category = std::random_access_iterator_tag;
 

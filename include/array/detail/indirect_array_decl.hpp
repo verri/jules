@@ -39,10 +39,10 @@ template <typename T, std::size_t N> class indirect_ndarray
     template <typename U> indirect_ndarray& operator=(const ref_ndarray<U, N>& source);
     template <typename U> indirect_ndarray& operator=(const indirect_ndarray<U, N>& source);
 
-    template <typename It, typename F>
-    indirect_ndarray& operator=(const unary_expr_ndarray<It, F, N>& source);
     template <typename LhsIt, typename RhsIt, typename F>
     indirect_ndarray& operator=(const binary_expr_ndarray<LhsIt, RhsIt, F, N>& source);
+    template <typename It, typename F>
+    indirect_ndarray& operator=(const unary_expr_ndarray<It, F, N>& source);
 
     template <typename U> indirect_ndarray& operator=(const U& source);
 
