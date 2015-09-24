@@ -9,14 +9,82 @@
         if (I >= MAX)                                                                                        \
             throw std::out_of_range{"out of array limits"};                                                  \
     } while (false)
+#define CHECK_STRIDE(VALUE)                                                                                  \
+    do {                                                                                                     \
+        if (VALUE == 0)                                                                                      \
+            throw std::out_of_range{"invalid stride"};                                                       \
+    } while (false)
 #else
 #define CHECK_BOUNDS(I, MAX)
+#define CHECK_STRIDE(VALUE)
 #endif // NDEBUG
+
+// TODO slice all
 
 namespace jules
 {
 namespace detail
 {
+// Slice
+
+template <std::size_t N>
+base_slice<N>::base_slice(std::size_t start, std::initializer_list<std::size_t> extents)
+    : start_{start}
+{
+#ifndef NDEBUG
+    if (extents.size() > N)
+        throw std::runtime_error{"invalid extents"};
+#endif // NDEBUG
+
+    std::copy(extents.begin(), extents.end(), std::begin(extents_));
+
+    std::size_t tmp = this->size();
+    for (std::size_t i = 0; i < N; ++i) {
+        tmp /= extents_[i];
+        strides_[i] = tmp;
+    }
+}
+
+template <std::size_t N>
+base_slice<N>::base_slice(std::size_t start, std::initializer_list<std::size_t> extents,
+                          std::initializer_list<std::size_t> strides)
+    : start_{start}
+{
+#ifndef NDEBUG
+    if (extents.size() > N || strides.size() > N)
+        throw std::runtime_error{"invalid extents or strides"};
+#endif // NDEBUG
+
+    std::copy(extents.begin(), extents.end(), std::begin(extents_));
+    std::copy(strides.begin(), strides.end(), std::begin(strides_));
+}
+
+template <std::size_t N>
+base_slice<N>::base_slice(std::size_t start, const std::array<std::size_t, N>& extents)
+    : start_{start}, extents_(extents)
+{
+    auto tmp = this->size();
+    for (std::size_t i = 0; i < N; ++i) {
+        tmp /= extents_[i];
+        strides_[i] = tmp;
+    }
+}
+
+template <std::size_t N>
+base_slice<N>::base_slice(std::size_t start, const std::array<std::size_t, N>& extents,
+                          const std::array<std::size_t, N>& strides)
+    : start_{start}, extents_(extents), strides_(strides)
+{
+}
+
+template <std::size_t N>
+template <typename... Dims, typename>
+std::size_t base_slice<N>::operator()(Dims... dims) const
+{
+    std::size_t indexes[N] = {dims...};
+    return std::inner_product(std::begin(indexes), std::end(indexes), std::begin(strides_), start_);
+}
+
 // Slice Iterator
 
 template <std::size_t N>
@@ -54,62 +122,74 @@ template <std::size_t N> auto base_slice_iterator<N>::operator++(int) -> base_sl
     return c;
 }
 
-// Slice
+// Slice Specialization
 
-template <std::size_t N>
-base_slice<N>::base_slice(std::size_t start, std::initializer_list<std::size_t> extents)
+inline base_slice<1>::base_slice(std::size_t start, std::size_t extent, std::size_t stride)
+    : start_{start}, extent_{{extent}}, stride_{{stride}}
+{
+    CHECK_STRIDE(stride);
+}
+
+inline base_slice<1>::base_slice(std::size_t start, std::initializer_list<std::size_t> extents)
+    : start_{start}, stride_{{1}}
+{
+#ifndef NDEBUG
+    if (extents.size() > 1)
+        throw std::runtime_error{"invalid extents"};
+#endif // NDEBUG
+    if (extents.size() > 0)
+        extent_[0] = *extents.begin();
+}
+
+inline base_slice<1>::base_slice(std::size_t start, std::initializer_list<std::size_t> extents,
+                                 std::initializer_list<std::size_t> strides)
     : start_{start}
 {
-    if (extents.size() > N)
-        throw std::runtime_error{"invalid extents"};
-
-    std::copy(extents.begin(), extents.end(), std::begin(extents_));
-
-    std::size_t tmp = prod(extents_);
-    size_ = tmp;
-
-    for (std::size_t i = 0; i < N; ++i) {
-        tmp /= extents_[i];
-        strides_[i] = tmp;
-    }
-}
-
-template <std::size_t N>
-base_slice<N>::base_slice(std::size_t start, std::initializer_list<std::size_t> extents,
-                          std::initializer_list<std::size_t> strides)
-    : start_{start}, size_{prod(extents)}
-{
-    if (extents.size() > N || strides.size() > N)
+#ifndef NDEBUG
+    if (extents.size() > 1 || strides.size() > 1)
         throw std::runtime_error{"invalid extents or strides"};
-
-    std::copy(extents.begin(), extents.end(), std::begin(extents_));
-    std::copy(strides.begin(), strides.end(), std::begin(strides_));
+#endif // NDEBUG
+    if (extents.size() > 0)
+        extent_[0] = *extents.begin();
+    if (strides.size() > 0)
+        stride_[0] = *strides.begin();
 }
 
-template <std::size_t N>
-base_slice<N>::base_slice(std::size_t start, const std::array<std::size_t, N>& extents)
-    : start_{start}, size_{prod(extents)}, extents_(extents)
-{
-    auto tmp = size_;
-    for (std::size_t i = 0; i < N; ++i) {
-        tmp /= extents_[i];
-        strides_[i] = tmp;
-    }
-}
-
-template <std::size_t N>
-base_slice<N>::base_slice(std::size_t start, const std::array<std::size_t, N>& extents,
-                          const std::array<std::size_t, N>& strides)
-    : start_{start}, size_{prod(extents)}, extents_(extents), strides_(strides)
+inline base_slice<1>::base_slice(std::size_t start, const std::array<std::size_t, 1>& extents)
+    : start_{start}, extent_(extents), stride_{{1}}
 {
 }
 
-template <std::size_t N>
-template <typename... Dims, typename>
-std::size_t base_slice<N>::operator()(Dims... dims) const
+inline base_slice<1>::base_slice(std::size_t start, const std::array<std::size_t, 1>& extents,
+                                 const std::array<std::size_t, 1>& strides)
+    : start_{start}, extent_(extents), stride_(strides)
 {
-    std::size_t indexes[N] = {dims...};
-    return std::inner_product(std::begin(indexes), std::end(indexes), std::begin(strides_), start_);
+}
+
+inline base_slice_iterator<1> base_slice<1>::begin() const { return {*this, 0}; }
+inline base_slice_iterator<1> base_slice<1>::end() const { return {*this, extent()}; }
+
+inline base_slice_iterator<1> base_slice<1>::cbegin() const { return {*this, 0}; }
+inline base_slice_iterator<1> base_slice<1>::cend() const { return {*this, extent()}; }
+
+// Slice Iterator Specialization
+
+inline base_slice_iterator<1>::base_slice_iterator(const base_slice<1>& slice, std::size_t i)
+    : index_{slice.start() + i * slice.stride()}, step_{slice.stride()}
+{
+}
+
+inline base_slice_iterator<1>& base_slice_iterator<1>::operator++()
+{
+    index_ += step_;
+    return *this;
+}
+
+inline base_slice_iterator<1> base_slice_iterator<1>::operator++(int)
+{
+    auto c = *this;
+    index_ += step_;
+    return c;
 }
 
 // Slicing Helpers
@@ -124,10 +204,12 @@ template <std::size_t D, std::size_t N, typename... Args>
 void do_slice(base_slice<N>& result, std::size_t i, Args&&... args)
 {
     static_assert(N - D - 1 == sizeof...(args), "Invalid number of arguments.");
+
     CHECK_BOUNDS(i, result.extents(D));
 
-    result.start(result.start() + result.strides(D) * i);
-    result.extents(D, 1);
+    result.start() += result.strides(D) * i;
+    result.extents(D) = 1;
+    result.strides(D) = 1;
 
     do_slice<D + 1>(result, std::forward<Args>(args)...);
 }
@@ -136,11 +218,14 @@ template <std::size_t D, std::size_t N, typename... Args>
 void do_slice(base_slice<N>& result, const base_slice<1>& slice, Args&&... args)
 {
     static_assert(N - D - 1 == sizeof...(args), "Invalid number of arguments.");
-    CHECK_BOUNDS(slice.start() + slice.extents(0) * slice.strides(0), result.extents(D));
 
-    result.start(result.start() + result.strides(D) * slice.start());
-    result.extents(D, slice.extents(0));
-    result.strides(D, result.strides() * slice.strides());
+    CHECK_STRIDE(slice.stride());
+    CHECK_BOUNDS(slice.start() + slice.extent() * slice.stride(), result.extents(D));
+
+    result.start() += result.strides(D) * slice.start();
+    result.stride(D) = result.strides() * slice.stride();
+    result.extent(D) =
+        slice.extent() > 0 ? slice.extent() : (result.extents(D) - slice.start()) / slice.stride();
 
     do_slice<D + 1>(result, std::forward<Args>(args)...);
 }
@@ -149,5 +234,8 @@ template <std::size_t D, std::size_t N> void do_slice(base_slice<N>&) {}
 
 } // namespace detail
 } // namespace jules
+
+#undef CHECK_BOUNDS
+#undef CHECK_STRIDE
 
 #endif // JULES_ARRAY_DETAIL_SLICE_H

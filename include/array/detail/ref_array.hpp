@@ -91,7 +91,7 @@ ref_ndarray<T, N>& ref_ndarray<T, N>::operator=(const U& source)
 
 template <typename T, std::size_t N> ref_ndarray<T, N - 1> ref_ndarray<T, N>::operator[](std::size_t i)
 {
-    auto start = descriptor_.start() + descriptor_.strides(0) * i;
+    auto start = descriptor_.start() + descriptor_.stride(0) * i;
     std::array<std::size_t, N - 1> extents, strides;
 
     const auto& e = descriptor_.extents();

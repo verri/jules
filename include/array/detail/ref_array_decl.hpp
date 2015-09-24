@@ -79,7 +79,7 @@ template <typename T, std::size_t N> class ref_ndarray
     ref_ndarray_iterator<const T, N> cend() const { return {*this, this->size(0)}; }
 
     std::size_t size() const { return descriptor_.size(); }
-    std::size_t size(std::size_t i) const { return descriptor_.extents(i); }
+    std::size_t size(std::size_t i) const { return descriptor_.extent(i); }
 
     const auto& extents() const { return descriptor_.extents(); }
 
@@ -151,13 +151,13 @@ template <typename T> class ref_ndarray<T, 1>
     template <typename... Args> element_request<const T&, Args...> operator()(Args&&... args) const;
 
     ref_ndarray_iterator<T, 1> begin() { return {*this, 0}; }
-    ref_ndarray_iterator<T, 1> end() { return {*this, descriptor_.extents(0)}; }
+    ref_ndarray_iterator<T, 1> end() { return {*this, descriptor_.extent()}; }
 
     ref_ndarray_iterator<const T, 1> begin() const { return {*this, 0}; }
-    ref_ndarray_iterator<const T, 1> end() const { return {*this, descriptor_.extents(0)}; }
+    ref_ndarray_iterator<const T, 1> end() const { return {*this, descriptor_.extent()}; }
 
     ref_ndarray_iterator<const T, 1> cbegin() const { return {*this, 0}; }
-    ref_ndarray_iterator<const T, 1> cend() const { return {*this, descriptor_.extents(0)}; }
+    ref_ndarray_iterator<const T, 1> cend() const { return {*this, descriptor_.extent()}; }
 
     std::size_t size() const { return descriptor_.size(); }
     const auto& extents() const { return descriptor_.extents(); }
