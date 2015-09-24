@@ -3,6 +3,16 @@
 
 #include "array/detail/slice_decl.hpp"
 
+#ifndef NDEBUG
+#define CHECK_BOUNDS(I, MAX) \
+    do {\
+        if (I >= MAX)\
+            throw std::out_of_range{"out of array limits"};\
+    } while (false)
+#else
+#define CHECK_BOUNDS(I, MAX)
+#endif // NDEBUG
+
 namespace jules
 {
 namespace detail
@@ -101,6 +111,43 @@ std::size_t base_slice<N>::operator()(Dims... dims) const
     std::size_t indexes[N] = {dims...};
     return std::inner_product(std::begin(indexes), std::end(indexes), std::begin(strides_), start_);
 }
+
+// Slicing Helpers
+
+template <std::size_t N, typename... Args>
+void start_slicing(base_slice<N>& result, Args&&... args)
+{
+    static_assert(sizeof...(args) == N, "Invalid number of arguments.");
+    do_slice<0>(result, std::forward<Args>(args)...);
+}
+
+template <std::size_t D, std::size_t N, typename... Args>
+void do_slice(base_slice<N>& result, std::size_t i, Args&&... args)
+{
+    static_assert(N - D - 1 == sizeof...(args), "Invalid number of arguments.");
+    CHECK_BOUNDS(i, result.extents(D));
+
+    result.start(result.start() + result.strides(D) * i);
+    result.extents(D, 1);
+
+    do_slice<D + 1>(result, std::forward<Args>(args)...);
+}
+
+template <std::size_t D, std::size_t N, typename... Args>
+void do_slice(base_slice<N>& result, const base_slice<1>& slice, Args&&... args)
+{
+    static_assert(N - D - 1 == sizeof...(args), "Invalid number of arguments.");
+    CHECK_BOUNDS(slice.start() + slice.extents(0) * slice.strides(0), result.extents(D));
+
+    result.start(result.start() + result.strides(D) * slice.start());
+    result.extents(D, slice.extents(0));
+    result.strides(D, result.strides() * slice.strides());
+
+    do_slice<D + 1>(result, std::forward<Args>(args)...);
+}
+
+template <std::size_t D, std::size_t N>
+void do_slice(base_slice<N>&) {}
 
 } // namespace detail
 } // namespace jules

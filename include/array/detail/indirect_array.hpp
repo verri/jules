@@ -148,7 +148,7 @@ indirect_ndarray<T, N - 1> indirect_ndarray<T, N>::operator[](std::size_t i)
 template <typename T, std::size_t N>
 indirect_ndarray<const T, N - 1> indirect_ndarray<T, N>::operator[](std::size_t i) const
 {
-    return static_cast<indirect_ndarray<const T, N>&>(*this)[i];
+    return static_cast<indirect_ndarray<const T, N>>(*this)[i];
 }
 
 //     template <typename... Args> indirect_request<indirect_ndarray<T, N>, Args...> operator()(Args&&...
@@ -158,11 +158,10 @@ template <typename T, std::size_t N>
 template <typename... Args>
 slice_request<indirect_ndarray<T, N>, Args...> indirect_ndarray<T, N>::operator()(Args&&... args)
 {
-    // XXX
     static_assert(sizeof...(args) == N, "Invalid number of arguments.");
 
     base_slice<N> slice;
-    do_slice<N-1>(slice, 1, std::forward<Args>(args)...);
+    start_slicing(slice, std::forward<Args>(args)...);
 
     std::vector<std::size_t> indexes;
     indexes.reserve(slice.size());
@@ -213,18 +212,6 @@ template <typename T, std::size_t N> void indirect_ndarray<T, N>::clone_from(ind
     this->data_ = source.data_;
     this->descriptor_ = std::move(source.descriptor_);
     this->indexes_ = std::move(source.indexes);
-}
-
-template <typename T, std::size_t N>
-template <std::size_t D, typename... Args>
-void indirect_ndarray<T, N>::
-    do_slice(base_slice<N>& slice, std::size_t s, std::size_t i, Args&&... args)
-{
-    // XXX
-    slice.extents(D, 1);
-    slice.strides(D, s);
-
-    do_slice<D-1>(slice, s, std::forward<Args>(args)...);
 }
 
 } // namespace detail

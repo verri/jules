@@ -102,6 +102,19 @@ binary_expr_ndarray<LhsIt, RhsIt, F, M> make_expr_ndarray(const LhsIt&, const Lh
                                                           const RhsIt&, const F&,
                                                           const std::array<std::size_t, M>&);
 
+// Slicing
+template <std::size_t N, typename... Args>
+void start_slicing(base_slice<N>&, Args&&... args);
+
+template <std::size_t D, std::size_t N, typename... Args>
+void do_slice(base_slice<N>&, std::size_t, Args&&... args);
+
+template <std::size_t D, std::size_t N, typename... Args>
+void do_slice(base_slice<N>&, const base_slice<1>&, Args&&... args);
+
+template <std::size_t D, std::size_t N>
+void do_slice(base_slice<N>&);
+
 } // namespace detail
 
 // Friend classes

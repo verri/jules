@@ -100,15 +100,6 @@ template <typename T, std::size_t N> class indirect_ndarray
     void clone_from(const indirect_ndarray& source);
     void clone_from(indirect_ndarray&& source);
 
-    template <std::size_t D, typename... Args>
-    static void do_slice(base_slice<N>& slice, std::size_t s, std::size_t i, Args&&... args);
-
-    template <std::size_t D, typename... Args>
-    static void do_slice(base_slice<N>& slice, std::size_t s, const base_slice<1>& i, Args&&... args);
-
-    template <std::size_t D>
-    static void do_slice(base_slice<N>& slice, std::size_t s) {}
-
     T* data_;
     base_slice<N> descriptor_;
     std::vector<std::size_t> indexes_;
