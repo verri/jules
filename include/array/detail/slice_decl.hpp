@@ -58,20 +58,19 @@ template <std::size_t N> class base_slice
     std::size_t operator()(Dims... dims) const;
 
     auto start() const { return start_; }
-    auto size() const { return size_; }
+    auto size() const { return prod(extents_); }
     const auto& extents() const { return extents_; }
     const auto& strides() const { return strides_; }
 
-    const auto& extents(std::size_t i) const { return extents_[i]; }
-    const auto& strides(std::size_t i) const { return strides_[i]; }
+    auto extent(std::size_t i) const { return extents_[i]; }
+    auto stride(std::size_t i) const { return strides_[i]; }
 
-    base_slice& start(std::size_t start) { start_ = start; return *this; }
-    base_slice& extents(std::size_t i, std::size_t value) {
-        extents_[i] = value;
-        size_ = prod(extents_);
-        return *this;
-    }
-    base_slice& strides(std::size_t i, std::size_t value) { strides_[i] = value; return *this; }
+    auto& start() { return start_; }
+    auto& extents() { return extents_; }
+    auto& strides() { return strides_; }
+
+    auto& extent(std::size_t i) { return extents_[i]; }
+    auto& stride(std::size_t i) { return strides_[i]; }
 
     base_slice_iterator<N> begin() const { return {*this, begin_index()}; }
     base_slice_iterator<N> end() const { return {*this, end_index()}; }
@@ -84,9 +83,71 @@ template <std::size_t N> class base_slice
     std::array<std::size_t, N> end_index() const { return {{extents_[0]}}; }
 
     std::size_t start_ = 0;
-    std::size_t size_ = 0;
     std::array<std::size_t, N> extents_ = {};
     std::array<std::size_t, N> strides_ = {};
+};
+
+template <> class base_slice_iterator<1>;
+template <> class base_slice<1>
+{
+  public:
+    base_slice() = default;
+
+    base_slice(std::size_t start, std::size_t extent, std::size_t stride = 1);
+
+    base_slice(const base_slice& source) = default;
+    base_slice(base_slice&& source) = default;
+
+    base_slice& operator=(const base_slice& source) = default;
+    base_slice& operator=(base_slice&& source) = default;
+
+    std::size_t operator()(std::size_t i) const;
+
+    auto start() const { return start_; }
+    auto size() const { return extent_; }
+    auto extent() const { return extent_; }
+    auto stride() const { return stride_; }
+
+    auto& start() { return start_; }
+    auto& size() { return extent_; }
+    auto& extent() { return extent_; }
+    auto& stride() { return stride_; }
+
+    base_slice_iterator<1> begin() const { return {*this, begin_index()}; }
+    base_slice_iterator<1> end() const { return {*this, end_index()}; }
+
+    base_slice_iterator<1> cbegin() const { return {*this, begin_index()}; }
+    base_slice_iterator<1> cend() const { return {*this, end_index()}; }
+
+  private:
+    std::size_t begin_index() const { return 0; }
+    std::size_t end_index() const { return extent_; }
+
+    std::size_t start_ = 0;
+    std::size_t extent_ = 0;
+    std::size_t stride_ = 0;
+};
+
+template <> class base_slice_iterator<1>
+{
+  public:
+    using value_type = std::size_t;
+    using reference = std::size_t&;
+    using pointer = std::size_t*;
+    using iterator_category = std::forward_iterator_tag;
+
+    base_slice_iterator(const base_slice<1>& slice, std::size_t i) : index_{slice.start() + i * slice.stride()}, step_{slice.stride()} {}
+
+    std::size_t operator*() const { return index; }
+
+    base_slice_iterator& operator++();
+    base_slice_iterator operator++(int);
+    bool operator==(const base_slice_iterator& other) const { return index_ == other.index_; }
+    bool operator!=(const base_slice_iterator& other) const { return !(*this == other); }
+
+  private:
+    std::size_t index_;
+    std::size_t step_;
 };
 
 } // namespace detail
