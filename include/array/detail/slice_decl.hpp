@@ -113,16 +113,16 @@ template <> class base_slice<1>
 
     std::size_t start() const { return start_; }
     std::size_t size() const { return extent_[0]; }
-    std::size_t extent() const { return extent_[0]; }
-    std::size_t stride() const { return stride_[0]; }
+    std::size_t extent(std::size_t = 0) const { return extent_[0]; }
+    std::size_t stride(std::size_t = 0) const { return stride_[0]; }
 
     const auto& extents() const { return extent_; }
     const auto& strides() const { return stride_; }
 
     std::size_t& start() { return start_; }
     std::size_t& size() { return extent_[0]; }
-    std::size_t& extent() { return extent_[0]; }
-    std::size_t& stride() { return stride_[0]; }
+    std::size_t& extent(std::size_t = 0) { return extent_[0]; }
+    std::size_t& stride(std::size_t = 0) { return stride_[0]; }
 
     inline base_slice_iterator<1> begin() const;
     inline base_slice_iterator<1> end() const;

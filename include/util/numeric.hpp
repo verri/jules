@@ -3,6 +3,7 @@
 
 #include "range/range.hpp"
 
+#include <array>
 #include <functional>
 #include <numeric>
 #include <type_traits>
@@ -65,6 +66,16 @@ auto all(Range1&& rng1, Range2&& rng2, BinaryPredicate p)
     auto result = std::mismatch(rng1_begin, rng1_end, rng2_begin, rng2_end, p);
 
     return result.first == rng1_end && result.second == rng2_end;
+}
+
+template <typename T, std::size_t N>
+static std::array<T, N+1> cat(const std::array<T, N>& head, const T& tail) {
+    return cat_helper(head, tail, std::make_index_sequence<N>());
+}
+
+template <typename T, std::size_t N, std::size_t... I>
+static std::array<T, N+1> cat_helper(const std::array<T, N>& head, const T& tail, std::index_sequence<I...>) {
+    return {{head[I]..., tail}};
 }
 
 } // namespace jules

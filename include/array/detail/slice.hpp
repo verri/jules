@@ -19,8 +19,6 @@
 #define CHECK_STRIDE(VALUE)
 #endif // NDEBUG
 
-// TODO slice all
-
 namespace jules
 {
 namespace detail
@@ -194,10 +192,13 @@ inline base_slice_iterator<1> base_slice_iterator<1>::operator++(int)
 
 // Slicing Helpers
 
-template <std::size_t N, typename... Args> void start_slicing(base_slice<N>& result, Args&&... args)
+template <std::size_t N, typename... Args>
+base_slice<N> default_slicing(const base_slice<N>& source, Args&&... args)
 {
     static_assert(sizeof...(args) == N, "Invalid number of arguments.");
+    auto result = source;
     do_slice<0>(result, std::forward<Args>(args)...);
+    return result;
 }
 
 template <std::size_t D, std::size_t N, typename... Args>
@@ -231,6 +232,60 @@ void do_slice(base_slice<N>& result, const base_slice<1>& slice, Args&&... args)
 }
 
 template <std::size_t D, std::size_t N> void do_slice(base_slice<N>&) {}
+
+// Indirect Slicing Helpers
+
+template <std::size_t N, typename... Args> std::vector<std::size_t>
+indirect_slicing(const base_slice<N>& slice, Args&&... args)
+{
+    static_assert(sizeof...(args) == N, "Invalid number of arguments.");
+
+    std::vector<std::size_t> indexes;
+
+    do_slice(indexes, slice, std::array<std::size_t, 0>{}, std::forward<Args>(args)...);
+
+    return indexes;
+}
+
+template <std::size_t D, std::size_t N, typename... Args>
+void do_slice(std::vector<std::size_t>& indexes, const base_slice<N>& slice,
+        std::array<std::size_t, D> ix, std::size_t i, Args&&... args)
+{
+    static_assert(N - D - 1 == sizeof...(args), "Invalid number of arguments.");
+
+    CHECK_BOUNDS(i, slice.extents(D));
+    do_slice(indexes, slice, cat(ix, i), std::forward<Args>(args)...);
+}
+
+template <std::size_t D, std::size_t N, typename... Args>
+void do_slice(std::vector<std::size_t>& indexes, const base_slice<N>& slice,
+        std::array<std::size_t, D> ix, const base_slice<1>& rng, Args&&... args)
+{
+    static_assert(N - D - 1 == sizeof...(args), "Invalid number of arguments.");
+
+    CHECK_STRIDE(rng.stride());
+    CHECK_BOUNDS(rng.start() + rng.extent() * rng.stride(), slice.extents(D));
+
+    for (std::size_t i : rng)
+        do_slice(indexes, slice, cat(ix, i), std::forward<Args>(args)...);
+}
+
+template <std::size_t D, std::size_t N, typename Range, typename... Args,
+    typename = std::enable_if_t<
+    std::is_same<std::size_t, range::range_value_t<Range>>::value
+    >>
+void do_slice(std::vector<std::size_t>& indexes, const base_slice<N>& slice,
+        std::array<std::size_t, D> ix, const Range& rng, Args&&... args)
+{
+    static_assert(N - D - 1 == sizeof...(args), "Invalid number of arguments.");
+
+    CHECK_STRIDE(rng.stride());
+    CHECK_BOUNDS(rng.start() + rng.extent() * rng.stride(), slice.extents(D));
+
+    for (std::size_t i : rng)
+        do_slice(indexes, slice, cat(ix, i), std::forward<Args>(args)...);
+}
+
 
 } // namespace detail
 } // namespace jules

@@ -4,6 +4,11 @@
 #include <string>
 #include <typeindex>
 
+using jules::range::range_value_t;
+
+template <typename Range, typename R = range_value_t<Range>>
+R make_value(const Range&) { return {}; }
+
 TEST_CASE("column constructor using initializer list", "[constructor]")
 {
     using jules::column;
@@ -43,6 +48,9 @@ TEST_CASE("column constructor using initializer list", "[constructor]")
     std::vector<double> tmp = {1.0, 2.0, 3.0};
     column range_column(tmp);
     CHECK(range_column.elements_type() == typeid(double));
+
+    static_assert(std::is_same<decltype(make_value(std::vector<double>{})), double>::value, "");
+    // XXX make_value(int_column);
 }
 
 TEST_CASE("column constructor inference", "[constructor]")
