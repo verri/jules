@@ -105,15 +105,12 @@ template <typename T, std::size_t N> class indirect_ndarray
     std::vector<std::size_t> indexes_;
 };
 
-template <typename T, std::size_t N> class indirect_ndarray_iterator
+template <typename T, std::size_t N>
+class indirect_ndarray_iterator
+    : public std::iterator<std::random_access_iterator_tag, indirect_ndarray<T, N - 1>, std::ptrdiff_t,
+                           indirect_ndarray<T, N - 1>>
 {
   public:
-    using value_type = indirect_ndarray<T, N - 1>;
-    using difference_type = std::ptrdiff_t;
-    using indirecterence = indirect_ndarray<T, N - 1>&;
-    using pointer = indirect_ndarray<T, N - 1>*;
-    using iterator_category = std::random_access_iterator_tag;
-
     indirect_ndarray_iterator() = default;
     indirect_ndarray_iterator(const indirect_ndarray<T, N>& array, std::size_t index)
         : array_{array}, index_{index}
@@ -138,15 +135,10 @@ template <typename T, std::size_t N> class indirect_ndarray_iterator
 
 // TODO: iterators and specializations like ref_ndarray
 
-template <typename T, std::size_t N> class indirect_ndarray_data_iterator
+template <typename T, std::size_t N>
+class indirect_ndarray_data_iterator : public std::iterator<std::forward_iterator_tag, T>
 {
   public:
-    using value_type = T;
-    using difference_type = std::ptrdiff_t;
-    using indirecterence = T&;
-    using pointer = T*;
-    using iterator_category = std::forward_iterator_tag;
-
     indirect_ndarray_data_iterator() = default;
     indirect_ndarray_data_iterator(T* data, const std::vector<std::size_t>& indexes, std::size_t i)
         : data_{data}, indexes_{indexes}, current_{i}

@@ -6,8 +6,7 @@
 
 using jules::range::range_value_t;
 
-template <typename Range, typename R = range_value_t<Range>>
-R make_value(const Range&) { return {}; }
+template <typename Range, typename R = range_value_t<Range>> R make_value(const Range&) { return {}; }
 
 TEST_CASE("column constructor using initializer list", "[constructor]")
 {

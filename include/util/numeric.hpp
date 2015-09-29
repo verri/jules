@@ -69,12 +69,14 @@ auto all(Range1&& rng1, Range2&& rng2, BinaryPredicate p)
 }
 
 template <typename T, std::size_t N>
-static std::array<T, N+1> cat(const std::array<T, N>& head, const T& tail) {
+static std::array<T, N + 1> cat(const std::array<T, N>& head, const T& tail)
+{
     return cat_helper(head, tail, std::make_index_sequence<N>());
 }
 
 template <typename T, std::size_t N, std::size_t... I>
-static std::array<T, N+1> cat_helper(const std::array<T, N>& head, const T& tail, std::index_sequence<I...>) {
+static std::array<T, N + 1> cat_helper(const std::array<T, N>& head, const T& tail, std::index_sequence<I...>)
+{
     return {{head[I]..., tail}};
 }
 

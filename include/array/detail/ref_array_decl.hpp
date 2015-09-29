@@ -7,6 +7,7 @@
 #include "array/detail/define_macros.hpp"
 
 #include <array>
+#include <iterator>
 #include <vector>
 
 namespace jules
@@ -188,15 +189,11 @@ template <typename T> class ref_ndarray<T, 1>
     void check_assignment(const T* data, const base_slice<1> descriptor);
 };
 
-template <typename T, std::size_t N> class ref_ndarray_iterator
+template <typename T, std::size_t N>
+class ref_ndarray_iterator : public std::iterator<std::random_access_iterator_tag, ref_ndarray<T, N - 1>,
+                                                  std::ptrdiff_t, ref_ndarray<T, N - 1>>
 {
   public:
-    using value_type = ref_ndarray<T, N - 1>;
-    using difference_type = std::ptrdiff_t;
-    using reference = ref_ndarray<T, N - 1>;
-    using pointer = ref_ndarray<T, N - 1>*;
-    using iterator_category = std::random_access_iterator_tag;
-
     ref_ndarray_iterator() = default;
     ref_ndarray_iterator(const ref_ndarray<T, N>& array, std::size_t index) : array_{array}, index_{index} {}
 
@@ -216,15 +213,10 @@ template <typename T, std::size_t N> class ref_ndarray_iterator
     std::size_t index_;
 };
 
-template <typename T> class ref_ndarray_iterator<T, 1>
+template <typename T>
+class ref_ndarray_iterator<T, 1> : public std::iterator<std::random_access_iterator_tag, T>
 {
   public:
-    using value_type = T;
-    using difference_type = std::ptrdiff_t;
-    using reference = T&;
-    using pointer = T*;
-    using iterator_category = std::random_access_iterator_tag;
-
     // TODO iterators must have a default constructor  (check others)
     ref_ndarray_iterator() = default;
     ref_ndarray_iterator(const ref_ndarray<T, 1>& array, std::size_t index) : array_{array}, index_{index} {}
@@ -245,15 +237,10 @@ template <typename T> class ref_ndarray_iterator<T, 1>
     std::size_t index_;
 };
 
-template <typename T, std::size_t N> class ref_ndarray_data_iterator
+template <typename T, std::size_t N>
+class ref_ndarray_data_iterator : public std::iterator<std::forward_iterator_tag, T>
 {
   public:
-    using value_type = T;
-    using difference_type = std::ptrdiff_t;
-    using reference = T&;
-    using pointer = T*;
-    using iterator_category = std::forward_iterator_tag;
-
     ref_ndarray_data_iterator() = default;
     ref_ndarray_data_iterator(T* data, const base_slice_iterator<N>& it) : data_{data}, it_{it} {}
 

@@ -4,6 +4,8 @@
 #include "array/detail/common.hpp"
 #include "array/detail/define_macros.hpp"
 
+#include <iterator>
+
 namespace jules
 {
 namespace detail
@@ -21,14 +23,10 @@ template <typename LhsIt, typename RhsIt, typename Op, size_t N> class binary_ex
 
   public:
     class iterator
+        : public std::iterator<std::forward_iterator_tag,
+                               decltype(std::declval<Op>()(*std::declval<LhsIt>(), *std::declval<RhsIt>()))>
     {
       public:
-        using value_type = decltype(std::declval<Op>()(*std::declval<LhsIt>(), *std::declval<RhsIt>()));
-        using difference_type = std::ptrdiff_t;
-        using reference = value_type&;
-        using pointer = value_type*;
-        using iterator_category = std::forward_iterator_tag;
-
         iterator(const LhsIt& lhs, const RhsIt& rhs, const Op& op) : lhs_{lhs}, rhs_{rhs}, op_{op} {}
 
         auto operator*() const { return op_(*lhs_, *rhs_); }
@@ -98,14 +96,9 @@ template <typename It, typename Op, std::size_t N> class unary_expr_ndarray
 
   public:
     class iterator
+        : public std::iterator<std::forward_iterator_tag, decltype(std::declval<Op>()(*std::declval<It>()))>
     {
       public:
-        using value_type = decltype(std::declval<Op>()(*std::declval<It>()));
-        using difference_type = std::ptrdiff_t;
-        using reference = value_type&;
-        using pointer = value_type*;
-        using iterator_category = std::forward_iterator_tag;
-
         iterator(const It& it, const Op& op) : it_{it}, op_{op} {}
 
         auto operator*() const { return op_(*it_); }

@@ -31,6 +31,8 @@ template <std::size_t N> class base_slice
     template <typename... Dims, typename = all_size_enabler<N, Dims...>>
     std::size_t operator()(Dims... dims) const;
 
+    std::size_t operator()(const std::array<std::size_t, N>& dims) const;
+
     auto start() const { return start_; }
     auto size() const { return prod(extents_); }
     const auto& extents() const { return extents_; }
@@ -110,6 +112,7 @@ template <> class base_slice<1>
     base_slice& operator=(base_slice&& source) = default;
 
     std::size_t operator()(std::size_t i) const { return start() + i * stride(); }
+    std::size_t operator()(const std::array<std::size_t, 1>& i) const { return start() + i[0] * stride(); }
 
     std::size_t start() const { return start_; }
     std::size_t size() const { return extent_[0]; }
@@ -158,6 +161,38 @@ template <> class base_slice_iterator<1>
     std::size_t index_ = 0;
     std::size_t step_ = 1;
 };
+
+// Default Slicing
+template <std::size_t N, typename... Args>
+base_slice<N> default_slicing(const base_slice<N>&, Args&&... args);
+
+template <std::size_t D, std::size_t N, typename... Args>
+void do_slice(base_slice<N>&, std::size_t, Args&&... args);
+
+template <std::size_t D, std::size_t N, typename... Args>
+void do_slice(base_slice<N>&, const base_slice<1>&, Args&&... args);
+
+template <std::size_t D, std::size_t N> void do_slice(base_slice<N>&);
+
+// Indirect Slicing
+template <std::size_t N, typename... Args>
+std::vector<std::size_t> indirect_slicing(const base_slice<N>& slice, Args&&... args);
+
+template <std::size_t D, std::size_t N, typename... Args>
+void do_slice(std::vector<std::size_t>& indexes, const base_slice<N>& slice, std::array<std::size_t, D> ix,
+              std::size_t i, Args&&... args);
+
+template <std::size_t D, std::size_t N, typename... Args>
+void do_slice(std::vector<std::size_t>& indexes, const base_slice<N>& slice, std::array<std::size_t, D> ix,
+              const base_slice<1>& rng, Args&&... args);
+
+template <std::size_t D, std::size_t N, typename Range, typename... Args,
+          typename = std::enable_if_t<std::is_same<std::size_t, range::range_value_t<Range>>::value>>
+void do_slice(std::vector<std::size_t>& indexes, const base_slice<N>& slice, std::array<std::size_t, D> ix,
+              const Range& rng, Args&&... args);
+
+template <std::size_t D, std::size_t N, typename... Args>
+void do_slice(std::vector<std::size_t>& indexes, const base_slice<N>& slice, std::array<std::size_t, D> ix);
 
 } // namespace detail
 } // namespace jules
