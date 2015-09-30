@@ -11,8 +11,7 @@
 
 namespace jules
 {
-template <typename Range, typename R = typename std::remove_reference<Range>::type::value_type>
-auto prod(Range&& rng)
+template <typename Range, typename R = range::range_value_t<Range>> auto prod(Range&& rng)
 {
     static_assert(std::is_arithmetic<R>::value, "value type must be arithmetic");
     return std::accumulate(range::begin(std::forward<Range>(rng)), range::end(std::forward<Range>(rng)),
@@ -31,16 +30,15 @@ template <typename Head, typename... Tail> constexpr bool all_args(const Head& h
     return head && all_args(tail...);
 }
 
-template <typename Range, typename R = typename std::remove_reference<Range>::type::value_type>
-auto all(Range&& rng)
+template <typename Range, typename R = range::range_value_t<Range>> auto all(Range&& rng)
 {
     static_assert(std::is_convertible<R, bool>::value, "value type must be convertible to boolean");
     return std::accumulate(range::begin(std::forward<Range>(rng)), range::end(std::forward<Range>(rng)), true,
                            [](auto&& acc, auto&& value) { return acc && value; });
 }
 
-template <typename Range1, typename R1 = typename std::remove_reference<Range1>::type::value_type,
-          typename Range2, typename R2 = typename std::remove_reference<Range2>::type::value_type>
+template <typename Range1, typename R1 = range::range_value_t<Range1>, typename Range2,
+          typename R2 = range::range_value_t<Range2>>
 auto all(Range1&& rng1, Range2&& rng2)
 {
     auto rng1_begin = range::begin(std::forward<Range1>(rng1));
@@ -53,9 +51,8 @@ auto all(Range1&& rng1, Range2&& rng2)
     return result.first == rng1_end && result.second == rng2_end;
 }
 
-template <typename Range1, typename R1 = typename std::remove_reference<Range1>::type::value_type,
-          typename Range2, typename R2 = typename std::remove_reference<Range2>::type::value_type,
-          typename BinaryPredicate>
+template <typename Range1, typename R1 = range::range_value_t<Range1>, typename Range2,
+          typename R2 = range::range_value_t<Range2>, typename BinaryPredicate>
 auto all(Range1&& rng1, Range2&& rng2, BinaryPredicate p)
 {
     auto rng1_begin = range::begin(std::forward<Range1>(rng1));

@@ -18,8 +18,6 @@ using boost::copy;
 
 using boost::make_iterator_range;
 
-// TODO Use for range checking
-// first need to make iterators inherit from std::iterator
 template <typename Range> using range_value_t = typename boost::range_value<Range>::type;
 
 using boost::begin;

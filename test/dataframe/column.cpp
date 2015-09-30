@@ -49,7 +49,7 @@ TEST_CASE("column constructor using initializer list", "[constructor]")
     CHECK(range_column.elements_type() == typeid(double));
 
     static_assert(std::is_same<decltype(make_value(std::vector<double>{})), double>::value, "");
-    // XXX make_value(int_column);
+    static_assert(std::is_same<decltype(make_value(v)), double>::value, "");
 }
 
 TEST_CASE("column constructor inference", "[constructor]")
