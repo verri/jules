@@ -245,29 +245,31 @@ template <std::size_t D, std::size_t N> void do_slice(base_slice<N>&)
 // Indirect Slicing Helpers
 
 template <std::size_t N, typename... Args>
-std::vector<std::size_t> indirect_slicing(const base_slice<N>& slice, Args&&... args)
+std::pair<std::array<std::size_t, N>, std::vector<std::size_t>>
+indirect_slicing(const base_slice<N>& slice, Args&&... args)
 {
     static_assert(sizeof...(args) == N, "Invalid number of arguments.");
 
-    std::vector<std::size_t> indexes;
+    std::pair<std::array<std::size_t, N>, std::vector<std::size_t>> result;
+    do_slice(result.first, result.second, slice, std::array<std::size_t, 0>{}, std::forward<Args>(args)...);
 
-    do_slice(indexes, slice, std::array<std::size_t, 0>{}, std::forward<Args>(args)...);
-
-    return indexes;
+    return result;
 }
 
 template <std::size_t D, std::size_t N, typename... Args>
-void do_slice(std::vector<std::size_t>& indexes, const base_slice<N>& slice, std::array<std::size_t, D> ix,
+void do_slice(std::array<std::size_t, N>& extents, std::vector<std::size_t>& indexes, const base_slice<N>& slice, std::array<std::size_t, D> ix,
               std::size_t i, Args&&... args)
 {
     static_assert(N - D - 1 == sizeof...(args), "Invalid number of arguments.");
 
     CHECK_BOUNDS(i, slice.extents(D));
+
+    extents[D] = 1;
     do_slice(indexes, slice, cat(ix, i), std::forward<Args>(args)...);
 }
 
 template <std::size_t D, std::size_t N, typename... Args>
-void do_slice(std::vector<std::size_t>& indexes, const base_slice<N>& slice, std::array<std::size_t, D> ix,
+void do_slice(std::array<std::size_t, N>& extents, std::vector<std::size_t>& indexes, const base_slice<N>& slice, std::array<std::size_t, D> ix,
               const base_slice<1>& rng, Args&&... args)
 {
     static_assert(N - D - 1 == sizeof...(args), "Invalid number of arguments.");
@@ -275,12 +277,14 @@ void do_slice(std::vector<std::size_t>& indexes, const base_slice<N>& slice, std
     CHECK_STRIDE(rng.stride());
     CHECK_BOUNDS(rng.start() + rng.extent() * rng.stride(), slice.extents(D));
 
+    extents[D] = rng.size();
+
     for (std::size_t i : rng)
         do_slice(indexes, slice, cat(ix, i), std::forward<Args>(args)...);
 }
 
 template <std::size_t D, std::size_t N, typename Range, typename... Args, typename>
-void do_slice(std::vector<std::size_t>& indexes, const base_slice<N>& slice, std::array<std::size_t, D> ix,
+void do_slice(std::array<std::size_t, N>& extents, std::vector<std::size_t>& indexes, const base_slice<N>& slice, std::array<std::size_t, D> ix,
               const Range& rng, Args&&... args)
 {
     static_assert(N - D - 1 == sizeof...(args), "Invalid number of arguments.");
@@ -288,14 +292,16 @@ void do_slice(std::vector<std::size_t>& indexes, const base_slice<N>& slice, std
     CHECK_STRIDE(rng.stride());
     CHECK_BOUNDS(max(rng), slice.extents(D));
 
+    extents[D] = range::size(rng);
+
     for (std::size_t i : rng)
         do_slice(indexes, slice, cat(ix, i), std::forward<Args>(args)...);
 }
 
 template <std::size_t D, std::size_t N, typename... Args>
-void do_slice(std::vector<std::size_t>& indexes, const base_slice<N>& slice, std::array<std::size_t, D> ix)
+void do_slice(std::array<std::size_t, N>&, std::vector<std::size_t>& indexes, const base_slice<N>& slice, std::array<std::size_t, D> ix)
 {
-    static_assert(N - D - 1 == 0, "Invalid number of arguments.");
+    static_assert(D == N, "Invalid number of arguments.");
     indexes.push_back(slice(ix));
 }
 

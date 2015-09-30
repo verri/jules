@@ -176,23 +176,24 @@ template <std::size_t D, std::size_t N> void do_slice(base_slice<N>&);
 
 // Indirect Slicing
 template <std::size_t N, typename... Args>
-std::vector<std::size_t> indirect_slicing(const base_slice<N>& slice, Args&&... args);
+std::pair<std::array<std::size_t, N>, std::vector<std::size_t>>
+indirect_slicing(const base_slice<N>& slice, Args&&... args);
 
 template <std::size_t D, std::size_t N, typename... Args>
-void do_slice(std::vector<std::size_t>& indexes, const base_slice<N>& slice, std::array<std::size_t, D> ix,
+void do_slice(std::array<std::size_t, N>& extents, std::vector<std::size_t>& indexes, const base_slice<N>& slice, std::array<std::size_t, D> ix,
               std::size_t i, Args&&... args);
 
 template <std::size_t D, std::size_t N, typename... Args>
-void do_slice(std::vector<std::size_t>& indexes, const base_slice<N>& slice, std::array<std::size_t, D> ix,
+void do_slice(std::array<std::size_t, N>& extents, std::vector<std::size_t>& indexes, const base_slice<N>& slice, std::array<std::size_t, D> ix,
               const base_slice<1>& rng, Args&&... args);
 
 template <std::size_t D, std::size_t N, typename Range, typename... Args,
           typename = std::enable_if_t<std::is_same<std::size_t, range::range_value_t<Range>>::value>>
-void do_slice(std::vector<std::size_t>& indexes, const base_slice<N>& slice, std::array<std::size_t, D> ix,
+void do_slice(std::array<std::size_t, N>& extents, std::vector<std::size_t>& indexes, const base_slice<N>& slice, std::array<std::size_t, D> ix,
               const Range& rng, Args&&... args);
 
 template <std::size_t D, std::size_t N, typename... Args>
-void do_slice(std::vector<std::size_t>& indexes, const base_slice<N>& slice, std::array<std::size_t, D> ix);
+void do_slice(std::array<std::size_t, N>& extents, std::vector<std::size_t>& indexes, const base_slice<N>& slice, std::array<std::size_t, D> ix);
 
 } // namespace detail
 } // namespace jules

@@ -14,11 +14,27 @@ namespace jules
 {
 namespace range
 {
+
+static struct tag_t {} tag;
+
 using boost::copy;
 
 using boost::make_iterator_range;
 
-template <typename Range> using range_value_t = typename boost::range_value<Range>::type;
+template <typename Range, typename = void, typename T = typename std::remove_reference_t<Range>::iterator>
+struct range_iterator
+{
+    using type = T;
+};
+
+template <typename Range>
+struct range_iterator<Range, std::enable_if_t<std::is_const<std::remove_reference_t<Range>>::value>, typename std::remove_reference_t<Range>::const_iterator>
+{
+    using type = typename std::remove_reference_t<Range>::const_iterator;
+};
+
+template <typename Range> using range_iterator_t = typename range_iterator<Range>::type;
+template <typename Range> using range_value_t = typename std::iterator_traits<range_iterator_t<Range>>::value_type;
 
 using boost::begin;
 using boost::end;
