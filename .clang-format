@@ -30,7 +30,7 @@ IndentCaseLabels: false
 IndentWrappedFunctionNames: false
 IndentFunctionDeclarationAfterType: false
 MaxEmptyLinesToKeep: 1
-KeepEmptyLinesAtTheStartOfBlocks: false
+KeepEmptyLinesAtTheStartOfBlocks: true
 NamespaceIndentation: None
 ObjCBlockIndentWidth: 2
 ObjCSpaceAfterProperty: false

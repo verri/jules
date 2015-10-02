@@ -22,8 +22,10 @@ template <typename T> struct trivial_dispatch_helper<T, std::enable_if_t<std::is
 
 template <typename T> auto trivial_dispatch() { return typename trivial_dispatch_helper<T>::type{}; }
 
-template<typename... Ts> struct make_void { using type = void;};
-template<typename... Ts> using void_t = typename make_void<Ts...>::type;
+template <typename... Ts> struct make_void {
+    using type = void;
+};
+template <typename... Ts> using void_t = typename make_void<Ts...>::type;
 
 template <typename F, typename Enabler = void> struct is_callable {
     static constexpr bool value = false;

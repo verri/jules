@@ -18,32 +18,24 @@
 namespace jules
 {
 
-template <typename Range, typename = void>
-struct range_traits {};
+template <typename Range, typename = void> struct range_traits {
+};
 
 template <typename Range>
-struct range_traits<Range, std::enable_if_t<!std::is_const<Range>::value, detail::void_t<typename std::remove_reference_t<Range>::iterator>>> {
+struct range_traits<Range,
+                    std::enable_if_t<!std::is_const<Range>::value,
+                                     detail::void_t<typename std::remove_reference_t<Range>::iterator>>> {
     using iterator_type = typename std::remove_reference_t<Range>::iterator;
     using iterator_traits = std::iterator_traits<iterator_type>;
 };
 
 template <typename Range>
-struct range_traits<Range, std::enable_if_t<std::is_const<Range>::value, detail::void_t<typename std::remove_reference_t<Range>::const_iterator>>> {
+struct range_traits<
+    Range, std::enable_if_t<std::is_const<Range>::value,
+                            detail::void_t<typename std::remove_reference_t<Range>::const_iterator>>> {
     using iterator_type = typename std::remove_reference_t<Range>::const_iterator;
     using iterator_traits = std::iterator_traits<iterator_type>;
 };
-
-// template <typename Range>
-// struct range_traits<Range, std::enable_if_t<!std::is_const<Range>::value>, typename std::remove_reference_t<Range>::iterator> {
-//     using iterator_type = typename std::remove_reference_t<Range>::iterator;
-//     using iterator_traits = std::iterator_traits<iterator_type>;
-// };
-//
-// template <typename Range>
-// struct range_traits<Range, std::enable_if_t<std::is_const<Range>::value>, typename std::remove_reference_t<Range>::const_iterator> {
-//     using iterator_type = typename std::remove_reference_t<Range>::const_iterator;
-//     using iterator_traits = std::iterator_traits<iterator_type>;
-// };
 
 template <typename Range> using range_iterator_t = typename range_traits<Range>::iterator_type;
 template <typename Range> using range_value_t = typename range_traits<Range>::iterator_traits::value_type;

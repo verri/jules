@@ -221,8 +221,7 @@ template <typename T> class indirect_ndarray<T, 1>
 };
 
 template <typename T>
-class indirect_ndarray_iterator<T, 1>
-    : public std::iterator<std::random_access_iterator_tag, T>
+class indirect_ndarray_iterator<T, 1> : public std::iterator<std::random_access_iterator_tag, T>
 {
   public:
     indirect_ndarray_iterator() = default;

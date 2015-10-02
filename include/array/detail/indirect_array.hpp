@@ -195,7 +195,8 @@ element_request<T&, Args...> indirect_ndarray<T, N>::operator()(Args&&... args)
 
 template <typename T, std::size_t N>
 template <typename... Args>
-indirect_request<indirect_ndarray<const T, N>, Args...> indirect_ndarray<T, N>::operator()(Args&&... args) const
+indirect_request<indirect_ndarray<const T, N>, Args...> indirect_ndarray<T, N>::
+operator()(Args&&... args) const
 {
     static_assert(sizeof...(args) == N, "Invalid number of arguments.");
 
@@ -263,8 +264,9 @@ template <typename T, std::size_t N> void indirect_ndarray<T, N>::clone_from(ind
     this->indexes_ = std::move(source.indexes);
 }
 
-template <typename T, std::size_t N> indirect_ndarray_iterator<T, N>::
-indirect_ndarray_iterator(const indirect_ndarray<T, N>& array, std::size_t index)
+template <typename T, std::size_t N>
+indirect_ndarray_iterator<T, N>::indirect_ndarray_iterator(const indirect_ndarray<T, N>& array,
+                                                           std::size_t index)
     : array_{array}, index_{index}
 {
 }
@@ -394,7 +396,8 @@ element_request<T&, Args...> indirect_ndarray<T, 1>::operator()(Args&&... args)
 
 template <typename T>
 template <typename... Args>
-indirect_request<indirect_ndarray<const T, 1>, Args...> indirect_ndarray<T, 1>::operator()(Args&&... args) const
+indirect_request<indirect_ndarray<const T, 1>, Args...> indirect_ndarray<T, 1>::
+operator()(Args&&... args) const
 {
     static_assert(sizeof...(args) == 1, "Invalid number of arguments.");
 
@@ -462,8 +465,9 @@ template <typename T> void indirect_ndarray<T, 1>::clone_from(indirect_ndarray&&
     this->indexes_ = std::move(source.indexes);
 }
 
-template <typename T> indirect_ndarray_iterator<T, 1>::
-indirect_ndarray_iterator(const indirect_ndarray<T, 1>& array, std::size_t index)
+template <typename T>
+indirect_ndarray_iterator<T, 1>::indirect_ndarray_iterator(const indirect_ndarray<T, 1>& array,
+                                                           std::size_t index)
     : array_{array}, index_{index}
 {
 }
@@ -471,15 +475,15 @@ indirect_ndarray_iterator(const indirect_ndarray<T, 1>& array, std::size_t index
 // Data Iterator
 
 template <typename T>
-indirect_ndarray_data_iterator<T>::indirect_ndarray_data_iterator
-(T* data, const std::vector<std::size_t>& indexes, std::size_t i)
+indirect_ndarray_data_iterator<T>::indirect_ndarray_data_iterator(T* data,
+                                                                  const std::vector<std::size_t>& indexes,
+                                                                  std::size_t i)
     : data_{data}, indexes_{indexes}, current_{i}
 {
 }
 
 template <typename T>
-std::ptrdiff_t indirect_ndarray_data_iterator<T>::
-operator-(const indirect_ndarray_data_iterator& other) const
+std::ptrdiff_t indirect_ndarray_data_iterator<T>::operator-(const indirect_ndarray_data_iterator& other) const
 {
     return current_ - other.current_;
 }
