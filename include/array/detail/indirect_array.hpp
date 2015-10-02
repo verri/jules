@@ -263,6 +263,227 @@ template <typename T, std::size_t N> void indirect_ndarray<T, N>::clone_from(ind
     this->indexes_ = std::move(source.indexes);
 }
 
+template <typename T, std::size_t N> indirect_ndarray_iterator<T, N>::
+indirect_ndarray_iterator(const indirect_ndarray<T, N>& array, std::size_t index)
+    : array_{array}, index_{index}
+{
+}
+
+// Specialization
+
+template <typename T>
+indirect_ndarray<T, 1>& indirect_ndarray<T, 1>::operator=(const indirect_ndarray& source)
+{
+    CHECK_ASSIGNMENT(source.data_, source.descriptor_);
+    COPY_FROM_SOURCE;
+}
+
+template <typename T>
+template <typename U>
+indirect_ndarray<T, 1>& indirect_ndarray<T, 1>::operator=(const base_ndarray<U, 1>& source)
+{
+    CHECK_ASSIGNMENT(source.data_, source.descriptor_);
+    CHECK_ASSIGNABLE(U);
+    COPY_FROM_SOURCE;
+}
+
+template <typename T>
+template <typename U>
+indirect_ndarray<T, 1>& indirect_ndarray<T, 1>::operator=(base_ndarray<U, 1>&& source)
+{
+    CHECK_ASSIGNMENT(source.data_, source.descriptor_);
+    CHECK_ASSIGNABLE(U);
+    MOVE_FROM_SOURCE;
+}
+
+template <typename T>
+template <typename U>
+indirect_ndarray<T, 1>& indirect_ndarray<T, 1>::operator=(const ref_ndarray<U, 1>& source)
+{
+    CHECK_ASSIGNMENT(source.data_, source.descriptor_);
+    CHECK_ASSIGNABLE(U);
+    COPY_FROM_SOURCE;
+}
+
+template <typename T>
+template <typename U>
+indirect_ndarray<T, 1>& indirect_ndarray<T, 1>::operator=(const indirect_ndarray<U, 1>& source)
+{
+    CHECK_ASSIGNMENT(source.data_, source.descriptor_);
+    CHECK_ASSIGNABLE(U);
+    COPY_FROM_SOURCE;
+}
+
+template <typename T>
+template <typename LhsIt, typename RhsIt, typename F>
+indirect_ndarray<T, 1>& indirect_ndarray<T, 1>::
+operator=(const binary_expr_ndarray<LhsIt, RhsIt, F, 1>& source)
+{
+    using U = typename binary_expr_ndarray<LhsIt, RhsIt, F, 1>::value_type;
+    CHECK_ASSIGNMENT(source.data_, source.descriptor_);
+    CHECK_ASSIGNABLE(U);
+    COPY_FROM_SOURCE;
+}
+
+template <typename T>
+template <typename It, typename F>
+indirect_ndarray<T, 1>& indirect_ndarray<T, 1>::operator=(const unary_expr_ndarray<It, F, 1>& source)
+{
+    using U = typename unary_expr_ndarray<It, F, 1>::value_type;
+    CHECK_ASSIGNMENT(source.data_, source.descriptor_);
+    CHECK_ASSIGNABLE(U);
+    COPY_FROM_SOURCE;
+}
+
+template <typename T>
+template <typename U>
+indirect_ndarray<T, 1>& indirect_ndarray<T, 1>::operator=(const U& source)
+{
+    auto to = this->data_begin();
+    auto end = this->data_end();
+
+    while (to != end) {
+        *to = source;
+        ++to;
+    }
+
+    return *this;
+}
+
+template <typename T>
+template <typename... Args>
+indirect_request<indirect_ndarray<T, 1>, Args...> indirect_ndarray<T, 1>::operator()(Args&&... args)
+{
+    static_assert(sizeof...(args) == 1, "Invalid number of arguments.");
+
+    auto slicing = indirect_slicing(this->descriptor_, std::forward<Args>(args)...);
+
+    std::vector<std::size_t> indexes;
+    indexes.reserve(slicing.second.size());
+
+    for (std::size_t j : slicing.second)
+        indexes.push_back(this->indexes_[j]);
+
+    return {data_, slicing.first, std::move(indexes)};
+}
+
+template <typename T>
+template <typename... Args>
+slice_request<indirect_ndarray<T, 1>, Args...> indirect_ndarray<T, 1>::operator()(Args&&... args)
+{
+    static_assert(sizeof...(args) == 1, "Invalid number of arguments.");
+
+    auto slice = default_slicing(this->descriptor_, std::forward<Args>(args)...);
+
+    std::vector<std::size_t> indexes;
+    indexes.reserve(slice.size());
+
+    for (std::size_t j : slice)
+        indexes.push_back(this->indexes_[j]);
+
+    return {data_, slice.extents(), std::move(indexes)};
+}
+
+template <typename T>
+template <typename... Args>
+element_request<T&, Args...> indirect_ndarray<T, 1>::operator()(Args&&... args)
+{
+    static_assert(sizeof...(args) == 1, "Invalid number of arguments.");
+    return data_[indexes_[descriptor_(std::size_t(args)...)]];
+}
+
+template <typename T>
+template <typename... Args>
+indirect_request<indirect_ndarray<const T, 1>, Args...> indirect_ndarray<T, 1>::operator()(Args&&... args) const
+{
+    static_assert(sizeof...(args) == 1, "Invalid number of arguments.");
+
+    auto slicing = indirect_slicing(this->descriptor_, std::forward<Args>(args)...);
+
+    std::vector<std::size_t> indexes;
+    indexes.reserve(slicing.second.size());
+
+    for (std::size_t j : slicing.second)
+        indexes.push_back(this->indexes_[j]);
+
+    return {data_, slicing.first, std::move(indexes)};
+}
+
+template <typename T>
+template <typename... Args>
+slice_request<indirect_ndarray<const T, 1>, Args...> indirect_ndarray<T, 1>::operator()(Args&&... args) const
+{
+    static_assert(sizeof...(args) == 1, "Invalid number of arguments.");
+
+    auto slice = default_slicing(this->descriptor_, std::forward<Args>(args)...);
+
+    std::vector<std::size_t> indexes;
+    indexes.reserve(slice.size());
+
+    for (std::size_t j : slice)
+        indexes.push_back(this->indexes_[j]);
+
+    return {data_, slice.extents(), std::move(indexes)};
+}
+
+template <typename T>
+template <typename... Args>
+element_request<const T&, Args...> indirect_ndarray<T, 1>::operator()(Args&&... args) const
+{
+    static_assert(sizeof...(args) == 1, "Invalid number of arguments.");
+    return data_[indexes_[descriptor_(std::size_t(args)...)]];
+}
+
+template <typename T>
+indirect_ndarray<T, 1>::indirect_ndarray(T* data, const std::array<std::size_t, 1>& extents,
+                                         std::vector<std::size_t>&& indexes)
+    : data_{data}, descriptor_{0, extents}, indexes_{std::move(indexes)}
+{
+}
+
+template <typename T>
+indirect_ndarray<T, 1>::indirect_ndarray(T* data, const std::array<std::size_t, 1>& extents,
+                                         const std::vector<std::size_t>& indexes)
+    : data_{data}, descriptor_{0, extents}, indexes_{indexes}
+{
+}
+
+template <typename T> void indirect_ndarray<T, 1>::clone_from(const indirect_ndarray& source)
+{
+    this->data_ = source.data_;
+    this->descriptor_ = source.descriptor_;
+    this->indexes_ = source.indexes;
+}
+
+template <typename T> void indirect_ndarray<T, 1>::clone_from(indirect_ndarray&& source)
+{
+    this->data_ = source.data_;
+    this->descriptor_ = std::move(source.descriptor_);
+    this->indexes_ = std::move(source.indexes);
+}
+
+template <typename T> indirect_ndarray_iterator<T, 1>::
+indirect_ndarray_iterator(const indirect_ndarray<T, 1>& array, std::size_t index)
+    : array_{array}, index_{index}
+{
+}
+
+// Data Iterator
+
+template <typename T>
+indirect_ndarray_data_iterator<T>::indirect_ndarray_data_iterator
+(T* data, const std::vector<std::size_t>& indexes, std::size_t i)
+    : data_{data}, indexes_{indexes}, current_{i}
+{
+}
+
+template <typename T>
+std::ptrdiff_t indirect_ndarray_data_iterator<T>::
+operator-(const indirect_ndarray_data_iterator& other) const
+{
+    return current_ - other.current_;
+}
+
 } // namespace detail
 } // namespace jules
 

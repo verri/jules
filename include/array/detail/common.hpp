@@ -57,7 +57,7 @@ template <typename, std::size_t> class indirect_ndarray;
 template <typename, std::size_t> class ref_ndarray_iterator;
 template <typename, std::size_t> class ref_ndarray_data_iterator;
 template <typename, std::size_t> class indirect_ndarray_iterator;
-template <typename, std::size_t> class indirect_ndarray_data_iterator;
+template <typename> class indirect_ndarray_data_iterator;
 
 template <typename, typename, typename, std::size_t> class binary_expr_ndarray;
 template <typename, typename, std::size_t> class unary_expr_ndarray;

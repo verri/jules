@@ -169,7 +169,7 @@ template <typename T> class ref_ndarray<T, 1>
     ref_ndarray_data_iterator<const T, 1> data_begin() const { return {data_, descriptor_.begin()}; }
     ref_ndarray_data_iterator<const T, 1> data_end() const { return {data_, descriptor_.end()}; }
 
-    OPERATIONS_LIST((typename R, std::size_t M), (const ref_ndarray<R, M>&), 1)
+    OPERATIONS_LIST((typename R), (const ref_ndarray<R, 1>&), 1)
 
   protected:
     ref_ndarray(T* data, const base_slice<1>& descriptor) : data_{data}, descriptor_{descriptor} {}
