@@ -1,6 +1,8 @@
 #ifndef JULES_RANGE_RANGE_H
 #define JULES_RANGE_RANGE_H
 
+#include "util/type.hpp"
+
 #include <boost/range/adaptor/indexed.hpp>
 #include <boost/range/adaptor/strided.hpp>
 #include <boost/range/adaptor/transformed.hpp>
@@ -10,31 +12,46 @@
 
 #include <range/tokenized.hpp>
 
+#include <iterator>
+#include <type_traits>
+
 namespace jules
 {
-namespace range
-{
 
-static struct tag_t {} tag;
+template <typename Range, typename = void>
+struct range_traits {};
 
-using boost::copy;
-
-using boost::make_iterator_range;
-
-template <typename Range, typename = void, typename T = typename std::remove_reference_t<Range>::iterator>
-struct range_iterator
-{
-    using type = T;
+template <typename Range>
+struct range_traits<Range, std::enable_if_t<!std::is_const<Range>::value, detail::void_t<typename std::remove_reference_t<Range>::iterator>>> {
+    using iterator_type = typename std::remove_reference_t<Range>::iterator;
+    using iterator_traits = std::iterator_traits<iterator_type>;
 };
 
 template <typename Range>
-struct range_iterator<Range, std::enable_if_t<std::is_const<std::remove_reference_t<Range>>::value>, typename std::remove_reference_t<Range>::const_iterator>
-{
-    using type = typename std::remove_reference_t<Range>::const_iterator;
+struct range_traits<Range, std::enable_if_t<std::is_const<Range>::value, detail::void_t<typename std::remove_reference_t<Range>::const_iterator>>> {
+    using iterator_type = typename std::remove_reference_t<Range>::const_iterator;
+    using iterator_traits = std::iterator_traits<iterator_type>;
 };
 
-template <typename Range> using range_iterator_t = typename range_iterator<Range>::type;
-template <typename Range> using range_value_t = typename std::iterator_traits<range_iterator_t<Range>>::value_type;
+// template <typename Range>
+// struct range_traits<Range, std::enable_if_t<!std::is_const<Range>::value>, typename std::remove_reference_t<Range>::iterator> {
+//     using iterator_type = typename std::remove_reference_t<Range>::iterator;
+//     using iterator_traits = std::iterator_traits<iterator_type>;
+// };
+//
+// template <typename Range>
+// struct range_traits<Range, std::enable_if_t<std::is_const<Range>::value>, typename std::remove_reference_t<Range>::const_iterator> {
+//     using iterator_type = typename std::remove_reference_t<Range>::const_iterator;
+//     using iterator_traits = std::iterator_traits<iterator_type>;
+// };
+
+template <typename Range> using range_iterator_t = typename range_traits<Range>::iterator_type;
+template <typename Range> using range_value_t = typename range_traits<Range>::iterator_traits::value_type;
+
+namespace range
+{
+using boost::copy;
+using boost::make_iterator_range;
 
 using boost::begin;
 using boost::end;

@@ -4,7 +4,7 @@
 #include <string>
 #include <typeindex>
 
-using jules::range::range_value_t;
+using jules::range_value_t;
 
 template <typename Range, typename R = range_value_t<Range>> R make_value(const Range&) { return {}; }
 

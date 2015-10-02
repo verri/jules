@@ -8,10 +8,6 @@
 
 namespace jules
 {
-template <typename T> struct tag {
-    using untag = T;
-};
-
 struct numeric_rules {
     using type = double;
     static type coerce_from(const std::string& value) { return std::stod(value); }
@@ -37,15 +33,6 @@ template <typename... Rules> class coercion_rules
 };
 
 using default_coercion_rules = coercion_rules<numeric_rules, string_rules>;
-
-template <typename F, typename Enabler = void> struct is_callable {
-    static constexpr bool value = false;
-};
-
-template <typename F>
-struct is_callable<F, typename std::enable_if_t<std::is_same<void, decltype(std::declval<F>()())>::value>> {
-    static constexpr bool value = true;
-};
 
 } // namespace jules
 

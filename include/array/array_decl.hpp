@@ -14,7 +14,7 @@ template <typename T> using scalar = ndarray<T, 0>;
 template <typename T, typename Range, typename = detail::range_type_enabler<Range, T>>
 vector<T> to_vector(const Range& range);
 
-template <typename Range, typename R = range::range_value_t<Range>> vector<R> as_vector(const Range& range);
+template <typename Range, typename R = range_value_t<Range>> vector<R> as_vector(const Range& range);
 
 } // namespace jules
 

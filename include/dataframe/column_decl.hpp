@@ -31,10 +31,10 @@ template <typename Coercion> class base_column
     template <typename T> base_column(std::initializer_list<T> values);
     template <typename T> base_column(const T& value, std::size_t size);
 
-    template <typename Range, typename R = range::range_value_t<Range>>
+    template <typename Range, typename R = range_value_t<Range>>
     base_column(const std::string& name, const Range& rng);
 
-    template <typename Range, typename R = range::range_value_t<Range>>
+    template <typename Range, typename R = range_value_t<Range>>
     base_column(const Range& rng);
 
     base_column(const base_column& source);

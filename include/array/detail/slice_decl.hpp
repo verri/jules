@@ -188,7 +188,7 @@ void do_slice(std::array<std::size_t, N>& extents, std::vector<std::size_t>& ind
               const base_slice<1>& rng, Args&&... args);
 
 template <std::size_t D, std::size_t N, typename Range, typename... Args,
-          typename = std::enable_if_t<std::is_same<std::size_t, range::range_value_t<Range>>::value>>
+          typename = std::enable_if_t<std::is_same<std::size_t, range_value_t<Range>>::value>>
 void do_slice(std::array<std::size_t, N>& extents, std::vector<std::size_t>& indexes, const base_slice<N>& slice, std::array<std::size_t, D> ix,
               const Range& rng, Args&&... args);
 

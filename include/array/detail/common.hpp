@@ -21,7 +21,7 @@ using all_size_enabler =
     std::enable_if_t<N == sizeof...(Types) && all_args(std::is_convertible<Types, std::size_t>::value...)>;
 
 template <typename Range, typename R, typename T = R>
-using range_type_enabler = std::enable_if_t<std::is_assignable<R&, range::range_value_t<Range>>::value, T>;
+using range_type_enabler = std::enable_if_t<std::is_assignable<R&, range_value_t<Range>>::value, T>;
 
 template <typename T, typename U, typename R = void>
 using assignable_enabler = std::enable_if_t<std::is_assignable<T&, U>::value, R>;

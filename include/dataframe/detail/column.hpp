@@ -2,6 +2,7 @@
 #define JULES_DATAFRAME_DETAIL_STORAGE_H
 
 #include "core/type.hpp"
+#include "util/type.hpp"
 #include "util/async.hpp"
 
 #include <algorithm>
