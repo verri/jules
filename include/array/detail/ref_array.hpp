@@ -159,14 +159,7 @@ indirect_request<indirect_ndarray<T, N>, Args...> ref_ndarray<T, N>::operator()(
     static_assert(sizeof...(args) == N, "Invalid number of arguments.");
 
     auto slicing = indirect_slicing(this->descriptor_, std::forward<Args>(args)...);
-
-    std::vector<std::size_t> indexes;
-    indexes.reserve(slicing.second.size());
-
-    for (std::size_t j : slicing.second)
-        indexes.push_back(this->indexes_[j]);
-
-    return {data_, slicing.first, std::move(indexes)};
+    return {data_, slicing.first, std::move(slicing.second)};
 }
 
 template <typename T, std::size_t N>

@@ -259,7 +259,7 @@ class ref_ndarray_data_iterator : public std::iterator<std::forward_iterator_tag
     operator ref_ndarray_data_iterator<const T, N>() const { return {data_, it_}; }
 
   private:
-    T* data_ = nullptr;
+    mutable T* data_ = nullptr;
     base_slice_iterator<N> it_;
 };
 

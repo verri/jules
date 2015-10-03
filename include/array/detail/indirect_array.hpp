@@ -469,6 +469,21 @@ indirect_ndarray_data_iterator<T>::indirect_ndarray_data_iterator(T* data,
 }
 
 template <typename T>
+indirect_ndarray_data_iterator<T>& indirect_ndarray_data_iterator<T>::operator++()
+{
+    ++current_;
+    return *this;
+}
+
+template <typename T>
+indirect_ndarray_data_iterator<T> indirect_ndarray_data_iterator<T>::operator++(int)
+{
+    auto c = *this;
+    ++(*this);
+    return c;
+}
+
+template <typename T>
 std::ptrdiff_t indirect_ndarray_data_iterator<T>::operator-(const indirect_ndarray_data_iterator& other) const
 {
     return current_ - other.current_;
