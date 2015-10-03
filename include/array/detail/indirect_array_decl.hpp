@@ -14,6 +14,8 @@ FRIEND_OPERATIONS_DECLARATION((typename R, std::size_t M), (const indirect_ndarr
 
 template <typename T, std::size_t N> class indirect_ndarray
 {
+    static_assert(N > 1, "Invalid array dimension.");
+
     template <typename, std::size_t> friend class indirect_ndarray;
     template <typename, std::size_t> friend class indirect_ndarray_iterator;
     template <typename, std::size_t> friend class ref_ndarray;
@@ -171,15 +173,13 @@ template <typename T> class indirect_ndarray<T, 1>
     T& operator[](std::size_t i) { return data_[indexes_[i]]; }
     const T& operator[](std::size_t i) const { return data_[indexes_[i]]; }
 
-    template <typename... Args> indirect_request<indirect_ndarray<T, 1>, Args...> operator()(Args&&... args);
-    template <typename... Args> slice_request<indirect_ndarray<T, 1>, Args...> operator()(Args&&... args);
-    template <typename... Args> element_request<T&, Args...> operator()(Args&&... args);
+    template <typename Range> indirect_ndarray<T, 1> operator()(const Range& rng);
+    indirect_ndarray<T, 1> operator()(const base_slice<1>& slice);
+    T& operator()(std::size_t i);
 
-    template <typename... Args>
-    indirect_request<indirect_ndarray<const T, 1>, Args...> operator()(Args&&... args) const;
-    template <typename... Args>
-    slice_request<indirect_ndarray<const T, 1>, Args...> operator()(Args&&... args) const;
-    template <typename... Args> element_request<const T&, Args...> operator()(Args&&... args) const;
+    template <typename Range> indirect_ndarray<const T, 1> operator()(const Range& rng) const;
+    indirect_ndarray<const T, 1> operator()(const base_slice<1>& slice) const;
+    const T& operator()(std::size_t i) const;
 
     indirect_ndarray_iterator<T, 1> begin() { return {*this, 0}; }
     indirect_ndarray_iterator<T, 1> end() { return {*this, this->size(0)}; }
@@ -199,7 +199,7 @@ template <typename T> class indirect_ndarray<T, 1>
     indirect_ndarray_data_iterator<const T> data_begin() const { return {data_, indexes_, 0}; }
     indirect_ndarray_data_iterator<const T> data_end() const { return {data_, indexes_, indexes_.size()}; }
 
-    OPERATIONS_LIST((typename R, std::size_t M), (const indirect_ndarray<R, 1>&), 1)
+    OPERATIONS_LIST((typename R), (const indirect_ndarray<R, 1>&), 1)
 
   private:
     indirect_ndarray() = default;

@@ -118,6 +118,8 @@ template <typename T, std::size_t N>
 template <typename U>
 indirect_ndarray<T, N>& indirect_ndarray<T, N>::operator=(const U& source)
 {
+    CHECK_ASSIGNABLE(U);
+
     auto to = this->data_begin();
     auto end = this->data_end();
 
@@ -341,6 +343,8 @@ template <typename T>
 template <typename U>
 indirect_ndarray<T, 1>& indirect_ndarray<T, 1>::operator=(const U& source)
 {
+    CHECK_ASSIGNABLE(U);
+
     auto to = this->data_begin();
     auto end = this->data_end();
 
@@ -353,12 +357,43 @@ indirect_ndarray<T, 1>& indirect_ndarray<T, 1>::operator=(const U& source)
 }
 
 template <typename T>
-template <typename... Args>
-indirect_request<indirect_ndarray<T, 1>, Args...> indirect_ndarray<T, 1>::operator()(Args&&... args)
+template <typename Range>
+indirect_ndarray<T, 1> indirect_ndarray<T, 1>::operator()(const Range& rng)
 {
-    static_assert(sizeof...(args) == 1, "Invalid number of arguments.");
+    auto slicing = indirect_slicing(this->descriptor_, rng);
 
-    auto slicing = indirect_slicing(this->descriptor_, std::forward<Args>(args)...);
+    std::vector<std::size_t> indexes;
+    indexes.reserve(slicing.second.size());
+
+    for (std::size_t j : slicing.second)
+        indexes.push_back(this->indexes_[j]);
+
+    return {data_, slicing.first, std::move(indexes)};
+}
+
+template <typename T> indirect_ndarray<T, 1> indirect_ndarray<T, 1>::operator()(const base_slice<1>& s)
+{
+    auto slice = default_slicing(this->descriptor_, s);
+
+    std::vector<std::size_t> indexes;
+    indexes.reserve(slice.size());
+
+    for (std::size_t j : slice)
+        indexes.push_back(this->indexes_[j]);
+
+    return {data_, slice.extents(), std::move(indexes)};
+}
+
+template <typename T> T& indirect_ndarray<T, 1>::operator()(std::size_t i)
+{
+    return data_[indexes_[descriptor_(i)]];
+}
+
+template <typename T>
+template <typename Range>
+indirect_ndarray<const T, 1> indirect_ndarray<T, 1>::operator()(const Range& rng) const
+{
+    auto slicing = indirect_slicing(this->descriptor_, rng);
 
     std::vector<std::size_t> indexes;
     indexes.reserve(slicing.second.size());
@@ -370,12 +405,9 @@ indirect_request<indirect_ndarray<T, 1>, Args...> indirect_ndarray<T, 1>::operat
 }
 
 template <typename T>
-template <typename... Args>
-slice_request<indirect_ndarray<T, 1>, Args...> indirect_ndarray<T, 1>::operator()(Args&&... args)
+indirect_ndarray<const T, 1> indirect_ndarray<T, 1>::operator()(const base_slice<1>& s) const
 {
-    static_assert(sizeof...(args) == 1, "Invalid number of arguments.");
-
-    auto slice = default_slicing(this->descriptor_, std::forward<Args>(args)...);
+    auto slice = default_slicing(this->descriptor_, s);
 
     std::vector<std::size_t> indexes;
     indexes.reserve(slice.size());
@@ -386,55 +418,9 @@ slice_request<indirect_ndarray<T, 1>, Args...> indirect_ndarray<T, 1>::operator(
     return {data_, slice.extents(), std::move(indexes)};
 }
 
-template <typename T>
-template <typename... Args>
-element_request<T&, Args...> indirect_ndarray<T, 1>::operator()(Args&&... args)
+template <typename T> const T& indirect_ndarray<T, 1>::operator()(std::size_t i) const
 {
-    static_assert(sizeof...(args) == 1, "Invalid number of arguments.");
-    return data_[indexes_[descriptor_(std::size_t(args)...)]];
-}
-
-template <typename T>
-template <typename... Args>
-indirect_request<indirect_ndarray<const T, 1>, Args...> indirect_ndarray<T, 1>::
-operator()(Args&&... args) const
-{
-    static_assert(sizeof...(args) == 1, "Invalid number of arguments.");
-
-    auto slicing = indirect_slicing(this->descriptor_, std::forward<Args>(args)...);
-
-    std::vector<std::size_t> indexes;
-    indexes.reserve(slicing.second.size());
-
-    for (std::size_t j : slicing.second)
-        indexes.push_back(this->indexes_[j]);
-
-    return {data_, slicing.first, std::move(indexes)};
-}
-
-template <typename T>
-template <typename... Args>
-slice_request<indirect_ndarray<const T, 1>, Args...> indirect_ndarray<T, 1>::operator()(Args&&... args) const
-{
-    static_assert(sizeof...(args) == 1, "Invalid number of arguments.");
-
-    auto slice = default_slicing(this->descriptor_, std::forward<Args>(args)...);
-
-    std::vector<std::size_t> indexes;
-    indexes.reserve(slice.size());
-
-    for (std::size_t j : slice)
-        indexes.push_back(this->indexes_[j]);
-
-    return {data_, slice.extents(), std::move(indexes)};
-}
-
-template <typename T>
-template <typename... Args>
-element_request<const T&, Args...> indirect_ndarray<T, 1>::operator()(Args&&... args) const
-{
-    static_assert(sizeof...(args) == 1, "Invalid number of arguments.");
-    return data_[indexes_[descriptor_(std::size_t(args)...)]];
+    return data_[indexes_[descriptor_(i)]];
 }
 
 template <typename T>
@@ -492,6 +478,8 @@ std::ptrdiff_t indirect_ndarray_data_iterator<T>::operator-(const indirect_ndarr
 } // namespace jules
 
 #undef CHECK_ASSIGNMENT
+#undef CHECK_ASSIGNABLE
+
 #undef COPY_FROM_SOURCE
 #undef MOVE_FROM_SOURCE
 
