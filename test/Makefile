@@ -1,7 +1,8 @@
 SUFFIXES += .d
 
-SRC = range/range.cpp array/array_detail.cpp array/array.cpp dataframe/column.cpp dataframe/dataframe.cpp dataframe/column_detail.cpp \
-	  tutorial/naive.cpp
+SRC = array/array_detail.cpp array/array.cpp \
+	dataframe/column.cpp dataframe/dataframe.cpp dataframe/column_detail.cpp \
+	range/range.cpp tutorial/naive.cpp
 OBJ := $(SRC:.cpp=.o) test_suite.o
 DEP := $(SRC:.cpp=.d) test_suite.d
 
@@ -33,6 +34,6 @@ test_suite: $(OBJ)
 
 clean:
 	@echo "Cleaning test..."
-	@rm -f {array,dataframe,tutorial}/*.{o,d} test_suite{,.o,.d}
+	@find . -iname '*.[od]' -exec rm {} \;
 
 .PHONY: test clean

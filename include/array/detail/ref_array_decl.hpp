@@ -2,7 +2,7 @@
 #define JULES_ARRAY_DETAIL_REF_ARRAY_DECL_H
 
 #include "array/detail/common.hpp"
-#include "array/detail/slice_decl.hpp"
+#include "array/detail/slice.hpp"
 
 #include "array/detail/define_macros.hpp"
 
@@ -133,7 +133,12 @@ template <typename T> class ref_ndarray<T, 1>
     template <typename U> ref_ndarray& operator=(base_ndarray<U, 1>&& source);
 
     template <typename U> ref_ndarray& operator=(const ref_ndarray<U, 1>& source);
-    // TODO: template <typename U> ref_ndarray& operator=(const indirect_ndarray<U, 1>& source);
+    template <typename U> ref_ndarray& operator=(const indirect_ndarray<U, 1>& source);
+
+    template <typename LhsIt, typename RhsIt, typename F>
+    ref_ndarray& operator=(const binary_expr_ndarray<LhsIt, RhsIt, F, 1>& source);
+    template <typename It, typename F> ref_ndarray& operator=(const unary_expr_ndarray<It, F, 1>& source);
+
     template <typename U> ref_ndarray& operator=(const U& source);
 
     operator ref_ndarray<const T, 1>() const { return {this->data_, descriptor_}; }
@@ -141,15 +146,13 @@ template <typename T> class ref_ndarray<T, 1>
     T& operator[](std::size_t i) { return data_[descriptor_(i)]; }
     const T& operator[](std::size_t i) const { return data_[descriptor_(i)]; }
 
-    template <typename... Args> indirect_request<indirect_ndarray<T, 1>, Args...> operator()(Args&&... args);
-    template <typename... Args> slice_request<ref_ndarray<T, 1>, Args...> operator()(Args&&... args);
-    template <typename... Args> element_request<T&, Args...> operator()(Args&&... args);
+    template <typename Range> indirect_ndarray<T, 1> operator()(const Range& rng);
+    ref_ndarray<T, 1> operator()(const base_slice<1>& slice);
+    T& operator()(std::size_t i);
 
-    template <typename... Args>
-    indirect_request<indirect_ndarray<const T, 1>, Args...> operator()(Args&&... args) const;
-    template <typename... Args>
-    slice_request<ref_ndarray<const T, 1>, Args...> operator()(Args&&... args) const;
-    template <typename... Args> element_request<const T&, Args...> operator()(Args&&... args) const;
+    template <typename Range> indirect_ndarray<const T, 1> operator()(const Range& rng) const;
+    ref_ndarray<const T, 1> operator()(const base_slice<1>& slice) const;
+    const T& operator()(std::size_t i) const;
 
     ref_ndarray_iterator<T, 1> begin() { return {*this, 0}; }
     ref_ndarray_iterator<T, 1> end() { return {*this, descriptor_.extent()}; }
