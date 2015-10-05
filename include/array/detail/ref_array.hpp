@@ -313,6 +313,7 @@ template <typename T>
 template <typename Range>
 indirect_ndarray<T, 1> ref_ndarray<T, 1>::operator()(const Range& rng)
 {
+    // TODO: Range&& and specialization of indirect_slicing
     auto slicing = indirect_slicing(this->descriptor_, rng);
 
     std::vector<std::size_t> indexes;
@@ -342,7 +343,7 @@ indirect_ndarray<const T, 1> ref_ndarray<T, 1>::operator()(const Range& rng) con
     indexes.reserve(slicing.second.size());
 
     for (std::size_t j : slicing.second)
-        indexes.push_back(this->indexes_[j]);
+        indexes.push_back(j);
 
     return {data_, slicing.first, std::move(indexes)};
 }

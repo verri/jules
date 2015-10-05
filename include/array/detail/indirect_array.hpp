@@ -468,15 +468,13 @@ indirect_ndarray_data_iterator<T>::indirect_ndarray_data_iterator(T* data,
 {
 }
 
-template <typename T>
-indirect_ndarray_data_iterator<T>& indirect_ndarray_data_iterator<T>::operator++()
+template <typename T> indirect_ndarray_data_iterator<T>& indirect_ndarray_data_iterator<T>::operator++()
 {
     ++current_;
     return *this;
 }
 
-template <typename T>
-indirect_ndarray_data_iterator<T> indirect_ndarray_data_iterator<T>::operator++(int)
+template <typename T> indirect_ndarray_data_iterator<T> indirect_ndarray_data_iterator<T>::operator++(int)
 {
     auto c = *this;
     ++(*this);

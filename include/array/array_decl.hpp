@@ -16,7 +16,8 @@ vector<T> to_vector(const Range& range);
 
 template <typename Range, typename R = range_value_t<Range>> vector<R> as_vector(const Range& range);
 
-static inline detail::base_slice<1> slice(std::size_t start = 0, std::size_t size = 0, std::size_t stride = 1);
+static inline detail::base_slice<1> slice(std::size_t start = 0, std::size_t size = 0,
+                                          std::size_t stride = 1);
 static inline vector<std::size_t> seq(std::size_t start, std::size_t stop, std::size_t step = 1);
 
 } // namespace jules

@@ -294,7 +294,7 @@ void do_slice(std::array<std::size_t, N>& extents, std::vector<std::size_t>& ind
 {
     static_assert(N - D - 1 == sizeof...(args), "Invalid number of arguments.");
 
-    //CHECK_BOUNDS(max(rng), slice.extent(D)); TODO fix max for ref_ndarray
+    // CHECK_BOUNDS(max(rng), slice.extent(D)); TODO fix max for ref_ndarray
 
     extents[D] = range::size(rng);
 
