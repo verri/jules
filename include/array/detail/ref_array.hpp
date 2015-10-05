@@ -319,7 +319,7 @@ indirect_ndarray<T, 1> ref_ndarray<T, 1>::operator()(const Range& rng)
     indexes.reserve(slicing.second.size());
 
     for (std::size_t j : slicing.second)
-        indexes.push_back(this->indexes_[j]);
+        indexes.push_back(j);
 
     return {data_, slicing.first, std::move(indexes)};
 }
