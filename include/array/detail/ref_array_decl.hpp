@@ -202,6 +202,9 @@ class ref_ndarray_iterator
     ref_ndarray_iterator() = default;
     ref_ndarray_iterator(const ref_ndarray<T, N>& array, std::size_t index) : array_{array}, index_{index} {}
 
+    ref_ndarray_iterator(const ref_ndarray_iterator& source) = default;
+    ref_ndarray_iterator(ref_ndarray_iterator&& source) = default;
+
     ref_ndarray_iterator& operator=(const ref_ndarray_iterator& source);
     ref_ndarray_iterator& operator=(ref_ndarray_iterator&& source);
 

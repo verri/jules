@@ -22,7 +22,7 @@ static inline detail::base_slice<1> slice(std::size_t start, std::size_t size, s
 
 static inline vector<std::size_t> seq(std::size_t start, std::size_t stop, std::size_t step)
 {
-    std::size_t size = (start < stop ? stop - start : start - stop) / step;
+    std::size_t size = detail::seq_size(start, stop, step);
     vector<std::size_t> indexes(size);
 
     if (start < stop) {

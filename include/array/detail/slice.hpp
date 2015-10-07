@@ -197,6 +197,15 @@ inline base_slice_iterator<1> base_slice_iterator<1>::operator++(int)
 }
 
 // Slicing size
+static inline auto seq_size(std::size_t start, std::size_t stop, std::size_t step)
+{
+    std::size_t size = (start < stop ? stop - start : start - stop);
+    size += size % step == 0 ? 0 : 1;
+    size /= step;
+
+    return size;
+}
+
 template <std::size_t D, std::size_t N, typename... Args>
 std::size_t slicing_size(const std::array<std::size_t, N>& extents, std::size_t, Args&&... args)
 {
@@ -207,7 +216,7 @@ template <std::size_t D, std::size_t N, typename... Args>
 std::size_t slicing_size(const std::array<std::size_t, N>& extents, const base_slice<1>& slice,
                          Args&&... args)
 {
-    return (slice.size() == 0 ? extents[D] : slice.size()) *
+    return (slice.size() == 0 ? seq_size(slice.start(), extents[D], slice.stride()) : slice.size()) *
            slicing_size<D + 1>(extents, std::forward<Args>(args)...);
 }
 
@@ -308,7 +317,8 @@ void do_slice(std::array<std::size_t, N>& extents, std::vector<std::size_t>& ind
 
     auto rng = rng_base;
     if (rng.size() == 0)
-        rng = base_slice<1>{rng_base.start(), slice.extent(D), rng_base.stride()};
+        rng = base_slice<1>{rng_base.start(), seq_size(rng_base.start(), slice.extent(D), rng_base.stride()),
+                            rng_base.stride()};
 
     extents[D] = rng.size();
 

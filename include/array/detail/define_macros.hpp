@@ -138,16 +138,6 @@
     }
 
 #define FRIEND_OPERATIONS_DECLARATION(TX__, X__)                                                             \
-    BINARY_LEFT_TYPE_OPERATION_DECLARATION(TX__, X__, +)                                                     \
-    BINARY_LEFT_TYPE_OPERATION_DECLARATION(TX__, X__, -)                                                     \
-    BINARY_LEFT_TYPE_OPERATION_DECLARATION(TX__, X__, *)                                                     \
-    BINARY_LEFT_TYPE_OPERATION_DECLARATION(TX__, X__, / )                                                    \
-    BINARY_LEFT_TYPE_OPERATION_DECLARATION(TX__, X__, % )                                                    \
-    BINARY_LEFT_TYPE_OPERATION_DECLARATION(TX__, X__, &)                                                     \
-    BINARY_LEFT_TYPE_OPERATION_DECLARATION(TX__, X__, | )                                                    \
-    BINARY_LEFT_TYPE_OPERATION_DECLARATION(TX__, X__, ^)                                                     \
-    BINARY_LEFT_TYPE_OPERATION_DECLARATION(TX__, X__, << )                                                   \
-    BINARY_LEFT_TYPE_OPERATION_DECLARATION(TX__, X__, >> )                                                   \
     BINARY_LEFT_TYPE_OPERATION_DECLARATION(TX__, X__, &&)                                                    \
     BINARY_LEFT_TYPE_OPERATION_DECLARATION(TX__, X__, || )                                                   \
     BINARY_LEFT_TYPE_OPERATION_DECLARATION(TX__, X__, == )                                                   \
@@ -158,16 +148,6 @@
     BINARY_LEFT_TYPE_OPERATION_DECLARATION(TX__, X__, >= )
 
 #define FRIEND_OPERATIONS_DEFINITION(TX__, X__)                                                              \
-    BINARY_LEFT_TYPE_OPERATION_DEFINITION(TX__, X__, +)                                                      \
-    BINARY_LEFT_TYPE_OPERATION_DEFINITION(TX__, X__, -)                                                      \
-    BINARY_LEFT_TYPE_OPERATION_DEFINITION(TX__, X__, *)                                                      \
-    BINARY_LEFT_TYPE_OPERATION_DEFINITION(TX__, X__, / )                                                     \
-    BINARY_LEFT_TYPE_OPERATION_DEFINITION(TX__, X__, % )                                                     \
-    BINARY_LEFT_TYPE_OPERATION_DEFINITION(TX__, X__, &)                                                      \
-    BINARY_LEFT_TYPE_OPERATION_DEFINITION(TX__, X__, | )                                                     \
-    BINARY_LEFT_TYPE_OPERATION_DEFINITION(TX__, X__, ^)                                                      \
-    BINARY_LEFT_TYPE_OPERATION_DEFINITION(TX__, X__, << )                                                    \
-    BINARY_LEFT_TYPE_OPERATION_DEFINITION(TX__, X__, >> )                                                    \
     BINARY_LEFT_TYPE_OPERATION_DEFINITION(TX__, X__, &&)                                                     \
     BINARY_LEFT_TYPE_OPERATION_DEFINITION(TX__, X__, || )                                                    \
     BINARY_LEFT_TYPE_OPERATION_DEFINITION(TX__, X__, == )                                                    \
@@ -178,16 +158,6 @@
     BINARY_LEFT_TYPE_OPERATION_DEFINITION(TX__, X__, >= )
 
 #define FRIEND_OPERATIONS(TX__, X__)                                                                         \
-    BINARY_LEFT_TYPE_OPERATION(TX__, X__, +)                                                                 \
-    BINARY_LEFT_TYPE_OPERATION(TX__, X__, -)                                                                 \
-    BINARY_LEFT_TYPE_OPERATION(TX__, X__, *)                                                                 \
-    BINARY_LEFT_TYPE_OPERATION(TX__, X__, / )                                                                \
-    BINARY_LEFT_TYPE_OPERATION(TX__, X__, % )                                                                \
-    BINARY_LEFT_TYPE_OPERATION(TX__, X__, &)                                                                 \
-    BINARY_LEFT_TYPE_OPERATION(TX__, X__, | )                                                                \
-    BINARY_LEFT_TYPE_OPERATION(TX__, X__, ^)                                                                 \
-    BINARY_LEFT_TYPE_OPERATION(TX__, X__, << )                                                               \
-    BINARY_LEFT_TYPE_OPERATION(TX__, X__, >> )                                                               \
     BINARY_LEFT_TYPE_OPERATION(TX__, X__, &&)                                                                \
     BINARY_LEFT_TYPE_OPERATION(TX__, X__, || )                                                               \
     BINARY_LEFT_TYPE_OPERATION(TX__, X__, == )                                                               \

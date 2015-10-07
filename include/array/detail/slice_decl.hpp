@@ -163,6 +163,8 @@ template <> class base_slice_iterator<1>
 };
 
 // Slicing size
+static inline auto seq_size(std::size_t start, std::size_t stop, std::size_t step);
+
 template <std::size_t D, std::size_t N, typename... Args>
 std::size_t slicing_size(const std::array<std::size_t, N>& extents, std::size_t, Args&&... args);
 
