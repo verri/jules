@@ -4,7 +4,7 @@ SRC =
 OBJ := $(SRC:.cpp=.o) test_suite.o
 DEP := $(SRC:.cpp=.d) test_suite.d
 
-CXXFLAGS += -std=c++14 -g -march=native -O3 -Wall -Wextra -I../include -isystem../third_party/Celero/include
+CXXFLAGS += -std=c++14 -g -march=native -O3 -DNDEBUG -Wall -Wextra -I../include -isystem../third_party/Celero/include
 
 NODEPS = clean
 

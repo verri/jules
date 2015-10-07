@@ -161,13 +161,10 @@ indirect_request<indirect_ndarray<T, N>, Args...> indirect_ndarray<T, N>::operat
 
     auto slicing = indirect_slicing(this->descriptor_, std::forward<Args>(args)...);
 
-    std::vector<std::size_t> indexes;
-    indexes.reserve(slicing.second.size());
+    for (auto it = slicing.second.begin(); it != slicing.second.end(); ++it)
+        *it = this->indexes_[*it];
 
-    for (std::size_t j : slicing.second)
-        indexes.push_back(this->indexes_[j]);
-
-    return {data_, slicing.first, std::move(indexes)};
+    return {data_, slicing.first, std::move(slicing.second)};
 }
 
 template <typename T, std::size_t N>
@@ -204,13 +201,10 @@ operator()(Args&&... args) const
 
     auto slicing = indirect_slicing(this->descriptor_, std::forward<Args>(args)...);
 
-    std::vector<std::size_t> indexes;
-    indexes.reserve(slicing.second.size());
+    for (auto it = slicing.second.begin(); it != slicing.second.end(); ++it)
+        *it = this->indexes_[*it];
 
-    for (std::size_t j : slicing.second)
-        indexes.push_back(this->indexes_[j]);
-
-    return {data_, slicing.first, std::move(indexes)};
+    return {data_, slicing.first, std::move(slicing.second)};
 }
 
 template <typename T, std::size_t N>

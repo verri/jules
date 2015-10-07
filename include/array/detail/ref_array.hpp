@@ -186,14 +186,7 @@ indirect_request<indirect_ndarray<const T, N>, Args...> ref_ndarray<T, N>::opera
     static_assert(sizeof...(args) == N, "Invalid number of arguments.");
 
     auto slicing = indirect_slicing(this->descriptor_, std::forward<Args>(args)...);
-
-    std::vector<std::size_t> indexes;
-    indexes.reserve(slicing.second.size());
-
-    for (std::size_t j : slicing.second)
-        indexes.push_back(this->indexes_[j]);
-
-    return {data_, slicing.first, std::move(indexes)};
+    return {data_, slicing.first, std::move(slicing.second)};
 }
 
 template <typename T, std::size_t N>
@@ -313,16 +306,8 @@ template <typename T>
 template <typename Range>
 indirect_ndarray<T, 1> ref_ndarray<T, 1>::operator()(const Range& rng)
 {
-    // TODO: Range&& and specialization of indirect_slicing
     auto slicing = indirect_slicing(this->descriptor_, rng);
-
-    std::vector<std::size_t> indexes;
-    indexes.reserve(slicing.second.size());
-
-    for (std::size_t j : slicing.second)
-        indexes.push_back(j);
-
-    return {data_, slicing.first, std::move(indexes)};
+    return {data_, slicing.first, std::move(slicing.second)};
 }
 
 template <typename T> ref_ndarray<T, 1> ref_ndarray<T, 1>::operator()(const base_slice<1>& s)
@@ -338,14 +323,7 @@ template <typename Range>
 indirect_ndarray<const T, 1> ref_ndarray<T, 1>::operator()(const Range& rng) const
 {
     auto slicing = indirect_slicing(this->descriptor_, rng);
-
-    std::vector<std::size_t> indexes;
-    indexes.reserve(slicing.second.size());
-
-    for (std::size_t j : slicing.second)
-        indexes.push_back(j);
-
-    return {data_, slicing.first, std::move(indexes)};
+    return {data_, slicing.first, std::move(slicing.second)};
 }
 
 template <typename T> ref_ndarray<const T, 1> ref_ndarray<T, 1>::operator()(const base_slice<1>& s) const
