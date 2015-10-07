@@ -1,10 +1,13 @@
 SUFFIXES += .d
 
-SRC =
+CELERO_SRC = $(shell find ../third_party/Celero/src -iname '*.cpp')
+
+SRC = $(CELERO_SRC)
 OBJ := $(SRC:.cpp=.o) test_suite.o
 DEP := $(SRC:.cpp=.d) test_suite.d
 
 CXXFLAGS += -std=c++14 -g -march=native -O3 -DNDEBUG -Wall -Wextra -I../include -isystem../third_party/Celero/include
+LDFLAGS += -lpthread
 
 NODEPS = clean
 
@@ -33,5 +36,6 @@ test_suite: $(OBJ)
 clean:
 	@echo "Cleaning test..."
 	@find . -iname '*.[od]' -exec rm {} \;
+	@find ../third_party/Celero/src -iname '*.[od]' -exec rm {} \;
 
 .PHONY: test clean

@@ -3,4 +3,4 @@
 	url = https://github.com/philsquared/Catch.git
 [submodule "third_party/Celero"]
 	path = third_party/Celero
-	url = https://github.com/DigitalInBlue/Celero.git
+	url = https://github.com/verri/Celero.git
