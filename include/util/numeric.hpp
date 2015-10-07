@@ -17,10 +17,10 @@ template <typename Range, typename R = range_value_t<Range>> auto prod(const Ran
     return std::accumulate(range::begin(rng), range::end(rng), static_cast<R>(1), std::multiplies<R>{});
 }
 
-template <typename Range, typename R = range_value_t<Range>> R max(const Range& rng)
+template <typename Range, typename It = range_iterator_t<Range>> It max(Range&& rng)
 {
-    auto it = std::max_element(range::begin(rng), range::end(rng));
-    return *it;
+    decltype(auto) frng = std::forward<Range>(rng);
+    return std::max_element(range::begin(frng), range::end(frng));
 }
 
 constexpr auto prod_args() { return 1u; }

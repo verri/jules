@@ -410,6 +410,24 @@ template <typename T> auto ref_ndarray_iterator<T, 1>::operator++(int) -> ref_nd
     return copy;
 }
 
+template <typename T>
+ref_ndarray_iterator<T, 1>& ref_ndarray_iterator<T, 1>::operator=(const ref_ndarray_iterator& source)
+{
+    this->index_ = source.index_;
+    this->array_.clone_from(source.array_);
+
+    return *this;
+}
+
+template <typename T>
+ref_ndarray_iterator<T, 1>& ref_ndarray_iterator<T, 1>::operator=(ref_ndarray_iterator&& source)
+{
+    this->index_ = source.index_;
+    this->array_.clone_from(std::move(source.array_));
+
+    return *this;
+}
+
 // Data Iterator
 
 template <typename T, std::size_t N>
