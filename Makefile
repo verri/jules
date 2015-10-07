@@ -1,4 +1,4 @@
-SRC = $(shell find include test -iname \*.[ch]pp)
+SRC = $(shell find include test benchmark -iname \*.[ch]pp)
 
 all: test
 

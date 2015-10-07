@@ -162,6 +162,20 @@ template <> class base_slice_iterator<1>
     std::size_t step_ = 1;
 };
 
+// Slicing size
+template <std::size_t D, std::size_t N, typename... Args>
+std::size_t slicing_size(const std::array<std::size_t, N>& extents, std::size_t, Args&&... args);
+
+template <std::size_t D, std::size_t N, typename... Args>
+std::size_t slicing_size(const std::array<std::size_t, N>& extents, const base_slice<1>& slice,
+                         Args&&... args);
+
+template <std::size_t D, std::size_t N, typename Range, typename... Args,
+          typename = std::enable_if_t<std::is_convertible<typename Range::size_type, std::size_t>::value>>
+std::size_t slicing_size(const std::array<std::size_t, N>& extents, const Range& rng, Args&&... args);
+
+template <std::size_t D, std::size_t N> std::size_t slicing_size(const std::array<std::size_t, N>& extents);
+
 // Default Slicing
 template <std::size_t N, typename... Args>
 base_slice<N> default_slicing(const base_slice<N>&, Args&&... args);

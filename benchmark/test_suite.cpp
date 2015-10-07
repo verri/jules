@@ -4,11 +4,18 @@
 #include <iostream>
 #include <chrono>
 
-constexpr std::size_t N = 20000;
+using vec_t = std::vector<double>;
+
+static_assert(std::is_same<jules::range_iterator_t<vec_t>, typename vec_t::iterator>::value, "");
+static_assert(std::is_same<jules::range_iterator_t<vec_t&>, typename vec_t::iterator>::value, "");
+static_assert(std::is_same<jules::range_iterator_t<const vec_t>, typename vec_t::const_iterator>::value, "");
+static_assert(std::is_same<jules::range_iterator_t<const vec_t&>, typename vec_t::const_iterator>::value, "");
+
+constexpr std::size_t N = 10000;
 constexpr double ToMB = 1.0 / 1024.0 / 1024.0;
 
-template <typename F>
-auto PrintHeadUsage(F&& f) {
+template <typename F> auto PrintHeadUsage(F&& f)
+{
     Memory::Reset();
 
     auto start = std::chrono::system_clock::now();
@@ -18,13 +25,13 @@ auto PrintHeadUsage(F&& f) {
     std::cout << (Memory::Size() * ToMB) << " MB in " << Memory::Count() << " allocations ("
               << (Memory::Count() > 0 ? (Memory::Size() * ToMB) / Memory::Count() : 0.0)
               << " MB/alloc)\ntime elapsed: "
-              << std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count()
-              << "ms\n" << std::endl;
+              << std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count() << "ms\n"
+              << std::endl;
 
     return result;
 }
 
-void f(void *) {}
+void f(void*) {}
 static volatile auto use = f;
 
 int main()
@@ -33,9 +40,7 @@ int main()
     using jules::seq;
 
     std::cout << "Creating vector." << std::endl;
-    auto vector = PrintHeadUsage([&] {
-        return jules::vector<double>(N * N);
-    });
+    auto vector = PrintHeadUsage([&] { return jules::vector<double>(N * N); });
 
     std::cout << "Filling even lines with zeros using slice." << std::endl;
     PrintHeadUsage([&] {
@@ -52,9 +57,7 @@ int main()
     use(&vector);
 
     std::cout << "Creating matrix." << std::endl;
-    auto matrix = PrintHeadUsage([&] {
-        return jules::matrix<double>(N, N);
-    });
+    auto matrix = PrintHeadUsage([&] { return jules::matrix<double>(N, N); });
 
     std::cout << "Filling even lines with zeros using slice." << std::endl;
     PrintHeadUsage([&] {

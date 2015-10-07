@@ -23,7 +23,7 @@ template <typename Range, typename = void> struct range_traits {
 
 template <typename Range>
 struct range_traits<Range,
-                    std::enable_if_t<!std::is_const<Range>::value,
+                    std::enable_if_t<!std::is_const<std::remove_reference_t<Range>>::value,
                                      detail::void_t<typename std::remove_reference_t<Range>::iterator>>> {
     using iterator_type = typename std::remove_reference_t<Range>::iterator;
     using iterator_traits = std::iterator_traits<iterator_type>;
@@ -31,7 +31,7 @@ struct range_traits<Range,
 
 template <typename Range>
 struct range_traits<
-    Range, std::enable_if_t<std::is_const<Range>::value,
+    Range, std::enable_if_t<std::is_const<std::remove_reference_t<Range>>::value,
                             detail::void_t<typename std::remove_reference_t<Range>::const_iterator>>> {
     using iterator_type = typename std::remove_reference_t<Range>::const_iterator;
     using iterator_traits = std::iterator_traits<iterator_type>;

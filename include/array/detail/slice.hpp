@@ -196,6 +196,32 @@ inline base_slice_iterator<1> base_slice_iterator<1>::operator++(int)
     return c;
 }
 
+// Slicing size
+template <std::size_t D, std::size_t N, typename... Args>
+std::size_t slicing_size(const std::array<std::size_t, N>& extents, std::size_t, Args&&... args)
+{
+    return slicing_size<D + 1>(extents, std::forward<Args>(args)...);
+}
+
+template <std::size_t D, std::size_t N, typename... Args>
+std::size_t slicing_size(const std::array<std::size_t, N>& extents, const base_slice<1>& slice,
+                         Args&&... args)
+{
+    return (slice.size() == 0 ? extents[D] : slice.size()) *
+           slicing_size<D + 1>(extents, std::forward<Args>(args)...);
+}
+
+template <std::size_t D, std::size_t N, typename Range, typename... Args, typename>
+std::size_t slicing_size(const std::array<std::size_t, N>& extents, const Range& rng, Args&&... args)
+{
+    return range::size(rng) * slicing_size<D + 1>(extents, std::forward<Args>(args)...);
+}
+
+template <std::size_t D, std::size_t N> std::size_t slicing_size(const std::array<std::size_t, N>&)
+{
+    return 1;
+}
+
 // Slicing Helpers
 
 template <std::size_t N, typename... Args>
@@ -251,6 +277,8 @@ std::pair<std::array<std::size_t, N>, std::vector<std::size_t>> indirect_slicing
     static_assert(sizeof...(args) == N, "Invalid number of arguments.");
 
     std::pair<std::array<std::size_t, N>, std::vector<std::size_t>> result;
+    result.second.reserve(slicing_size<0>(slice.extents(), std::forward<Args>(args)...));
+
     do_slice(result.first, result.second, slice, std::array<std::size_t, 0>{}, std::forward<Args>(args)...);
 
     return result;
