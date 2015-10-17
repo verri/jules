@@ -50,8 +50,8 @@ template <typename Coercion> class base_column
 
     std::type_index elements_type() const { return column_model_->elements_type(); }
 
-    template <typename T> view_t<T> view();
-    template <typename T> view_t<const T> view() const;
+    template <typename T> view_t<T> view()&;
+    template <typename T> view_t<const T> view() const&;
 
     template <typename T, typename C> friend base_column_view<T, C> make_view(base_column<C>& column);
     template <typename T, typename C>
@@ -68,6 +68,8 @@ template <typename Coercion> class base_column
     std::string name_;
     std::unique_ptr<column_interface_t> column_model_;
 };
+
+template <typename T, typename C> void make_view(base_column<C>&& column) = delete;
 
 using column = base_column<default_coercion_rules>;
 
