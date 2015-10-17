@@ -1,5 +1,6 @@
 #include "catch.hpp"
 #include "dataframe/column.hpp"
+#include "dataframe/dataframe.hpp"
 
 #include <string>
 #include <typeindex>
@@ -62,4 +63,16 @@ TEST_CASE("column constructor inference", "[constructor]")
     check_column({"int", {1, 2, 3}}, typeid(int));
     check_column({1.0, 2.0, 3.0, 1.0}, typeid(double));
     check_column({"1.0"s, "2.0"s, "3.0"s, "1.0"s}, typeid(std::string));
+}
+
+TEST_CASE("temporary columns", "[column]")
+{
+    jules::column col{{1, 2, 3, 4, 5}};
+    jules::dataframe df;
+
+    df.colbind(col);
+    auto view = jules::coerce_to<double>(df.select(0)).view<double>();
+
+    for (std::size_t i = 0; i < df.nrow(); ++i)
+        CHECK(view[i] == i + 1);
 }
