@@ -52,6 +52,7 @@ template <typename Coercion> class base_column
 
     template <typename T> view_t<T> view()&;
     template <typename T> view_t<const T> view() const&;
+    template <typename T> void view() && = delete;
 
     template <typename T, typename C> friend base_column_view<T, C> make_view(base_column<C>& column);
     template <typename T, typename C>
