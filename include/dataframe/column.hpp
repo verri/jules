@@ -84,13 +84,15 @@ template <typename T, typename Coercion> bool can_coerce_to(const base_column<Co
     return column.column_model_->template can_coerce_to<T>();
 }
 
-template <typename Coercion> template <typename T> auto base_column<Coercion>::view() -> view_t<T>
+template <typename Coercion> template <typename T> auto base_column<Coercion>::view() & -> view_t<T>
 {
     auto& model = this->column_model_->template downcast<T>();
     return {model.data(), model.size()};
 }
 
-template <typename Coercion> template <typename T> auto base_column<Coercion>::view() const -> view_t<const T>
+template <typename Coercion>
+template <typename T>
+auto base_column<Coercion>::view() const & -> view_t<const T>
 {
     const auto& model = this->column_model_->template downcast<T>();
     return {model.data(), model.size()};
