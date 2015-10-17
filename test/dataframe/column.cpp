@@ -71,7 +71,9 @@ TEST_CASE("temporary columns", "[column]")
     jules::dataframe df;
 
     df.colbind(col);
-    auto view = jules::coerce_to<double>(df.select(0)).view<double>();
+    auto c = jules::coerce_to<double>(df.select(0));
+    auto view = c.view<double>();
+    // auto view = jules::coerce_to<double>(df.select(0)).view<double>();
 
     for (std::size_t i = 0; i < df.nrow(); ++i)
         CHECK(view[i] == i + 1);
