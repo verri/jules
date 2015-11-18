@@ -8,7 +8,7 @@ flags = [
 '-x',
 'c++',
 '-I',
-'../include',
+'../jules',
 '-I',
 '../third_party/Catch/include',
 ]

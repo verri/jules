@@ -231,6 +231,10 @@ TEST_CASE("reading matrix of integers", "[dataframe]")
         REQUIRE(idf.select(idf.ncol() - 1).elements_type() == typeid(int));
     }
 
+    // coerce all columns
+    CHECK(jules::can_coerce_to<int>(df));
+    df.coerce_to<int>();
+
     // int -> double: Not OK
     CHECK_FALSE(jules::can_coerce_to<double>(idf.select(0)));
     CHECK_THROWS(jules::coerce_to<double>(idf.select(0)));
