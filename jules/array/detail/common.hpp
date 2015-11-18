@@ -1,10 +1,10 @@
 #ifndef JULES_ARRAY_DETAIL_COMMON_DECL_H
 #define JULES_ARRAY_DETAIL_COMMON_DECL_H
 
-#include "range/range.hpp"
-#include "util/async.hpp"
-#include "util/numeric.hpp"
-#include "util/type.hpp"
+#include <jules/range/range.hpp>
+#include <jules/util/async.hpp>
+#include <jules/util/numeric.hpp>
+#include <jules/util/type.hpp>
 
 #include <array>
 #include <type_traits>

@@ -1,10 +1,10 @@
 #ifndef JULES_DATAFRAME_COLUMN_DECL_H
 #define JULES_DATAFRAME_COLUMN_DECL_H
 
-#include "core/type.hpp"
-#include "dataframe/column_view.hpp"
-#include "dataframe/detail/column.hpp"
-#include "range/range.hpp"
+#include <jules/core/type.hpp>
+#include <jules/dataframe/column_view.hpp>
+#include <jules/dataframe/detail/column.hpp>
+#include <jules/range/range.hpp>
 
 #include <initializer_list>
 #include <memory>

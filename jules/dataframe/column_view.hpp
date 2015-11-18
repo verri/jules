@@ -1,7 +1,7 @@
 #ifndef JULES_DATAFRAME_COLUMN_VIEW_H
 #define JULES_DATAFRAME_COLUMN_VIEW_H
 
-#include "dataframe/column_view_decl.hpp"
+#include <jules/dataframe/column_view_decl.hpp>
 
 namespace jules
 {

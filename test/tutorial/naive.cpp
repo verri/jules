@@ -1,9 +1,9 @@
 #include "catch.hpp"
 
-#include <array/array.hpp>
-#include <dataframe/dataframe.hpp>
-#include <formula/formula.hpp>
-#include <util/numeric.hpp>
+#include "jules/array/array.hpp"
+#include "jules/dataframe/dataframe.hpp"
+#include "jules/formula/formula.hpp"
+#include "jules/util/numeric.hpp"
 
 #include <fstream>
 

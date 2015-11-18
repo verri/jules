@@ -1,6 +1,6 @@
 #include "catch.hpp"
-#include "dataframe/column.hpp"
-#include "dataframe/dataframe.hpp"
+#include "jules/dataframe/column.hpp"
+#include "jules/dataframe/dataframe.hpp"
 
 #include <string>
 #include <typeindex>

@@ -1,10 +1,10 @@
 #ifndef JULES_ARRAY_DETAIL_REF_ARRAY_DECL_H
 #define JULES_ARRAY_DETAIL_REF_ARRAY_DECL_H
 
-#include "array/detail/common.hpp"
-#include "array/detail/slice.hpp"
+#include <jules/array/detail/common.hpp>
+#include <jules/array/detail/slice.hpp>
 
-#include "array/detail/define_macros.hpp"
+#include <jules/array/detail/define_macros.hpp>
 
 #include <array>
 #include <iterator>
@@ -282,7 +282,7 @@ class ref_ndarray_data_iterator
 
 FRIEND_OPERATIONS_DEFINITION((typename R, std::size_t M), (const ref_ndarray<R, M>&))
 
-#include "array/detail/undef_macros.hpp"
+#include <jules/array/detail/undef_macros.hpp>
 
 } // namespace detail
 } // namespace jules

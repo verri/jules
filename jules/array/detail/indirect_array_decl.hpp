@@ -1,10 +1,10 @@
 #ifndef JULES_ARRAY_DETAIL_INDIRECT_ARRAY_DECL_H
 #define JULES_ARRAY_DETAIL_INDIRECT_ARRAY_DECL_H
 
-#include "array/detail/common.hpp"
-#include "array/detail/slice.hpp"
+#include <jules/array/detail/common.hpp>
+#include <jules/array/detail/slice.hpp>
 
-#include "array/detail/define_macros.hpp"
+#include <jules/array/detail/define_macros.hpp>
 
 namespace jules
 {
@@ -270,6 +270,6 @@ class indirect_ndarray_data_iterator : public std::iterator<std::forward_iterato
 } // namespace detail
 } // namespace jules
 
-#include "array/detail/undef_macros.hpp"
+#include <jules/array/detail/undef_macros.hpp>
 
 #endif // JULES_ARRAY_DETAIL_INDIRECT_ARRAY_DECL_H

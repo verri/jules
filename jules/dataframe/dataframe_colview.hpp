@@ -1,7 +1,7 @@
 #ifndef JULES_DATAFRAME_DATAFRAME_COLVIEW_H
 #define JULES_DATAFRAME_DATAFRAME_COLVIEW_H
 
-#include "dataframe/dataframe_colview_decl.hpp"
+#include <jules/dataframe/dataframe_colview_decl.hpp>
 
 namespace jules
 {

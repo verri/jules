@@ -1,7 +1,7 @@
 #ifndef JULES_ARRAY_DETAIL_DEFINE_MACROS_H
 #define JULES_ARRAY_DETAIL_DEFINE_MACROS_H
 
-#include "array/detail/common.hpp"
+#include <jules/array/detail/common.hpp>
 
 #define BASE_NDARRAY(X__, N__) const base_ndarray<X__, N__> &
 #define REF_NDARRAY(X__, N__) const ref_ndarray<X__, N__> &

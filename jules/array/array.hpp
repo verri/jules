@@ -1,7 +1,7 @@
 #ifndef JULES_ARRAY_ARRAY_H
 #define JULES_ARRAY_ARRAY_H
 
-#include "array/array_decl.hpp"
+#include <jules/array/array_decl.hpp>
 
 namespace jules
 {

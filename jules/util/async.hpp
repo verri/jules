@@ -1,7 +1,7 @@
 #ifndef JULES_UTIL_ASYNC_H
 #define JULES_UTIL_ASYNC_H
 
-#include "core/type.hpp"
+#include <jules/core/type.hpp>
 
 #include <type_traits>
 #include <utility>

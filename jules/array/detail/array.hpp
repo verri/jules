@@ -1,7 +1,7 @@
 #ifndef JULES_ARRAY_DETAIL_ARRAY_H
 #define JULES_ARRAY_DETAIL_ARRAY_H
 
-#include "array/detail/array_decl.hpp"
+#include <jules/array/detail/array_decl.hpp>
 
 #define COPY_FROM_BASE                                                                                       \
     do {                                                                                                     \

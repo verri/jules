@@ -1,8 +1,8 @@
 #ifndef JULES_ARRAY_DETAIL_ARRAY_DECL_H
 #define JULES_ARRAY_DETAIL_ARRAY_DECL_H
 
-#include "array/detail/common.hpp"
-#include "array/detail/define_macros.hpp"
+#include <jules/array/detail/common.hpp>
+#include <jules/array/detail/define_macros.hpp>
 
 #include <array>
 #include <utility>
@@ -138,7 +138,7 @@ template <typename T> class base_ndarray<T, 0>
 
 FRIEND_OPERATIONS_DEFINITION((typename R, std::size_t M), (const base_ndarray<R, M>&))
 
-#include "array/detail/undef_macros.hpp"
+#include <jules/array/detail/undef_macros.hpp>
 
 } // namespace detail
 } // namespace jules

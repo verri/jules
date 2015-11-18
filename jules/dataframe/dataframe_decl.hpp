@@ -1,11 +1,11 @@
 #ifndef JULES_DATAFRAME_DATAFRAME_DECL_H
 #define JULES_DATAFRAME_DATAFRAME_DECL_H
 
-#include "array/array.hpp"
-#include "dataframe/column.hpp"
-#include "dataframe/dataframe_colview.hpp"
-#include "dataframe/io_decl.hpp"
-#include "formula/expression_decl.hpp"
+#include <jules/array/array.hpp>
+#include <jules/dataframe/column.hpp>
+#include <jules/dataframe/dataframe_colview.hpp>
+#include <jules/dataframe/io_decl.hpp>
+#include <jules/formula/expression_decl.hpp>
 
 #include <initializer_list>
 #include <string>

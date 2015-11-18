@@ -1,8 +1,8 @@
 #ifndef JULES_FORMULA_EXPRESSION_H
 #define JULES_FORMULA_EXPRESSION_H
 
-#include "formula/expression_decl.hpp"
-#include "dataframe/dataframe.hpp"
+#include <jules/formula/expression_decl.hpp>
+#include <jules/dataframe/dataframe.hpp>
 
 namespace jules
 {

@@ -1,7 +1,7 @@
 #ifndef JULES_DATAFRAME_COLUMN_H
 #define JULES_DATAFRAME_COLUMN_H
 
-#include "dataframe/column_decl.hpp"
+#include <jules/dataframe/column_decl.hpp>
 
 namespace jules
 {

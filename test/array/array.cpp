@@ -1,6 +1,6 @@
 #include <catch.hpp>
 
-#include "array/array.hpp"
+#include "jules/array/array.hpp"
 
 TEST_CASE("array", "[array]")
 {

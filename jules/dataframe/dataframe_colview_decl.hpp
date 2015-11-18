@@ -1,8 +1,8 @@
 #ifndef JULES_DATAFRAME_DATAFRAME_COLVIEW_DECL_H
 #define JULES_DATAFRAME_DATAFRAME_COLVIEW_DECL_H
 
-#include "dataframe/column.hpp"
-#include "dataframe/column_view.hpp"
+#include <jules/dataframe/column.hpp>
+#include <jules/dataframe/column_view.hpp>
 
 namespace jules
 {

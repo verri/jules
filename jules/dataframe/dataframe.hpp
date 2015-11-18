@@ -1,8 +1,8 @@
 #ifndef JULES_DATAFRAME_DATAFRAME_H
 #define JULES_DATAFRAME_DATAFRAME_H
 
-#include "dataframe/dataframe_decl.hpp"
-#include "range/range.hpp"
+#include <jules/dataframe/dataframe_decl.hpp>
+#include <jules/range/range.hpp>
 
 #include <algorithm>
 #include <iterator>
@@ -103,7 +103,9 @@ auto base_dataframe<Coercion>::select(const expr_list_t& expression_list) const 
 }
 
 template <typename Coercion>
-template <typename T> base_dataframe<Coercion>& base_dataframe<Coercion>::coerce_to() {
+template <typename T>
+base_dataframe<Coercion>& base_dataframe<Coercion>::coerce_to()
+{
     std::vector<column_t> new_columns;
 
     new_columns.reserve(columns_.size());
@@ -116,26 +118,26 @@ template <typename T> base_dataframe<Coercion>& base_dataframe<Coercion>::coerce
 }
 
 template <typename Coercion, typename T>
-base_dataframe<Coercion> coerce_to(const base_dataframe<Coercion>& dataframe) {
+base_dataframe<Coercion> coerce_to(const base_dataframe<Coercion>& dataframe)
+{
     base_dataframe<Coercion> coerced;
     for (std::size_t i = 0; dataframe.ncol(); ++i)
         coerced.colbind(jules::coerce_to<T>(dataframe.select(i)));
     return coerced;
 }
 
-template <typename Coercion>
-template <typename T> bool base_dataframe<Coercion>::can_coerce_to() const {
+template <typename Coercion> template <typename T> bool base_dataframe<Coercion>::can_coerce_to() const
+{
     for (auto&& column : columns_)
         if (!column.template can_coerce_to<T>())
             return false;
     return true;
 }
 
-template <typename T, typename Coercion>
-bool can_coerce_to(const base_dataframe<Coercion>& dataframe) {
+template <typename T, typename Coercion> bool can_coerce_to(const base_dataframe<Coercion>& dataframe)
+{
     return dataframe.template can_coerce_to<T>();
 }
-
 
 template <typename Coercion>
 base_dataframe<Coercion> base_dataframe<Coercion>::read(std::istream& is, const dataframe_read_options& opt)

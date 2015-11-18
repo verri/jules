@@ -1,7 +1,7 @@
 #ifndef JULES_FORMULA_EXPRESSION_DECL_H
 #define JULES_FORMULA_EXPRESSION_DECL_H
 
-#include "core/type.hpp"
+#include <jules/core/type.hpp>
 
 #include <deque>
 #include <functional>

@@ -1,8 +1,8 @@
 #ifndef JULES_ARRAY_DETAIL_EXPRESSION_DECL_H
 #define JULES_ARRAY_DETAIL_EXPRESSION_DECL_H
 
-#include "array/detail/common.hpp"
-#include "array/detail/define_macros.hpp"
+#include <jules/array/detail/common.hpp>
+#include <jules/array/detail/define_macros.hpp>
 
 #include <iterator>
 
@@ -149,6 +149,6 @@ template <typename It, typename Op, std::size_t N> class unary_expr_ndarray
 } // namespace detail
 } // namespace jules
 
-#include "array/detail/undef_macros.hpp"
+#include <jules/array/detail/undef_macros.hpp>
 
 #endif // JULES_ARRAY_DETAIL_EXPRESSION_H

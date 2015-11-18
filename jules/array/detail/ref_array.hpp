@@ -1,7 +1,7 @@
 #ifndef JULES_ARRAY_DETAIL_REF_ARRAY_H
 #define JULES_ARRAY_DETAIL_REF_ARRAY_H
 
-#include "array/detail/ref_array_decl.hpp"
+#include <jules/array/detail/ref_array_decl.hpp>
 
 #ifndef NDEBUG
 #define CHECK_ASSIGNMENT(data, descriptor)                                                                   \

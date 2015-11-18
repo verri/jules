@@ -1,7 +1,7 @@
 #ifndef JULES_ARRAY_DETAIL_SLICE_DECL_H
 #define JULES_ARRAY_DETAIL_SLICE_DECL_H
 
-#include "array/detail/common.hpp"
+#include <jules/array/detail/common.hpp>
 
 namespace jules
 {

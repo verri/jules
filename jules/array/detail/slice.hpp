@@ -1,7 +1,7 @@
 #ifndef JULES_ARRAY_DETAIL_SLICE_H
 #define JULES_ARRAY_DETAIL_SLICE_H
 
-#include "array/detail/slice_decl.hpp"
+#include <jules/array/detail/slice_decl.hpp>
 
 #ifndef NDEBUG
 #define CHECK_BOUNDS(I, MAX)                                                                                 \

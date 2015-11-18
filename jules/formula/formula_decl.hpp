@@ -1,8 +1,8 @@
 #ifndef JULES_FORMULA_FORMULA_DECL_H
 #define JULES_FORMULA_FORMULA_DECL_H
 
-#include "dataframe/dataframe.hpp"
-#include "formula/expression.hpp"
+#include <jules/dataframe/dataframe.hpp>
+#include <jules/formula/expression.hpp>
 
 #include <memory>
 #include <string>
