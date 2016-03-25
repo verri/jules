@@ -1,5 +1,5 @@
 #include "benchmark.hpp"
-#include "array/array.hpp"
+#include "jules/array/array.hpp"
 
 #include <chrono>
 
