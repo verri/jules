@@ -30,8 +30,7 @@ template <typename Coercion> base_dataframe<Coercion>::base_dataframe(std::initi
     }
 }
 
-template <typename Coercion>
-base_dataframe<Coercion>& base_dataframe<Coercion>::colbind(const column_t& column)
+template <typename Coercion> base_dataframe<Coercion>& base_dataframe<Coercion>::colbind(const column_t& column)
 {
     const auto& name = column.name();
 
@@ -78,12 +77,10 @@ template <typename Coercion> base_dataframe<Coercion>& base_dataframe<Coercion>:
 
 template <typename Coercion> vector<std::string> base_dataframe<Coercion>::colnames() const
 {
-    return to_vector<std::string>(columns_ |
-                                  adaptors::transformed([](const column_t& col) { return col.name(); }));
+    return to_vector<std::string>(columns_ | adaptors::transformed([](const column_t& col) { return col.name(); }));
 }
 
-template <typename Coercion>
-auto base_dataframe<Coercion>::select(const std::string& name) const -> const column_t &
+template <typename Coercion> auto base_dataframe<Coercion>::select(const std::string& name) const -> const column_t &
 {
     auto it = colindexes_.find(name);
     if (it == colindexes_.end())
@@ -96,15 +93,12 @@ template <typename Coercion> auto base_dataframe<Coercion>::select(const expr_t&
     return expression.extract_from(*this);
 }
 
-template <typename Coercion>
-auto base_dataframe<Coercion>::select(const expr_list_t& expression_list) const -> base_dataframe
+template <typename Coercion> auto base_dataframe<Coercion>::select(const expr_list_t& expression_list) const -> base_dataframe
 {
     return expression_list.extract_from(*this);
 }
 
-template <typename Coercion>
-template <typename T>
-base_dataframe<Coercion>& base_dataframe<Coercion>::coerce_to()
+template <typename Coercion> template <typename T> base_dataframe<Coercion>& base_dataframe<Coercion>::coerce_to()
 {
     std::vector<column_t> new_columns;
 
@@ -117,8 +111,7 @@ base_dataframe<Coercion>& base_dataframe<Coercion>::coerce_to()
     return *this;
 }
 
-template <typename Coercion, typename T>
-base_dataframe<Coercion> coerce_to(const base_dataframe<Coercion>& dataframe)
+template <typename Coercion, typename T> base_dataframe<Coercion> coerce_to(const base_dataframe<Coercion>& dataframe)
 {
     base_dataframe<Coercion> coerced;
     for (std::size_t i = 0; dataframe.ncol(); ++i)
@@ -163,8 +156,7 @@ base_dataframe<Coercion> base_dataframe<Coercion>::read(std::istream& is, const 
         if (line.first == line.second)
             continue;
 
-        copy(as_range(line) | tokenized(opt.cell.regex, opt.cell.separator ? -1 : 0, opt.cell.flag),
-             std::back_inserter(data));
+        copy(as_range(line) | tokenized(opt.cell.regex, opt.cell.separator ? -1 : 0, opt.cell.flag), std::back_inserter(data));
 
         if (ncol == 0)
             ncol = data.size() - size;
@@ -188,20 +180,18 @@ base_dataframe<Coercion> base_dataframe<Coercion>::read(std::istream& is, const 
     }
 
     for (std::size_t j = 0; j < ncol; ++j) {
-        auto column_data = make_iterator_range(data.begin() + j + (opt.header ? ncol : 0), data.end()) |
-                           strided(ncol) | transformed([](auto&& match) {
+        auto column_data = make_iterator_range(data.begin() + j + (opt.header ? ncol : 0), data.end()) | strided(ncol) |
+                           transformed([](auto&& match) {
                                return std::move(std::string{match.first, match.second});
                            });
-        base_column<Coercion> col(opt.header ? std::string{data[j].first, data[j].second} : std::string{},
-                                  column_data);
+        base_column<Coercion> col(opt.header ? std::string{data[j].first, data[j].second} : std::string{}, column_data);
         df.colbind(std::move(col));
     }
     return df;
 }
 
 template <typename Coercion>
-void base_dataframe<Coercion>::write(const base_dataframe<Coercion>& df, std::ostream& os,
-                                     const dataframe_write_options& opt)
+void base_dataframe<Coercion>::write(const base_dataframe<Coercion>& df, std::ostream& os, const dataframe_write_options& opt)
 {
     if (df.nrow() == 0 || df.ncol() == 0)
         return;
@@ -213,10 +203,10 @@ void base_dataframe<Coercion>::write(const base_dataframe<Coercion>& df, std::os
         const auto& col = df.select(j);
 
         if (col.elements_type() == typeid(std::string)) {
-            data.push_back(make_view<std::string>(col));
+            data.push_back(view<std::string>(col));
         } else {
             coerced.push_back(std::move(jules::coerce_to<std::string>(col)));
-            data.push_back(make_view<std::string>(coerced.back()));
+            data.push_back(view<std::string>(coerced.back()));
         }
     }
 
@@ -241,28 +231,26 @@ base_dataframe_colview<const T, Coercion> base_dataframe<Coercion>::colview() co
 {
     std::vector<base_column_view<const T, Coercion>> views;
     for (const auto& col : columns_)
-        views.push_back(make_view<T>(col));
+        views.push_back(view<T>(col));
 
     return {std::move(views)};
 }
 
-template <typename Coercion>
-template <typename T>
-base_dataframe_colview<T, Coercion> base_dataframe<Coercion>::colview()
+template <typename Coercion> template <typename T> base_dataframe_colview<T, Coercion> base_dataframe<Coercion>::colview()
 {
     std::vector<base_column_view<T, Coercion>> views;
     for (auto& col : columns_)
-        views.push_back(make_view<T>(col));
+        views.push_back(view<T>(col));
 
     return {std::move(views)};
 }
 
-template <typename T, typename C> base_dataframe_colview<const T, C> make_colview(const base_dataframe<C>& df)
+template <typename T, typename C> base_dataframe_colview<const T, C> colview(const base_dataframe<C>& df)
 {
     return df.template colview<T>();
 }
 
-template <typename T, typename C> base_dataframe_colview<T, C> make_colview(base_dataframe<C>& df)
+template <typename T, typename C> base_dataframe_colview<T, C> colview(base_dataframe<C>& df)
 {
     return df.template colview<T>();
 }

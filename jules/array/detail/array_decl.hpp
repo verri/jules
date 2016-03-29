@@ -40,11 +40,9 @@ template <typename T, std::size_t N> class base_ndarray : public ref_ndarray<T, 
 
     template <typename... Dims, typename = all_size_enabler<N, Dims...>> explicit base_ndarray(Dims... dims);
 
-    template <typename... Dims, typename = all_size_enabler<N, Dims...>>
-    base_ndarray(const T& value, Dims... dims);
+    template <typename... Dims, typename = all_size_enabler<N, Dims...>> base_ndarray(const T& value, Dims... dims);
 
-    template <typename... Dims, typename = all_size_enabler<N, Dims...>>
-    base_ndarray(const T* data, Dims... dims);
+    template <typename... Dims, typename = all_size_enabler<N, Dims...>> base_ndarray(const T* data, Dims... dims);
 
     base_ndarray(const base_ndarray& source);
     base_ndarray(base_ndarray&& source);
@@ -52,8 +50,7 @@ template <typename T, std::size_t N> class base_ndarray : public ref_ndarray<T, 
     template <typename U> base_ndarray(const base_ndarray<U, N>& source);
     template <typename U> base_ndarray(const ref_ndarray<U, N>& source);
     template <typename U> base_ndarray(const indirect_ndarray<U, N>& source);
-    template <typename LhsIt, typename RhsIt, typename F>
-    base_ndarray(const binary_expr_ndarray<LhsIt, RhsIt, F, N>& source);
+    template <typename LhsIt, typename RhsIt, typename F> base_ndarray(const binary_expr_ndarray<LhsIt, RhsIt, F, N>& source);
     template <typename It, typename F> base_ndarray(const unary_expr_ndarray<It, F, N>& source);
 
     base_ndarray& operator=(const base_ndarray& source);
@@ -83,8 +80,7 @@ template <typename T, std::size_t N> class base_ndarray : public ref_ndarray<T, 
 
     static void create(trivial_tag, T* data, std::size_t size);
     template <typename... Args> static void create(trivial_tag, T* data, std::size_t size, Args&&... args);
-    template <typename... Args>
-    static void create(non_trivial_tag, T* data, std::size_t size, Args&&... args);
+    template <typename... Args> static void create(non_trivial_tag, T* data, std::size_t size, Args&&... args);
 
     template <typename It> static void create(trivial_tag, T* to, It from, std::size_t size);
     static void create(trivial_tag, T* to, T* from, std::size_t size);

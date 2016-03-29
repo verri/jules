@@ -31,8 +31,7 @@ template <typename F, typename Enabler = void> struct is_callable {
     static constexpr bool value = false;
 };
 
-template <typename F>
-struct is_callable<F, typename std::enable_if_t<std::is_same<void, decltype(std::declval<F>()())>::value>> {
+template <typename F> struct is_callable<F, typename std::enable_if_t<std::is_same<void, decltype(std::declval<F>()())>::value>> {
     static constexpr bool value = true;
 };
 

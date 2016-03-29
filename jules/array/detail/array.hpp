@@ -3,30 +3,30 @@
 
 #include <jules/array/detail/array_decl.hpp>
 
-#define COPY_FROM_BASE                                                                                       \
-    do {                                                                                                     \
-        clear();                                                                                             \
-        this->data_ = allocate(source.size());                                                               \
-        create(trivial_dispatch<T>(), this->data(), source.data(), source.size());                           \
-        this->descriptor_ = source.descriptor_;                                                              \
-        return *this;                                                                                        \
+#define COPY_FROM_BASE                                                                                                           \
+    do {                                                                                                                         \
+        clear();                                                                                                                 \
+        this->data_ = allocate(source.size());                                                                                   \
+        create(trivial_dispatch<T>(), this->data(), source.data(), source.size());                                               \
+        this->descriptor_ = source.descriptor_;                                                                                  \
+        return *this;                                                                                                            \
     } while (false)
 
-#define MOVE_FROM_BASE                                                                                       \
-    do {                                                                                                     \
-        clear();                                                                                             \
-        this->data_ = move_ptr(source.data_);                                                                \
-        this->descriptor_ = std::move(source.descriptor_);                                                   \
-        return *this;                                                                                        \
+#define MOVE_FROM_BASE                                                                                                           \
+    do {                                                                                                                         \
+        clear();                                                                                                                 \
+        this->data_ = move_ptr(source.data_);                                                                                    \
+        this->descriptor_ = std::move(source.descriptor_);                                                                       \
+        return *this;                                                                                                            \
     } while (false)
 
-#define COPY_FROM_REF                                                                                        \
-    do {                                                                                                     \
-        clear();                                                                                             \
-        this->data_ = allocate(source.size());                                                               \
-        create(trivial_dispatch<T>(), this->data(), source.data_begin(), source.size());                     \
-        this->descriptor_ = {0, source.extents()};                                                           \
-        return *this;                                                                                        \
+#define COPY_FROM_REF                                                                                                            \
+    do {                                                                                                                         \
+        clear();                                                                                                                 \
+        this->data_ = allocate(source.size());                                                                                   \
+        create(trivial_dispatch<T>(), this->data(), source.data_begin(), source.size());                                         \
+        this->descriptor_ = {0, source.extents()};                                                                               \
+        return *this;                                                                                                            \
     } while (false)
 
 namespace jules
@@ -135,14 +135,12 @@ base_ndarray<T, N>::base_ndarray(const unary_expr_ndarray<It, F, N>& source)
     create(trivial_dispatch<T>(), this->data(), source.data_begin(), source.size());
 }
 
-template <typename T, std::size_t N>
-auto base_ndarray<T, N>::operator=(const base_ndarray& source) -> base_ndarray &
+template <typename T, std::size_t N> auto base_ndarray<T, N>::operator=(const base_ndarray& source) -> base_ndarray &
 {
     COPY_FROM_BASE;
 }
 
-template <typename T, std::size_t N>
-auto base_ndarray<T, N>::operator=(base_ndarray&& source) -> base_ndarray &
+template <typename T, std::size_t N> auto base_ndarray<T, N>::operator=(base_ndarray&& source) -> base_ndarray &
 {
     MOVE_FROM_BASE;
 }
@@ -195,8 +193,7 @@ void base_ndarray<T, N>::create(trivial_tag, T* to, It from, std::size_t size)
     }
 }
 
-template <typename T, std::size_t N>
-void base_ndarray<T, N>::create(trivial_tag, T* to, T* from, std::size_t size)
+template <typename T, std::size_t N> void base_ndarray<T, N>::create(trivial_tag, T* to, T* from, std::size_t size)
 {
     std::memcpy(to, from, size * sizeof(T));
 }
@@ -214,8 +211,7 @@ void base_ndarray<T, N>::create(non_trivial_tag, T* to, It from, std::size_t siz
 
 template <typename T, std::size_t N> void base_ndarray<T, N>::destroy(trivial_tag, T*, std::size_t) {}
 
-template <typename T, std::size_t N>
-void base_ndarray<T, N>::destroy(non_trivial_tag, T* data, std::size_t size)
+template <typename T, std::size_t N> void base_ndarray<T, N>::destroy(non_trivial_tag, T* data, std::size_t size)
 {
     for (std::size_t i = 0; i < size; ++i)
         data[i].~T();

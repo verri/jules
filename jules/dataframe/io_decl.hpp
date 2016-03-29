@@ -9,8 +9,8 @@
 namespace jules
 {
 struct dataframe_read_options {
-    dataframe_read_options(const std::regex& line_regex = std::regex{R"(\n)"},
-                           const std::regex& cell_regex = std::regex{R"(\t)"}, bool header = true)
+    dataframe_read_options(const std::regex& line_regex = std::regex{R"(\n)"}, const std::regex& cell_regex = std::regex{R"(\t)"},
+                           bool header = true)
         : line{line_regex, true, {}}, cell{cell_regex, true, {}}, header{header}
     {
     }

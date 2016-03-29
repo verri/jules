@@ -42,8 +42,7 @@ template <typename Range, typename R = range_value_t<Range>> auto all(Range&& rn
                            [](auto&& acc, auto&& value) { return acc && value; });
 }
 
-template <typename Range1, typename R1 = range_value_t<Range1>, typename Range2,
-          typename R2 = range_value_t<Range2>>
+template <typename Range1, typename R1 = range_value_t<Range1>, typename Range2, typename R2 = range_value_t<Range2>>
 auto all(Range1&& rng1, Range2&& rng2)
 {
     auto rng1_begin = range::begin(std::forward<Range1>(rng1));
@@ -56,8 +55,8 @@ auto all(Range1&& rng1, Range2&& rng2)
     return result.first == rng1_end && result.second == rng2_end;
 }
 
-template <typename Range1, typename R1 = range_value_t<Range1>, typename Range2,
-          typename R2 = range_value_t<Range2>, typename BinaryPredicate>
+template <typename Range1, typename R1 = range_value_t<Range1>, typename Range2, typename R2 = range_value_t<Range2>,
+          typename BinaryPredicate>
 auto all(Range1&& rng1, Range2&& rng2, BinaryPredicate p)
 {
     auto rng1_begin = range::begin(std::forward<Range1>(rng1));
@@ -76,8 +75,7 @@ static std::array<T, N + 1> cat_helper(const std::array<T, N>& head, const T& ta
     return {{head[I]..., tail}};
 }
 
-template <typename T, std::size_t N>
-static std::array<T, N + 1> cat(const std::array<T, N>& head, const T& tail)
+template <typename T, std::size_t N> static std::array<T, N + 1> cat(const std::array<T, N>& head, const T& tail)
 {
     return cat_helper(head, tail, std::make_index_sequence<N>());
 }

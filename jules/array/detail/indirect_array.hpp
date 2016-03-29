@@ -4,54 +4,52 @@
 #include <jules/array/detail/indirect_array_decl.hpp>
 
 #ifndef NDEBUG
-#define CHECK_ASSIGNMENT(data, descriptor)                                                                   \
-    do {                                                                                                     \
-        if (this->data_ == data)                                                                             \
-            throw std::runtime_error{"self-assignment is not supported"};                                    \
-        if (!all(this->descriptor_.extents(), descriptor.extents()))                                         \
-            throw std::out_of_range{"extents do not match"};                                                 \
+#define CHECK_ASSIGNMENT(data, descriptor)                                                                                       \
+    do {                                                                                                                         \
+        if (this->data_ == data)                                                                                                 \
+            throw std::runtime_error{"self-assignment is not supported"};                                                        \
+        if (!all(this->descriptor_.extents(), descriptor.extents()))                                                             \
+            throw std::out_of_range{"extents do not match"};                                                                     \
     } while (false)
 #else
 #define CHECK_ASSIGNMENT(data, descriptor)
 #endif // NDEBUG
 
-#define CHECK_ASSIGNABLE(U)                                                                                  \
-    static_assert(std::is_assignable<T&, U>::value,                                                          \
-                  "The elements with values of type U can not be assigned to the values with"                \
-                  "type T of the N-dimensional array reference.")
+#define CHECK_ASSIGNABLE(U)                                                                                                      \
+    static_assert(std::is_assignable<T&, U>::value, "The elements with values of type U can not be assigned to the values with"  \
+                                                    "type T of the N-dimensional array reference.")
 
-#define COPY_FROM_SOURCE                                                                                     \
-    do {                                                                                                     \
-        auto from = source.data_begin();                                                                     \
-        auto to = this->data_begin();                                                                        \
-        auto end = this->data_end();                                                                         \
-        while (to != end) {                                                                                  \
-            *to = *from;                                                                                     \
-            ++to;                                                                                            \
-            ++from;                                                                                          \
-        }                                                                                                    \
-        return *this;                                                                                        \
+#define COPY_FROM_SOURCE                                                                                                         \
+    do {                                                                                                                         \
+        auto from = source.data_begin();                                                                                         \
+        auto to = this->data_begin();                                                                                            \
+        auto end = this->data_end();                                                                                             \
+        while (to != end) {                                                                                                      \
+            *to = *from;                                                                                                         \
+            ++to;                                                                                                                \
+            ++from;                                                                                                              \
+        }                                                                                                                        \
+        return *this;                                                                                                            \
     } while (false)
 
-#define MOVE_FROM_SOURCE                                                                                     \
-    do {                                                                                                     \
-        auto from = source.data_begin();                                                                     \
-        auto to = this->data_begin();                                                                        \
-        auto end = this->data_end();                                                                         \
-        while (to != end) {                                                                                  \
-            *to = std::move(*from);                                                                          \
-            ++to;                                                                                            \
-            ++from;                                                                                          \
-        }                                                                                                    \
-        return *this;                                                                                        \
+#define MOVE_FROM_SOURCE                                                                                                         \
+    do {                                                                                                                         \
+        auto from = source.data_begin();                                                                                         \
+        auto to = this->data_begin();                                                                                            \
+        auto end = this->data_end();                                                                                             \
+        while (to != end) {                                                                                                      \
+            *to = std::move(*from);                                                                                              \
+            ++to;                                                                                                                \
+            ++from;                                                                                                              \
+        }                                                                                                                        \
+        return *this;                                                                                                            \
     } while (false)
 
 namespace jules
 {
 namespace detail
 {
-template <typename T, std::size_t N>
-indirect_ndarray<T, N>& indirect_ndarray<T, N>::operator=(const indirect_ndarray& source)
+template <typename T, std::size_t N> indirect_ndarray<T, N>& indirect_ndarray<T, N>::operator=(const indirect_ndarray& source)
 {
     CHECK_ASSIGNMENT(source.data_, source.descriptor_);
     COPY_FROM_SOURCE;
@@ -95,8 +93,7 @@ indirect_ndarray<T, N>& indirect_ndarray<T, N>::operator=(const indirect_ndarray
 
 template <typename T, std::size_t N>
 template <typename LhsIt, typename RhsIt, typename F>
-indirect_ndarray<T, N>& indirect_ndarray<T, N>::
-operator=(const binary_expr_ndarray<LhsIt, RhsIt, F, N>& source)
+indirect_ndarray<T, N>& indirect_ndarray<T, N>::operator=(const binary_expr_ndarray<LhsIt, RhsIt, F, N>& source)
 {
     using U = typename binary_expr_ndarray<LhsIt, RhsIt, F, N>::value_type;
     CHECK_ASSIGNMENT(source.data_, source.descriptor_);
@@ -131,8 +128,7 @@ indirect_ndarray<T, N>& indirect_ndarray<T, N>::operator=(const U& source)
     return *this;
 }
 
-template <typename T, std::size_t N>
-indirect_ndarray<T, N - 1> indirect_ndarray<T, N>::operator[](std::size_t i)
+template <typename T, std::size_t N> indirect_ndarray<T, N - 1> indirect_ndarray<T, N>::operator[](std::size_t i)
 {
     std::vector<std::size_t> indexes;
     indexes.reserve(this->size() / this->size(0));
@@ -140,15 +136,13 @@ indirect_ndarray<T, N - 1> indirect_ndarray<T, N>::operator[](std::size_t i)
     std::array<std::size_t, N - 1> extents;
     std::copy(std::begin(this->extents()) + 1, std::end(this->extents()), std::begin(extents));
 
-    std::copy(indexes_.begin() + i * this->size(0),
-              indexes_.begin() + i * this->size(0) + this->size() / this->size(0),
+    std::copy(indexes_.begin() + i * this->size(0), indexes_.begin() + i * this->size(0) + this->size() / this->size(0),
               std::back_inserter(indexes));
 
     return {data_, extents, std::move(indexes)};
 }
 
-template <typename T, std::size_t N>
-indirect_ndarray<const T, N - 1> indirect_ndarray<T, N>::operator[](std::size_t i) const
+template <typename T, std::size_t N> indirect_ndarray<const T, N - 1> indirect_ndarray<T, N>::operator[](std::size_t i) const
 {
     return static_cast<indirect_ndarray<const T, N>>(*this)[i];
 }
@@ -194,8 +188,7 @@ element_request<T&, Args...> indirect_ndarray<T, N>::operator()(Args&&... args)
 
 template <typename T, std::size_t N>
 template <typename... Args>
-indirect_request<indirect_ndarray<const T, N>, Args...> indirect_ndarray<T, N>::
-operator()(Args&&... args) const
+indirect_request<indirect_ndarray<const T, N>, Args...> indirect_ndarray<T, N>::operator()(Args&&... args) const
 {
     static_assert(sizeof...(args) == N, "Invalid number of arguments.");
 
@@ -233,8 +226,7 @@ element_request<const T&, Args...> indirect_ndarray<T, N>::operator()(Args&&... 
 }
 
 template <typename T, std::size_t N>
-indirect_ndarray<T, N>::indirect_ndarray(T* data, const std::array<std::size_t, N>& extents,
-                                         std::vector<std::size_t>&& indexes)
+indirect_ndarray<T, N>::indirect_ndarray(T* data, const std::array<std::size_t, N>& extents, std::vector<std::size_t>&& indexes)
     : data_{data}, descriptor_{0, extents}, indexes_{std::move(indexes)}
 {
 }
@@ -261,16 +253,14 @@ template <typename T, std::size_t N> void indirect_ndarray<T, N>::clone_from(ind
 }
 
 template <typename T, std::size_t N>
-indirect_ndarray_iterator<T, N>::indirect_ndarray_iterator(const indirect_ndarray<T, N>& array,
-                                                           std::size_t index)
+indirect_ndarray_iterator<T, N>::indirect_ndarray_iterator(const indirect_ndarray<T, N>& array, std::size_t index)
     : array_{array}, index_{index}
 {
 }
 
 // Specialization
 
-template <typename T>
-indirect_ndarray<T, 1>& indirect_ndarray<T, 1>::operator=(const indirect_ndarray& source)
+template <typename T> indirect_ndarray<T, 1>& indirect_ndarray<T, 1>::operator=(const indirect_ndarray& source)
 {
     CHECK_ASSIGNMENT(source.data_, source.descriptor_);
     COPY_FROM_SOURCE;
@@ -285,9 +275,7 @@ indirect_ndarray<T, 1>& indirect_ndarray<T, 1>::operator=(const base_ndarray<U, 
     COPY_FROM_SOURCE;
 }
 
-template <typename T>
-template <typename U>
-indirect_ndarray<T, 1>& indirect_ndarray<T, 1>::operator=(base_ndarray<U, 1>&& source)
+template <typename T> template <typename U> indirect_ndarray<T, 1>& indirect_ndarray<T, 1>::operator=(base_ndarray<U, 1>&& source)
 {
     CHECK_ASSIGNMENT(source.data_, source.descriptor_);
     CHECK_ASSIGNABLE(U);
@@ -314,8 +302,7 @@ indirect_ndarray<T, 1>& indirect_ndarray<T, 1>::operator=(const indirect_ndarray
 
 template <typename T>
 template <typename LhsIt, typename RhsIt, typename F>
-indirect_ndarray<T, 1>& indirect_ndarray<T, 1>::
-operator=(const binary_expr_ndarray<LhsIt, RhsIt, F, 1>& source)
+indirect_ndarray<T, 1>& indirect_ndarray<T, 1>::operator=(const binary_expr_ndarray<LhsIt, RhsIt, F, 1>& source)
 {
     using U = typename binary_expr_ndarray<LhsIt, RhsIt, F, 1>::value_type;
     CHECK_ASSIGNMENT(source.data_, source.descriptor_);
@@ -333,9 +320,7 @@ indirect_ndarray<T, 1>& indirect_ndarray<T, 1>::operator=(const unary_expr_ndarr
     COPY_FROM_SOURCE;
 }
 
-template <typename T>
-template <typename U>
-indirect_ndarray<T, 1>& indirect_ndarray<T, 1>::operator=(const U& source)
+template <typename T> template <typename U> indirect_ndarray<T, 1>& indirect_ndarray<T, 1>::operator=(const U& source)
 {
     CHECK_ASSIGNABLE(U);
 
@@ -350,9 +335,7 @@ indirect_ndarray<T, 1>& indirect_ndarray<T, 1>::operator=(const U& source)
     return *this;
 }
 
-template <typename T>
-template <typename Range>
-indirect_ndarray<T, 1> indirect_ndarray<T, 1>::operator()(const Range& rng)
+template <typename T> template <typename Range> indirect_ndarray<T, 1> indirect_ndarray<T, 1>::operator()(const Range& rng)
 {
     auto slicing = indirect_slicing(this->descriptor_, rng);
 
@@ -378,10 +361,7 @@ template <typename T> indirect_ndarray<T, 1> indirect_ndarray<T, 1>::operator()(
     return {data_, slice.extents(), std::move(indexes)};
 }
 
-template <typename T> T& indirect_ndarray<T, 1>::operator()(std::size_t i)
-{
-    return data_[indexes_[descriptor_(i)]];
-}
+template <typename T> T& indirect_ndarray<T, 1>::operator()(std::size_t i) { return data_[indexes_[descriptor_(i)]]; }
 
 template <typename T>
 template <typename Range>
@@ -398,8 +378,7 @@ indirect_ndarray<const T, 1> indirect_ndarray<T, 1>::operator()(const Range& rng
     return {data_, slicing.first, std::move(indexes)};
 }
 
-template <typename T>
-indirect_ndarray<const T, 1> indirect_ndarray<T, 1>::operator()(const base_slice<1>& s) const
+template <typename T> indirect_ndarray<const T, 1> indirect_ndarray<T, 1>::operator()(const base_slice<1>& s) const
 {
     auto slice = default_slicing(this->descriptor_, s);
 
@@ -412,14 +391,10 @@ indirect_ndarray<const T, 1> indirect_ndarray<T, 1>::operator()(const base_slice
     return {data_, slice.extents(), std::move(indexes)};
 }
 
-template <typename T> const T& indirect_ndarray<T, 1>::operator()(std::size_t i) const
-{
-    return data_[indexes_[descriptor_(i)]];
-}
+template <typename T> const T& indirect_ndarray<T, 1>::operator()(std::size_t i) const { return data_[indexes_[descriptor_(i)]]; }
 
 template <typename T>
-indirect_ndarray<T, 1>::indirect_ndarray(T* data, const std::array<std::size_t, 1>& extents,
-                                         std::vector<std::size_t>&& indexes)
+indirect_ndarray<T, 1>::indirect_ndarray(T* data, const std::array<std::size_t, 1>& extents, std::vector<std::size_t>&& indexes)
     : data_{data}, descriptor_{0, extents}, indexes_{std::move(indexes)}
 {
 }
@@ -446,8 +421,7 @@ template <typename T> void indirect_ndarray<T, 1>::clone_from(indirect_ndarray&&
 }
 
 template <typename T>
-indirect_ndarray_iterator<T, 1>::indirect_ndarray_iterator(const indirect_ndarray<T, 1>& array,
-                                                           std::size_t index)
+indirect_ndarray_iterator<T, 1>::indirect_ndarray_iterator(const indirect_ndarray<T, 1>& array, std::size_t index)
     : array_{array}, index_{index}
 {
 }
@@ -455,9 +429,7 @@ indirect_ndarray_iterator<T, 1>::indirect_ndarray_iterator(const indirect_ndarra
 // Data Iterator
 
 template <typename T>
-indirect_ndarray_data_iterator<T>::indirect_ndarray_data_iterator(T* data,
-                                                                  const std::vector<std::size_t>& indexes,
-                                                                  std::size_t i)
+indirect_ndarray_data_iterator<T>::indirect_ndarray_data_iterator(T* data, const std::vector<std::size_t>& indexes, std::size_t i)
     : data_{data}, indexes_{indexes}, current_{i}
 {
 }

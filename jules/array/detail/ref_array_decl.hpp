@@ -64,10 +64,8 @@ template <typename T, std::size_t N> class ref_ndarray
     template <typename... Args> slice_request<ref_ndarray<T, N>, Args...> operator()(Args&&... args);
     template <typename... Args> element_request<T&, Args...> operator()(Args&&... args);
 
-    template <typename... Args>
-    indirect_request<indirect_ndarray<const T, N>, Args...> operator()(Args&&... args) const;
-    template <typename... Args>
-    slice_request<ref_ndarray<const T, N>, Args...> operator()(Args&&... args) const;
+    template <typename... Args> indirect_request<indirect_ndarray<const T, N>, Args...> operator()(Args&&... args) const;
+    template <typename... Args> slice_request<ref_ndarray<const T, N>, Args...> operator()(Args&&... args) const;
     template <typename... Args> element_request<const T&, Args...> operator()(Args&&... args) const;
 
     ref_ndarray_iterator<T, N> begin() { return {*this, 0}; }
@@ -193,9 +191,8 @@ template <typename T> class ref_ndarray<T, 1>
 };
 
 template <typename T, std::size_t N>
-class ref_ndarray_iterator
-    : public std::iterator<std::random_access_iterator_tag, base_ndarray<std::remove_const_t<T>, N - 1>,
-                           std::ptrdiff_t, ref_ndarray<T, N - 1>*, ref_ndarray<T, N - 1>>
+class ref_ndarray_iterator : public std::iterator<std::random_access_iterator_tag, base_ndarray<std::remove_const_t<T>, N - 1>,
+                                                  std::ptrdiff_t, ref_ndarray<T, N - 1>*, ref_ndarray<T, N - 1>>
 // TODO pointer_ndarray
 {
   public:
@@ -257,8 +254,7 @@ class ref_ndarray_iterator<T, 1>
 };
 
 template <typename T, std::size_t N>
-class ref_ndarray_data_iterator
-    : public std::iterator<std::forward_iterator_tag, std::remove_const_t<T>, std::ptrdiff_t, T*, T&>
+class ref_ndarray_data_iterator : public std::iterator<std::forward_iterator_tag, std::remove_const_t<T>, std::ptrdiff_t, T*, T&>
 {
   public:
     ref_ndarray_data_iterator() = default;

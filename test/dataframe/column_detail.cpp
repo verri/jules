@@ -53,8 +53,8 @@ TEST_CASE("coercion", "[coercion]")
     auto back_to_dcolumn = scolumn->coerce_to<double>();
     auto& back_to_dvec = back_to_dcolumn->downcast<double>();
 
-    auto check_back = std::mismatch(dvec.begin(), dvec.end(), back_to_dvec.begin(),
-                                    [](auto x, auto y) { return x == Approx(y); });
+    auto check_back =
+        std::mismatch(dvec.begin(), dvec.end(), back_to_dvec.begin(), [](auto x, auto y) { return x == Approx(y); });
     CHECK(check_back.first == dvec.end());
     CHECK(check_back.second == back_to_dvec.end());
 

@@ -44,8 +44,7 @@ template <typename T, std::size_t N> class indirect_ndarray
 
     template <typename LhsIt, typename RhsIt, typename F>
     indirect_ndarray& operator=(const binary_expr_ndarray<LhsIt, RhsIt, F, N>& source);
-    template <typename It, typename F>
-    indirect_ndarray& operator=(const unary_expr_ndarray<It, F, N>& source);
+    template <typename It, typename F> indirect_ndarray& operator=(const unary_expr_ndarray<It, F, N>& source);
 
     template <typename U> indirect_ndarray& operator=(const U& source);
 
@@ -58,10 +57,8 @@ template <typename T, std::size_t N> class indirect_ndarray
     template <typename... Args> slice_request<indirect_ndarray<T, N>, Args...> operator()(Args&&... args);
     template <typename... Args> element_request<T&, Args...> operator()(Args&&... args);
 
-    template <typename... Args>
-    indirect_request<indirect_ndarray<const T, N>, Args...> operator()(Args&&... args) const;
-    template <typename... Args>
-    slice_request<indirect_ndarray<const T, N>, Args...> operator()(Args&&... args) const;
+    template <typename... Args> indirect_request<indirect_ndarray<const T, N>, Args...> operator()(Args&&... args) const;
+    template <typename... Args> slice_request<indirect_ndarray<const T, N>, Args...> operator()(Args&&... args) const;
     template <typename... Args> element_request<const T&, Args...> operator()(Args&&... args) const;
 
     indirect_ndarray_iterator<T, N> begin() { return {*this, 0}; }
@@ -94,8 +91,7 @@ template <typename T, std::size_t N> class indirect_ndarray
 
     // guarantees default strides and start=0.
     indirect_ndarray(T* data, const std::array<std::size_t, N>& extents, std::vector<std::size_t>&& indexes);
-    indirect_ndarray(T* data, const std::array<std::size_t, N>& extents,
-                     const std::vector<std::size_t>& indexes);
+    indirect_ndarray(T* data, const std::array<std::size_t, N>& extents, const std::vector<std::size_t>& indexes);
 
     indirect_ndarray(const indirect_ndarray& source) = default;
     indirect_ndarray(indirect_ndarray&& source) = default;
@@ -109,9 +105,8 @@ template <typename T, std::size_t N> class indirect_ndarray
 };
 
 template <typename T, std::size_t N>
-class indirect_ndarray_iterator
-    : public std::iterator<std::random_access_iterator_tag, indirect_ndarray<T, N - 1>, std::ptrdiff_t,
-                           indirect_ndarray<T, N - 1>>
+class indirect_ndarray_iterator : public std::iterator<std::random_access_iterator_tag, indirect_ndarray<T, N - 1>,
+                                                       std::ptrdiff_t, indirect_ndarray<T, N - 1>>
 {
   public:
     indirect_ndarray_iterator() = default;
@@ -163,8 +158,7 @@ template <typename T> class indirect_ndarray<T, 1>
 
     template <typename LhsIt, typename RhsIt, typename F>
     indirect_ndarray& operator=(const binary_expr_ndarray<LhsIt, RhsIt, F, 1>& source);
-    template <typename It, typename F>
-    indirect_ndarray& operator=(const unary_expr_ndarray<It, F, 1>& source);
+    template <typename It, typename F> indirect_ndarray& operator=(const unary_expr_ndarray<It, F, 1>& source);
 
     template <typename U> indirect_ndarray& operator=(const U& source);
 
@@ -206,8 +200,7 @@ template <typename T> class indirect_ndarray<T, 1>
 
     // guarantees default strides and start=0.
     indirect_ndarray(T* data, const std::array<std::size_t, 1>& extents, std::vector<std::size_t>&& indexes);
-    indirect_ndarray(T* data, const std::array<std::size_t, 1>& extents,
-                     const std::vector<std::size_t>& indexes);
+    indirect_ndarray(T* data, const std::array<std::size_t, 1>& extents, const std::vector<std::size_t>& indexes);
 
     indirect_ndarray(const indirect_ndarray& source) = default;
     indirect_ndarray(indirect_ndarray&& source) = default;
@@ -220,8 +213,7 @@ template <typename T> class indirect_ndarray<T, 1>
     std::vector<std::size_t> indexes_;
 };
 
-template <typename T>
-class indirect_ndarray_iterator<T, 1> : public std::iterator<std::random_access_iterator_tag, T>
+template <typename T> class indirect_ndarray_iterator<T, 1> : public std::iterator<std::random_access_iterator_tag, T>
 {
   public:
     indirect_ndarray_iterator() = default;
@@ -243,8 +235,7 @@ class indirect_ndarray_iterator<T, 1> : public std::iterator<std::random_access_
     std::size_t index_;
 };
 
-template <typename T>
-class indirect_ndarray_data_iterator : public std::iterator<std::forward_iterator_tag, T>
+template <typename T> class indirect_ndarray_data_iterator : public std::iterator<std::forward_iterator_tag, T>
 {
   public:
     indirect_ndarray_data_iterator() = default;

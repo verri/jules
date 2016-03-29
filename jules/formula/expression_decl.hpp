@@ -116,10 +116,8 @@ template <typename Coercion> class base_expr_list
     void insert_right(const expr_t& expr) { expressions_.push_back(expr); }
 
     template <typename C> friend base_expr_list<C> operator, (const expr_t& lhs, const expr_t& rhs);
-    template <typename C>
-    friend base_expr_list<C> operator, (const expr_t& lhs, const base_expr_list<C>& rhs);
-    template <typename C>
-    friend base_expr_list<C> operator, (const base_expr_list<C>& lhs, const expr_t& rhs);
+    template <typename C> friend base_expr_list<C> operator, (const expr_t& lhs, const base_expr_list<C>& rhs);
+    template <typename C> friend base_expr_list<C> operator, (const base_expr_list<C>& lhs, const expr_t& rhs);
 
   private:
     std::deque<expr_t> expressions_;

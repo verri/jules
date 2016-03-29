@@ -17,8 +17,7 @@ namespace detail
 // Enablers
 
 template <std::size_t N, typename... Types>
-using all_size_enabler =
-    std::enable_if_t<N == sizeof...(Types) && all_args(std::is_convertible<Types, std::size_t>::value...)>;
+using all_size_enabler = std::enable_if_t<N == sizeof...(Types) && all_args(std::is_convertible<Types, std::size_t>::value...)>;
 
 template <typename Range, typename R, typename T = R>
 using range_type_enabler = std::enable_if_t<std::is_assignable<R&, range_value_t<Range>>::value, T>;
@@ -38,9 +37,8 @@ template <typename Return, typename... Args>
 using element_request = std::enable_if_t<all_args(std::is_convertible<Args, std::size_t>::value...), Return>;
 
 template <typename Return, typename... Args>
-using slice_request = std::enable_if_t<all_args(size_or_slice<Args>()...) &&
-                                           !all_args(std::is_convertible<Args, std::size_t>::value...),
-                                       Return>;
+using slice_request =
+    std::enable_if_t<all_args(size_or_slice<Args>()...) && !all_args(std::is_convertible<Args, std::size_t>::value...), Return>;
 
 template <typename Return, typename... Args>
 using indirect_request = std::enable_if_t<!all_args(size_or_slice<Args>()...), Return>;
@@ -98,12 +96,10 @@ template <typename T> constexpr bool is_array() { return is_array_helper<T>::val
 // Helpers for operators
 
 template <typename It, typename F, std::size_t M>
-unary_expr_ndarray<It, F, M> make_expr_ndarray(const It&, const It&, const F&,
-                                               const std::array<std::size_t, M>&);
+unary_expr_ndarray<It, F, M> make_expr_ndarray(const It&, const It&, const F&, const std::array<std::size_t, M>&);
 
 template <typename LhsIt, typename RhsIt, typename F, std::size_t M>
-binary_expr_ndarray<LhsIt, RhsIt, F, M> make_expr_ndarray(const LhsIt&, const LhsIt&, const RhsIt&,
-                                                          const RhsIt&, const F&,
+binary_expr_ndarray<LhsIt, RhsIt, F, M> make_expr_ndarray(const LhsIt&, const LhsIt&, const RhsIt&, const RhsIt&, const F&,
                                                           const std::array<std::size_t, M>&);
 
 } // namespace detail

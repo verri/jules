@@ -37,21 +37,17 @@ template <typename Coercion> auto base_expr<Coercion, void>::operator=(const bas
     return *this;
 }
 
-template <typename Coercion, typename T>
-auto base_expr<Coercion, T>::extract_from(const dataframe_t& data) const -> column_t
+template <typename Coercion, typename T> auto base_expr<Coercion, T>::extract_from(const dataframe_t& data) const -> column_t
 {
     return f_(data);
 }
 
-template <typename Coercion>
-auto base_expr<Coercion, void>::extract_from(const dataframe_t& data) const -> column_t
+template <typename Coercion> auto base_expr<Coercion, void>::extract_from(const dataframe_t& data) const -> column_t
 {
     return child_ ? child_->extract_from(data) : data.select(colname_);
 }
 
-template <typename Coercion, typename T>
-template <typename U>
-auto base_expr<Coercion, T>::operator+(const U& operand) const
+template <typename Coercion, typename T> template <typename U> auto base_expr<Coercion, T>::operator+(const U& operand) const
 {
     using R = decltype(T{} + U{});
 
@@ -95,9 +91,7 @@ auto base_expr<Coercion, T>::operator+(const base_expr<Coercion, U>& operand) co
     });
 }
 
-template <typename Coercion, typename T>
-template <typename U>
-auto base_expr<Coercion, T>::operator*(const U& operand) const
+template <typename Coercion, typename T> template <typename U> auto base_expr<Coercion, T>::operator*(const U& operand) const
 {
     using R = decltype(T{} * U{});
 
@@ -161,8 +155,7 @@ auto base_expr<Coercion, T>::operator*(const base_expr<Coercion, U>& operand) co
     });
 }
 
-template <typename Coercion>
-auto base_expr_list<Coercion>::extract_from(const dataframe_t& data) const -> dataframe_t
+template <typename Coercion> auto base_expr_list<Coercion>::extract_from(const dataframe_t& data) const -> dataframe_t
 {
     dataframe_t df;
     for (auto&& expr : expressions_)

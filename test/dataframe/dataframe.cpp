@@ -268,9 +268,8 @@ TEST_CASE("reading and writing a well-formed dataframe", "[dataframe]")
 {
     using jules::dataframe;
 
-    std::string data = "y\tx\tz\n" + std::to_string(0.0) + "\t" + std::to_string(1.0) + "\t" +
-                       std::to_string(2.0) + "\n" + std::to_string(3.0) + "\t" + std::to_string(4.0) + "\t" +
-                       std::to_string(5.0) + "\n";
+    std::string data = "y\tx\tz\n" + std::to_string(0.0) + "\t" + std::to_string(1.0) + "\t" + std::to_string(2.0) + "\n" +
+                       std::to_string(3.0) + "\t" + std::to_string(4.0) + "\t" + std::to_string(5.0) + "\n";
 
     std::stringstream is(data);
 

@@ -34,8 +34,7 @@ base_column<Coercion>::base_column(const T& value, std::size_t size)
 }
 
 template <typename Coercion>
-base_column<Coercion>::base_column(const std::string& name,
-                                   std::unique_ptr<column_interface_t>&& column_model)
+base_column<Coercion>::base_column(const std::string& name, std::unique_ptr<column_interface_t>&& column_model)
     : name_{name}, column_model_{std::move(column_model)}
 {
 }
@@ -90,20 +89,15 @@ template <typename Coercion> template <typename T> auto base_column<Coercion>::v
     return {model.data(), model.size()};
 }
 
-template <typename Coercion>
-template <typename T>
-auto base_column<Coercion>::view() const & -> view_t<const T>
+template <typename Coercion> template <typename T> auto base_column<Coercion>::view() const & -> view_t<const T>
 {
     const auto& model = this->column_model_->template downcast<T>();
     return {model.data(), model.size()};
 }
 
-template <typename T, typename C> base_column_view<T, C> make_view(base_column<C>& column)
-{
-    return column.template view<T>();
-}
+template <typename T, typename C> base_column_view<T, C> view(base_column<C>& column) { return column.template view<T>(); }
 
-template <typename T, typename C> base_column_view<const T, C> make_view(const base_column<C>& column)
+template <typename T, typename C> base_column_view<const T, C> view(const base_column<C>& column)
 {
     return column.template view<T>();
 }

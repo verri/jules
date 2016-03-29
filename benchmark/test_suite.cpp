@@ -8,8 +8,7 @@ constexpr std::size_t N = 10000;
 void f(void*) {}
 static volatile auto use = f;
 
-template <typename T, std::size_t N>
-std::ostream& operator<<(std::ostream& os, const jules::detail::ref_ndarray<T, N>& array)
+template <typename T, std::size_t N> std::ostream& operator<<(std::ostream& os, const jules::detail::ref_ndarray<T, N>& array)
 {
     os << "{ ";
     for (auto&& subarray : array)

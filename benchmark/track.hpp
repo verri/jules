@@ -55,8 +55,7 @@ struct Memory {
         friend std::ostream& operator<<(std::ostream& os, const Alloc& alloc)
         {
             return os << (alloc.size * ToMB) << " MB in " << alloc.count
-                      << " block (mean: " << (alloc.count > 0 ? (alloc.size * ToMB) / alloc.count : 0.0)
-                      << " MB/block)";
+                      << " block (mean: " << (alloc.count > 0 ? (alloc.size * ToMB) / alloc.count : 0.0) << " MB/block)";
         }
     };
 
@@ -131,8 +130,7 @@ struct Memory {
     Alloc total, peak, current;
     std::unordered_map<void*, std::size_t, std::hash<void*>, std::equal_to<void*>,
                        SafeAllocator<std::pair<void* const, std::size_t>>> blocks;
-    std::vector<std::pair<void* const, std::size_t>, SafeAllocator<std::pair<void* const, std::size_t>>>
-        freed;
+    std::vector<std::pair<void* const, std::size_t>, SafeAllocator<std::pair<void* const, std::size_t>>> freed;
 };
 
 Memory* Memory::instance = nullptr;

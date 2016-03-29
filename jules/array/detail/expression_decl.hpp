@@ -22,9 +22,8 @@ template <typename LhsIt, typename RhsIt, typename Op, size_t N> class binary_ex
     using extent_t = std::array<std::size_t, N>;
 
   public:
-    class iterator
-        : public std::iterator<std::forward_iterator_tag,
-                               decltype(std::declval<Op>()(*std::declval<LhsIt>(), *std::declval<RhsIt>()))>
+    class iterator : public std::iterator<std::forward_iterator_tag,
+                                          decltype(std::declval<Op>()(*std::declval<LhsIt>(), *std::declval<RhsIt>()))>
     {
       public:
         iterator(const LhsIt& lhs, const RhsIt& rhs, const Op& op) : lhs_{lhs}, rhs_{rhs}, op_{op} {}
@@ -52,8 +51,8 @@ template <typename LhsIt, typename RhsIt, typename Op, size_t N> class binary_ex
     using size_type = std::size_t;
     using difference_type = std::ptrdiff_t;
 
-    binary_expr_ndarray(const LhsIt& lhs_begin, const LhsIt& lhs_end, const RhsIt& rhs_begin,
-                        const RhsIt& rhs_end, const Op& op, const extent_t& extents);
+    binary_expr_ndarray(const LhsIt& lhs_begin, const LhsIt& lhs_end, const RhsIt& rhs_begin, const RhsIt& rhs_end, const Op& op,
+                        const extent_t& extents);
 
     binary_expr_ndarray(const binary_expr_ndarray& source) = delete;
     binary_expr_ndarray& operator=(const binary_expr_ndarray& source) = delete;
@@ -65,9 +64,9 @@ template <typename LhsIt, typename RhsIt, typename Op, size_t N> class binary_ex
     std::size_t size() const { return prod(extents_); }
 
     template <typename LhsI, typename RhsI, typename F, std::size_t M>
-    friend binary_expr_ndarray<LhsI, RhsI, F, M>
-    make_expr_ndarray(const LhsI& lhs_begin, const LhsI& lhs_end, const RhsI& rhs_begin, const RhsI& rhs_end,
-                      const F& op, const std::array<std::size_t, M>& extents);
+    friend binary_expr_ndarray<LhsI, RhsI, F, M> make_expr_ndarray(const LhsI& lhs_begin, const LhsI& lhs_end,
+                                                                   const RhsI& rhs_begin, const RhsI& rhs_end, const F& op,
+                                                                   const std::array<std::size_t, M>& extents);
 
     FRIEND_OPERATIONS((typename R, std::size_t M), (const base_ndarray<R, M>&))
     FRIEND_OPERATIONS((typename R, std::size_t M), (const ref_ndarray<R, M>&))
@@ -95,8 +94,7 @@ template <typename It, typename Op, std::size_t N> class unary_expr_ndarray
     using extent_t = std::array<std::size_t, N>;
 
   public:
-    class iterator
-        : public std::iterator<std::forward_iterator_tag, decltype(std::declval<Op>()(*std::declval<It>()))>
+    class iterator : public std::iterator<std::forward_iterator_tag, decltype(std::declval<Op>()(*std::declval<It>()))>
     {
       public:
         iterator(const It& it, const Op& op) : it_{it}, op_{op} {}

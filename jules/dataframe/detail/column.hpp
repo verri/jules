@@ -52,8 +52,7 @@ template <typename Eraser, typename Coercion> class generate_virtual_coercions<E
 };
 
 template <typename Coercion>
-class column_interface
-    : public generate_virtual_coercions<column_interface<Coercion>, Coercion, Coercion::ntypes() - 1>
+class column_interface : public generate_virtual_coercions<column_interface<Coercion>, Coercion, Coercion::ntypes() - 1>
 {
   private:
     using column_interface_ptr = std::unique_ptr<column_interface>;
@@ -79,10 +78,7 @@ class column_interface
     virtual std::type_index elements_type() const = 0;
 
     template <typename T> auto& downcast() { return dynamic_cast<column_model<T, coercion_rules>&>(*this); }
-    template <typename T> const auto& downcast() const
-    {
-        return dynamic_cast<const column_model<T, coercion_rules>&>(*this);
-    }
+    template <typename T> const auto& downcast() const { return dynamic_cast<const column_model<T, coercion_rules>&>(*this); }
 
   protected:
     using base::coerce_to_;
@@ -94,18 +90,14 @@ class column_interface
 
 // Default coercion rules.  If it is impossible to convert from T to type, this class is
 // instantiated.
-template <typename T, typename U, typename Coercion, std::size_t I, typename Enabler = void>
-class specific_concrete_coercion
+template <typename T, typename U, typename Coercion, std::size_t I, typename Enabler = void> class specific_concrete_coercion
 {
   private:
     using type = typename Coercion::template type<I>;
     using column_interface_ptr = std::unique_ptr<column_interface<Coercion>>;
 
   protected:
-    template <typename Iter>[[noreturn]] column_interface_ptr coerce_to_(Iter, Iter, tag<type>) const
-    {
-        throw std::bad_cast{};
-    }
+    template <typename Iter>[[noreturn]] column_interface_ptr coerce_to_(Iter, Iter, tag<type>) const { throw std::bad_cast{}; }
 
     constexpr bool can_coerce_to_(tag<type>) const { return false; }
 };
@@ -115,9 +107,8 @@ class specific_concrete_coercion
 template <typename T, typename U, typename Coercion, std::size_t I>
 class specific_concrete_coercion<
     T, U, Coercion, I,
-    std::enable_if_t<
-        std::is_same<decltype(Coercion::template rule<I>::coerce_from(std::declval<T>())), U>::value &&
-        !std::is_convertible<T, U>::value>>
+    std::enable_if_t<std::is_same<decltype(Coercion::template rule<I>::coerce_from(std::declval<T>())), U>::value &&
+                     !std::is_convertible<T, U>::value>>
 {
   private:
     using type = typename Coercion::template type<I>;
@@ -164,10 +155,9 @@ class specific_concrete_coercion<T, U, Coercion, I, std::enable_if_t<std::is_con
 };
 
 template <typename T, typename Coercion, std::size_t I>
-class generate_concrete_coercions
-    : public specific_concrete_coercion<T, typename Coercion::template type<I>, Coercion, I>,
-      public generate_concrete_coercions<T, Coercion, I - 1>,
-      public virtual column_interface<Coercion>
+class generate_concrete_coercions : public specific_concrete_coercion<T, typename Coercion::template type<I>, Coercion, I>,
+                                    public generate_concrete_coercions<T, Coercion, I - 1>,
+                                    public virtual column_interface<Coercion>
 {
   private:
     using type = typename Coercion::template type<I>;
