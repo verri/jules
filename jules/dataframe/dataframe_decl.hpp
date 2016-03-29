@@ -48,7 +48,7 @@ template <typename Coercion> class base_dataframe
     base_dataframe select(const expr_list_t& expression_list) const;
 
     template <typename T> base_dataframe& coerce_to();
-    template <typename T, typename C> friend base_dataframe can_coerce_to(const base_dataframe<C>& dataframe);
+    template <typename T, typename C> friend bool can_coerce_to(const base_dataframe<C>& dataframe);
 
     template <typename T> bool can_coerce_to() const;
     template <typename T, typename C> friend bool can_coerce_to(const base_dataframe<C>& dataframe);
