@@ -250,10 +250,7 @@ template <typename T, typename C> base_dataframe_colview<const T, C> colview(con
     return df.template colview<T>();
 }
 
-template <typename T, typename C> base_dataframe_colview<T, C> colview(base_dataframe<C>& df)
-{
-    return df.template colview<T>();
-}
+template <typename T, typename C> base_dataframe_colview<T, C> colview(base_dataframe<C>& df) { return df.template colview<T>(); }
 
 } // namespace jules
 

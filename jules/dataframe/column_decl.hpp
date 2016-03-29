@@ -47,18 +47,18 @@ template <typename Coercion> class base_column
 
     auto elements_type() const { return column_model_->elements_type(); }
 
-    template <typename T> auto view() const& -> view_t<const T>;
+    template <typename T> auto view() const & -> view_t<const T>;
     template <typename T> auto view() & -> view_t<T>;
     template <typename T> auto view() && = delete;
 
-    template <typename T, typename C> friend auto view(base_column<C>& column) -> base_column_view<T, C>;
-    template <typename T, typename C> friend auto view(const base_column<C>& column) -> base_column_view<const T, C>;
+    template <typename T, typename C> friend auto view(base_column<C>& column);
+    template <typename T, typename C> friend auto view(const base_column<C>& column);
 
     auto size() const { return column_model_->size(); }
     auto is_empty() const { return size() == 0; }
 
-    auto name() -> std::string& { return name_; }
-    auto name() const -> const std::string& { return name_; }
+    auto name() -> std::string & { return name_; }
+    auto name() const -> const std::string & { return name_; }
 
   private:
     base_column(const std::string& name, std::unique_ptr<column_interface_t>&& column_model);

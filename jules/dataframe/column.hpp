@@ -73,12 +73,12 @@ template <typename Coercion> template <typename T> auto base_column<Coercion>::c
     return *this;
 }
 
-template <typename T, typename Coercion> base_column<Coercion> coerce_to(const base_column<Coercion>& source)
+template <typename T, typename Coercion> auto coerce_to(const base_column<Coercion>& source) -> base_column<Coercion>
 {
     return {source.name(), source.column_model_->template coerce_to<T>()};
 }
 
-template <typename T, typename Coercion> bool can_coerce_to(const base_column<Coercion>& column)
+template <typename T, typename Coercion> auto can_coerce_to(const base_column<Coercion>& column) -> bool
 {
     return column.column_model_->template can_coerce_to<T>();
 }
@@ -95,12 +95,8 @@ template <typename Coercion> template <typename T> auto base_column<Coercion>::v
     return {model.data(), model.size()};
 }
 
-template <typename T, typename C> base_column_view<T, C> view(base_column<C>& column) { return column.template view<T>(); }
-
-template <typename T, typename C> base_column_view<const T, C> view(const base_column<C>& column)
-{
-    return column.template view<T>();
-}
+template <typename T, typename C> auto view(base_column<C>& column) { return column.template view<T>(); }
+template <typename T, typename C> auto view(const base_column<C>& column) { return column.template view<T>(); }
 
 } // namespace jules
 
