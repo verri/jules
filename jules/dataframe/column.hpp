@@ -8,28 +8,28 @@ namespace jules
 template <typename Coercion>
 template <typename T>
 base_column<Coercion>::base_column(const std::string& name, std::initializer_list<T> values)
-    : name_{name}, column_model_{new column_model_t<T>(values)}
+    : name_{name}, column_model_{std::make_unique<column_model_t<T>>(values)}
 {
 }
 
 template <typename Coercion>
 template <typename T>
 base_column<Coercion>::base_column(const std::string& name, const T& value, std::size_t size)
-    : name_{name}, column_model_{new column_model_t<T>(size, value)}
+    : name_{name}, column_model_{std::make_unique<column_model_t<T>>(size, value)}
 {
 }
 
 template <typename Coercion>
 template <typename T>
 base_column<Coercion>::base_column(std::initializer_list<T> values)
-    : column_model_{new column_model_t<T>(values)}
+    : column_model_{std::make_unique<column_model_t<T>>(values)}
 {
 }
 
 template <typename Coercion>
 template <typename T>
 base_column<Coercion>::base_column(const T& value, std::size_t size)
-    : column_model_{new column_model_t<T>(size, value)}
+    : column_model_{std::make_unique<column_model_t<T>>(size, value)}
 {
 }
 
@@ -42,14 +42,14 @@ base_column<Coercion>::base_column(const std::string& name, std::unique_ptr<colu
 template <typename Coercion>
 template <typename Range, typename R>
 base_column<Coercion>::base_column(const std::string& name, const Range& rng)
-    : name_{name}, column_model_{new column_model_t<R>(range::begin(rng), range::end(rng))}
+    : name_{name}, column_model_{std::make_unique<column_model_t<R>>(range::begin(rng), range::end(rng))}
 {
 }
 
 template <typename Coercion>
 template <typename Range, typename R>
 base_column<Coercion>::base_column(const Range& rng)
-    : column_model_{new column_model_t<R>(range::begin(rng), range::end(rng))}
+    : column_model_{std::make_unique<column_model_t<R>>(range::begin(rng), range::end(rng))}
 {
 }
 
@@ -67,7 +67,7 @@ template <typename Coercion> auto base_column<Coercion>::operator=(const base_co
     return *this;
 }
 
-template <typename Coercion> template <typename T> auto base_column<Coercion>::coerce_to() -> base_column &
+template <typename Coercion> template <typename T> auto base_column<Coercion>::coerce_to() & -> base_column &
 {
     column_model_ = column_model_->template coerce_to<T>();
     return *this;
@@ -82,21 +82,6 @@ template <typename T, typename Coercion> auto can_coerce_to(const base_column<Co
 {
     return column.column_model_->template can_coerce_to<T>();
 }
-
-template <typename Coercion> template <typename T> auto base_column<Coercion>::view() & -> view_t<T>
-{
-    auto& model = this->column_model_->template downcast<T>();
-    return {model.data(), model.size()};
-}
-
-template <typename Coercion> template <typename T> auto base_column<Coercion>::view() const & -> view_t<const T>
-{
-    const auto& model = this->column_model_->template downcast<T>();
-    return {model.data(), model.size()};
-}
-
-template <typename T, typename C> auto view(base_column<C>& column) { return column.template view<T>(); }
-template <typename T, typename C> auto view(const base_column<C>& column) { return column.template view<T>(); }
 
 } // namespace jules
 

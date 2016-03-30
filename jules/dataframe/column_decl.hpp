@@ -18,6 +18,7 @@ template <typename Coercion> class base_column;
 template <typename Coercion> class base_column
 {
     friend class base_dataframe<Coercion>;
+    template<typename, typename> friend class base_column_view;
 
   private:
     template <typename T> using column_model_t = detail::column_model<T, Coercion>;
@@ -39,20 +40,10 @@ template <typename Coercion> class base_column
     auto operator=(const base_column& source) -> base_column&;
     auto operator=(base_column&& source) -> base_column& = default;
 
-    template <typename T> auto coerce_to() -> base_column&;
+    template <typename T> auto coerce_to() & -> base_column&;
     template <typename T> auto can_coerce_to() const { return column_model_->template can_coerce_to<T>(); }
 
-    template <typename T, typename C> friend auto coerce_to(const base_column<C>& source) -> base_column<C>;
-    template <typename T, typename C> friend auto can_coerce_to(const base_column<C>& column) -> bool;
-
     auto elements_type() const { return column_model_->elements_type(); }
-
-    template <typename T> auto view() const & -> view_t<const T>;
-    template <typename T> auto view() & -> view_t<T>;
-    template <typename T> auto view() && = delete;
-
-    template <typename T, typename C> friend auto view(base_column<C>& column);
-    template <typename T, typename C> friend auto view(const base_column<C>& column);
 
     auto size() const { return column_model_->size(); }
     auto is_empty() const { return size() == 0; }
@@ -66,8 +57,6 @@ template <typename Coercion> class base_column
     std::string name_;
     std::unique_ptr<column_interface_t> column_model_;
 };
-
-template <typename T, typename C> auto make_view(base_column<C>&& column) = delete;
 
 using column = base_column<default_coercion_rules>;
 
