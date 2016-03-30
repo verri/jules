@@ -2,15 +2,14 @@
 #define JULES_DATAFRAME_COLUMN_VIEW_DECL_H
 
 #include <jules/array/array.hpp>
-#include <jules/dataframe/detail/column.hpp>
 
 namespace jules
 {
-template <typename Coercion> class base_column;
+template <typename> class base_column;
 
-template <typename T, typename Coercion> class base_column_view : public detail::ref_ndarray<T, 1>
+template <typename T> class base_column_view : public detail::ref_ndarray<T, 1>
 {
-    friend class base_column<Coercion>;
+    template <typename> friend class base_column;
     template <typename, typename> friend class base_column_view;
 
   public:
@@ -24,7 +23,7 @@ template <typename T, typename Coercion> class base_column_view : public detail:
     base_column_view& operator=(base_column_view&& source) = delete;
 
     // TODO: idem no colview do dataframe
-    operator base_column_view<const T, Coercion>() const;
+    operator base_column_view<const T>() const;
 
     using detail::ref_ndarray<T, 1>::operator=;
 
@@ -42,7 +41,7 @@ template <typename T, typename Coercion> class base_column_view : public detail:
     base_column_view(const detail::ref_ndarray<T, 1>& source) : detail::ref_ndarray<T, 1>{source} {}
 };
 
-template <typename T> using column_view = base_column_view<T, default_coercion_rules>;
+template <typename T> using column_view = base_column_view<T>;
 
 } // namespace jules
 

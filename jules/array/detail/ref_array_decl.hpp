@@ -26,7 +26,7 @@ template <typename T, std::size_t N> class ref_ndarray
     template <typename, typename, typename, std::size_t> friend class binary_expr_ndarray;
     template <typename, typename, std::size_t> friend class unary_expr_ndarray;
 
-    template <typename, typename> friend class jules::base_column_view;
+    template <typename> friend class jules::base_column_view;
     template <typename, typename, typename> friend class jules::base_dataframe_colview;
 
   public:

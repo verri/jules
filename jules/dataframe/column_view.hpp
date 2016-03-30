@@ -5,7 +5,7 @@
 
 namespace jules
 {
-template <typename T, typename Coercion> base_column_view<T, Coercion>::operator base_column_view<const T, Coercion>() const
+template <typename T> base_column_view<T>::operator base_column_view<const T>() const
 {
     return {static_cast<const detail::ref_ndarray<T, 1>&>(*this)};
 }

@@ -106,7 +106,7 @@ binary_expr_ndarray<LhsIt, RhsIt, F, M> make_expr_ndarray(const LhsIt&, const Lh
 
 // Friend classes
 
-template <typename, typename> class base_column_view;
+template <typename> class base_column_view;
 template <typename, typename, typename> class base_dataframe_colview;
 
 } // namespace jules
