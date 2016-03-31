@@ -29,6 +29,12 @@ template <typename Coercion> class base_dataframe
 
     base_dataframe() = default;
     base_dataframe(std::initializer_list<column_t> columns);
+    template <typename Range, typename R = range_value_t<Range>,
+              typename = std::enable_if_t<std::is_convertible<R, column_t>::value>>
+    base_dataframe(const Range& rng);
+
+    static base_dataframe read(std::istream& is, const dataframe_read_options& opt = {});
+    static void write(const base_dataframe& df, std::ostream& os, const dataframe_write_options& opt = {});
 
     base_dataframe(const base_dataframe& source) = default;
     base_dataframe(base_dataframe&& source) = default;
@@ -58,9 +64,6 @@ template <typename Coercion> class base_dataframe
 
     std::size_t nrow() const { return nrow_; }
     std::size_t ncol() const { return columns_.size(); }
-
-    static base_dataframe read(std::istream& is, const dataframe_read_options& opt = {});
-    static void write(const base_dataframe& df, std::ostream& os, const dataframe_write_options& opt = {});
 
     template <typename T> base_dataframe_colview<T, Coercion> colview();
     template <typename T> base_dataframe_colview<const T, Coercion> colview() const;

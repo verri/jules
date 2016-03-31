@@ -30,6 +30,32 @@ template <typename Coercion> base_dataframe<Coercion>::base_dataframe(std::initi
     }
 }
 
+template <typename Coercion>
+template <typename Range, typename, typename>
+base_dataframe<Coercion>::base_dataframe(const Range& rng)
+{
+    // TODO: specialize this construction to reserve size when rng knows its size.
+    std::vector<column_t> columns;
+    jules::range::copy(rng, std::back_inserter(columns));
+
+    auto size = columns.begin()->size();
+    if (!std::all_of(columns.begin() + 1, columns.end(), [size](auto& col) { return col.size() == size; }))
+        throw std::runtime_error{"columns size mismatch"};
+
+    nrow_ = size;
+    columns_.assign(columns.begin(), columns.end());
+
+    std::size_t i = 0;
+    for (auto& column : columns_) {
+        auto& colname = column.name();
+        if (!colname.empty()) {
+            if (colindexes_.find(colname) != colindexes_.end())
+                throw std::runtime_error{"repeated column name"};
+            colindexes_[colname] = i++;
+        }
+    }
+}
+
 template <typename Coercion> base_dataframe<Coercion>& base_dataframe<Coercion>::colbind(const column_t& column)
 {
     const auto& name = column.name();

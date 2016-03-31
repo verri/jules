@@ -107,6 +107,22 @@ TEST_CASE("invalid exception dataframe", "[dataframe]")
     CHECK_THROWS(create_invalid_dataframe());
 }
 
+TEST_CASE("constructing a dataframe from a range of columns", "[dataframe]")
+{
+    using jules::column;
+    using jules::dataframe;
+
+    auto columns = std::vector<column>{
+        {"a", {1, 2, 3}}, {"b", {'a', 'b', 'c'}}, {"c", {1.0, 2.0, 3.0}},
+    };
+
+    auto df = dataframe(columns);
+
+    CHECK(df.select("a").elements_type() == columns[0].elements_type());
+    CHECK(df.select("b").elements_type() == columns[1].elements_type());
+    CHECK(df.select("c").elements_type() == columns[2].elements_type());
+}
+
 TEST_CASE("assigning a null dataframe", "[dataframe]")
 {
     using jules::dataframe;

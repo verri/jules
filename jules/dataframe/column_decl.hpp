@@ -46,6 +46,7 @@ template <typename Coercion> class base_column
     auto elements_type() const { return column_model_->elements_type(); }
 
     auto size() const { return column_model_->size(); }
+    auto dimensions() const { return size(); }
     auto is_empty() const { return size() == 0; }
 
     auto name() -> std::string & { return name_; }
