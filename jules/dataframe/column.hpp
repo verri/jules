@@ -98,7 +98,7 @@ template <typename T, typename C> auto as_view(base_column<C>& column) -> base_c
 {
     return column.template view<T>();
 }
-template <typename T, typename C> auto as_view(const base_column<C>& column) -> base_column_view<T>
+template <typename T, typename C> auto as_view(const base_column<C>& column) -> base_column_view<const T>
 {
     return column.template view<T>();
 };

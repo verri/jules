@@ -115,7 +115,7 @@ template <typename Coercion, typename T> base_dataframe<Coercion> coerce_to(cons
 {
     base_dataframe<Coercion> coerced;
     for (std::size_t i = 0; dataframe.ncol(); ++i)
-        coerced.colbind(jules::coerce_to<T>(dataframe.select(i)));
+        coerced.colbind(jules::as_column<T>(dataframe.select(i)));
     return coerced;
 }
 
@@ -205,7 +205,7 @@ void base_dataframe<Coercion>::write(const base_dataframe<Coercion>& df, std::os
         if (col.elements_type() == typeid(std::string)) {
             data.push_back(jules::as_view<std::string>(col));
         } else {
-            coerced.push_back(std::move(jules::coerce_to<std::string>(col)));
+            coerced.push_back(std::move(jules::as_column<std::string>(col)));
             data.push_back(jules::as_view<std::string>(coerced.back()));
         }
     }

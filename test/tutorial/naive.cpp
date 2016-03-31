@@ -35,8 +35,8 @@ class gaussian_naive_bayes
 
         CHECK(all(features, FEATURES));
 
-        auto y = view<std::string>(response_column);
-        // auto X = view<double, double, double, double>(terms_dataframe);
+        auto y = as_view<std::string>(response_column);
+        // auto X = as_view<double, double, double, double>(terms_dataframe);
 
         classes = to_vector<std::string>(range::unique(y));
 

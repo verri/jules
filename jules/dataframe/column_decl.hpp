@@ -52,7 +52,7 @@ template <typename Coercion> class base_column
     auto name() const -> const std::string & { return name_; }
 
     template <typename T, typename C> friend auto as_view(base_column<C>& column) -> base_column_view<T>;
-    template <typename T, typename C> friend auto as_view(const base_column<C>& column) -> base_column_view<T>;
+    template <typename T, typename C> friend auto as_view(const base_column<C>& column) -> base_column_view<const T>;
     template <typename T, typename C> friend auto as_column(const base_column<C>& column) -> base_column<C>;
 
   private:

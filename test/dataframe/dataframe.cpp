@@ -222,12 +222,12 @@ TEST_CASE("reading matrix of integers", "[dataframe]")
     my_dataframe idf;
 
     // std::string -> double: Not OK
-    CHECK_FALSE(jules::can_coerce_to<double>(df.select(0)));
-    CHECK_THROWS(jules::coerce_to<double>(df.select(0)));
-    CHECK(jules::can_coerce_to<int>(df.select(0)));
+    CHECK_FALSE(df.select(0).can_coerce_to<double>());
+    CHECK_THROWS(jules::as_column<double>(df.select(0)));
+    CHECK(df.select(0).can_coerce_to<int>());
 
     for (std::size_t i = 0; i < df.ncol(); ++i) {
-        idf.colbind(jules::coerce_to<int>(df.select(i)));
+        idf.colbind(jules::as_column<int>(df.select(i)));
         REQUIRE(idf.select(idf.ncol() - 1).elements_type() == typeid(int));
     }
 
@@ -236,13 +236,13 @@ TEST_CASE("reading matrix of integers", "[dataframe]")
     df.coerce_to<int>();
 
     // int -> double: Not OK
-    CHECK_FALSE(jules::can_coerce_to<double>(idf.select(0)));
-    CHECK_THROWS(jules::coerce_to<double>(idf.select(0)));
-    CHECK(jules::can_coerce_to<int>(idf.select(0)));
+    CHECK_FALSE(idf.select(0).can_coerce_to<double>());
+    CHECK_THROWS(jules::as_column<double>(idf.select(0)));
+    CHECK(idf.select(0).can_coerce_to<int>());
 
     // int -> std::string: OK
-    CHECK(jules::can_coerce_to<std::string>(idf.select(0)));
-    CHECK_NOTHROW(jules::coerce_to<std::string>(idf.select(0)));
+    CHECK(idf.select(0).can_coerce_to<std::string>());
+    CHECK_NOTHROW(jules::as_column<std::string>(idf.select(0)));
 
     CHECK(idf.ncol() == N);
     CHECK(idf.nrow() == N);
