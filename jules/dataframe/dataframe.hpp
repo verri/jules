@@ -159,7 +159,7 @@ template <typename T, typename Coercion> bool can_coerce_to(const base_dataframe
 }
 
 template <typename Coercion>
-base_dataframe<Coercion> base_dataframe<Coercion>::read(std::istream& is, const dataframe_read_options& opt)
+auto base_dataframe<Coercion>::read(std::istream& is, const dataframe_read_options& opt) -> base_dataframe
 {
     using namespace adaptors;
     using namespace range;
@@ -216,13 +216,13 @@ base_dataframe<Coercion> base_dataframe<Coercion>::read(std::istream& is, const 
     return df;
 }
 
-template <typename Coercion>
-void base_dataframe<Coercion>::write(const base_dataframe<Coercion>& df, std::ostream& os, const dataframe_write_options& opt)
+template <typename C>
+auto write(const base_dataframe<C>& df, std::ostream& os, const dataframe_write_options& opt) -> std::ostream &
 {
     if (df.nrow() == 0 || df.ncol() == 0)
-        return;
+        return os;
 
-    std::vector<base_column<Coercion>> coerced;
+    std::vector<base_column<C>> coerced;
     std::vector<column_view<const std::string>> data;
 
     for (std::size_t j = 0; j < df.ncol(); ++j) {
@@ -249,6 +249,15 @@ void base_dataframe<Coercion>::write(const base_dataframe<Coercion>& df, std::os
             opt.cell.data(opt.cell.separator(os), data[j][i]);
         opt.line.separator(os);
     }
+
+    return os;
+}
+
+template <typename C> auto write(const base_dataframe<C>& df, std::ostream& os) -> std::ostream & { return write(df, os, {}); };
+
+template <typename C> auto operator<<(std::ostream& os, const base_dataframe<C>& df) -> std::ostream &
+{
+    return write(df, os, {});
 }
 
 template <typename Coercion>

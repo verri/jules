@@ -33,8 +33,11 @@ template <typename Coercion> class base_dataframe
               typename = std::enable_if_t<std::is_convertible<R, column_t>::value>>
     base_dataframe(const Range& rng);
 
-    static base_dataframe read(std::istream& is, const dataframe_read_options& opt = {});
-    static void write(const base_dataframe& df, std::ostream& os, const dataframe_write_options& opt = {});
+    static auto read(std::istream& is, const dataframe_read_options& opt = {}) -> base_dataframe;
+    template <typename C>
+    friend auto write(const base_dataframe<C>& df, std::ostream& os, const dataframe_write_options& opt) -> std::ostream&;
+    template <typename C> friend auto write(const base_dataframe<C>& df, std::ostream& os) -> std::ostream&;
+    template <typename C> friend auto operator<<(std::ostream& os, const base_dataframe<C>& df) -> std::ostream&;
 
     base_dataframe(const base_dataframe& source) = default;
     base_dataframe(base_dataframe&& source) = default;

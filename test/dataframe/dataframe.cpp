@@ -294,11 +294,11 @@ TEST_CASE("reading and writing a well-formed dataframe", "[dataframe]")
     CHECK(df.ncol() == 3);
 
     std::stringstream os1;
-    dataframe::write(df, os1);
+    os1 << df;
     CHECK(data == os1.str());
 
     std::stringstream os2;
-    dataframe::write({{"y", {0, 3}}, {"x", {1, 4}}, {"z", {2, 5}}}, os2);
+    write(dataframe{{"y", {0, 3}}, {"x", {1, 4}}, {"z", {2, 5}}}, os2);
     CHECK(data == os2.str());
 
     auto cols = df.colnames();
