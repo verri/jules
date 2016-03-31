@@ -94,17 +94,54 @@ template <typename Coercion> template <typename T> auto base_column<Coercion>::c
 }
 
 // Friend functions.
+
 template <typename T, typename C> auto as_view(base_column<C>& column) -> base_column_view<T>
 {
     return column.template view<T>();
 }
+
 template <typename T, typename C> auto as_view(const base_column<C>& column) -> base_column_view<const T>
 {
     return column.template view<T>();
 };
+
 template <typename T, typename C> auto as_column(const base_column<C>& column) -> base_column<C>
 {
     return column.template clone<T>();
+}
+
+template <typename T, typename C> auto as_vector(const base_column<C>& column) -> vector<T> { return {as_view<T>(column)}; }
+
+template <typename C, std::size_t D> auto concatenate(const base_column<C>& a, const base_column<C>& b) -> base_dataframe<C>
+{
+    static_assert(D == 1, "invalid dimension: only horizontal column concatenation is implemented");
+    auto result = base_dataframe<C>();
+    result.concatenate<1>(a).concatenate<1>(b);
+    return result;
+}
+
+template <typename C, std::size_t D> auto concatenate(const base_column<C>& a, base_column<C>&& b) -> base_dataframe<C>
+{
+    static_assert(D == 1, "invalid dimension: only horizontal column concatenation is implemented");
+    auto result = base_dataframe<C>();
+    result.concatenate<1>(a).concatenate<1>(std::move(b));
+    return result;
+}
+
+template <typename C, std::size_t D> auto concatenate(base_column<C>&& a, const base_column<C>& b) -> base_dataframe<C>
+{
+    static_assert(D == 1, "invalid dimension: only horizontal column concatenation is implemented");
+    auto result = base_dataframe<C>();
+    result.concatenate<1>(std::move(a)).concatenate<1>(b);
+    return result;
+}
+
+template <typename C, std::size_t D> auto concatenate(base_column<C>&& a, base_column<C>&& b) -> base_dataframe<C>
+{
+    static_assert(D == 1, "invalid dimension: only horizontal column concatenation is implemented");
+    auto result = base_dataframe<C>();
+    result.concatenate<1>(std::move(a)).concatenate<1>(std::move(b));
+    return result;
 }
 
 } // namespace jules

@@ -76,8 +76,23 @@ TEST_CASE("temporary columns", "[column]")
     df.colbind(col);
     auto c = jules::as_column<double>(df.select(0));
     auto view = jules::as_view<double>(c);
-    // auto view = jules::as_column<double>(df.select(0)).view<double>();
+    // auto impossible_view = jules::as_view<double>(jules::as_column<double>(df.select(0)));
 
     for (std::size_t i = 0; i < df.rows_count(); ++i)
         CHECK(view[i] == i + 1);
+}
+
+TEST_CASE("as_view vs as_vector", "[column]")
+{
+    auto col = jules::column{{0, 1, 2, 3, 4, 5}};
+
+    auto view1 = jules::as_view<int>(col);
+    auto view2 = jules::as_view<int>(col);
+    auto vector = jules::as_vector<int>(col);
+
+    for (auto i : jules::slice(0, col.size())) {
+        view1[i] = -1;
+        CHECK(view2[i] == -1);
+        CHECK(vector[i] == i);
+    }
 }
