@@ -78,6 +78,6 @@ TEST_CASE("temporary columns", "[column]")
     auto view = jules::as_view<double>(c);
     // auto view = jules::as_column<double>(df.select(0)).view<double>();
 
-    for (std::size_t i = 0; i < df.nrow(); ++i)
+    for (std::size_t i = 0; i < df.rows_count(); ++i)
         CHECK(view[i] == i + 1);
 }

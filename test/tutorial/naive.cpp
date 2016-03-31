@@ -26,12 +26,12 @@ class gaussian_naive_bayes
         CHECK(response_column.size() == 150);
         CHECK(response_column.elements_type() == typeid(std::string));
 
-        CHECK(terms_dataframe.nrow() == 150);
-        CHECK(terms_dataframe.ncol() == 4);
+        CHECK(terms_dataframe.rows_count() == 150);
+        CHECK(terms_dataframe.columns_count() == 4);
 
         CHECK(response_column.name() == "Species");
 
-        features = terms_dataframe.colnames();
+        features = terms_dataframe.columns_names();
 
         CHECK(all(features, FEATURES));
 
@@ -45,11 +45,11 @@ class gaussian_naive_bayes
         mu = sigma2 = matrix<double>(classes.size(), features.size());
         priori = vector<double>(classes.size());
 
-        CHECK(mu.nrow() == classes.size());
-        CHECK(sigma2.nrow() == classes.size());
+        CHECK(mu.rows_count() == classes.size());
+        CHECK(sigma2.rows_count() == classes.size());
 
-        CHECK(mu.ncol() == features.size());
-        CHECK(sigma2.ncol() == features.size());
+        CHECK(mu.columns_count() == features.size());
+        CHECK(sigma2.columns_count() == features.size());
 
         CHECK(priori.size() == classes.size());
 
@@ -98,8 +98,8 @@ TEST_CASE("Naïve Bayes", "[naive]")
     std::ifstream file{"data/iris.csv"};
     const auto iris = dataframe::read(file);
 
-    REQUIRE(iris.nrow() == 150);
-    REQUIRE(iris.ncol() == 5);
+    REQUIRE(iris.rows_count() == 150);
+    REQUIRE(iris.columns_count() == 5);
 
     expr<std::string> species{"Species"};
     expr_list features;
@@ -114,13 +114,13 @@ TEST_CASE("Naïve Bayes", "[naive]")
     // // Settings
     // loo.threads(8);
 
-    // auto indexes = range(0, iris.nrow());
+    // auto indexes = range(0, iris.rows_count());
 
     // auto error = loo.expand(indexes)([&iris](auto i) {
     //     auto model = gaussian_naive_bayes{"Species" = ~remaining<double>{}, iris[-i]};
     //     return model.classify(iris[i][all_except("Species")]) == iris.at<std::string>(i, "Species");
     // });
 
-    // std::cout << "the classifier misclassified " << error << " of " << iris.nrow() << " samples."
+    // std::cout << "the classifier misclassified " << error << " of " << iris.rows_count() << " samples."
     //           << std::endl;
 }

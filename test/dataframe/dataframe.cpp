@@ -13,10 +13,11 @@ TEST_CASE("null dataframe", "[dataframe]")
 
     dataframe df;
 
-    CHECK(df.empty());
-    CHECK(df.null());
-    CHECK(df.nrow() == 0);
-    CHECK(df.ncol() == 0);
+    CHECK(df.is_empty());
+    CHECK(df.is_null());
+    CHECK(df);
+    CHECK(df.rows_count() == 0);
+    CHECK(df.columns_count() == 0);
 }
 
 TEST_CASE("null dataframe colbind", "[dataframe]")
@@ -28,14 +29,14 @@ TEST_CASE("null dataframe colbind", "[dataframe]")
     dataframe null;
     dataframe df = null.colbind(a).colbind(column(0, 0));
 
-    CHECK_FALSE(null.null());
-    CHECK_FALSE(df.null());
+    CHECK_FALSE(null.is_null());
+    CHECK_FALSE(df.is_null());
 
-    CHECK(null.empty());
-    CHECK(df.empty());
+    CHECK(null.is_empty());
+    CHECK(df.is_empty());
 
-    CHECK(df.nrow() == 0);
-    CHECK(df.ncol() == 2);
+    CHECK(df.rows_count() == 0);
+    CHECK(df.columns_count() == 2);
 }
 
 TEST_CASE("dataframe colbind", "[dataframe]")
@@ -48,17 +49,17 @@ TEST_CASE("dataframe colbind", "[dataframe]")
     dataframe null;
     dataframe df = null.colbind(c).colbind(a).colbind(column("b", 0, 0));
 
-    CHECK_FALSE(null.null());
-    CHECK_FALSE(df.null());
+    CHECK_FALSE(null.is_null());
+    CHECK_FALSE(df.is_null());
 
-    CHECK(null.empty());
-    CHECK(df.empty());
+    CHECK(null.is_empty());
+    CHECK(df.is_empty());
 
-    CHECK(df.nrow() == 0);
-    CHECK(df.ncol() == 3);
+    CHECK(df.rows_count() == 0);
+    CHECK(df.columns_count() == 3);
 
-    auto cols = df.colnames();
-    auto nullcols = null.colnames();
+    auto cols = df.columns_names();
+    auto nullcols = null.columns_names();
     struct bla {
         std::string unnamed[3];
     };
@@ -129,10 +130,10 @@ TEST_CASE("assigning a null dataframe", "[dataframe]")
 
     dataframe some_df{{"int", {1, 2, 3, 4}}, {"const char*", {"hello", " ", "world", "!"}}};
 
-    CHECK(!some_df.empty());
+    CHECK(!some_df.is_empty());
 
     some_df = {};
-    CHECK(some_df.empty());
+    CHECK(some_df.is_empty());
 }
 
 TEST_CASE("assigning itself", "[dataframe]")
@@ -151,9 +152,9 @@ TEST_CASE("reading an empty dataframe with header", "[dataframe]")
     std::stringstream stream(input);
 
     auto df = jules::dataframe::read(stream);
-    CHECK(df.nrow() == 0);
-    CHECK(df.ncol() == 3);
-    CHECK(df.empty());
+    CHECK(df.rows_count() == 0);
+    CHECK(df.columns_count() == 3);
+    CHECK(df.is_empty());
 }
 
 TEST_CASE("reading an empty dataframe with line-break", "[dataframe]")
@@ -163,9 +164,9 @@ TEST_CASE("reading an empty dataframe with line-break", "[dataframe]")
     std::stringstream stream(input);
 
     auto df = jules::dataframe::read(stream);
-    CHECK(df.nrow() == 0);
-    CHECK(df.ncol() == 0);
-    CHECK(df.empty());
+    CHECK(df.rows_count() == 0);
+    CHECK(df.columns_count() == 0);
+    CHECK(df.is_empty());
 }
 
 TEST_CASE("reading an empty dataframe from an empty string", "[dataframe]")
@@ -175,18 +176,18 @@ TEST_CASE("reading an empty dataframe from an empty string", "[dataframe]")
     std::stringstream stream(input);
 
     auto df = jules::dataframe::read(stream);
-    CHECK(df.nrow() == 0);
-    CHECK(df.ncol() == 0);
-    CHECK(df.empty());
-    CHECK(df.null());
+    CHECK(df.rows_count() == 0);
+    CHECK(df.columns_count() == 0);
+    CHECK(df.is_empty());
+    CHECK(df.is_null());
 
     std::stringstream null_stream;
 
     auto df2 = jules::dataframe::read(null_stream);
-    CHECK(df2.nrow() == 0);
-    CHECK(df2.ncol() == 0);
-    CHECK(df2.empty());
-    CHECK(df.null());
+    CHECK(df2.rows_count() == 0);
+    CHECK(df2.columns_count() == 0);
+    CHECK(df2.is_empty());
+    CHECK(df.is_null());
 }
 
 TEST_CASE("reading a dataframe", "[dataframe]")
@@ -196,9 +197,9 @@ TEST_CASE("reading a dataframe", "[dataframe]")
     std::stringstream stream(input);
 
     auto df = jules::dataframe::read(stream);
-    CHECK(df.nrow() == 1);
-    CHECK(df.ncol() == 3);
-    auto cols = df.colnames();
+    CHECK(df.rows_count() == 1);
+    CHECK(df.columns_count() == 3);
+    auto cols = df.columns_names();
     CHECK(cols.size() == 3);
     CHECK(cols[0] == "");
     CHECK(cols[1] == "");
@@ -233,8 +234,8 @@ TEST_CASE("reading matrix of integers", "[dataframe]")
     }
 
     auto df = my_dataframe::read(stream, opts);
-    REQUIRE(df.ncol() == N);
-    REQUIRE(df.nrow() == N);
+    REQUIRE(df.columns_count() == N);
+    REQUIRE(df.rows_count() == N);
     my_dataframe idf;
 
     // std::string -> double: Not OK
@@ -242,9 +243,9 @@ TEST_CASE("reading matrix of integers", "[dataframe]")
     CHECK_THROWS(jules::as_column<double>(df.select(0)));
     CHECK(df.select(0).can_coerce_to<int>());
 
-    for (std::size_t i = 0; i < df.ncol(); ++i) {
+    for (std::size_t i = 0; i < df.columns_count(); ++i) {
         idf.colbind(jules::as_column<int>(df.select(i)));
-        REQUIRE(idf.select(idf.ncol() - 1).elements_type() == typeid(int));
+        REQUIRE(idf.select(idf.columns_count() - 1).elements_type() == typeid(int));
     }
 
     // coerce all columns
@@ -260,8 +261,8 @@ TEST_CASE("reading matrix of integers", "[dataframe]")
     CHECK(idf.select(0).can_coerce_to<std::string>());
     CHECK_NOTHROW(jules::as_column<std::string>(idf.select(0)));
 
-    CHECK(idf.ncol() == N);
-    CHECK(idf.nrow() == N);
+    CHECK(idf.columns_count() == N);
+    CHECK(idf.rows_count() == N);
 }
 
 TEST_CASE("reading an inconsistent dataframe", "[dataframe]")
@@ -273,10 +274,10 @@ TEST_CASE("reading an inconsistent dataframe", "[dataframe]")
     jules::dataframe df;
     CHECK_THROWS(df = jules::dataframe::read(stream));
 
-    CHECK(df.nrow() == 0);
-    CHECK(df.ncol() == 0);
-    CHECK(df.null());
-    CHECK(df.empty());
+    CHECK(df.rows_count() == 0);
+    CHECK(df.columns_count() == 0);
+    CHECK(df.is_null());
+    CHECK(df.is_empty());
     CHECK_THROWS(df.select(0));
 }
 
@@ -290,8 +291,8 @@ TEST_CASE("reading and writing a well-formed dataframe", "[dataframe]")
     std::stringstream is(data);
 
     auto df = jules::dataframe::read(is);
-    CHECK(df.nrow() == 2);
-    CHECK(df.ncol() == 3);
+    CHECK(df.rows_count() == 2);
+    CHECK(df.columns_count() == 3);
 
     std::stringstream os1;
     os1 << df;
@@ -301,7 +302,7 @@ TEST_CASE("reading and writing a well-formed dataframe", "[dataframe]")
     write(dataframe{{"y", {0, 3}}, {"x", {1, 4}}, {"z", {2, 5}}}, os2);
     CHECK(data == os2.str());
 
-    auto cols = df.colnames();
+    auto cols = df.columns_names();
     std::array<std::string, 3> names{{"y", "x", "z"}};
     // CHECK(cols == names);
 

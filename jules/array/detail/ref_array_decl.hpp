@@ -82,8 +82,8 @@ template <typename T, std::size_t N> class ref_ndarray
 
     const auto& extents() const { return descriptor_.extents(); }
 
-    std::size_t nrow() const { return size(0); }
-    std::size_t ncol() const { return size(1); }
+    std::size_t rows_count() const { return size(0); }
+    std::size_t columns_count() const { return size(1); }
 
     ref_ndarray_data_iterator<T, N> data_begin() { return {data_, descriptor_.begin()}; }
     ref_ndarray_data_iterator<T, N> data_end() { return {data_, descriptor_.end()}; }

@@ -77,7 +77,7 @@ auto base_expr<Coercion, T>::operator+(const base_expr<Coercion, U>& operand) co
         auto lhs = parent1.extract_from(data);
         auto rhs = parent2.extract_from(data);
 
-        auto size = data.nrow();
+        auto size = data.rows_count();
         auto result = column_t(lhs.name() + "+" + rhs.name(), R{}, size);
 
         auto lhs_view = as_view<T>(lhs);
@@ -141,7 +141,7 @@ auto base_expr<Coercion, T>::operator*(const base_expr<Coercion, U>& operand) co
         auto lhs = parent1.extract_from(data);
         auto rhs = parent2.extract_from(data);
 
-        auto size = data.nrow();
+        auto size = data.rows_count();
         auto result = column_t(lhs.name() * "*" * rhs.name(), R{}, size);
 
         auto lhs_view = as_view<T>(lhs);

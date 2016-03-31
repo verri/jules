@@ -66,10 +66,10 @@ template <typename Coercion> base_dataframe<Coercion>& base_dataframe<Coercion>:
             throw std::runtime_error{"column already exists"};
     }
 
-    if (!null() && nrow() != column.size())
+    if (!is_null() && rows_count() != column.size())
         throw std::runtime_error{"invalid column size"};
 
-    if (null())
+    if (is_null())
         nrow_ = column.size();
 
     columns_.push_back(column);
@@ -88,10 +88,10 @@ template <typename Coercion> base_dataframe<Coercion>& base_dataframe<Coercion>:
             throw std::runtime_error{"column already exists"};
     }
 
-    if (!null() && nrow() != column.size())
+    if (!is_null() && rows_count() != column.size())
         throw std::runtime_error{"invalid column size"};
 
-    if (null())
+    if (is_null())
         nrow_ = column.size();
 
     if (!name.empty())
@@ -101,7 +101,12 @@ template <typename Coercion> base_dataframe<Coercion>& base_dataframe<Coercion>:
     return *this;
 }
 
-template <typename Coercion> vector<std::string> base_dataframe<Coercion>::colnames() const
+template <typename Coercion> auto base_dataframe<Coercion>::columns_elements_types() const -> vector<std::type_index>
+{
+    return to_vector<std::type_index>(columns_ | adaptors::transformed([](const column_t& col) { return col.elements_type(); }));
+}
+
+template <typename Coercion> auto base_dataframe<Coercion>::columns_names() const -> vector<std::string>
 {
     return to_vector<std::string>(columns_ | adaptors::transformed([](const column_t& col) { return col.name(); }));
 }
@@ -140,7 +145,7 @@ template <typename Coercion> template <typename T> base_dataframe<Coercion>& bas
 template <typename Coercion, typename T> base_dataframe<Coercion> coerce_to(const base_dataframe<Coercion>& dataframe)
 {
     base_dataframe<Coercion> coerced;
-    for (std::size_t i = 0; dataframe.ncol(); ++i)
+    for (std::size_t i = 0; dataframe.columns_count(); ++i)
         coerced.colbind(jules::as_column<T>(dataframe.select(i)));
     return coerced;
 }
@@ -219,13 +224,13 @@ auto base_dataframe<Coercion>::read(std::istream& is, const dataframe_read_optio
 template <typename C>
 auto write(const base_dataframe<C>& df, std::ostream& os, const dataframe_write_options& opt) -> std::ostream &
 {
-    if (df.nrow() == 0 || df.ncol() == 0)
+    if (df.rows_count() == 0 || df.columns_count() == 0)
         return os;
 
     std::vector<base_column<C>> coerced;
     std::vector<column_view<const std::string>> data;
 
-    for (std::size_t j = 0; j < df.ncol(); ++j) {
+    for (std::size_t j = 0; j < df.columns_count(); ++j) {
         const auto& col = df.select(j);
 
         if (col.elements_type() == typeid(std::string)) {
@@ -238,14 +243,14 @@ auto write(const base_dataframe<C>& df, std::ostream& os, const dataframe_write_
 
     if (opt.header) {
         opt.cell.data(os, df.select(0).name());
-        for (std::size_t j = 1; j < df.ncol(); ++j)
+        for (std::size_t j = 1; j < df.columns_count(); ++j)
             opt.cell.data(opt.cell.separator(os), df.select(j).name());
         opt.line.separator(os);
     }
 
-    for (std::size_t i = 0; i < df.nrow(); ++i) {
+    for (std::size_t i = 0; i < df.rows_count(); ++i) {
         opt.cell.data(os, data[0][i]);
-        for (std::size_t j = 1; j < df.ncol(); ++j)
+        for (std::size_t j = 1; j < df.columns_count(); ++j)
             opt.cell.data(opt.cell.separator(os), data[j][i]);
         opt.line.separator(os);
     }

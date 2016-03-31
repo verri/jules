@@ -75,8 +75,8 @@ template <typename T, std::size_t N> class indirect_ndarray
 
     const auto& extents() const { return descriptor_.extents(); }
 
-    std::size_t nrow() const { return size(0); }
-    std::size_t ncol() const { return size(1); }
+    std::size_t rows_count() const { return size(0); }
+    std::size_t columns_count() const { return size(1); }
 
     indirect_ndarray_data_iterator<T> data_begin() { return {data_, indexes_, 0}; }
     indirect_ndarray_data_iterator<T> data_end() { return {data_, indexes_, indexes_.size()}; }
