@@ -9,7 +9,7 @@ namespace jules
 template <typename Coercion> class base_dataframe;
 
 // TODO: remove parameter V
-template <typename T, typename Coercion, typename V = base_column_view<T, Coercion>>
+template <typename T, typename Coercion, typename V = base_column_view<T>>
 class base_dataframe_colview : public detail::ref_ndarray<V, 1>
 {
     friend class base_dataframe<Coercion>;

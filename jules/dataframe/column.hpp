@@ -5,6 +5,9 @@
 
 namespace jules
 {
+
+// Member functions.
+
 template <typename Coercion>
 template <typename T>
 base_column<Coercion>::base_column(const std::string& name, std::initializer_list<T> values)
@@ -73,26 +76,35 @@ template <typename Coercion> template <typename T> auto base_column<Coercion>::c
     return *this;
 }
 
-template <typename T, typename Coercion> auto coerce_to(const base_column<Coercion>& source) -> base_column<Coercion>
-{
-    return {source.name(), source.column_model_->template coerce_to<T>()};
-}
-
-template <typename T, typename Coercion> auto can_coerce_to(const base_column<Coercion>& column) -> bool
-{
-    return column.column_model_->template can_coerce_to<T>();
-}
-
 template <typename Coercion> template <typename T> auto base_column<Coercion>::view() -> view_t<T>
 {
-    auto& model = this->column_model_.template downcast<T>();
+    auto& model = this->column_model_->template downcast<T>();
     return {model.data(), model.size()};
 }
 
 template <typename Coercion> template <typename T> auto base_column<Coercion>::view() const -> view_t<const T>
 {
-    const auto& model = this->column_model_.template downcast<T>();
+    const auto& model = this->column_model_->template downcast<T>();
     return {model.data(), model.size()};
+}
+
+template <typename Coercion> template <typename T> auto base_column<Coercion>::clone() const -> base_column
+{
+    return {this->name(), this->column_model_->template coerce_to<T>()};
+}
+
+// Friend functions.
+template <typename T, typename C> auto as_view(base_column<C>& column) -> base_column_view<T>
+{
+    return column.template view<T>();
+}
+template <typename T, typename C> auto as_view(const base_column<C>& column) -> base_column_view<T>
+{
+    return column.template view<T>();
+};
+template <typename T, typename C> auto as_column(const base_column<C>& column) -> base_column<C>
+{
+    return column.template clone<T>();
 }
 
 } // namespace jules

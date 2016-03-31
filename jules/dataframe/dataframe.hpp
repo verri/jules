@@ -104,7 +104,7 @@ template <typename Coercion> template <typename T> base_dataframe<Coercion>& bas
 
     new_columns.reserve(columns_.size());
     std::transform(columns_.begin(), columns_.end(), std::back_inserter(new_columns),
-                   [](auto&& column) { return jules::coerce_to<T>(column); });
+                   [](auto&& column) { return jules::as_column<T>(column); });
 
     columns_ = std::move(new_columns);
 
@@ -203,10 +203,10 @@ void base_dataframe<Coercion>::write(const base_dataframe<Coercion>& df, std::os
         const auto& col = df.select(j);
 
         if (col.elements_type() == typeid(std::string)) {
-            data.push_back(view<std::string>(col));
+            data.push_back(jules::as_view<std::string>(col));
         } else {
             coerced.push_back(std::move(jules::coerce_to<std::string>(col)));
-            data.push_back(view<std::string>(coerced.back()));
+            data.push_back(jules::as_view<std::string>(coerced.back()));
         }
     }
 
@@ -229,18 +229,18 @@ template <typename Coercion>
 template <typename T>
 base_dataframe_colview<const T, Coercion> base_dataframe<Coercion>::colview() const
 {
-    std::vector<base_column_view<const T, Coercion>> views;
+    std::vector<base_column_view<const T>> views;
     for (const auto& col : columns_)
-        views.push_back(view<T>(col));
+        views.push_back(jules::as_view<T>(col));
 
     return {std::move(views)};
 }
 
 template <typename Coercion> template <typename T> base_dataframe_colview<T, Coercion> base_dataframe<Coercion>::colview()
 {
-    std::vector<base_column_view<T, Coercion>> views;
+    std::vector<base_column_view<T>> views;
     for (auto& col : columns_)
-        views.push_back(view<T>(col));
+        views.push_back(jules::as_view<T>(col));
 
     return {std::move(views)};
 }

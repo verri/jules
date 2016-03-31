@@ -33,13 +33,13 @@ TEST_CASE("column constructor using initializer list", "[constructor]")
     REQUIRE(!toy_column.can_coerce_to<double>());
     REQUIRE(!toy_column.can_coerce_to<std::string>());
 
-    using jules::coerce_to;
-    using jules::view;
+    using jules::as_column;
+    using jules::as_view;
 
     auto string_numbers = column{"1.0", "2.4", "3.3"};
-    auto double_numbers = coerce_to<double>(string_numbers);
+    auto double_numbers = jules::as_column<double>(string_numbers);
 
-    auto v = view<double>(double_numbers);
+    auto v = as_view<double>(double_numbers);
 
     CHECK(double_numbers.size() == v.size());
     CHECK(!double_numbers.is_empty());
@@ -74,8 +74,8 @@ TEST_CASE("temporary columns", "[column]")
     jules::dataframe df;
 
     df.colbind(col);
-    auto c = jules::coerce_to<double>(df.select(0));
-    auto view = c.view<double>();
+    auto c = jules::as_column<double>(df.select(0));
+    auto view = jules::as_view<double>(c);
     // auto view = jules::coerce_to<double>(df.select(0)).view<double>();
 
     for (std::size_t i = 0; i < df.nrow(); ++i)

@@ -18,7 +18,7 @@ template <typename Coercion> class base_column;
 template <typename Coercion> class base_column
 {
     friend class base_dataframe<Coercion>;
-    template <typename, typename> friend class base_column_view;
+    template <typename> friend class base_column_view;
 
   private:
     template <typename T> using column_model_t = detail::column_model<T, Coercion>;
@@ -51,14 +51,17 @@ template <typename Coercion> class base_column
     auto name() -> std::string & { return name_; }
     auto name() const -> const std::string & { return name_; }
 
-    template <typename T, typename C> friend auto as_view(base_column<C>& column) { return column.template view<T>; }
-    template <typename T, typename C> friend auto as_view(const base_column<C>& column) { return column.template view<T>; };
+    template <typename T, typename C> friend auto as_view(base_column<C>& column) -> base_column_view<T>;
+    template <typename T, typename C> friend auto as_view(const base_column<C>& column) -> base_column_view<T>;
+    template <typename T, typename C> friend auto as_column(const base_column<C>& column) -> base_column<C>;
 
   private:
     base_column(const std::string& name, std::unique_ptr<column_interface_t>&& column_model);
 
     template <typename T> auto view() -> view_t<T>;
     template <typename T> auto view() const -> view_t<const T>;
+
+    template <typename T> auto clone() const -> base_column;
 
     std::string name_;
     std::unique_ptr<column_interface_t> column_model_;

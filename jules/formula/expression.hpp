@@ -57,8 +57,8 @@ template <typename Coercion, typename T> template <typename U> auto base_expr<Co
         auto size = col.size();
         auto result = column_t(col.name() + "+" + typeid(U).name(), R{}, size);
 
-        auto view = make_view<T>(col);
-        auto result_view = make_view<R>(result);
+        auto view = as_view<T>(col);
+        auto result_view = as_view<R>(result);
 
         for (std::size_t i = 0; i < size; ++i)
             result_view[i] = view[i] + operand;
@@ -80,9 +80,9 @@ auto base_expr<Coercion, T>::operator+(const base_expr<Coercion, U>& operand) co
         auto size = data.nrow();
         auto result = column_t(lhs.name() + "+" + rhs.name(), R{}, size);
 
-        auto lhs_view = make_view<T>(lhs);
-        auto rhs_view = make_view<U>(rhs);
-        auto result_view = make_view<R>(result);
+        auto lhs_view = as_view<T>(lhs);
+        auto rhs_view = as_view<U>(rhs);
+        auto result_view = as_view<R>(result);
 
         for (std::size_t i = 0; i < size; ++i)
             result_view[i] = lhs_view[i] + rhs_view[i];
@@ -101,8 +101,8 @@ template <typename Coercion, typename T> template <typename U> auto base_expr<Co
         auto size = col.size();
         auto result = column_t(col.name() + "*" + typeid(U).name(), R{}, size);
 
-        auto view = make_view<T>(col);
-        auto result_view = make_view<R>(result);
+        auto view = as_view<T>(col);
+        auto result_view = as_view<R>(result);
 
         for (std::size_t i = 0; i < size; ++i)
             result_view[i] = view[i] * operand;
@@ -121,8 +121,8 @@ template <typename C, typename V, typename U> auto operator*(const U& operand, c
         auto size = col.size();
         auto result = base_column<C>(col.name() + "*" + typeid(U).name(), R{}, size);
 
-        auto view = make_view<V>(col);
-        auto result_view = make_view<R>(result);
+        auto view = as_view<V>(col);
+        auto result_view = as_view<R>(result);
 
         for (std::size_t i = 0; i < size; ++i)
             result_view[i] = operand * view[i];
@@ -144,9 +144,9 @@ auto base_expr<Coercion, T>::operator*(const base_expr<Coercion, U>& operand) co
         auto size = data.nrow();
         auto result = column_t(lhs.name() * "*" * rhs.name(), R{}, size);
 
-        auto lhs_view = make_view<T>(lhs);
-        auto rhs_view = make_view<U>(rhs);
-        auto result_view = make_view<R>(result);
+        auto lhs_view = as_view<T>(lhs);
+        auto rhs_view = as_view<U>(rhs);
+        auto result_view = as_view<R>(result);
 
         for (std::size_t i = 0; i < size; ++i)
             result_view[i] = lhs_view[i] * rhs_view[i];

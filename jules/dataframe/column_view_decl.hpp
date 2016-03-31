@@ -10,7 +10,7 @@ template <typename> class base_column;
 template <typename T> class base_column_view : public detail::ref_ndarray<T, 1>
 {
     template <typename> friend class base_column;
-    template <typename, typename> friend class base_column_view;
+    template <typename> friend class base_column_view;
 
   public:
     base_column_view() {}

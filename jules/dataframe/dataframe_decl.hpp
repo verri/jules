@@ -22,7 +22,7 @@ template <typename Coercion> class base_dataframe
     using expr_t = base_expr<Coercion, void>;
     using expr_list_t = base_expr_list<Coercion>;
 
-    template <typename T> using column_view_t = base_column_view<T, Coercion>;
+    template <typename T> using column_view_t = base_column_view<T>;
 
   public:
     using column_t = base_column<Coercion>;
