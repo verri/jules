@@ -6,26 +6,30 @@
 namespace jules
 {
 template <typename> class base_column;
+template <typename> class base_dataframe;
 
 template <typename T> class base_column_view : public detail::ref_ndarray<T, 1>
 {
     template <typename> friend class base_column;
     template <typename> friend class base_column_view;
+    template <typename> friend class base_dataframe;
+
+  private:
+    using super_t = detail::ref_ndarray<T, 1>;
 
   public:
-    base_column_view() {}
+    base_column_view() = delete;
     ~base_column_view() = default;
 
-    base_column_view(const base_column_view& source) : detail::ref_ndarray<T, 1>{source} {}
-    base_column_view(base_column_view&& source) : detail::ref_ndarray<T, 1>{std::move(source)} {}
+    base_column_view(const base_column_view& source) = default;
+    base_column_view(base_column_view&& source) = default;
 
     base_column_view& operator=(const base_column_view& source) = delete;
     base_column_view& operator=(base_column_view&& source) = delete;
 
-    // TODO: idem no colview do dataframe
-    operator base_column_view<const T>() const;
-
     using detail::ref_ndarray<T, 1>::operator=;
+
+    operator base_column_view<const T>() const;
 
     T* data() { return this->data_; }
     const T* data() const { return this->data_; }

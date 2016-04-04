@@ -56,6 +56,69 @@ base_dataframe<Coercion>::base_dataframe(const Range& rng)
     }
 }
 
+template <typename Coercion> template <typename T> auto base_dataframe<Coercion>::columns() -> vector<base_column_view<T>>
+{
+    using namespace adaptors;
+    return {(columns_ | transformed([](auto& column) { return as_view<T>(column); })).begin(), columns_.size()};
+}
+
+template <typename Coercion>
+template <typename T>
+auto base_dataframe<Coercion>::columns() const -> vector<base_column_view<const T>>
+{
+    using namespace adaptors;
+    return {(columns_ | transformed([](const auto& column) { return as_view<T>(column); })).begin(), columns_.size()};
+}
+
+template <typename Coercion> template <typename... T> auto base_dataframe<Coercion>::rows() -> vector<base_row_view<T...>>
+{
+    if (sizeof...(T) != this->columns_count())
+        throw std::runtime_error{"invalid number of columns inferred from column types"};
+
+    auto tuple = this->views<T...>(std::make_index_sequence<sizeof...(T)>());
+    return rows_helper(tuple, std::make_index_sequence<sizeof...(T)>(), this->rows_count());
+}
+
+template <typename Coercion>
+template <typename... T>
+auto base_dataframe<Coercion>::rows() const -> vector<base_row_view<const T...>>
+{
+    if (sizeof...(T) != this->columns_count())
+        throw std::runtime_error{"invalid number of columns inferred from column types"};
+
+    auto tuple = this->views<const T...>(std::make_index_sequence<sizeof...(T)>());
+    return rows_helper(tuple, std::make_index_sequence<sizeof...(T)>(), this->rows_count());
+}
+
+template <typename Coercion>
+template <typename... T, std::size_t... I>
+auto base_dataframe<Coercion>::views(std::index_sequence<I...>) -> std::tuple<base_column_view<T>...>
+{
+    return std::make_tuple(as_view<T>(this->columns_[I])...);
+}
+
+template <typename Coercion>
+template <typename... T, std::size_t... I>
+auto base_dataframe<Coercion>::views(std::index_sequence<I...>) const -> std::tuple<base_column_view<const T>...>
+{
+    return std::make_tuple(as_view<const T>(this->columns_[I])...);
+}
+
+template <typename Coercion>
+template <typename... T, std::size_t... I>
+auto base_dataframe<Coercion>::rows_helper(std::tuple<base_column_view<T>...>& columns, std::index_sequence<I...>,
+                                           std::size_t rows_count) -> vector<base_row_view<T...>>
+{
+    auto i = std::size_t{};
+    auto iter = jules::as_iterator([&] {
+        auto row_view = base_row_view<T...>{std::get<I>(columns)[i]...};
+        ++i;
+        return row_view;
+    });
+
+    return {iter, rows_count};
+}
+
 template <typename Coercion> base_dataframe<Coercion>& base_dataframe<Coercion>::colbind(const column_t& column)
 {
     const auto& name = column.name();

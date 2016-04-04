@@ -3,6 +3,7 @@
 
 #include <jules/util/type.hpp>
 #include <jules/range/tokenized.hpp>
+#include <jules/range/iterator.hpp>
 
 #include <boost/range/adaptor/indexed.hpp>
 #include <boost/range/adaptor/strided.hpp>

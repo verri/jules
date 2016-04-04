@@ -42,7 +42,9 @@ template <typename T, std::size_t N> class base_ndarray : public ref_ndarray<T, 
 
     template <typename... Dims, typename = all_size_enabler<N, Dims...>> base_ndarray(const T& value, Dims... dims);
 
-    template <typename... Dims, typename = all_size_enabler<N, Dims...>> base_ndarray(const T* data, Dims... dims);
+    template <typename Iter, typename... Dims, typename R = typename std::iterator_traits<Iter>::value_type,
+              typename = all_size_enabler<N, Dims...>, typename = std::enable_if_t<std::is_convertible<R, T>::value>>
+    base_ndarray(Iter iter, Dims... dims);
 
     base_ndarray(const base_ndarray& source);
     base_ndarray(base_ndarray&& source);

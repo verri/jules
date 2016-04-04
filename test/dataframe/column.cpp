@@ -90,7 +90,7 @@ TEST_CASE("as_view vs as_vector", "[column]")
     auto view2 = jules::as_view<int>(col);
     auto vector = jules::as_vector<int>(col);
 
-    for (auto i : jules::slice(0, col.size())) {
+    for (int i : jules::slice(0, col.size())) {
         view1[i] = -1;
         CHECK(view2[i] == -1);
         CHECK(vector[i] == i);

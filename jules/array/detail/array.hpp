@@ -53,11 +53,11 @@ base_ndarray<T, N>::base_ndarray(const T& value, Dims... dims)
 }
 
 template <typename T, std::size_t N>
-template <typename... Dims, typename>
-base_ndarray<T, N>::base_ndarray(const T* data, Dims... dims)
+template <typename Iter, typename... Dims, typename R, typename, typename>
+base_ndarray<T, N>::base_ndarray(Iter iter, Dims... dims)
     : ref_ndarray<T, N>{allocate(prod_args(dims...)), {0, {std::size_t(dims)...}}}
 {
-    create(trivial_dispatch<T>(), this->data(), data, this->size());
+    create(trivial_dispatch<T>(), this->data(), iter, this->size());
 }
 
 template <typename T, std::size_t N>

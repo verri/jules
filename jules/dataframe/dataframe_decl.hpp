@@ -3,6 +3,7 @@
 
 #include <jules/array/array.hpp>
 #include <jules/dataframe/column.hpp>
+#include <jules/dataframe/row_view.hpp>
 #include <jules/dataframe/dataframe_colview.hpp>
 #include <jules/dataframe/io_decl.hpp>
 #include <jules/formula/expression_decl.hpp>
@@ -92,6 +93,14 @@ template <typename Coercion> class base_dataframe
     auto crbegin() const { return columns_.crbegin(); }
     auto crend() const { return columns_.crend(); }
 
+    // Ranges
+
+    template <typename T> auto columns() -> vector<base_column_view<T>>;
+    template <typename T> auto columns() const -> vector<base_column_view<const T>>;
+
+    template <typename... T> auto rows() -> vector<base_row_view<T...>>;
+    template <typename... T> auto rows() const -> vector<base_row_view<const T...>>;
+
     // Others
 
     base_dataframe& colbind(const column_t& column);
@@ -116,6 +125,14 @@ template <typename Coercion> class base_dataframe
     template <typename T, typename C> friend base_dataframe_colview<const T, C> colview(const base_dataframe<C>& df);
 
   private:
+    template <typename... T, std::size_t... I> auto views(std::index_sequence<I...>) -> std::tuple<base_column_view<T>...>;
+    template <typename... T, std::size_t... I>
+    auto views(std::index_sequence<I...>) const -> std::tuple<base_column_view<const T>...>;
+
+    template <typename... T, std::size_t... I>
+    static auto rows_helper(std::tuple<base_column_view<T>...>& columns, std::index_sequence<I...>, std::size_t rows_count)
+        -> vector<base_row_view<T...>>;
+
     std::size_t nrow_ = 0;
 
     std::vector<column_t> columns_;

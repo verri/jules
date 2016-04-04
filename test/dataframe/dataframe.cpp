@@ -100,6 +100,22 @@ TEST_CASE("dataframe select by name", "[dataframe]")
     CHECK(df.select("str").size() == 4);
 }
 
+TEST_CASE("accessing rows of the dataframe", "[datafrae]")
+{
+    using jules::dataframe;
+    using namespace std::literals::string_literals;
+
+    auto df = dataframe{{0, 1, 2, 3}, {"0"s, "1"s, "2"s, "3"s}, {0.0, 1.0, 2.0, 3.0}};
+
+    CHECK_THROWS((df.rows<int, std::string>()));
+    CHECK_THROWS((df.rows<double, std::string, int>()));
+
+    auto rows = df.rows<int, std::string, double>();
+
+    for (auto i : jules::seq(0, df.rows_count()))
+        CHECK((rows[i] == std::tuple<int, std::string, double>(i, std::to_string(i), i)));
+}
+
 TEST_CASE("invalid exception dataframe", "[dataframe]")
 {
     using jules::dataframe;
