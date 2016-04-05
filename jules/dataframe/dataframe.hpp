@@ -328,33 +328,6 @@ template <typename C> auto operator<<(std::ostream& os, const base_dataframe<C>&
     return write(df, os, {});
 }
 
-template <typename Coercion>
-template <typename T>
-base_dataframe_colview<const T, Coercion> base_dataframe<Coercion>::colview() const
-{
-    std::vector<base_column_view<const T>> views;
-    for (const auto& col : columns_)
-        views.push_back(jules::as_view<T>(col));
-
-    return {std::move(views)};
-}
-
-template <typename Coercion> template <typename T> base_dataframe_colview<T, Coercion> base_dataframe<Coercion>::colview()
-{
-    std::vector<base_column_view<T>> views;
-    for (auto& col : columns_)
-        views.push_back(jules::as_view<T>(col));
-
-    return {std::move(views)};
-}
-
-template <typename T, typename C> base_dataframe_colview<const T, C> colview(const base_dataframe<C>& df)
-{
-    return df.template colview<T>();
-}
-
-template <typename T, typename C> base_dataframe_colview<T, C> colview(base_dataframe<C>& df) { return df.template colview<T>(); }
-
 } // namespace jules
 
 #endif // JULES_DATAFRAME_DATAFRAME_H

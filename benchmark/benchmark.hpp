@@ -5,16 +5,14 @@
 
 #include "track.hpp"
 
-template <typename F, typename = std::enable_if_t<std::is_same<void, std::result_of_t<F()>>::value>>
-void PrintHeapUsage(F&& f)
+template <typename F, typename = std::enable_if_t<std::is_same<void, std::result_of_t<F()>>::value>> void PrintHeapUsage(F&& f)
 {
     Memory::Reset();
     f();
     Memory::Summary(std::cout);
 }
 
-template <typename F, typename = std::enable_if_t<!std::is_same<void, std::result_of_t<F()>>::value>>
-auto PrintHeapUsage(F&& f)
+template <typename F, typename = std::enable_if_t<!std::is_same<void, std::result_of_t<F()>>::value>> auto PrintHeapUsage(F&& f)
 {
     Memory::Reset();
     decltype(auto) result = f();
@@ -22,8 +20,7 @@ auto PrintHeapUsage(F&& f)
     return result;
 }
 
-template <typename F, typename = std::enable_if_t<std::is_same<void, std::result_of_t<F()>>::value>>
-void PrintTimeElapsed(F&& f)
+template <typename F, typename = std::enable_if_t<std::is_same<void, std::result_of_t<F()>>::value>> void PrintTimeElapsed(F&& f)
 {
     using namespace std::chrono;
     auto before = system_clock::now();
@@ -32,8 +29,7 @@ void PrintTimeElapsed(F&& f)
     std::cerr << "Time elapsed: " << duration_cast<milliseconds>(after - before).count() << "ms" << std::endl;
 }
 
-template <typename F, typename = std::enable_if_t<!std::is_same<void, std::result_of_t<F()>>::value>>
-auto PrintTimeElapsed(F&& f)
+template <typename F, typename = std::enable_if_t<!std::is_same<void, std::result_of_t<F()>>::value>> auto PrintTimeElapsed(F&& f)
 {
     using namespace std::chrono;
     auto before = system_clock::now();
@@ -43,8 +39,7 @@ auto PrintTimeElapsed(F&& f)
     return result;
 }
 
-template <typename F>
-auto PrintInfo(F&& f)
+template <typename F> auto PrintInfo(F&& f)
 {
     return PrintTimeElapsed([&] { return PrintHeapUsage(std::forward<F>(f)); });
 }

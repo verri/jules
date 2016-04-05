@@ -4,7 +4,6 @@
 #include <jules/array/array.hpp>
 #include <jules/dataframe/column.hpp>
 #include <jules/dataframe/row_view.hpp>
-#include <jules/dataframe/dataframe_colview.hpp>
 #include <jules/dataframe/io_decl.hpp>
 #include <jules/formula/expression_decl.hpp>
 
@@ -117,12 +116,6 @@ template <typename Coercion> class base_dataframe
 
     template <typename T> bool can_coerce_to() const;
     template <typename T, typename C> friend bool can_coerce_to(const base_dataframe<C>& dataframe);
-
-    template <typename T> base_dataframe_colview<T, Coercion> colview();
-    template <typename T> base_dataframe_colview<const T, Coercion> colview() const;
-
-    template <typename T, typename C> friend base_dataframe_colview<T, C> colview(base_dataframe<C>& df);
-    template <typename T, typename C> friend base_dataframe_colview<const T, C> colview(const base_dataframe<C>& df);
 
   private:
     template <typename... T, std::size_t... I> auto views(std::index_sequence<I...>) -> std::tuple<base_column_view<T>...>;
