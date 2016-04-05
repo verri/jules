@@ -23,13 +23,13 @@ int main()
 
     // Vector
     std::cout << "\nCreating vector." << std::endl;
-    auto vector = PrintHeapUsage([&] { return jules::vector<double>(N * N); });
+    auto vector = PrintInfo([&] { return jules::vector<double>(N * N); });
 
     std::cout << "\nFilling odd lines using slice." << std::endl;
-    PrintHeapUsage([&] { vector(slice(0, 0, 2)) = 1.0; });
+    PrintInfo([&] { vector(slice(0, 0, 2)) = 1.0; });
 
     std::cout << "\nFilling even lines using indirect indexing." << std::endl;
-    PrintHeapUsage([&] { vector(seq(1, N * N, 2)) = 2.0; });
+    PrintInfo([&] { vector(seq(1, N * N, 2)) = 2.0; });
 
     if (N < 5)
         std::cout << "\nVector: " << vector << std::endl;
@@ -37,20 +37,20 @@ int main()
 
     // Matrix
     std::cout << "\nCreating matrix." << std::endl;
-    auto matrix = PrintHeapUsage([&] { return jules::matrix<double>(N, N); });
+    auto matrix = PrintInfo([&] { return jules::matrix<double>(N, N); });
 
     std::cout << "\nFilling odd lines using slice." << std::endl;
-    PrintHeapUsage([&] { matrix(slice(0, 0, 2), slice()) = 1.0; });
+    PrintInfo([&] { matrix(slice(0, 0, 2), slice()) = 1.0; });
 
     std::cout << "\nFilling even lines using indirect indexing." << std::endl;
-    PrintHeapUsage([&] { matrix(seq(1, N, 2), seq(0, N)) = 2.0; });
+    PrintInfo([&] { matrix(seq(1, N, 2), seq(0, N)) = 2.0; });
 
     if (N < 5)
         std::cout << "\nMatrix: " << matrix << std::endl;
 
     std::cout << "\nFilling matrix using mixed indexing." << std::endl;
-    PrintHeapUsage([&] { matrix(seq(0, N, 2), slice(0, 0, 2)) = 2.0; });
-    PrintHeapUsage([&] { matrix(slice(1, 0, 2), seq(1, N, 2)) = 1.0; });
+    PrintInfo([&] { matrix(seq(0, N, 2), slice(0, 0, 2)) = 2.0; });
+    PrintInfo([&] { matrix(slice(1, 0, 2), seq(1, N, 2)) = 1.0; });
 
     if (N < 5)
         std::cout << "\nMatrix: " << matrix << std::endl;
