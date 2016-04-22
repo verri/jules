@@ -36,7 +36,7 @@ class gaussian_naive_bayes
         CHECK(all(features, FEATURES));
 
         auto y = as_view<std::string>(response_column);
-        // auto X = as_view<double, double, double, double>(terms_dataframe);
+        // auto X = as_matrix<double>(std::move(terms_dataframe));
 
         classes = to_vector<std::string>(range::unique(y));
 
@@ -58,8 +58,8 @@ class gaussian_naive_bayes
             vector<bool> ix = y == class_;
             CHECK(ix.size() == y.size());
 
-            // mu[i] = apply(features[ix], [](const auto& x) { return mean(x); });
-            // sigma2[i] = apply(features[ix], [](const auto& x) { return var(x); });
+            // mu[i] = apply<1>(X[ix], [](const auto& x) { return mean(x); });
+            // sigma2[i] = apply<1>(X[ix], [](const auto& x) { return var(x); });
             // priori[i] = count(ix) / ix.size();
 
             ++i;
