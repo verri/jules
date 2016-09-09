@@ -129,7 +129,8 @@ struct Memory {
 
     Alloc total, peak, current;
     std::unordered_map<void*, std::size_t, std::hash<void*>, std::equal_to<void*>,
-                       SafeAllocator<std::pair<void* const, std::size_t>>> blocks;
+                       SafeAllocator<std::pair<void* const, std::size_t>>>
+        blocks;
     std::vector<std::pair<void* const, std::size_t>, SafeAllocator<std::pair<void* const, std::size_t>>> freed;
 };
 

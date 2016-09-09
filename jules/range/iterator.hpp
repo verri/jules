@@ -16,8 +16,8 @@ template <typename F> class generator : public std::iterator<std::forward_iterat
 
     auto operator*() const { return f_(); }
 
-    auto operator++(int) -> generator<F> & { return *this; }
-    auto operator++() -> generator<F> & { return *this; }
+    auto operator++(int) -> generator<F>& { return *this; }
+    auto operator++() -> generator<F>& { return *this; }
 
   private:
     F f_;

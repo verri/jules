@@ -1,5 +1,5 @@
-#include "catch.hpp"
 #include "jules/dataframe/column.hpp"
+#include "catch.hpp"
 #include "jules/dataframe/dataframe.hpp"
 
 #include <string>

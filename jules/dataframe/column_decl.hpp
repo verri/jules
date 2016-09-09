@@ -49,8 +49,8 @@ template <typename Coercion> class base_column
     auto dimensions() const { return size(); }
     auto is_empty() const { return size() == 0; }
 
-    auto name() -> std::string & { return name_; }
-    auto name() const -> const std::string & { return name_; }
+    auto name() -> std::string& { return name_; }
+    auto name() const -> const std::string& { return name_; }
 
     template <typename T, typename C> friend auto as_view(base_column<C>& column) -> base_column_view<T>;
     template <typename T, typename C> friend auto as_view(const base_column<C>& column) -> base_column_view<const T>;
@@ -73,9 +73,9 @@ template <typename Coercion> class base_column
 template <typename T, typename C> auto as_view(base_column<C>&& column) = delete;
 
 template <typename C, std::size_t D> auto concatenate(const base_column<C>&, const base_column<C>&) -> base_dataframe<C>;
-template <typename C, std::size_t D> auto concatenate(const base_column<C>&, base_column<C> && ) -> base_dataframe<C>;
+template <typename C, std::size_t D> auto concatenate(const base_column<C>&, base_column<C> &&) -> base_dataframe<C>;
 template <typename C, std::size_t D> auto concatenate(base_column<C>&&, const base_column<C>&) -> base_dataframe<C>;
-template <typename C, std::size_t D> auto concatenate(base_column<C>&&, base_column<C> && ) -> base_dataframe<C>;
+template <typename C, std::size_t D> auto concatenate(base_column<C>&&, base_column<C> &&) -> base_dataframe<C>;
 
 using column = base_column<default_coercion_rules>;
 

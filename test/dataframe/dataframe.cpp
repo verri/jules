@@ -1,10 +1,10 @@
-#include "catch.hpp"
 #include "jules/dataframe/dataframe.hpp"
+#include "catch.hpp"
 
 #include <algorithm>
 #include <array>
-#include <string>
 #include <sstream>
+#include <string>
 #include <typeinfo>
 
 TEST_CASE("null dataframe", "[dataframe]")

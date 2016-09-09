@@ -24,8 +24,7 @@ base_column<Coercion>::base_column(const std::string& name, const T& value, std:
 
 template <typename Coercion>
 template <typename T>
-base_column<Coercion>::base_column(std::initializer_list<T> values)
-    : column_model_{std::make_unique<column_model_t<T>>(values)}
+base_column<Coercion>::base_column(std::initializer_list<T> values) : column_model_{std::make_unique<column_model_t<T>>(values)}
 {
 }
 
@@ -62,7 +61,7 @@ base_column<Coercion>::base_column(const base_column& source)
 {
 }
 
-template <typename Coercion> auto base_column<Coercion>::operator=(const base_column& source) -> base_column &
+template <typename Coercion> auto base_column<Coercion>::operator=(const base_column& source) -> base_column&
 {
     name_ = source.name_;
     column_model_ = std::move(source.column_model_->clone());
@@ -70,7 +69,7 @@ template <typename Coercion> auto base_column<Coercion>::operator=(const base_co
     return *this;
 }
 
-template <typename Coercion> template <typename T> auto base_column<Coercion>::coerce_to() & -> base_column &
+template <typename Coercion> template <typename T> auto base_column<Coercion>::coerce_to()& -> base_column&
 {
     column_model_ = column_model_->template coerce_to<T>();
     return *this;

@@ -56,8 +56,7 @@ base_slice<N>::base_slice(std::size_t start, std::initializer_list<std::size_t> 
 }
 
 template <std::size_t N>
-base_slice<N>::base_slice(std::size_t start, const std::array<std::size_t, N>& extents)
-    : start_{start}, extents_(extents)
+base_slice<N>::base_slice(std::size_t start, const std::array<std::size_t, N>& extents) : start_{start}, extents_(extents)
 {
     auto tmp = this->size();
     for (std::size_t i = 0; i < N; ++i) {
@@ -87,8 +86,7 @@ template <std::size_t N> std::size_t base_slice<N>::operator()(const std::array<
 
 template <std::size_t N>
 template <typename... Dims, typename>
-base_slice_iterator<N>::base_slice_iterator(const base_slice<N>& slice, Dims... indexes)
-    : slice_{slice}, indexes_{{indexes...}}
+base_slice_iterator<N>::base_slice_iterator(const base_slice<N>& slice, Dims... indexes) : slice_{slice}, indexes_{{indexes...}}
 {
 }
 
@@ -98,7 +96,7 @@ base_slice_iterator<N>::base_slice_iterator(const base_slice<N>& slice, const st
 {
 }
 
-template <std::size_t N> auto base_slice_iterator<N>::operator++() -> base_slice_iterator &
+template <std::size_t N> auto base_slice_iterator<N>::operator++() -> base_slice_iterator&
 {
     auto i = N - 1;
     for (; i != 0; --i) {

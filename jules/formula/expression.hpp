@@ -1,8 +1,8 @@
 #ifndef JULES_FORMULA_EXPRESSION_H
 #define JULES_FORMULA_EXPRESSION_H
 
-#include <jules/formula/expression_decl.hpp>
 #include <jules/dataframe/dataframe.hpp>
+#include <jules/formula/expression_decl.hpp>
 
 namespace jules
 {
@@ -18,8 +18,7 @@ template <typename Coercion, typename T> base_expr<Coercion, T>::base_expr(const
 
 template <typename Coercion>
 template <typename T>
-base_expr<Coercion, void>::base_expr(const base_expr<Coercion, T>& source)
-    : child_{new expr_model<T>(source)}
+base_expr<Coercion, void>::base_expr(const base_expr<Coercion, T>& source) : child_{new expr_model<T>(source)}
 {
 }
 
@@ -29,7 +28,7 @@ base_expr<Coercion, void>::base_expr(const base_expr& source)
 {
 }
 
-template <typename Coercion> auto base_expr<Coercion, void>::operator=(const base_expr& source) -> base_expr &
+template <typename Coercion> auto base_expr<Coercion, void>::operator=(const base_expr& source) -> base_expr&
 {
     child_.release(source.child_ ? source.child_->clone() : nullptr);
     colname_ = source.colname_;

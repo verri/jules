@@ -1,9 +1,9 @@
 #ifndef JULES_RANGE_RANGE_H
 #define JULES_RANGE_RANGE_H
 
-#include <jules/util/type.hpp>
-#include <jules/range/tokenized.hpp>
 #include <jules/range/iterator.hpp>
+#include <jules/range/tokenized.hpp>
+#include <jules/util/type.hpp>
 
 #include <boost/range/adaptor/indexed.hpp>
 #include <boost/range/adaptor/strided.hpp>

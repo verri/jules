@@ -12,7 +12,7 @@ namespace detail
 // Expression Classes
 
 template <typename LhsIt, typename RhsIt, typename Op, std::size_t N>
-auto binary_expr_ndarray<LhsIt, RhsIt, Op, N>::iterator::operator++() -> iterator &
+auto binary_expr_ndarray<LhsIt, RhsIt, Op, N>::iterator::operator++() -> iterator&
 {
     ++lhs_;
     ++rhs_;
@@ -36,7 +36,7 @@ binary_expr_ndarray<LhsIt, RhsIt, Op, N>::binary_expr_ndarray(const LhsIt& lhs_b
 {
 }
 
-template <typename It, typename Op, std::size_t N> auto unary_expr_ndarray<It, Op, N>::iterator::operator++() -> iterator &
+template <typename It, typename Op, std::size_t N> auto unary_expr_ndarray<It, Op, N>::iterator::operator++() -> iterator&
 {
     ++it_;
     return *this;

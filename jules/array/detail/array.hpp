@@ -38,8 +38,7 @@ template <typename T, std::size_t N> base_ndarray<T, N>::~base_ndarray() { clear
 
 template <typename T, std::size_t N>
 template <typename... Dims, typename>
-base_ndarray<T, N>::base_ndarray(Dims... dims)
-    : ref_ndarray<T, N>{allocate(prod_args(dims...)), {0, {std::size_t(dims)...}}}
+base_ndarray<T, N>::base_ndarray(Dims... dims) : ref_ndarray<T, N>{allocate(prod_args(dims...)), {0, {std::size_t(dims)...}}}
 {
     create(trivial_dispatch<T>(), this->data(), this->size());
 }
@@ -61,15 +60,13 @@ base_ndarray<T, N>::base_ndarray(Iter iter, Dims... dims)
 }
 
 template <typename T, std::size_t N>
-base_ndarray<T, N>::base_ndarray(const base_ndarray& source)
-    : ref_ndarray<T, N>{allocate(source.size()), source.descriptor_}
+base_ndarray<T, N>::base_ndarray(const base_ndarray& source) : ref_ndarray<T, N>{allocate(source.size()), source.descriptor_}
 {
     create(trivial_dispatch<T>(), this->data(), source.data(), this->size());
 }
 
 template <typename T, std::size_t N>
-base_ndarray<T, N>::base_ndarray(base_ndarray&& source)
-    : ref_ndarray<T, N>{move_ptr(source.data_), source.descriptor_}
+base_ndarray<T, N>::base_ndarray(base_ndarray&& source) : ref_ndarray<T, N>{move_ptr(source.data_), source.descriptor_}
 {
 }
 
@@ -135,19 +132,19 @@ base_ndarray<T, N>::base_ndarray(const unary_expr_ndarray<It, F, N>& source)
     create(trivial_dispatch<T>(), this->data(), source.data_begin(), source.size());
 }
 
-template <typename T, std::size_t N> auto base_ndarray<T, N>::operator=(const base_ndarray& source) -> base_ndarray &
+template <typename T, std::size_t N> auto base_ndarray<T, N>::operator=(const base_ndarray& source) -> base_ndarray&
 {
     COPY_FROM_BASE;
 }
 
-template <typename T, std::size_t N> auto base_ndarray<T, N>::operator=(base_ndarray&& source) -> base_ndarray &
+template <typename T, std::size_t N> auto base_ndarray<T, N>::operator=(base_ndarray&& source) -> base_ndarray&
 {
     MOVE_FROM_BASE;
 }
 
 template <typename T, std::size_t N>
 template <typename U>
-auto base_ndarray<T, N>::operator=(const base_ndarray<U, N>& source) -> base_ndarray &
+auto base_ndarray<T, N>::operator=(const base_ndarray<U, N>& source) -> base_ndarray&
 {
     static_assert(std::is_assignable<T&, U>::value, "invalid values type");
     COPY_FROM_BASE;
@@ -155,7 +152,7 @@ auto base_ndarray<T, N>::operator=(const base_ndarray<U, N>& source) -> base_nda
 
 template <typename T, std::size_t N>
 template <typename U>
-auto base_ndarray<T, N>::operator=(const ref_ndarray<U, N>& source) -> base_ndarray &
+auto base_ndarray<T, N>::operator=(const ref_ndarray<U, N>& source) -> base_ndarray&
 {
     static_assert(std::is_assignable<T&, U>::value, "invalid values type");
     COPY_FROM_REF;

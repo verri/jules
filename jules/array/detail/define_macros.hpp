@@ -3,11 +3,11 @@
 
 #include <jules/array/detail/common.hpp>
 
-#define BASE_NDARRAY(X__, N__) const base_ndarray<X__, N__> &
-#define REF_NDARRAY(X__, N__) const ref_ndarray<X__, N__> &
-#define INDIRECT_NDARRAY(X__, N__) const indirect_ndarray<X__, N__> &
-#define BINARY_EXPR_NDARRAY(X__, Y__, Z__, N__) const binary_expr_ndarray<X__, Y__, Z__, N__> &
-#define UNARY_EXPR_NDARRAY(X__, Y__, N__) const unary_expr_ndarray<X__, Y__, N__> &
+#define BASE_NDARRAY(X__, N__) const base_ndarray<X__, N__>&
+#define REF_NDARRAY(X__, N__) const ref_ndarray<X__, N__>&
+#define INDIRECT_NDARRAY(X__, N__) const indirect_ndarray<X__, N__>&
+#define BINARY_EXPR_NDARRAY(X__, Y__, Z__, N__) const binary_expr_ndarray<X__, Y__, Z__, N__>&
+#define UNARY_EXPR_NDARRAY(X__, Y__, N__) const unary_expr_ndarray<X__, Y__, N__>&
 
 #define UNPACK(...) __VA_ARGS__
 
@@ -88,21 +88,21 @@
     BINARY_COMBINATIONS(TX__, X__, N__, +)                                                                                       \
     BINARY_COMBINATIONS(TX__, X__, N__, -)                                                                                       \
     BINARY_COMBINATIONS(TX__, X__, N__, *)                                                                                       \
-    BINARY_COMBINATIONS(TX__, X__, N__, / )                                                                                      \
-    BINARY_COMBINATIONS(TX__, X__, N__, % )                                                                                      \
+    BINARY_COMBINATIONS(TX__, X__, N__, /)                                                                                       \
+    BINARY_COMBINATIONS(TX__, X__, N__, %)                                                                                       \
     BINARY_COMBINATIONS(TX__, X__, N__, &)                                                                                       \
-    BINARY_COMBINATIONS(TX__, X__, N__, | )                                                                                      \
+    BINARY_COMBINATIONS(TX__, X__, N__, |)                                                                                       \
     BINARY_COMBINATIONS(TX__, X__, N__, ^)                                                                                       \
-    BINARY_COMBINATIONS(TX__, X__, N__, << )                                                                                     \
-    BINARY_COMBINATIONS(TX__, X__, N__, >> )                                                                                     \
+    BINARY_COMBINATIONS(TX__, X__, N__, <<)                                                                                      \
+    BINARY_COMBINATIONS(TX__, X__, N__, >>)                                                                                      \
     BINARY_COMBINATIONS(TX__, X__, N__, &&)                                                                                      \
-    BINARY_COMBINATIONS(TX__, X__, N__, || )                                                                                     \
-    BINARY_COMBINATIONS(TX__, X__, N__, == )                                                                                     \
-    BINARY_COMBINATIONS(TX__, X__, N__, != )                                                                                     \
-    BINARY_COMBINATIONS(TX__, X__, N__, < )                                                                                      \
-    BINARY_COMBINATIONS(TX__, X__, N__, <= )                                                                                     \
-    BINARY_COMBINATIONS(TX__, X__, N__, > )                                                                                      \
-    BINARY_COMBINATIONS(TX__, X__, N__, >= )
+    BINARY_COMBINATIONS(TX__, X__, N__, ||)                                                                                      \
+    BINARY_COMBINATIONS(TX__, X__, N__, ==)                                                                                      \
+    BINARY_COMBINATIONS(TX__, X__, N__, !=)                                                                                      \
+    BINARY_COMBINATIONS(TX__, X__, N__, <)                                                                                       \
+    BINARY_COMBINATIONS(TX__, X__, N__, <=)                                                                                      \
+    BINARY_COMBINATIONS(TX__, X__, N__, >)                                                                                       \
+    BINARY_COMBINATIONS(TX__, X__, N__, >=)
 
 #define OPERATIONS_LIST(TX__, X__, N__)                                                                                          \
     UNARY_OPERATIONS_LIST(TX__, X__, N__)                                                                                        \
@@ -132,32 +132,32 @@
 
 #define FRIEND_OPERATIONS_DECLARATION(TX__, X__)                                                                                 \
     BINARY_LEFT_TYPE_OPERATION_DECLARATION(TX__, X__, &&)                                                                        \
-    BINARY_LEFT_TYPE_OPERATION_DECLARATION(TX__, X__, || )                                                                       \
-    BINARY_LEFT_TYPE_OPERATION_DECLARATION(TX__, X__, == )                                                                       \
-    BINARY_LEFT_TYPE_OPERATION_DECLARATION(TX__, X__, != )                                                                       \
-    BINARY_LEFT_TYPE_OPERATION_DECLARATION(TX__, X__, < )                                                                        \
-    BINARY_LEFT_TYPE_OPERATION_DECLARATION(TX__, X__, <= )                                                                       \
-    BINARY_LEFT_TYPE_OPERATION_DECLARATION(TX__, X__, > )                                                                        \
-    BINARY_LEFT_TYPE_OPERATION_DECLARATION(TX__, X__, >= )
+    BINARY_LEFT_TYPE_OPERATION_DECLARATION(TX__, X__, ||)                                                                        \
+    BINARY_LEFT_TYPE_OPERATION_DECLARATION(TX__, X__, ==)                                                                        \
+    BINARY_LEFT_TYPE_OPERATION_DECLARATION(TX__, X__, !=)                                                                        \
+    BINARY_LEFT_TYPE_OPERATION_DECLARATION(TX__, X__, <)                                                                         \
+    BINARY_LEFT_TYPE_OPERATION_DECLARATION(TX__, X__, <=)                                                                        \
+    BINARY_LEFT_TYPE_OPERATION_DECLARATION(TX__, X__, >)                                                                         \
+    BINARY_LEFT_TYPE_OPERATION_DECLARATION(TX__, X__, >=)
 
 #define FRIEND_OPERATIONS_DEFINITION(TX__, X__)                                                                                  \
     BINARY_LEFT_TYPE_OPERATION_DEFINITION(TX__, X__, &&)                                                                         \
-    BINARY_LEFT_TYPE_OPERATION_DEFINITION(TX__, X__, || )                                                                        \
-    BINARY_LEFT_TYPE_OPERATION_DEFINITION(TX__, X__, == )                                                                        \
-    BINARY_LEFT_TYPE_OPERATION_DEFINITION(TX__, X__, != )                                                                        \
-    BINARY_LEFT_TYPE_OPERATION_DEFINITION(TX__, X__, < )                                                                         \
-    BINARY_LEFT_TYPE_OPERATION_DEFINITION(TX__, X__, <= )                                                                        \
-    BINARY_LEFT_TYPE_OPERATION_DEFINITION(TX__, X__, > )                                                                         \
-    BINARY_LEFT_TYPE_OPERATION_DEFINITION(TX__, X__, >= )
+    BINARY_LEFT_TYPE_OPERATION_DEFINITION(TX__, X__, ||)                                                                         \
+    BINARY_LEFT_TYPE_OPERATION_DEFINITION(TX__, X__, ==)                                                                         \
+    BINARY_LEFT_TYPE_OPERATION_DEFINITION(TX__, X__, !=)                                                                         \
+    BINARY_LEFT_TYPE_OPERATION_DEFINITION(TX__, X__, <)                                                                          \
+    BINARY_LEFT_TYPE_OPERATION_DEFINITION(TX__, X__, <=)                                                                         \
+    BINARY_LEFT_TYPE_OPERATION_DEFINITION(TX__, X__, >)                                                                          \
+    BINARY_LEFT_TYPE_OPERATION_DEFINITION(TX__, X__, >=)
 
 #define FRIEND_OPERATIONS(TX__, X__)                                                                                             \
     BINARY_LEFT_TYPE_OPERATION(TX__, X__, &&)                                                                                    \
-    BINARY_LEFT_TYPE_OPERATION(TX__, X__, || )                                                                                   \
-    BINARY_LEFT_TYPE_OPERATION(TX__, X__, == )                                                                                   \
-    BINARY_LEFT_TYPE_OPERATION(TX__, X__, != )                                                                                   \
-    BINARY_LEFT_TYPE_OPERATION(TX__, X__, < )                                                                                    \
-    BINARY_LEFT_TYPE_OPERATION(TX__, X__, <= )                                                                                   \
-    BINARY_LEFT_TYPE_OPERATION(TX__, X__, > )                                                                                    \
-    BINARY_LEFT_TYPE_OPERATION(TX__, X__, >= )
+    BINARY_LEFT_TYPE_OPERATION(TX__, X__, ||)                                                                                    \
+    BINARY_LEFT_TYPE_OPERATION(TX__, X__, ==)                                                                                    \
+    BINARY_LEFT_TYPE_OPERATION(TX__, X__, !=)                                                                                    \
+    BINARY_LEFT_TYPE_OPERATION(TX__, X__, <)                                                                                     \
+    BINARY_LEFT_TYPE_OPERATION(TX__, X__, <=)                                                                                    \
+    BINARY_LEFT_TYPE_OPERATION(TX__, X__, >)                                                                                     \
+    BINARY_LEFT_TYPE_OPERATION(TX__, X__, >=)
 
 #endif // JULES_ARRAY_DETAIL_DEFINE_MACROS_H
