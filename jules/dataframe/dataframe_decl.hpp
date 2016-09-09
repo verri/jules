@@ -3,16 +3,16 @@
 
 #include <jules/array/array.hpp>
 #include <jules/dataframe/column.hpp>
-#include <jules/dataframe/row_view.hpp>
 #include <jules/dataframe/io_decl.hpp>
+#include <jules/dataframe/row_view.hpp>
 #include <jules/formula/expression_decl.hpp>
 
 #include <initializer_list>
+#include <iostream>
+#include <stdexcept>
 #include <string>
 #include <unordered_map>
 #include <vector>
-#include <stdexcept>
-#include <iostream>
 
 namespace jules
 {
@@ -112,7 +112,7 @@ template <typename Coercion> class base_dataframe
     base_dataframe select(const expr_list_t& expression_list) const;
 
     template <typename T> base_dataframe& coerce_to();
-    template <typename T, typename C> friend bool can_coerce_to(const base_dataframe<C>& dataframe);
+    template <typename T, typename C> friend auto coerce_to(const base_dataframe<C>& dataframe) -> base_dataframe<C>;
 
     template <typename T> bool can_coerce_to() const;
     template <typename T, typename C> friend bool can_coerce_to(const base_dataframe<C>& dataframe);

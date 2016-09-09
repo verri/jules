@@ -174,7 +174,7 @@ template <typename Coercion> auto base_dataframe<Coercion>::columns_names() cons
     return to_vector<std::string>(columns_ | adaptors::transformed([](const column_t& col) { return col.name(); }));
 }
 
-template <typename Coercion> auto base_dataframe<Coercion>::select(const std::string& name) const -> const column_t &
+template <typename Coercion> auto base_dataframe<Coercion>::select(const std::string& name) const -> const column_t&
 {
     auto it = colindexes_.find(name);
     if (it == colindexes_.end())
@@ -205,9 +205,9 @@ template <typename Coercion> template <typename T> base_dataframe<Coercion>& bas
     return *this;
 }
 
-template <typename Coercion, typename T> base_dataframe<Coercion> coerce_to(const base_dataframe<Coercion>& dataframe)
+template <typename T, typename C> auto coerce_to(const base_dataframe<C>& dataframe) -> base_dataframe<C>
 {
-    base_dataframe<Coercion> coerced;
+    base_dataframe<C> coerced;
     for (std::size_t i = 0; dataframe.columns_count(); ++i)
         coerced.colbind(jules::as_column<T>(dataframe.select(i)));
     return coerced;
@@ -285,7 +285,7 @@ auto base_dataframe<Coercion>::read(std::istream& is, const dataframe_read_optio
 }
 
 template <typename C>
-auto write(const base_dataframe<C>& df, std::ostream& os, const dataframe_write_options& opt) -> std::ostream &
+auto write(const base_dataframe<C>& df, std::ostream& os, const dataframe_write_options& opt) -> std::ostream&
 {
     if (df.rows_count() == 0 || df.columns_count() == 0)
         return os;
@@ -321,9 +321,9 @@ auto write(const base_dataframe<C>& df, std::ostream& os, const dataframe_write_
     return os;
 }
 
-template <typename C> auto write(const base_dataframe<C>& df, std::ostream& os) -> std::ostream & { return write(df, os, {}); };
+template <typename C> auto write(const base_dataframe<C>& df, std::ostream& os) -> std::ostream& { return write(df, os, {}); };
 
-template <typename C> auto operator<<(std::ostream& os, const base_dataframe<C>& df) -> std::ostream &
+template <typename C> auto operator<<(std::ostream& os, const base_dataframe<C>& df) -> std::ostream&
 {
     return write(df, os, {});
 }
