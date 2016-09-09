@@ -7,7 +7,7 @@ namespace jules
 {
 template <typename F, typename... Ts> void for_each_arg(F&& f, Ts&&... t)
 {
-    [](...) {}((f(std::forward<Ts>(t)), 0)...);
+  [](...) {}((f(std::forward<Ts>(t)), 0)...);
 }
 
 template <typename Head, typename... Tail> bool any_arg(Head head, Tail... tail) { return head || any_arg(tail...); }

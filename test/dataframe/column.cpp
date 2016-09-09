@@ -11,88 +11,88 @@ template <typename Range, typename R = range_value_t<Range>> R make_value(const 
 
 TEST_CASE("column constructor using initializer list", "[constructor]")
 {
-    using jules::column;
+  using jules::column;
 
-    struct Toy {
-    };
+  struct Toy {
+  };
 
-    auto int_column = column{"int", {1, 2, 3, 4, 5}};
-    auto c_str_column = column("char*", {"hello", "world"});
-    auto toy_column = column("toy", {Toy{}, Toy{}});
+  auto int_column = column{"int", {1, 2, 3, 4, 5}};
+  auto c_str_column = column("char*", {"hello", "world"});
+  auto toy_column = column("toy", {Toy{}, Toy{}});
 
-    REQUIRE(int_column.elements_type() == typeid(int));
-    REQUIRE(c_str_column.elements_type() == typeid(const char*));
-    REQUIRE(toy_column.elements_type() == typeid(Toy));
+  REQUIRE(int_column.elements_type() == typeid(int));
+  REQUIRE(c_str_column.elements_type() == typeid(const char*));
+  REQUIRE(toy_column.elements_type() == typeid(Toy));
 
-    REQUIRE(int_column.can_coerce_to<double>());
-    REQUIRE(int_column.can_coerce_to<std::string>());
+  REQUIRE(int_column.can_coerce_to<double>());
+  REQUIRE(int_column.can_coerce_to<std::string>());
 
-    REQUIRE(c_str_column.can_coerce_to<double>());
-    REQUIRE(c_str_column.can_coerce_to<std::string>());
+  REQUIRE(c_str_column.can_coerce_to<double>());
+  REQUIRE(c_str_column.can_coerce_to<std::string>());
 
-    REQUIRE(!toy_column.can_coerce_to<double>());
-    REQUIRE(!toy_column.can_coerce_to<std::string>());
+  REQUIRE(!toy_column.can_coerce_to<double>());
+  REQUIRE(!toy_column.can_coerce_to<std::string>());
 
-    using jules::as_column;
-    using jules::as_view;
+  using jules::as_column;
+  using jules::as_view;
 
-    auto string_numbers = column{"1.0", "2.4", "3.3"};
-    auto double_numbers = jules::as_column<double>(string_numbers);
+  auto string_numbers = column{"1.0", "2.4", "3.3"};
+  auto double_numbers = jules::as_column<double>(string_numbers);
 
-    auto v = as_view<double>(double_numbers);
+  auto v = as_view<double>(double_numbers);
 
-    CHECK(double_numbers.size() == v.size());
-    CHECK(!double_numbers.is_empty());
+  CHECK(double_numbers.size() == v.size());
+  CHECK(!double_numbers.is_empty());
 
-    CHECK(v[0] == 1.0);
-    CHECK(v[1] == 2.4);
-    CHECK(v[2] == 3.3);
+  CHECK(v[0] == 1.0);
+  CHECK(v[1] == 2.4);
+  CHECK(v[2] == 3.3);
 
-    std::vector<double> tmp = {1.0, 2.0, 3.0};
-    column range_column(tmp);
-    CHECK(range_column.elements_type() == typeid(double));
+  std::vector<double> tmp = {1.0, 2.0, 3.0};
+  column range_column(tmp);
+  CHECK(range_column.elements_type() == typeid(double));
 
-    static_assert(std::is_same<decltype(make_value(std::vector<double>{})), double>::value, "");
-    static_assert(std::is_same<decltype(make_value(v)), double>::value, "");
+  static_assert(std::is_same<decltype(make_value(std::vector<double>{})), double>::value, "");
+  static_assert(std::is_same<decltype(make_value(v)), double>::value, "");
 }
 
 TEST_CASE("column constructor inference", "[constructor]")
 {
-    using jules::column;
-    using namespace std::literals::string_literals;
+  using jules::column;
+  using namespace std::literals::string_literals;
 
-    auto check_column = [](const column& col, const auto& value) { REQUIRE(col.elements_type() == value); };
+  auto check_column = [](const column& col, const auto& value) { REQUIRE(col.elements_type() == value); };
 
-    check_column({"int", {1, 2, 3}}, typeid(int));
-    check_column({1.0, 2.0, 3.0, 1.0}, typeid(double));
-    check_column({"1.0"s, "2.0"s, "3.0"s, "1.0"s}, typeid(std::string));
+  check_column({"int", {1, 2, 3}}, typeid(int));
+  check_column({1.0, 2.0, 3.0, 1.0}, typeid(double));
+  check_column({"1.0"s, "2.0"s, "3.0"s, "1.0"s}, typeid(std::string));
 }
 
 TEST_CASE("temporary columns", "[column]")
 {
-    jules::column col{{1, 2, 3, 4, 5}};
-    jules::dataframe df;
+  jules::column col{{1, 2, 3, 4, 5}};
+  jules::dataframe df;
 
-    df.colbind(col);
-    auto c = jules::as_column<double>(df.select(0));
-    auto view = jules::as_view<double>(c);
-    // auto impossible_view = jules::as_view<double>(jules::as_column<double>(df.select(0)));
+  df.colbind(col);
+  auto c = jules::as_column<double>(df.select(0));
+  auto view = jules::as_view<double>(c);
+  // auto impossible_view = jules::as_view<double>(jules::as_column<double>(df.select(0)));
 
-    for (std::size_t i = 0; i < df.rows_count(); ++i)
-        CHECK(view[i] == i + 1);
+  for (std::size_t i = 0; i < df.rows_count(); ++i)
+    CHECK(view[i] == i + 1);
 }
 
 TEST_CASE("as_view vs as_vector", "[column]")
 {
-    auto col = jules::column{{0, 1, 2, 3, 4, 5}};
+  auto col = jules::column{{0, 1, 2, 3, 4, 5}};
 
-    auto view1 = jules::as_view<int>(col);
-    auto view2 = jules::as_view<int>(col);
-    auto vector = jules::as_vector<int>(col);
+  auto view1 = jules::as_view<int>(col);
+  auto view2 = jules::as_view<int>(col);
+  auto vector = jules::as_vector<int>(col);
 
-    for (int i : jules::slice(0, col.size())) {
-        view1[i] = -1;
-        CHECK(view2[i] == -1);
-        CHECK(vector[i] == i);
-    }
+  for (int i : jules::slice(0, col.size())) {
+    view1[i] = -1;
+    CHECK(view2[i] == -1);
+    CHECK(vector[i] == i);
+  }
 }

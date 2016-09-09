@@ -23,7 +23,7 @@ BinPackParameters: true
 BinPackArguments: true
 ColumnLimit:     130
 ConstructorInitializerAllOnOneLineOrOnePerLine: false
-ConstructorInitializerIndentWidth: 4
+ConstructorInitializerIndentWidth: 2
 DerivePointerAlignment: false
 ExperimentalAutoDetectBinPacking: false
 IndentCaseLabels: false
@@ -45,8 +45,8 @@ PointerAlignment: Left
 SpacesBeforeTrailingComments: 1
 Cpp11BracedListStyle: true
 Standard:        Cpp11
-IndentWidth:     4
-TabWidth:        8
+IndentWidth:     2
+TabWidth:        2
 UseTab:          Never
 BreakBeforeBraces: Linux
 SpacesInParentheses: false
@@ -57,7 +57,7 @@ SpacesInCStyleCastParentheses: false
 SpaceAfterCStyleCast: false
 SpacesInContainerLiterals: true
 SpaceBeforeAssignmentOperators: true
-ContinuationIndentWidth: 4
+ContinuationIndentWidth: 2
 CommentPragmas:  '^ IWYU pragma:'
 SpaceBeforeParens: ControlStatements
 DisableFormat:   false

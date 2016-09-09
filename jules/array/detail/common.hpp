@@ -30,7 +30,7 @@ using assignable_enabler = std::enable_if_t<std::is_assignable<T&, U>::value, R>
 template <std::size_t N> class base_slice;
 template <typename T> constexpr bool size_or_slice()
 {
-    return std::is_convertible<T, std::size_t>::value || std::is_convertible<T, base_slice<1>>::value;
+  return std::is_convertible<T, std::size_t>::value || std::is_convertible<T, base_slice<1>>::value;
 }
 
 template <typename Return, typename... Args>
@@ -38,7 +38,7 @@ using element_request = std::enable_if_t<all_args(std::is_convertible<Args, std:
 
 template <typename Return, typename... Args>
 using slice_request =
-    std::enable_if_t<all_args(size_or_slice<Args>()...) && !all_args(std::is_convertible<Args, std::size_t>::value...), Return>;
+  std::enable_if_t<all_args(size_or_slice<Args>()...) && !all_args(std::is_convertible<Args, std::size_t>::value...), Return>;
 
 template <typename Return, typename... Args>
 using indirect_request = std::enable_if_t<!all_args(size_or_slice<Args>()...), Return>;
@@ -67,28 +67,28 @@ template <typename, typename, typename, std::size_t> class binary_expr_ndarray;
 template <typename, typename, std::size_t> class unary_expr_ndarray;
 
 template <typename T> struct is_array_helper {
-    static constexpr bool value = false;
+  static constexpr bool value = false;
 };
 
 template <typename T, std::size_t N> struct is_array_helper<base_ndarray<T, N>> {
-    static constexpr bool value = true;
+  static constexpr bool value = true;
 };
 
 template <typename T, std::size_t N> struct is_array_helper<ref_ndarray<T, N>> {
-    static constexpr bool value = true;
+  static constexpr bool value = true;
 };
 
 template <typename T, std::size_t N> struct is_array_helper<indirect_ndarray<T, N>> {
-    static constexpr bool value = true;
+  static constexpr bool value = true;
 };
 
 template <typename It, typename F, std::size_t N> struct is_array_helper<unary_expr_ndarray<It, F, N>> {
-    static constexpr bool value = true;
+  static constexpr bool value = true;
 };
 
 template <typename LhsIt, typename RhsIt, typename F, std::size_t N>
 struct is_array_helper<binary_expr_ndarray<LhsIt, RhsIt, F, N>> {
-    static constexpr bool value = true;
+  static constexpr bool value = true;
 };
 
 template <typename T> constexpr bool is_array() { return is_array_helper<T>::value; }
