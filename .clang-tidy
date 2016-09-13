@@ -1,6 +1,6 @@
 ---
 Checks: >
-  modernize-*,performance-*,clang-analyzer-*,clang-diagnostic-*
+  modernize-*,performance-*,clang-analyzer-*,clang-diagnostic-*,cert-*,misc-*,-misc-definitions-in-headers
 HeaderFilterRegex: ''
 AnalyzeTemporaryDtors: true
 ...

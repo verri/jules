@@ -46,10 +46,7 @@ struct regex_forwarder {
 
 namespace adaptors
 {
-namespace
-{
 static const detail::regex_forwarder tokenized = {};
-}
 
 template <typename BidirectionalRange, class Submatch>
 auto tokenize(BidirectionalRange& rng, const std::regex& re, const Submatch& sub, detail::match_flag_type f)
