@@ -27,11 +27,11 @@ private:
 public:
   template <typename T> using view_t = base_column_view<T>;
 
-  template <typename T> base_column(std::string  name, std::initializer_list<T> values);
-  template <typename T> base_column(std::string  name, const T& value, std::size_t size);
+  template <typename T> base_column(std::string name, std::initializer_list<T> values);
+  template <typename T> base_column(std::string name, const T& value, std::size_t size);
   template <typename T> base_column(std::initializer_list<T> values);
   template <typename T> base_column(const T& value, std::size_t size);
-  template <typename Range, typename R = range_value_t<Range>> base_column(std::string  name, const Range& rng);
+  template <typename Range, typename R = range_value_t<Range>> base_column(std::string name, const Range& rng);
   template <typename Range, typename R = range_value_t<Range>> base_column(const Range& rng);
 
   base_column(const base_column& source);
@@ -59,7 +59,7 @@ public:
   template <typename T, typename C> friend auto as_vector(const base_column<C>& column) -> vector<T>;
 
 private:
-  base_column(std::string  name, std::unique_ptr<column_interface_t>&& column_model);
+  base_column(std::string name, std::unique_ptr<column_interface_t>&& column_model);
 
   template <typename T> auto view() -> view_t<T>;
   template <typename T> auto view() const -> view_t<const T>;

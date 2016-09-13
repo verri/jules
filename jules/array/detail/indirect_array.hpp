@@ -232,9 +232,8 @@ indirect_ndarray<T, N>::indirect_ndarray(T* data, const std::array<std::size_t, 
 }
 
 template <typename T, std::size_t N>
-indirect_ndarray<T, N>::indirect_ndarray(T* data, const std::array<std::size_t, N>& extents,
-                                         const std::vector<std::size_t>& indexes)
-  : data_{data}, descriptor_{0, extents}, indexes_{indexes}
+indirect_ndarray<T, N>::indirect_ndarray(T* data, const std::array<std::size_t, N>& extents, std::vector<std::size_t> indexes)
+  : data_{data}, descriptor_{0, extents}, indexes_{std::move(indexes)}
 {
 }
 
@@ -400,9 +399,8 @@ indirect_ndarray<T, 1>::indirect_ndarray(T* data, const std::array<std::size_t, 
 }
 
 template <typename T>
-indirect_ndarray<T, 1>::indirect_ndarray(T* data, const std::array<std::size_t, 1>& extents,
-                                         const std::vector<std::size_t>& indexes)
-  : data_{data}, descriptor_{0, extents}, indexes_{indexes}
+indirect_ndarray<T, 1>::indirect_ndarray(T* data, const std::array<std::size_t, 1>& extents, std::vector<std::size_t> indexes)
+  : data_{data}, descriptor_{0, extents}, indexes_{std::move(indexes)}
 {
 }
 

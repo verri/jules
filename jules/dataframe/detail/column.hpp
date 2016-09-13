@@ -64,7 +64,8 @@ public:
   column_interface(const column_interface&) = default;
   column_interface(column_interface&&) = default;
 
-  virtual ~column_interface()= default;;
+  virtual ~column_interface() = default;
+  ;
 
   column_interface& operator=(const column_interface&) = delete;
   column_interface& operator=(column_interface&&) = delete;
@@ -171,10 +172,7 @@ protected:
   using column_interface<Coercion>::coerce_to_;
   using column_interface<Coercion>::can_coerce_to_;
 
-  column_interface_ptr coerce_to_(tag<type> tag) const final
-  {
-    return specific::coerce_to_(this->begin(), this->end(), tag);
-  }
+  column_interface_ptr coerce_to_(tag<type> tag) const final { return specific::coerce_to_(this->begin(), this->end(), tag); }
 
   bool can_coerce_to_(tag<type> tag) const final { return specific::can_coerce_to_(tag); }
 
@@ -201,10 +199,7 @@ protected:
   using column_interface<Coercion>::coerce_to_;
   using column_interface<Coercion>::can_coerce_to_;
 
-  column_interface_ptr coerce_to_(tag<type> tag) const final
-  {
-    return specific::coerce_to_(this->begin(), this->end(), tag);
-  }
+  column_interface_ptr coerce_to_(tag<type> tag) const final { return specific::coerce_to_(this->begin(), this->end(), tag); }
 
   bool can_coerce_to_(tag<type> tag) const final { return specific::can_coerce_to_(tag); }
 

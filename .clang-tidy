@@ -1,6 +1,6 @@
 ---
 Checks: >
-  *,clang-diagnostic-*,clang-analyzer-*,-clang-analyzer-alpha*,-google*,-readability-named-parameter,-readability-braces-around-statements
+  modernize-*,performance-*,clang-analyzer-*,clang-diagnostic-*
 HeaderFilterRegex: ''
-AnalyzeTemporaryDtors: false
+AnalyzeTemporaryDtors: true
 ...

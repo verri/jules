@@ -91,7 +91,7 @@ private:
 
   // guarantees default strides and start=0.
   indirect_ndarray(T* data, const std::array<std::size_t, N>& extents, std::vector<std::size_t>&& indexes);
-  indirect_ndarray(T* data, const std::array<std::size_t, N>& extents, const std::vector<std::size_t>& indexes);
+  indirect_ndarray(T* data, const std::array<std::size_t, N>& extents, std::vector<std::size_t> indexes);
 
   indirect_ndarray(const indirect_ndarray& source) = default;
   indirect_ndarray(indirect_ndarray&& source) = default;
@@ -200,7 +200,7 @@ private:
 
   // guarantees default strides and start=0.
   indirect_ndarray(T* data, const std::array<std::size_t, 1>& extents, std::vector<std::size_t>&& indexes);
-  indirect_ndarray(T* data, const std::array<std::size_t, 1>& extents, const std::vector<std::size_t>& indexes);
+  indirect_ndarray(T* data, const std::array<std::size_t, 1>& extents, std::vector<std::size_t> indexes);
 
   indirect_ndarray(const indirect_ndarray& source) = default;
   indirect_ndarray(indirect_ndarray&& source) = default;

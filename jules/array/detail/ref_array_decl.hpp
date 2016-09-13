@@ -172,7 +172,7 @@ public:
   OPERATIONS_LIST((typename R), (const ref_ndarray<R, 1>&), 1)
 
 protected:
-  ref_ndarray(T* data, const base_slice<1>& descriptor) : data_{data}, descriptor_{descriptor} {}
+  ref_ndarray(T* data, base_slice<1> descriptor) : data_{data}, descriptor_{std::move(descriptor)} {}
   ref_ndarray() : data_{nullptr} {}
 
   ref_ndarray(const ref_ndarray& source) = default;

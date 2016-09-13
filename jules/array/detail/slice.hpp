@@ -149,14 +149,13 @@ inline base_slice<1>::base_slice(std::size_t start, std::initializer_list<std::s
     stride_[0] = *strides.begin();
 }
 
-inline base_slice<1>::base_slice(std::size_t start, const std::array<std::size_t, 1>& extents)
-  : start_{start}, extent_(extents), stride_{{1}}
+inline base_slice<1>::base_slice(std::size_t start, std::array<std::size_t, 1> extents)
+  : start_{start}, extent_(std::move(extents)), stride_{{1}}
 {
 }
 
-inline base_slice<1>::base_slice(std::size_t start, const std::array<std::size_t, 1>& extents,
-                                 const std::array<std::size_t, 1>& strides)
-  : start_{start}, extent_(extents), stride_(strides)
+inline base_slice<1>::base_slice(std::size_t start, std::array<std::size_t, 1> extents, std::array<std::size_t, 1> strides)
+  : start_{start}, extent_(std::move(extents)), stride_(std::move(strides))
 {
 }
 

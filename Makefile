@@ -1,4 +1,4 @@
-HEADERS = $(shell find jules -name \*.[ch]pp)
+HEADERS = $(shell find jules -name \*.[ch]pp -not -name undef\*)
 SRC = $(shell find test benchmark -name \*.[ch]pp) $(HEADERS)
 
 all: test
@@ -12,7 +12,7 @@ format:
 
 tidy:
 	@echo Tidying source...
-	@clang-tidy $(HEADERS) -- -std=c++14 -I.
+	@clang-tidy $(HEADERS) -fix -fix-errors -- -std=c++14 -I.
 
 clean:
 	@$(MAKE) --no-print-directory -C test clean

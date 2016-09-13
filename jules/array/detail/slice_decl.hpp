@@ -97,8 +97,8 @@ public:
   inline base_slice(std::size_t start, std::initializer_list<std::size_t> extents);
   inline base_slice(std::size_t start, std::initializer_list<std::size_t> extents, std::initializer_list<std::size_t> strides);
 
-  inline base_slice(std::size_t start, const std::array<std::size_t, 1>& extents);
-  inline base_slice(std::size_t start, const std::array<std::size_t, 1>& extents, const std::array<std::size_t, 1>& strides);
+  inline base_slice(std::size_t start, std::array<std::size_t, 1> extents);
+  inline base_slice(std::size_t start, std::array<std::size_t, 1> extents, std::array<std::size_t, 1> strides);
 
   base_slice(const base_slice& source) = default;
   base_slice(base_slice&& source) = default;

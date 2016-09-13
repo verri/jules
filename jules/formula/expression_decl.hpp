@@ -7,6 +7,7 @@
 #include <functional>
 #include <memory>
 #include <string>
+#include <utility>
 
 namespace jules
 {
@@ -70,7 +71,7 @@ private:
 
 public:
   template <typename T> base_expr(const base_expr<Coercion, T>& source);
-  explicit base_expr(const std::string& colname) : colname_{colname} {}
+  explicit base_expr(std::string colname) : colname_{std::move(colname)} {}
 
   base_expr(const base_expr& source);
   base_expr(base_expr&& source) = default;

@@ -10,14 +10,14 @@ namespace jules
 
 template <typename Coercion>
 template <typename T>
-base_column<Coercion>::base_column(std::string  name, std::initializer_list<T> values)
+base_column<Coercion>::base_column(std::string name, std::initializer_list<T> values)
   : name_{std::move(name)}, column_model_{std::make_unique<column_model_t<T>>(values)}
 {
 }
 
 template <typename Coercion>
 template <typename T>
-base_column<Coercion>::base_column(std::string  name, const T& value, std::size_t size)
+base_column<Coercion>::base_column(std::string name, const T& value, std::size_t size)
   : name_{std::move(name)}, column_model_{std::make_unique<column_model_t<T>>(size, value)}
 {
 }
@@ -36,14 +36,14 @@ base_column<Coercion>::base_column(const T& value, std::size_t size)
 }
 
 template <typename Coercion>
-base_column<Coercion>::base_column(std::string  name, std::unique_ptr<column_interface_t>&& column_model)
+base_column<Coercion>::base_column(std::string name, std::unique_ptr<column_interface_t>&& column_model)
   : name_{std::move(name)}, column_model_{std::move(column_model)}
 {
 }
 
 template <typename Coercion>
 template <typename Range, typename R>
-base_column<Coercion>::base_column(std::string  name, const Range& rng)
+base_column<Coercion>::base_column(std::string name, const Range& rng)
   : name_{std::move(name)}, column_model_{std::make_unique<column_model_t<R>>(range::begin(rng), range::end(rng))}
 {
 }
