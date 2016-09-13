@@ -15,7 +15,7 @@ struct dataframe_read_options {
   {
   }
 
-  ~dataframe_read_options() {}
+  ~dataframe_read_options() = default;
 
   struct {
     std::regex regex;
@@ -41,7 +41,7 @@ struct dataframe_write_options {
            [sep = cell_separator](auto& os) -> auto & { return os << sep; }},
       header{header} {}
 
-  ~dataframe_write_options() {}
+  ~dataframe_write_options() = default;
 
   struct { std::function<std::ostream&(std::ostream&)> separator; } line;
 

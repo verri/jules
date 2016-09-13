@@ -61,5 +61,7 @@ ContinuationIndentWidth: 2
 CommentPragmas:  '^ IWYU pragma:'
 SpaceBeforeParens: ControlStatements
 DisableFormat:   false
+ReflowComments: true
+SortIncludes: true
 ...
 

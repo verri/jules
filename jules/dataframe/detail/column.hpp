@@ -34,7 +34,7 @@ protected:
   virtual bool can_coerce_to_(tag<type>) const = 0;
 
 public:
-  ~generate_virtual_coercions() {}
+  ~generate_virtual_coercions() = default;
 };
 
 template <typename Eraser, typename Coercion> class generate_virtual_coercions<Eraser, Coercion, 0>
@@ -48,7 +48,7 @@ protected:
   virtual bool can_coerce_to_(tag<type>) const = 0;
 
 public:
-  ~generate_virtual_coercions() {}
+  ~generate_virtual_coercions() = default;
 };
 
 template <typename Coercion>
@@ -64,7 +64,7 @@ public:
   column_interface(const column_interface&) = default;
   column_interface(column_interface&&) = default;
 
-  virtual ~column_interface(){};
+  virtual ~column_interface()= default;;
 
   column_interface& operator=(const column_interface&) = delete;
   column_interface& operator=(column_interface&&) = delete;
@@ -171,12 +171,12 @@ protected:
   using column_interface<Coercion>::coerce_to_;
   using column_interface<Coercion>::can_coerce_to_;
 
-  virtual column_interface_ptr coerce_to_(tag<type> tag) const override final
+  column_interface_ptr coerce_to_(tag<type> tag) const final
   {
     return specific::coerce_to_(this->begin(), this->end(), tag);
   }
 
-  virtual bool can_coerce_to_(tag<type> tag) const override final { return specific::can_coerce_to_(tag); }
+  bool can_coerce_to_(tag<type> tag) const final { return specific::can_coerce_to_(tag); }
 
 public:
   using generate_concrete_coercions<T, Coercion, I - 1>::generate_concrete_coercions;
@@ -201,12 +201,12 @@ protected:
   using column_interface<Coercion>::coerce_to_;
   using column_interface<Coercion>::can_coerce_to_;
 
-  virtual column_interface_ptr coerce_to_(tag<type> tag) const override final
+  column_interface_ptr coerce_to_(tag<type> tag) const final
   {
     return specific::coerce_to_(this->begin(), this->end(), tag);
   }
 
-  virtual bool can_coerce_to_(tag<type> tag) const override final { return specific::can_coerce_to_(tag); }
+  bool can_coerce_to_(tag<type> tag) const final { return specific::can_coerce_to_(tag); }
 
 public:
   using std::vector<T>::vector;
@@ -232,13 +232,13 @@ public:
   column_model& operator=(const column_model&) = delete;
   column_model& operator=(column_model&&) = delete;
 
-  virtual std::type_index elements_type() const override final { return typeid(T); }
-  virtual std::unique_ptr<column_interface<Coercion>> clone() const override final
+  std::type_index elements_type() const final { return typeid(T); }
+  std::unique_ptr<column_interface<Coercion>> clone() const final
   {
     return std::unique_ptr<column_interface<Coercion>>{new column_model{*this}};
   }
 
-  virtual std::size_t size() const override final { return std::vector<T>::size(); }
+  std::size_t size() const final { return std::vector<T>::size(); }
 };
 
 } // namespace detail
