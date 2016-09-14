@@ -72,8 +72,8 @@ public:
   FRIEND_OPERATIONS((typename R, std::size_t M), (const ref_ndarray<R, M>&))
 
 private:
-  binary_expr_ndarray(binary_expr_ndarray&& source) = default;
-  binary_expr_ndarray& operator=(binary_expr_ndarray&& source) = default;
+  binary_expr_ndarray(binary_expr_ndarray&& source) noexcept = default;
+  binary_expr_ndarray& operator=(binary_expr_ndarray&& source) noexcept = default;
 
   LhsIt lhs_begin_, lhs_end_;
   RhsIt rhs_begin_, rhs_end_;
@@ -136,8 +136,8 @@ public:
   FRIEND_OPERATIONS((typename R, std::size_t M), (const ref_ndarray<R, M>&))
 
 private:
-  unary_expr_ndarray(unary_expr_ndarray&& source) = default;
-  unary_expr_ndarray& operator=(unary_expr_ndarray&& source) = default;
+  unary_expr_ndarray(unary_expr_ndarray&& source) noexcept = default;
+  unary_expr_ndarray& operator=(unary_expr_ndarray&& source) noexcept = default;
 
   It it_begin_, it_end_;
   Op op_;

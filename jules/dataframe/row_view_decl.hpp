@@ -19,10 +19,10 @@ public:
   ~base_row_view() = default;
 
   base_row_view(const base_row_view& source) = default;
-  base_row_view(base_row_view&& source) = default;
+  base_row_view(base_row_view&& source) noexcept = default;
 
   auto operator=(const base_row_view& source) -> base_row_view& = delete;
-  auto operator=(base_row_view&& source) -> base_row_view& = delete;
+  auto operator=(base_row_view&& source) noexcept -> base_row_view& = delete;
 
   using super_t::operator=;
 

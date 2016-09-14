@@ -36,10 +36,10 @@ public:
   base_dataframe(const Range& rng);
 
   base_dataframe(const base_dataframe& source) = default;
-  base_dataframe(base_dataframe&& source) = default;
+  base_dataframe(base_dataframe&& source) noexcept = default;
 
   base_dataframe& operator=(const base_dataframe& source) = default;
-  base_dataframe& operator=(base_dataframe&& source) = default;
+  base_dataframe& operator=(base_dataframe&& source) noexcept = default;
 
   // IO
 

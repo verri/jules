@@ -43,7 +43,7 @@ public:
   ref_ndarray& operator=(const ref_ndarray& source);
 
   template <typename U> ref_ndarray& operator=(const base_ndarray<U, N>& source);
-  template <typename U> ref_ndarray& operator=(base_ndarray<U, N>&& source);
+  template <typename U> ref_ndarray& operator=(base_ndarray<U, N>&& source) noexcept;
 
   template <typename U> ref_ndarray& operator=(const ref_ndarray<U, N>& source);
   template <typename U> ref_ndarray& operator=(const indirect_ndarray<U, N>& source);
@@ -97,10 +97,10 @@ protected:
   ref_ndarray() : data_{nullptr} {}
 
   ref_ndarray(const ref_ndarray& source) = default;
-  ref_ndarray(ref_ndarray&& source) = default;
+  ref_ndarray(ref_ndarray&& source) noexcept = default;
 
   void clone_from(const ref_ndarray& source);
-  void clone_from(ref_ndarray&& source);
+  void clone_from(ref_ndarray&& source) noexcept;
   [[deprecated("use clone_from")]] void assign(const ref_ndarray& source);
 
   T* data_;
@@ -127,7 +127,7 @@ public:
   ref_ndarray& operator=(const ref_ndarray& source);
 
   template <typename U> ref_ndarray& operator=(const base_ndarray<U, 1>& source);
-  template <typename U> ref_ndarray& operator=(base_ndarray<U, 1>&& source);
+  template <typename U> ref_ndarray& operator=(base_ndarray<U, 1>&& source) noexcept;
 
   template <typename U> ref_ndarray& operator=(const ref_ndarray<U, 1>& source);
   template <typename U> ref_ndarray& operator=(const indirect_ndarray<U, 1>& source);
@@ -176,10 +176,10 @@ protected:
   ref_ndarray() : data_{nullptr} {}
 
   ref_ndarray(const ref_ndarray& source) = default;
-  ref_ndarray(ref_ndarray&& source) = default;
+  ref_ndarray(ref_ndarray&& source) noexcept = default;
 
   void clone_from(const ref_ndarray& source);
-  void clone_from(ref_ndarray&& source);
+  void clone_from(ref_ndarray&& source) noexcept;
   [[deprecated("use clone_from")]] void assign(const ref_ndarray& source);
 
   T* data_;
@@ -199,10 +199,10 @@ public:
   ref_ndarray_iterator(const ref_ndarray<T, N>& array, std::size_t index) : array_{array}, index_{index} {}
 
   ref_ndarray_iterator(const ref_ndarray_iterator& source) = default;
-  ref_ndarray_iterator(ref_ndarray_iterator&& source) = default;
+  ref_ndarray_iterator(ref_ndarray_iterator&& source) noexcept = default;
 
   ref_ndarray_iterator& operator=(const ref_ndarray_iterator& source);
-  ref_ndarray_iterator& operator=(ref_ndarray_iterator&& source);
+  ref_ndarray_iterator& operator=(ref_ndarray_iterator&& source) noexcept;
 
   ref_ndarray<T, N - 1> operator*() const { return array_[index_]; }
 
@@ -230,11 +230,11 @@ public:
   ref_ndarray_iterator(const ref_ndarray<T, 1>& array, std::size_t index) : array_{array}, index_{index} {}
 
   ref_ndarray_iterator(const ref_ndarray_iterator& source) = default;
-  ref_ndarray_iterator(ref_ndarray_iterator&& source) = default;
+  ref_ndarray_iterator(ref_ndarray_iterator&& source) noexcept = default;
 
   // TODO: all operator= of iterators are not trivial
   ref_ndarray_iterator& operator=(const ref_ndarray_iterator& source);
-  ref_ndarray_iterator& operator=(ref_ndarray_iterator&& source);
+  ref_ndarray_iterator& operator=(ref_ndarray_iterator&& source) noexcept;
 
   T& operator*() const { return array_[index_]; }
 

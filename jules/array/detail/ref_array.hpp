@@ -68,7 +68,7 @@ ref_ndarray<T, N>& ref_ndarray<T, N>::operator=(const base_ndarray<U, N>& source
 
 template <typename T, std::size_t N>
 template <typename U>
-ref_ndarray<T, N>& ref_ndarray<T, N>::operator=(base_ndarray<U, N>&& source)
+ref_ndarray<T, N>& ref_ndarray<T, N>::operator=(base_ndarray<U, N>&& source) noexcept
 {
   CHECK_ASSIGNMENT(source.data_, source.descriptor_);
   CHECK_ASSIGNABLE(U);
@@ -207,7 +207,7 @@ template <typename T, std::size_t N> void ref_ndarray<T, N>::clone_from(const re
   descriptor_ = source.descriptor_;
 }
 
-template <typename T, std::size_t N> void ref_ndarray<T, N>::clone_from(ref_ndarray&& source)
+template <typename T, std::size_t N> void ref_ndarray<T, N>::clone_from(ref_ndarray&& source) noexcept
 {
   data_ = move_ptr(source.data_);
   descriptor_ = std::move(source.descriptor_);
@@ -230,7 +230,7 @@ template <typename T> template <typename U> ref_ndarray<T, 1>& ref_ndarray<T, 1>
   COPY_FROM_SOURCE;
 }
 
-template <typename T> template <typename U> ref_ndarray<T, 1>& ref_ndarray<T, 1>::operator=(base_ndarray<U, 1>&& source)
+template <typename T> template <typename U> ref_ndarray<T, 1>& ref_ndarray<T, 1>::operator=(base_ndarray<U, 1>&& source) noexcept
 {
   CHECK_ASSIGNMENT(source.data_, source.descriptor_);
   CHECK_ASSIGNABLE(U);
@@ -327,7 +327,7 @@ template <typename T> void ref_ndarray<T, 1>::clone_from(const ref_ndarray& sour
   descriptor_ = source.descriptor_;
 }
 
-template <typename T> void ref_ndarray<T, 1>::clone_from(ref_ndarray&& source)
+template <typename T> void ref_ndarray<T, 1>::clone_from(ref_ndarray&& source) noexcept
 {
   data_ = move_ptr(source.data_);
   descriptor_ = std::move(source.descriptor_);
@@ -373,7 +373,7 @@ template <typename T> ref_ndarray_iterator<T, 1>& ref_ndarray_iterator<T, 1>::op
   return *this;
 }
 
-template <typename T> ref_ndarray_iterator<T, 1>& ref_ndarray_iterator<T, 1>::operator=(ref_ndarray_iterator&& source)
+template <typename T> ref_ndarray_iterator<T, 1>& ref_ndarray_iterator<T, 1>::operator=(ref_ndarray_iterator&& source) noexcept
 {
   this->index_ = source.index_;
   this->array_.clone_from(std::move(source.array_));

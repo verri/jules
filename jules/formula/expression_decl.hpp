@@ -59,6 +59,7 @@ private:
   explicit base_expr(std::function<column_t(const dataframe_t& data)> f) : f_{f} {}
   explicit base_expr() = default;
 
+  // XXX: std::function has no noexcept move constructor
   std::function<column_t(const dataframe_t& data)> f_ = nullptr;
 };
 
@@ -74,10 +75,10 @@ public:
   explicit base_expr(std::string colname) : colname_{std::move(colname)} {}
 
   base_expr(const base_expr& source);
-  base_expr(base_expr&& source) = default;
+  base_expr(base_expr&& source) noexcept = default;
 
   base_expr& operator=(const base_expr& source);
-  base_expr& operator=(base_expr&& source) = default;
+  base_expr& operator=(base_expr&& source) noexcept = default;
 
   column_t extract_from(const dataframe_t& data) const;
 

@@ -66,7 +66,7 @@ base_ndarray<T, N>::base_ndarray(const base_ndarray& source) : ref_ndarray<T, N>
 }
 
 template <typename T, std::size_t N>
-base_ndarray<T, N>::base_ndarray(base_ndarray&& source) : ref_ndarray<T, N>{move_ptr(source.data_), source.descriptor_}
+base_ndarray<T, N>::base_ndarray(base_ndarray&& source) noexcept : ref_ndarray<T, N>{move_ptr(source.data_), source.descriptor_}
 {
 }
 
@@ -137,7 +137,7 @@ template <typename T, std::size_t N> auto base_ndarray<T, N>::operator=(const ba
   COPY_FROM_BASE;
 }
 
-template <typename T, std::size_t N> auto base_ndarray<T, N>::operator=(base_ndarray&& source) -> base_ndarray&
+template <typename T, std::size_t N> auto base_ndarray<T, N>::operator=(base_ndarray&& source) noexcept -> base_ndarray&
 {
   MOVE_FROM_BASE;
 }

@@ -15,7 +15,8 @@ struct dataframe_read_options {
   {
   }
 
-  ~dataframe_read_options() = default;
+  // XXX: = default doesn't work in clang 3.9
+  ~dataframe_read_options() {}
 
   struct {
     std::regex regex;
@@ -40,8 +41,6 @@ struct dataframe_write_options {
       cell{[](auto& os, const auto& data) -> auto& { return os << data; },
            [sep = cell_separator](auto& os) -> auto & { return os << sep; }},
       header{header} {}
-
-  ~dataframe_write_options() = default;
 
   struct { std::function<std::ostream&(std::ostream&)> separator; } line;
 

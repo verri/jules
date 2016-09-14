@@ -62,7 +62,7 @@ private:
 public:
   column_interface() = default;
   column_interface(const column_interface&) = default;
-  column_interface(column_interface&&) = default;
+  column_interface(column_interface&&) noexcept = default;
 
   virtual ~column_interface() = default;
   ;
@@ -181,7 +181,7 @@ public:
 
   generate_concrete_coercions() = default;
   generate_concrete_coercions(const generate_concrete_coercions&) = default;
-  generate_concrete_coercions(generate_concrete_coercions&&) = default;
+  generate_concrete_coercions(generate_concrete_coercions&&) noexcept = default;
 };
 
 template <typename T, typename Coercion>
@@ -208,7 +208,7 @@ public:
 
   generate_concrete_coercions() = default;
   generate_concrete_coercions(const generate_concrete_coercions&) = default;
-  generate_concrete_coercions(generate_concrete_coercions&&) = default;
+  generate_concrete_coercions(generate_concrete_coercions&&) noexcept = default;
 };
 
 template <typename T, typename Coercion>
@@ -222,7 +222,7 @@ public:
   column_model() = default;
 
   column_model(const column_model&) = default;
-  column_model(column_model&&) = default;
+  column_model(column_model&&) noexcept = default;
 
   column_model& operator=(const column_model&) = delete;
   column_model& operator=(column_model&&) = delete;

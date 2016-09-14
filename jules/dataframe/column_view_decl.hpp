@@ -22,10 +22,10 @@ public:
   ~base_column_view() = default;
 
   base_column_view(const base_column_view& source) = default;
-  base_column_view(base_column_view&& source) = default;
+  base_column_view(base_column_view&& source) noexcept = default;
 
   base_column_view& operator=(const base_column_view& source) = delete;
-  base_column_view& operator=(base_column_view&& source) = delete;
+  base_column_view& operator=(base_column_view&& source) noexcept = delete;
 
   using detail::ref_ndarray<T, 1>::operator=;
 

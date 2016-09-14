@@ -17,4 +17,4 @@ tidy:
 clean:
 	@$(MAKE) --no-print-directory -C test clean
 
-.PHONY: format test clean
+.PHONY: format test clean tidy

@@ -35,10 +35,10 @@ public:
   template <typename Range, typename R = range_value_t<Range>> base_column(const Range& rng);
 
   base_column(const base_column& source);
-  base_column(base_column&& source) = default;
+  base_column(base_column&& source) noexcept = default;
 
   auto operator=(const base_column& source) -> base_column&;
-  auto operator=(base_column&& source) -> base_column& = default;
+  auto operator=(base_column&& source) noexcept -> base_column& = default;
 
   template <typename T> auto coerce_to() & -> base_column&;
   template <typename T> auto can_coerce_to() const { return column_model_->template can_coerce_to<T>(); }

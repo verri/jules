@@ -47,7 +47,7 @@ public:
   base_ndarray(Iter iter, Dims... dims);
 
   base_ndarray(const base_ndarray& source);
-  base_ndarray(base_ndarray&& source);
+  base_ndarray(base_ndarray&& source) noexcept;
 
   template <typename U> base_ndarray(const base_ndarray<U, N>& source);
   template <typename U> base_ndarray(const ref_ndarray<U, N>& source);
@@ -56,7 +56,7 @@ public:
   template <typename It, typename F> base_ndarray(const unary_expr_ndarray<It, F, N>& source);
 
   base_ndarray& operator=(const base_ndarray& source);
-  base_ndarray& operator=(base_ndarray&& source);
+  base_ndarray& operator=(base_ndarray&& source) noexcept;
 
   template <typename U> base_ndarray& operator=(const base_ndarray<U, N>& source);
   template <typename U> base_ndarray& operator=(const ref_ndarray<U, N>& source);
@@ -114,13 +114,13 @@ public:
   ~base_ndarray() = default;
 
   base_ndarray(const base_ndarray& source) = default;
-  base_ndarray(base_ndarray&& source) = default;
+  base_ndarray(base_ndarray&& source) noexcept = default;
 
   base_ndarray& operator=(const base_ndarray& source) = default;
-  base_ndarray& operator=(base_ndarray&& source) = default;
+  base_ndarray& operator=(base_ndarray&& source) noexcept = default;
 
   base_ndarray& operator=(const T& source) { data_ = source; }
-  base_ndarray& operator=(T&& source) { data_ = std::move(source); }
+  base_ndarray& operator=(T&& source) noexcept { data_ = std::move(source); }
 
   operator T&() { return data_; }
   operator const T&() const { return data_; }

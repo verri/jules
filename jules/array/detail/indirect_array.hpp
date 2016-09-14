@@ -66,7 +66,7 @@ indirect_ndarray<T, N>& indirect_ndarray<T, N>::operator=(const base_ndarray<U, 
 
 template <typename T, std::size_t N>
 template <typename U>
-indirect_ndarray<T, N>& indirect_ndarray<T, N>::operator=(base_ndarray<U, N>&& source)
+indirect_ndarray<T, N>& indirect_ndarray<T, N>::operator=(base_ndarray<U, N>&& source) noexcept
 {
   CHECK_ASSIGNMENT(source.data_, source.descriptor_);
   CHECK_ASSIGNABLE(U);
@@ -244,7 +244,7 @@ template <typename T, std::size_t N> void indirect_ndarray<T, N>::clone_from(con
   this->indexes_ = source.indexes;
 }
 
-template <typename T, std::size_t N> void indirect_ndarray<T, N>::clone_from(indirect_ndarray&& source)
+template <typename T, std::size_t N> void indirect_ndarray<T, N>::clone_from(indirect_ndarray&& source) noexcept
 {
   this->data_ = source.data_;
   this->descriptor_ = std::move(source.descriptor_);
@@ -274,7 +274,9 @@ indirect_ndarray<T, 1>& indirect_ndarray<T, 1>::operator=(const base_ndarray<U, 
   COPY_FROM_SOURCE;
 }
 
-template <typename T> template <typename U> indirect_ndarray<T, 1>& indirect_ndarray<T, 1>::operator=(base_ndarray<U, 1>&& source)
+template <typename T>
+template <typename U>
+indirect_ndarray<T, 1>& indirect_ndarray<T, 1>::operator=(base_ndarray<U, 1>&& source) noexcept
 {
   CHECK_ASSIGNMENT(source.data_, source.descriptor_);
   CHECK_ASSIGNABLE(U);
@@ -411,7 +413,7 @@ template <typename T> void indirect_ndarray<T, 1>::clone_from(const indirect_nda
   this->indexes_ = source.indexes;
 }
 
-template <typename T> void indirect_ndarray<T, 1>::clone_from(indirect_ndarray&& source)
+template <typename T> void indirect_ndarray<T, 1>::clone_from(indirect_ndarray&& source) noexcept
 {
   this->data_ = source.data_;
   this->descriptor_ = std::move(source.descriptor_);

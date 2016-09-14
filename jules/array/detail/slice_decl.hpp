@@ -21,10 +21,10 @@ public:
   base_slice(std::size_t start, const std::array<std::size_t, N>& extents, const std::array<std::size_t, N>& strides);
 
   base_slice(const base_slice& source) = default;
-  base_slice(base_slice&& source) = default;
+  base_slice(base_slice&& source) noexcept = default;
 
   base_slice& operator=(const base_slice& source) = default;
-  base_slice& operator=(base_slice&& source) = default;
+  base_slice& operator=(base_slice&& source) noexcept = default;
 
   template <typename... Dims, typename = all_size_enabler<N, Dims...>> std::size_t operator()(Dims... dims) const;
 
@@ -101,10 +101,10 @@ public:
   inline base_slice(std::size_t start, std::array<std::size_t, 1> extents, std::array<std::size_t, 1> strides);
 
   base_slice(const base_slice& source) = default;
-  base_slice(base_slice&& source) = default;
+  base_slice(base_slice&& source) noexcept = default;
 
   base_slice& operator=(const base_slice& source) = default;
-  base_slice& operator=(base_slice&& source) = default;
+  base_slice& operator=(base_slice&& source) noexcept = default;
 
   std::size_t operator()(std::size_t i) const { return start() + i * stride(); }
   std::size_t operator()(const std::array<std::size_t, 1>& i) const { return start() + i[0] * stride(); }

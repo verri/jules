@@ -37,7 +37,7 @@ public:
   indirect_ndarray& operator=(const indirect_ndarray& source);
 
   template <typename U> indirect_ndarray& operator=(const base_ndarray<U, N>& source);
-  template <typename U> indirect_ndarray& operator=(base_ndarray<U, N>&& source);
+  template <typename U> indirect_ndarray& operator=(base_ndarray<U, N>&& source) noexcept;
 
   template <typename U> indirect_ndarray& operator=(const ref_ndarray<U, N>& source);
   template <typename U> indirect_ndarray& operator=(const indirect_ndarray<U, N>& source);
@@ -94,10 +94,10 @@ private:
   indirect_ndarray(T* data, const std::array<std::size_t, N>& extents, std::vector<std::size_t> indexes);
 
   indirect_ndarray(const indirect_ndarray& source) = default;
-  indirect_ndarray(indirect_ndarray&& source) = default;
+  indirect_ndarray(indirect_ndarray&& source) noexcept = default;
 
   void clone_from(const indirect_ndarray& source);
-  void clone_from(indirect_ndarray&& source);
+  void clone_from(indirect_ndarray&& source) noexcept;
 
   T* data_;
   base_slice<N> descriptor_;
@@ -151,7 +151,7 @@ public:
   indirect_ndarray& operator=(const indirect_ndarray& source);
 
   template <typename U> indirect_ndarray& operator=(const base_ndarray<U, 1>& source);
-  template <typename U> indirect_ndarray& operator=(base_ndarray<U, 1>&& source);
+  template <typename U> indirect_ndarray& operator=(base_ndarray<U, 1>&& source) noexcept;
 
   template <typename U> indirect_ndarray& operator=(const ref_ndarray<U, 1>& source);
   template <typename U> indirect_ndarray& operator=(const indirect_ndarray<U, 1>& source);
@@ -203,10 +203,10 @@ private:
   indirect_ndarray(T* data, const std::array<std::size_t, 1>& extents, std::vector<std::size_t> indexes);
 
   indirect_ndarray(const indirect_ndarray& source) = default;
-  indirect_ndarray(indirect_ndarray&& source) = default;
+  indirect_ndarray(indirect_ndarray&& source) noexcept = default;
 
   void clone_from(const indirect_ndarray& source);
-  void clone_from(indirect_ndarray&& source);
+  void clone_from(indirect_ndarray&& source) noexcept;
 
   T* data_;
   base_slice<1> descriptor_;
