@@ -1,6 +1,6 @@
-#include "catch.hpp"
-
 #include "jules/range/range.hpp"
+
+#include <catch.hpp>
 #include <vector>
 
 TEST_CASE("range", "[range]")

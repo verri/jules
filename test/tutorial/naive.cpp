@@ -1,10 +1,9 @@
-#include "catch.hpp"
-
 #include "jules/array/array.hpp"
 #include "jules/dataframe/dataframe.hpp"
 #include "jules/formula/formula.hpp"
 #include "jules/util/numeric.hpp"
 
+#include <catch.hpp>
 #include <fstream>
 
 using namespace jules;

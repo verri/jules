@@ -1,6 +1,6 @@
-#include <catch.hpp>
-
 #include "jules/array/array.hpp"
+
+#include <catch.hpp>
 
 TEST_CASE("base array", "[base array]")
 {

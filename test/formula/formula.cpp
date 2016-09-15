@@ -1,7 +1,8 @@
 #define CATCH_CONFIG_MAIN
 
 #include "jules/formula/formula.hpp"
-#include "catch.hpp"
+
+#include <catch.hpp>
 
 TEST_CASE("Formula", "[formula]")
 {

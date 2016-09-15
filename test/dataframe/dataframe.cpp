@@ -1,8 +1,8 @@
 #include "jules/dataframe/dataframe.hpp"
-#include "catch.hpp"
 
 #include <algorithm>
 #include <array>
+#include <catch.hpp>
 #include <sstream>
 #include <string>
 #include <typeinfo>

@@ -1,7 +1,7 @@
 #include "jules/dataframe/detail/column.hpp"
-#include "catch.hpp"
 
 #include <algorithm>
+#include <catch.hpp>
 #include <iterator>
 #include <numeric>
 
