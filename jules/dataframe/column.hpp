@@ -69,7 +69,7 @@ template <typename Coercion> auto base_column<Coercion>::operator=(const base_co
   return *this;
 }
 
-template <typename Coercion> template <typename T> auto base_column<Coercion>::coerce_to()& -> base_column&
+template <typename Coercion> template <typename T> auto base_column<Coercion>::coerce_to() & -> base_column&
 {
   column_model_ = column_model_->template coerce_to<T>();
   return *this;

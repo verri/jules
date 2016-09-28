@@ -43,9 +43,9 @@ public:
 
   // IO
 
-  static auto read(std::istream& is, const dataframe_read_options& opt = {}) -> base_dataframe;
+  static auto read(std::istream& is, dataframe_read_options opt = {}) -> base_dataframe;
   template <typename C>
-  friend auto write(const base_dataframe<C>& df, std::ostream& os, const dataframe_write_options& opt) -> std::ostream&;
+  friend auto write(const base_dataframe<C>& df, std::ostream& os, dataframe_write_options opt) -> std::ostream&;
   template <typename C> friend auto write(const base_dataframe<C>& df, std::ostream& os) -> std::ostream&;
   template <typename C> friend auto operator<<(std::ostream& os, const base_dataframe<C>& df) -> std::ostream&;
 

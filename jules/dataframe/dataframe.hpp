@@ -226,8 +226,7 @@ template <typename T, typename Coercion> bool can_coerce_to(const base_dataframe
   return dataframe.template can_coerce_to<T>();
 }
 
-template <typename Coercion>
-auto base_dataframe<Coercion>::read(std::istream& is, const dataframe_read_options& opt) -> base_dataframe
+template <typename Coercion> auto base_dataframe<Coercion>::read(std::istream& is, dataframe_read_options opt) -> base_dataframe
 {
   using namespace adaptors;
   using namespace range;
@@ -284,8 +283,7 @@ auto base_dataframe<Coercion>::read(std::istream& is, const dataframe_read_optio
   return df;
 }
 
-template <typename C>
-auto write(const base_dataframe<C>& df, std::ostream& os, const dataframe_write_options& opt) -> std::ostream&
+template <typename C> auto write(const base_dataframe<C>& df, std::ostream& os, dataframe_write_options opt) -> std::ostream&
 {
   if (df.rows_count() == 0 || df.columns_count() == 0)
     return os;
