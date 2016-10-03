@@ -4,8 +4,7 @@ SRC =
 OBJ := $(SRC:.cpp=.o) test_suite.o
 DEP := $(SRC:.cpp=.d) test_suite.d
 
-CXXFLAGS += -std=c++14 -g -march=native -O3 -DNDEBUG -Wall -Wextra -I..
-LDFLAGS += -lpthread
+CXXFLAGS += -std=c++14 -O2 -DNDEBUG -Wall -Wextra -I..
 
 NODEPS = clean
 

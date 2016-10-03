@@ -226,12 +226,6 @@ element_request<const T&, Args...> indirect_ndarray<T, N>::operator()(Args&&... 
 }
 
 template <typename T, std::size_t N>
-indirect_ndarray<T, N>::indirect_ndarray(T* data, const std::array<std::size_t, N>& extents, std::vector<std::size_t>&& indexes)
-  : data_{data}, descriptor_{0, extents}, indexes_{std::move(indexes)}
-{
-}
-
-template <typename T, std::size_t N>
 indirect_ndarray<T, N>::indirect_ndarray(T* data, const std::array<std::size_t, N>& extents, std::vector<std::size_t> indexes)
   : data_{data}, descriptor_{0, extents}, indexes_{std::move(indexes)}
 {
@@ -393,12 +387,6 @@ template <typename T> indirect_ndarray<const T, 1> indirect_ndarray<T, 1>::opera
 }
 
 template <typename T> const T& indirect_ndarray<T, 1>::operator()(std::size_t i) const { return data_[indexes_[descriptor_(i)]]; }
-
-template <typename T>
-indirect_ndarray<T, 1>::indirect_ndarray(T* data, const std::array<std::size_t, 1>& extents, std::vector<std::size_t>&& indexes)
-  : data_{data}, descriptor_{0, extents}, indexes_{std::move(indexes)}
-{
-}
 
 template <typename T>
 indirect_ndarray<T, 1>::indirect_ndarray(T* data, const std::array<std::size_t, 1>& extents, std::vector<std::size_t> indexes)
