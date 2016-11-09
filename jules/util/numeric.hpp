@@ -17,6 +17,17 @@ template <typename Range, typename R = range_value_t<Range>> auto prod(const Ran
   return std::accumulate(range::begin(rng), range::end(rng), static_cast<R>(1), std::multiplies<R>{});
 }
 
+template <typename Range, typename R = range_value_t<Range>> auto sum(const Range& rng)
+{
+  static_assert(std::is_arithmetic<R>::value, "Value type must be arithmetic.");
+  return std::accumulate(range::begin(rng), range::end(rng), static_cast<R>(1));
+}
+
+template <typename Range, typename R = range_value_t<Range>> auto mean(const Range& rng)
+{
+  return jules::sum(rng) / range::size(rng);
+}
+
 template <typename Range, typename It = range_iterator_t<Range>> It max(Range&& rng)
 {
   decltype(auto) frng = std::forward<Range>(rng);

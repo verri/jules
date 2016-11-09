@@ -10,7 +10,7 @@ flags = [
 '-I',
 '..',
 '-I',
-'../third_party/Catch/include',
+'../third_party/Catch/single_include',
 ]
 
 
