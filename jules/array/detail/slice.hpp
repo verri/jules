@@ -98,11 +98,14 @@ base_slice_iterator<N>::base_slice_iterator(const base_slice<N>& slice, const st
 
 template <std::size_t N> auto base_slice_iterator<N>::operator++() -> base_slice_iterator&
 {
-  for (auto i = 0ul; i < N; ++i) {
+  auto i = 0ul;
+  for (; i < N - 1; ++i) {
     indexes_[i] = (indexes_[i] + 1) % slice_.extent(i);
     if (indexes_[i] != 0)
       break;
   }
+  if (i == N - 1)
+    ++indexes_[i];
 
   return *this;
 }

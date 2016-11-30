@@ -53,7 +53,12 @@ public:
 
 private:
   std::array<std::size_t, N> begin_index() const { return {}; }
-  std::array<std::size_t, N> end_index() const { return {{extents_[0]}}; }
+  std::array<std::size_t, N> end_index() const { return end_index_impl(std::make_index_sequence<N>()); }
+
+  template <std::size_t... I> std::array<std::size_t, N> end_index_impl(std::index_sequence<I...>) const
+  {
+    return {{(I == N - 1 ? extents_[I] : 0ul)...}};
+  }
 
   std::size_t start_ = 0;
   std::array<std::size_t, N> extents_ = {};

@@ -29,4 +29,3 @@ TEST_CASE("colwise storage", "[base_slice]")
   CHECK(s1(1u, 1u) == 4ul);
   CHECK(s1(2u, 1u) == 5ul);
 }
-
