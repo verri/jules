@@ -9,7 +9,7 @@ TEST_CASE("unidimensional steps", "[base_slice]")
   using jules::base_slice;
 
   auto s1 = base_slice<1>(0u, 5u, 2u);
-  // auto a1 = {0ul, 2ul, 4ul, 6ul, 8ul};
+  auto a1 = {0ul, 2ul, 4ul, 6ul, 8ul};
   // auto r1 = std::mismatch(std::begin(s1), std::end(s1), std::begin(a1), std::end(a1));
 
   // CHECK(r1.first == std::end(s1));

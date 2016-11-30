@@ -1,5 +1,5 @@
 SRC = ../jules/array/slice.hpp ../jules/core/type.hpp
-JULES_PATH = $(shell pwd)/..
+JULES_PATH = ..
 
 all: standardese_modules.html
 
