@@ -35,9 +35,9 @@ template <std::size_t N> base_slice<N>::base_slice(std::size_t start, std::initi
   std::copy(extents.begin(), extents.end(), std::begin(extents_));
 
   std::size_t tmp = this->size();
-  for (std::size_t i = 0; i < N; ++i) {
-    tmp /= extents_[i];
-    strides_[i] = tmp;
+  for (std::size_t i = N; i > 0ul; --i) {
+    tmp /= extents_[i - 1];
+    strides_[i - 1] = tmp;
   }
 }
 
@@ -59,9 +59,9 @@ template <std::size_t N>
 base_slice<N>::base_slice(std::size_t start, const std::array<std::size_t, N>& extents) : start_{start}, extents_(extents)
 {
   auto tmp = this->size();
-  for (std::size_t i = 0; i < N; ++i) {
-    tmp /= extents_[i];
-    strides_[i] = tmp;
+  for (std::size_t i = N; i > 0ul; --i) {
+    tmp /= extents_[i - 1];
+    strides_[i - 1] = tmp;
   }
 }
 
@@ -98,14 +98,11 @@ base_slice_iterator<N>::base_slice_iterator(const base_slice<N>& slice, const st
 
 template <std::size_t N> auto base_slice_iterator<N>::operator++() -> base_slice_iterator&
 {
-  auto i = N - 1;
-  for (; i != 0; --i) {
+  for (auto i = 0ul; i < N; ++i) {
     indexes_[i] = (indexes_[i] + 1) % slice_.extent(i);
     if (indexes_[i] != 0)
       break;
   }
-  if (i == 0)
-    ++indexes_[0];
 
   return *this;
 }

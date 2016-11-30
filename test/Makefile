@@ -1,6 +1,6 @@
 SUFFIXES += .d
 
-SRC = array/array_detail.cpp array/array.cpp \
+SRC = array/array_detail.cpp array/array.cpp array/slice.cpp \
 	dataframe/column.cpp dataframe/dataframe.cpp dataframe/column_detail.cpp \
 	range/range.cpp tutorial/naive.cpp
 OBJ := $(SRC:.cpp=.o) test_suite.o

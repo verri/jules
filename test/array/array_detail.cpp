@@ -31,13 +31,13 @@ TEST_CASE("base array", "[base array]")
 
   // base_ndarray<int, 2> matrix3(3, 4, 5, 4); // do not compile
 
-  auto&& vector1 = matrix3[0]; // first line
+  auto&& vector1 = matrix3[3]; // last line
   vector1 = 0;
 
-  int y[5] = {0};
+  int y[4] = {0, 1, 2, 0};
   result = std::mismatch(std::begin(y), std::end(y), matrix3.data());
   CHECK(result.first == std::end(y));
-  CHECK(result.second == matrix3.data() + 5);
+  CHECK(result.second == matrix3.data() + 4);
 
   std::size_t i = 0;
   for (auto&& line : matrix3)

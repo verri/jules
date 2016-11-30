@@ -66,32 +66,24 @@ template <typename T> class indirect_ndarray_iterator<T, 1>;
 template <typename, typename, typename, std::size_t> class binary_expr_ndarray;
 template <typename, typename, std::size_t> class unary_expr_ndarray;
 
-template <typename T> struct is_array_helper {
-  static constexpr bool value = false;
+template <typename T> struct is_array_helper : public std::false_type {
 };
 
-template <typename T, std::size_t N> struct is_array_helper<base_ndarray<T, N>> {
-  static constexpr bool value = true;
+template <typename T, std::size_t N> struct is_array_helper<base_ndarray<T, N>> : public std::true_type {
 };
 
-template <typename T, std::size_t N> struct is_array_helper<ref_ndarray<T, N>> {
-  static constexpr bool value = true;
+template <typename T, std::size_t N> struct is_array_helper<ref_ndarray<T, N>> : public std::true_type {
 };
 
-template <typename T, std::size_t N> struct is_array_helper<indirect_ndarray<T, N>> {
-  static constexpr bool value = true;
+template <typename T, std::size_t N> struct is_array_helper<indirect_ndarray<T, N>> : public std::true_type {
 };
 
-template <typename It, typename F, std::size_t N> struct is_array_helper<unary_expr_ndarray<It, F, N>> {
-  static constexpr bool value = true;
+template <typename It, typename F, std::size_t N> struct is_array_helper<unary_expr_ndarray<It, F, N>> : public std::true_type {
 };
 
 template <typename LhsIt, typename RhsIt, typename F, std::size_t N>
-struct is_array_helper<binary_expr_ndarray<LhsIt, RhsIt, F, N>> {
-  static constexpr bool value = true;
+struct is_array_helper<binary_expr_ndarray<LhsIt, RhsIt, F, N>> : public std::true_type {
 };
-
-template <typename T> constexpr bool is_array() { return is_array_helper<T>::value; }
 
 // Helpers for operators
 
@@ -103,6 +95,10 @@ binary_expr_ndarray<LhsIt, RhsIt, F, M> make_expr_ndarray(const LhsIt&, const Lh
                                                           const std::array<std::size_t, M>&);
 
 } // namespace detail
+
+// Concept checking
+
+template <typename T> constexpr bool is_array() { return detail::is_array_helper<T>::value; }
 
 // Friend classes
 
