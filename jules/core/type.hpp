@@ -33,6 +33,14 @@ using string = std::string;
 /// \module Basic Types
 using uint = type_safe::size_t;
 
+/// Standard signed type.
+///
+/// It is a type-safe signed integer that can represent difference of memory addresses.
+/// \notes For more details consult [here](https://github.com/foonathan/type_safe).
+///
+/// \module Basic Types
+using sint = type_safe::ptrdiff_t;
+
 /// Coercion rules for [numeric type](standardese://jules::numeric/).
 /// \module Coercion Rules
 struct numeric_rule {

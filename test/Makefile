@@ -9,7 +9,7 @@ SRC = array/slice.cpp
 OBJ := $(SRC:.cpp=.o) test_suite.o
 DEP := $(SRC:.cpp=.d) test_suite.d
 
-CXXFLAGS += -std=c++1z -O2 -Wall -Wextra -I.. -isystem../third_party/Catch/single_include
+CXXFLAGS += -std=c++14 -O2 -Wall -Wextra -I.. -isystem../third_party/Catch/single_include
 
 NODEPS = clean
 
