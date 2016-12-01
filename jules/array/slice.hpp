@@ -1,6 +1,7 @@
 #ifndef JULES_ARRAY_SLICE_H
 #define JULES_ARRAY_SLICE_H
 
+#include <jules/array/detail/common.hpp>
 #include <jules/base/numeric.hpp>
 #include <jules/core/debug.hpp>
 #include <jules/core/type.hpp>
@@ -13,14 +14,6 @@
 
 namespace jules
 {
-
-namespace detail
-{
-
-template <std::size_t N, typename... Types>
-using n_indexes_enabler = std::enable_if_t<N == sizeof...(Types) && all(std::is_convertible<Types, uint>::value...)>;
-
-} // namespace detail
 
 /// Array slicing and dimensions representation.
 ///
