@@ -2,24 +2,42 @@
 #define JULES_ARRAY_SLICE_H
 
 #include <jules/base/numeric.hpp>
+#include <jules/core/debug.hpp>
 #include <jules/core/type.hpp>
 
 #include <array>
 #include <iterator>
 #include <numeric>
 #include <utility>
+#include <type_traits>
 
 namespace jules
 {
 
+namespace detail
+{
+
+template <std::size_t N, typename... Types>
+using n_indexes_enabler = std::enable_if_t<N == sizeof...(Types) && all(std::is_convertible<Types, uint>::value...)>;
+
+} // namespace detail
+
 /// Array slicing and dimensions representation.
-/// `base_slice` is `TriviallyCopyable` and `TriviallyMovable`.
+///
+/// This class is used internally by `jules` to represent the position of elements of an
+/// array in memory.
+///
+/// \notes `base_slice` is `TriviallyCopyable` and `TriviallyMovable`.
 /// \module N-Dimensional Array
 template <std::size_t N> class base_slice
 {
   static_assert(N > 0, "Slice cannot have dimension 0.");
 
 public:
+  /// `InputIterator` which gives the memory positions of a slice.
+  ///
+  /// \notes It depends on the slice that created it, and will be invalidated if have
+  /// longer lifetime than the slice.
   class iterator : public std::iterator<std::input_iterator_tag, uint, sint, void*, uint>
   {
     friend class base_slice<N>;
@@ -33,32 +51,60 @@ public:
     constexpr iterator& operator=(const iterator& source) = default;
     constexpr iterator& operator=(iterator&& source) noexcept = default;
 
-    constexpr auto operator++() -> iterator&;
-    constexpr auto operator++(int) -> iterator;
+    constexpr auto operator++() -> iterator& {
+      auto i = uint{0ul};
+      for(; i < N - 1; ++i) {
+        indexes_[i] = (indexes_[i] + 1) % slice_->extents[i];
+        if (indexes_[i] != 0)
+          break;
+      }
+      if (i == N - 1)
+        ++indexes_[i];
 
-    constexpr auto operator==(const iterator& other) const;
-    constexpr auto operator!=(const iterator& other) const;
+      return *this;
+    }
 
-    constexpr auto operator*() const -> reference;
-    constexpr auto operator-> () const -> pointer { return nullptr; }
+    constexpr auto operator++(int) -> iterator {
+      auto copy = *this;
+      ++(*this);
+      return copy;
+    }
+
+    /// \notes It does not check if the slices are the same.
+    constexpr auto operator==(const iterator& other) const {
+      return indexes_ == other.indexes_;
+    }
+
+    /// \notes It only checks if the slices are the same if `JULES_DEBUG_LEVEL` >=
+    /// `incompatible_comparison`.
+    constexpr auto operator!=(const iterator& other) const {
+      return !(*this == other);
+    }
+
+    constexpr auto operator*() const -> reference {
+      return (*slice_)(indexes_);
+    }
+
+    /// \notes You should not call this function.
+    auto operator-> () const -> pointer {
+      DEBUG_ASSERT(false, debug::module{}, debug::level::invalid_state, "you should not call this function");
+      return nullptr;
+    }
 
   private:
-    iterator(const base_slice* slice, std::array<uint, N> indexes) : slice_{slice}, indexes_{indexes} {}
+    constexpr iterator(const base_slice* slice, std::array<uint, N> indexes) : slice_{slice}, indexes_{indexes} {}
 
     const base_slice* slice_;
     std::array<uint, N> indexes_;
   };
 
-  /// One or more unsigned integers that represents all possibles extents when
-  /// applied to an array.
-  static constexpr auto all = repeat<N, uint>(0u);
-
   /// \group Constructor
-  /// \param start Start position of the slicing. It defaults to 0u.
+  /// \param start Start position of the slicing. It defaults to 0ul.
   /// \param extents Size of the slicing in each dimension.
   ///   It defaults to `base_slice<N>::all`.
   /// \param strides Number of skip positions in each dimension.
   ///   It defaults to consistent strides based on the `extents`.
+  /// \notes If `strides` are inferred, `extents` cannot be zero.
   constexpr base_slice(uint start, std::array<uint, N> extents, std::array<uint, N> strides)
     : start{start}, extents{extents}, strides{strides}
   {
@@ -68,7 +114,8 @@ public:
   constexpr base_slice(uint start, std::array<uint, N> extents) : start{start}, extents{extents}
   {
     auto tmp = size();
-    for (auto i = N; i > 0u; --i) {
+    for (auto i = N; i > 0ul; --i) {
+      DEBUG_ASSERT(extents[i - 1] != 0ul, debug::module{}, debug::level::invalid_argument, "zero extents while inferring strides");
       tmp /= extents[i - 1];
       strides[i - 1] = tmp;
     }
@@ -86,20 +133,41 @@ public:
   /// Effectively the product of the extents.
   constexpr auto size() const { return prod(extents); }
 
-  auto operator()(const std::array<std::size_t, N>& indexes) const -> uint
+  /// \group Index
+  /// Returns the memory position of the index.
+  /// \param indexes Index that can be either an array or more than one argument.
+  constexpr auto operator()(const std::array<uint, N>& indexes) const -> uint
   {
     return std::inner_product(std::begin(indexes), std::end(indexes), std::begin(strides), start);
   }
 
-  auto begin() const -> iterator { return cbegin(); }
-  auto end() const -> iterator { return cend(); }
+  /// \group Index
+  template <typename... Args, typename = detail::n_indexes_enabler<N, Args...>>
+  constexpr auto operator()(Args&&... indexes) const -> uint
+  {
+    static_assert(sizeof...(Args) == N, "invalid number of arguments");
+    // static_assert(all(std::is_convertible<Args, uint>::value...), "indexes must be convertible to uint");
+    auto arg = std::array<uint, N>{ std::forward<Args>(indexes)... };
+    return (*this)(arg);
+  }
 
-  auto cbegin() const -> iterator { return {this, {}}; }
-  auto cend() const -> iterator { return {this, end_index()}; }
+  constexpr auto operator==(const base_slice& other) const {
+    return start == other.start && extents == other.extents && strides == other.strides;
+  }
 
-  uint start = 0u;                                   //< Start position.
-  std::array<uint, N> extents = all;                 //< Size in each dimension.
-  std::array<uint, N> strides = repeat<N, uint>(1u); //< Skip in each dimension.
+  constexpr auto operator!=(const base_slice& other) const {
+    return !(*this == other);
+  }
+
+  constexpr auto begin() const -> iterator { return cbegin(); }
+  constexpr auto end() const -> iterator { return cend(); }
+
+  constexpr auto cbegin() const -> iterator { return {this, {}}; }
+  constexpr auto cend() const -> iterator { return {this, end_index()}; }
+
+  uint start = 0ul;                                   //< Start position.
+  std::array<uint, N> extents = repeat<N, uint>(0ul); //< Size in each dimension.
+  std::array<uint, N> strides = repeat<N, uint>(1ul); //< Skip in each dimension.
 
 private:
   auto end_index() const { return end_index_impl(std::make_index_sequence<N>()); }
@@ -111,11 +179,18 @@ private:
 };
 
 /// 1D-Array specialization for slicing and dimensions representation.
-/// `base_slice` is `TriviallyCopyable` and `TriviallyMovable`.
+///
+/// This specialization is useful for slicing multidimensional arrays.
+///
+/// *TODO*: See the alias `jules::slice` for usage more information.
+///
+/// \notes `base_slice` is `TriviallyCopyable` and `TriviallyMovable`.
 /// \module N-Dimensional Array
 template <> class base_slice<1>
 {
 public:
+  /// **TODO**: No documentation, consult `jules::base_slice<N>::iterator`.
+  /// \notes For this specialization, the iterator does not depend on the parent slice.
   class iterator : public std::iterator<std::input_iterator_tag, uint, sint, void*, uint>
   {
     friend class base_slice<1>;
@@ -129,27 +204,47 @@ public:
     constexpr iterator& operator=(const iterator& source) = default;
     constexpr iterator& operator=(iterator&& source) noexcept = default;
 
-    constexpr auto operator++() -> iterator&;
-    constexpr auto operator++(int) -> iterator;
+    constexpr auto operator++() -> iterator& {
+      index_ = index_ + stride_;
+      return *this;
+    }
 
-    constexpr auto operator==(const iterator& other) const;
-    constexpr auto operator!=(const iterator& other) const;
+    constexpr auto operator++(int) -> iterator {
+      auto copy = *this;
+      ++(*this);
+      return copy;
+    }
 
-    constexpr auto operator*() const -> reference;
-    constexpr auto operator-> () const -> pointer { return nullptr; }
+    constexpr auto operator==(const iterator& other) const {
+      return index_ == other.index_;
+    }
+
+    constexpr auto operator!=(const iterator& other) const {
+      return !(*this == other);
+    }
+
+    constexpr auto operator*() const -> reference {
+      return index_;
+    }
+
+    /// \notes You should not call this function.
+    auto operator-> () const -> pointer {
+      DEBUG_ASSERT(false, debug::module{}, debug::level::invalid_state, "you should not call this function");
+      return nullptr;
+    }
 
   private:
-    iterator(const base_slice* slice, uint index) : slice_{slice}, indexes_{index} {}
+    constexpr iterator(uint index, uint stride) : index_{index}, stride_{stride} {}
 
-    const base_slice* slice_;
-    uint indexes_;
+    uint index_;
+    uint stride_;
   };
 
   /// Unsigned integer that represents all possibles extents when applied to an array.
-  static constexpr auto all = uint{0u};
+  static constexpr auto all = uint{0ul};
 
   /// \group Constructor
-  /// \param start Start position of the slicing. It defaults to 0u.
+  /// \param start Start position of the slicing. It defaults to 0ul.
   /// \param extents Size of the slicing in each dimension.
   ///   It defaults to `base_slice<N>::all`.
   /// \param strides Number of skip positions in each dimension.
@@ -171,17 +266,19 @@ public:
   /// Effectively the product of the extents.
   constexpr auto size() const { return extent; }
 
-  auto operator()(uint index) const -> uint { return start + index * stride; }
+  /// \group Index
+  /// Returns the memory position of the `index`.
+  constexpr auto operator()(uint index) const -> uint { return start + index * stride; }
 
-  auto begin() const -> iterator { return cbegin(); }
-  auto end() const -> iterator { return cend(); }
+  constexpr auto begin() const -> iterator { return cbegin(); }
+  constexpr auto end() const -> iterator { return cend(); }
 
-  auto cbegin() const -> iterator { return {this, 0u}; }
-  auto cend() const -> iterator { return {this, extent}; }
+  constexpr auto cbegin() const -> iterator { return {start, stride}; }
+  constexpr auto cend() const -> iterator { return {start + stride * extent, stride}; }
 
-  uint start = 0u;   //< Start position.
+  uint start = 0ul;   //< Start position.
   uint extent = all; //< Number of position.
-  uint stride = 0u;  //< Skip positions.
+  uint stride = 1ul;  //< Skip positions.
 };
 
 } // namespace jules

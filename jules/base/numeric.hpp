@@ -7,6 +7,7 @@
 #include <functional>
 #include <numeric>
 #include <utility>
+#include <type_traits>
 
 namespace jules
 {
@@ -38,6 +39,12 @@ template <typename Rng, typename T = range::range_value_t<Rng>, CONCEPT_REQUIRES
 auto prod(Rng&& rng, const T& start = static_cast<T>(1u))
 {
   return prod(ranges::begin(rng), ranges::end(rng), start);
+}
+
+constexpr auto all() { return true; }
+
+template <typename... Args> constexpr auto all(bool arg, Args&&... args) {
+  return arg && all(std::forward<Args>(args)...);
 }
 
 } // namespace jules

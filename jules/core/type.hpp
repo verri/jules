@@ -5,7 +5,7 @@
 #include <utility>
 
 #include <type_safe/floating_point.hpp>
-#include <type_safe/types.hpp>
+#include <type_safe/integer.hpp>
 
 namespace jules
 {
@@ -31,7 +31,7 @@ using string = std::string;
 /// \notes For more details consult [here](https://github.com/foonathan/type_safe).
 ///
 /// \module Basic Types
-using uint = type_safe::size_t;
+using uint = type_safe::integer<std::size_t, type_safe::arithmetic_policy_default>;
 
 /// Standard signed type.
 ///
@@ -39,7 +39,7 @@ using uint = type_safe::size_t;
 /// \notes For more details consult [here](https://github.com/foonathan/type_safe).
 ///
 /// \module Basic Types
-using sint = type_safe::ptrdiff_t;
+using sint = type_safe::integer<std::ptrdiff_t, type_safe::arithmetic_policy_default>;
 
 /// Coercion rules for [numeric type](standardese://jules::numeric/).
 /// \module Coercion Rules
