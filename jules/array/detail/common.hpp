@@ -1,8 +1,8 @@
 #ifndef JULES_ARRAY_DETAIL_COMMON_H
 #define JULES_ARRAY_DETAIL_COMMON_H
 
-#include <jules/core/type.hpp>
 #include <jules/base/numeric.hpp>
+#include <jules/core/type.hpp>
 
 #include <type_traits>
 
@@ -80,8 +80,15 @@ template <typename LhsIt, typename RhsIt, typename F, std::size_t N>
 struct is_array<binary_expr_array<LhsIt, RhsIt, F, N>> : public std::true_type {
 };
 
-template <typename T> constexpr auto is_array_v() { return is_array<T>::value; }
+template <typename T> constexpr auto is_array_v() { return is_array<std::decay_t<T>>::value; }
 
+namespace detail
+{
+
+template <typename R, typename T> using array_request = std::enable_if_t<is_array_v<T>(), R>;
+template <typename R, typename T> using not_array_request = std::enable_if_t<!is_array_v<T>(), R>;
+
+} // namespace detail
 } // namespace jules
 
 #endif // JULES_ARRAY_DETAIL_COMMON_H

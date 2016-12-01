@@ -9,8 +9,8 @@
 #include <array>
 #include <iterator>
 #include <numeric>
-#include <utility>
 #include <type_traits>
+#include <utility>
 
 namespace jules
 {
@@ -44,9 +44,10 @@ public:
     constexpr iterator& operator=(const iterator& source) = default;
     constexpr iterator& operator=(iterator&& source) noexcept = default;
 
-    constexpr auto operator++() -> iterator& {
+    constexpr auto operator++() -> iterator&
+    {
       auto i = uint{0ul};
-      for(; i < N - 1; ++i) {
+      for (; i < N - 1; ++i) {
         indexes_[i] = (indexes_[i] + 1) % slice_->extents[i];
         if (indexes_[i] != 0)
           break;
@@ -57,29 +58,25 @@ public:
       return *this;
     }
 
-    constexpr auto operator++(int) -> iterator {
+    constexpr auto operator++(int) -> iterator
+    {
       auto copy = *this;
       ++(*this);
       return copy;
     }
 
     /// \notes It does not check if the slices are the same.
-    constexpr auto operator==(const iterator& other) const {
-      return indexes_ == other.indexes_;
-    }
+    constexpr auto operator==(const iterator& other) const { return indexes_ == other.indexes_; }
 
     /// \notes It only checks if the slices are the same if `JULES_DEBUG_LEVEL` >=
     /// `incompatible_comparison`.
-    constexpr auto operator!=(const iterator& other) const {
-      return !(*this == other);
-    }
+    constexpr auto operator!=(const iterator& other) const { return !(*this == other); }
 
-    constexpr auto operator*() const -> reference {
-      return (*slice_)(indexes_);
-    }
+    constexpr auto operator*() const -> reference { return (*slice_)(indexes_); }
 
     /// \notes You should not call this function.
-    auto operator-> () const -> pointer {
+    auto operator-> () const -> pointer
+    {
       DEBUG_ASSERT(false, debug::module{}, debug::level::invalid_state, "you should not call this function");
       return nullptr;
     }
@@ -108,7 +105,8 @@ public:
   {
     auto tmp = size();
     for (auto i = N; i > 0ul; --i) {
-      DEBUG_ASSERT(extents[i - 1] != 0ul, debug::module{}, debug::level::invalid_argument, "zero extents while inferring strides");
+      DEBUG_ASSERT(extents[i - 1] != 0ul, debug::module{}, debug::level::invalid_argument,
+                   "zero extents while inferring strides");
       tmp /= extents[i - 1];
       strides[i - 1] = tmp;
     }
@@ -140,17 +138,16 @@ public:
   {
     static_assert(sizeof...(Args) == N, "invalid number of arguments");
     // static_assert(all(std::is_convertible<Args, uint>::value...), "indexes must be convertible to uint");
-    auto arg = std::array<uint, N>{ std::forward<Args>(indexes)... };
+    auto arg = std::array<uint, N>{std::forward<Args>(indexes)...};
     return (*this)(arg);
   }
 
-  constexpr auto operator==(const base_slice& other) const {
+  constexpr auto operator==(const base_slice& other) const
+  {
     return start == other.start && extents == other.extents && strides == other.strides;
   }
 
-  constexpr auto operator!=(const base_slice& other) const {
-    return !(*this == other);
-  }
+  constexpr auto operator!=(const base_slice& other) const { return !(*this == other); }
 
   constexpr auto begin() const -> iterator { return cbegin(); }
   constexpr auto end() const -> iterator { return cend(); }
@@ -197,31 +194,28 @@ public:
     constexpr iterator& operator=(const iterator& source) = default;
     constexpr iterator& operator=(iterator&& source) noexcept = default;
 
-    constexpr auto operator++() -> iterator& {
+    constexpr auto operator++() -> iterator&
+    {
       index_ = index_ + stride_;
       return *this;
     }
 
-    constexpr auto operator++(int) -> iterator {
+    constexpr auto operator++(int) -> iterator
+    {
       auto copy = *this;
       ++(*this);
       return copy;
     }
 
-    constexpr auto operator==(const iterator& other) const {
-      return index_ == other.index_;
-    }
+    constexpr auto operator==(const iterator& other) const { return index_ == other.index_; }
 
-    constexpr auto operator!=(const iterator& other) const {
-      return !(*this == other);
-    }
+    constexpr auto operator!=(const iterator& other) const { return !(*this == other); }
 
-    constexpr auto operator*() const -> reference {
-      return index_;
-    }
+    constexpr auto operator*() const -> reference { return index_; }
 
     /// \notes You should not call this function.
-    auto operator-> () const -> pointer {
+    auto operator-> () const -> pointer
+    {
       DEBUG_ASSERT(false, debug::module{}, debug::level::invalid_state, "you should not call this function");
       return nullptr;
     }
@@ -269,9 +263,9 @@ public:
   constexpr auto cbegin() const -> iterator { return {start, stride}; }
   constexpr auto cend() const -> iterator { return {start + stride * extent, stride}; }
 
-  uint start = 0ul;   //< Start position.
+  uint start = 0ul;  //< Start position.
   uint extent = all; //< Number of position.
-  uint stride = 1ul;  //< Skip positions.
+  uint stride = 1ul; //< Skip positions.
 };
 
 } // namespace jules
