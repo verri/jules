@@ -13,10 +13,18 @@ TEST_CASE("reference array", "[ref_array]")
   auto values = std::vector<numeric>(10ul, 0.0);
 
   // TODO: XXX: cannot use AAA-style in C++14 because RVO is not guaranteed.
-  ref_array<numeric, 2> array(values.data(), base_slice<2>{0ul, {{2ul, 5ul}}});
-  REQUIRE(values.data() == array.data());
+  ref_array<numeric, 1> vector(values.data(), {0ul, 10ul});
+  REQUIRE(values.data() == vector.data());
 
-  array = 1.0;
+  vector = 1.0;
   for (auto value : values)
     CHECK(static_cast<double>(value) == 1.0);
+
+  // TODO: XXX: cannot use AAA-style in C++14 because RVO is not guaranteed.
+  ref_array<numeric, 2> matrix(values.data(), {0ul, {{2ul, 5ul}}});
+  REQUIRE(values.data() == matrix.data());
+
+  matrix = 2.0;
+  for (auto value : values)
+    CHECK(static_cast<double>(value) == 2.0);
 }

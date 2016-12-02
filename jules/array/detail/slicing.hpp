@@ -72,9 +72,11 @@ index_t slicing_size(const std::array<index_t, N>& extents, const base_slice<1>&
          slicing_size<D + 1>(extents, std::forward<Args>(args)...);
 }
 
-template <std::size_t D, std::size_t N, typename Range, typename... Args, typename>
-index_t slicing_size(const std::array<index_t, N>& extents, const Range& rng, Args&&... args)
+template <std::size_t D, std::size_t N, typename Rng, typename... Args, typename T = range::range_value_t<Rng>,
+          CONCEPT_REQUIRES_(range::Range<Rng>())>
+index_t slicing_size(const std::array<index_t, N>& extents, const Rng& rng, Args&&... args)
 {
+  static_assert(std::is_convertible<T, index_t>::value, "arbitrary ranges must contain indexes");
   return range::size(rng) * slicing_size<D + 1>(extents, std::forward<Args>(args)...);
 }
 
@@ -153,10 +155,12 @@ void do_slice(std::array<index_t, N>& extents, std::vector<index_t>& indexes, co
     do_slice(extents, indexes, slice, cat(ix, i), std::forward<Args>(args)...);
 }
 
-template <std::size_t D, std::size_t N, typename Range, typename... Args, typename>
+template <std::size_t D, std::size_t N, typename Rng, typename... Args, typename T = range::range_value_t<Rng>,
+          CONCEPT_REQUIRES_(range::Range<Rng>())>
 void do_slice(std::array<index_t, N>& extents, std::vector<index_t>& indexes, const base_slice<N>& slice,
-              std::array<index_t, D> ix, const Range& rng, Args&&... args)
+              std::array<index_t, D> ix, const Rng& rng, Args&&... args)
 {
+  static_assert(std::is_convertible<T, index_t>::value, "arbitrary ranges must contain indexes");
   static_assert(N - D - 1 == sizeof...(args), "invalid number of arguments");
 
   CHECK_BOUNDS(*max(rng), extent(slice, D));
