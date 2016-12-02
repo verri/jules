@@ -31,7 +31,7 @@ public:
   ///
   /// \notes It depends on the slice that created it, and will be invalidated if have
   /// longer lifetime than the slice.
-  class iterator : public std::iterator<std::input_iterator_tag, uint, sint, void*, uint>
+  class iterator : public std::iterator<std::input_iterator_tag, uint, std::ptrdiff_t, void*, uint>
   {
     friend class base_slice<N>;
 
@@ -181,7 +181,7 @@ template <> class base_slice<1>
 public:
   /// **TODO**: No documentation, consult `jules::base_slice<N>::iterator`.
   /// \notes For this specialization, the iterator does not depend on the parent slice.
-  class iterator : public std::iterator<std::input_iterator_tag, uint, sint, void*, uint>
+  class iterator : public std::iterator<std::input_iterator_tag, uint, std::ptrdiff_t, void*, uint>
   {
     friend class base_slice<1>;
 

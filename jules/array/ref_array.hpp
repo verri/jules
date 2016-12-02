@@ -2,10 +2,60 @@
 #define JULES_ARRAY_REF_ARRAY_H
 
 #include <jules/array/detail/common.hpp>
+#include <jules/array/slice.hpp>
+#include <jules/core/debug.hpp>
 #include <jules/core/type.hpp>
+
+#include <iterator>
 
 namespace jules
 {
+
+namespace detail
+{
+
+template <typename T, std::size_t N> class iterator_from_slice : public std::iterator<std::forward_iterator_tag, T>
+{
+  template <typename, std::size_t> friend class ref_array;
+
+public:
+  constexpr iterator_from_slice() = default;
+
+  constexpr iterator_from_slice(const iterator_from_slice& source) = default;
+  constexpr iterator_from_slice(iterator_from_slice&& source) noexcept = default;
+
+  constexpr iterator_from_slice& operator=(const iterator_from_slice& source) = default;
+  constexpr iterator_from_slice& operator=(iterator_from_slice&& source) noexcept = default;
+
+  constexpr auto operator++() -> iterator_from_slice&
+  {
+    ++it_;
+    return *this;
+  }
+
+  constexpr auto operator++(int) -> iterator_from_slice
+  {
+    auto copy = *this;
+    ++(*this);
+    return copy;
+  }
+
+  constexpr auto operator==(const iterator_from_slice& other) const { return it_ == other.it_; }
+
+  constexpr auto operator!=(const iterator_from_slice& other) const { return !(*this == other); }
+
+  constexpr auto operator*() -> typename decltype(*this)::reference { return data_[*it_]; }
+
+  constexpr auto operator-> () -> typename decltype(*this)::pointer { return data_ + *it_; }
+
+private:
+  iterator_from_slice(T* data, typename base_slice<N>::iterator it) : data_{data}, it_{std::move(it)} {}
+
+  T* data_ = nullptr;
+  typename base_slice<N>::iterator it_;
+};
+
+} // namespace detail
 
 /// Array reference.
 ///
@@ -23,6 +73,9 @@ public:
   using size_type = uint;
   using difference_type = sint;
 
+  using iterator = detail::iterator_from_slice<T, N>;
+  using const_iterator = detail::iterator_from_slice<const T, N>;
+
   /// *TODO*: Explain why the user should probably not call this function.
   /// In C++17, we can provide a helper that generates a view with more security.
   ref_array(T* data, base_slice<N>& descriptor) : data_{data}, descriptor_{descriptor} {}
@@ -33,13 +86,51 @@ public:
   ~ref_array() = default;
 
   /// \group Assignment
-  template <typename U> auto operator=(const U& source) -> detail::not_array_request<ref_array&, U>;
+  template <typename U> auto operator=(const U& source) -> detail::not_array_request<ref_array&, U>
+  {
+    static_assert(std::is_assignable<T&, U>::value, "incompatible assignment");
+    for (auto& elem : *this)
+      elem = source;
+    return *this;
+  }
 
   /// \group Assignment
-  template <typename Array> auto operator=(const Array& source) -> detail::array_request<ref_array&, Array>;
+  template <typename Array> auto operator=(const Array& source) -> detail::array_request<ref_array&, Array>
+  {
+    static_assert(Array::order == N, "array order mismatch");
+    static_assert(std::is_assignable<T&, typename Array::value_type>::value, "incompatible assignment");
+
+    DEBUG_ASSERT(descriptor_.extents == source.descriptor().extents, debug::module{}, debug::level::extents_check,
+                 "extents mismatch");
+    auto it = source.begin();
+    for (auto& elem : *this)
+      elem = *it++;
+    levelDEBUG_ASSERT(it == source.end(), debug::module{}, debug::level::unreachable, "should never happen");
+
+    return *this;
+  }
 
   /// \group Assignment
-  auto operator=(base_array<T, N>&& source) noexcept -> ref_array&;
+  auto operator=(base_array<T, N>&& source) noexcept -> ref_array&
+  {
+    auto it = source.begin();
+    for (auto& elem : *this)
+      elem = std::move(*it++);
+
+    return *this;
+  }
+
+  auto begin() -> iterator { return {data_, descriptor_.begin()}; }
+  auto end() -> iterator { return {data_, descriptor_.end()}; }
+
+  auto begin() const -> const_iterator { return cbegin(); }
+  auto end() const -> const_iterator { return cend(); }
+
+  auto cbegin() const -> const_iterator { return {data_, descriptor_.begin()}; }
+  auto cend() const -> const_iterator { return {data_, descriptor_.end()}; }
+
+  auto descriptor() const { return descriptor_; }
+  auto data() const { return data_; }
 
 private:
   T* data_;

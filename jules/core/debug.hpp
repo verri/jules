@@ -19,10 +19,11 @@ namespace debug
 /// Debug level for each kind of checking.
 namespace level
 {
-constexpr auto invalid_argument = debug_assert::level<1u>{};
-constexpr auto invalid_state = debug_assert::level<1u>{};
-constexpr auto boundary_check = debug_assert::level<2u>{};
-constexpr auto incompatible_comparison = debug_assert::level<3u>{};
+constexpr auto unreachable = debug_assert::level<1u>{};
+constexpr auto invalid_argument = debug_assert::level<2u>{};
+constexpr auto invalid_state = debug_assert::level<2u>{};
+constexpr auto boundary_check = debug_assert::level<3u>{};
+constexpr auto extents_check = debug_assert::level<3u>{};
 } // namespace level
 
 struct module : debug_assert::default_handler, debug_assert::set_level<JULES_DEBUG_LEVEL> {
