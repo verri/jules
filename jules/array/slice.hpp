@@ -268,6 +268,8 @@ public:
   index_t stride = 1ul; //< Skip positions.
 };
 
+using slice = base_slice<1>;
+
 } // namespace jules
 
 #endif // JULES_ARRAY_SLICE_H
