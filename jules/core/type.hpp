@@ -33,6 +33,14 @@ using string = std::string;
 /// \module Basic Types
 using uint = type_safe::integer<std::size_t, type_safe::arithmetic_policy_default>;
 
+/// Standard index type.
+///
+/// It is a type-safe unsigned integer that can represent memory addresses.
+/// \notes For more details consult [here](https://github.com/foonathan/type_safe).
+///
+/// \module Basic Types
+using index_t = std::size_t; // TODO: XXX: check what we need to use: type_safe::index_t;
+
 /// Standard signed type.
 ///
 /// It is a type-safe signed integer that can represent difference of memory addresses.
@@ -40,6 +48,14 @@ using uint = type_safe::integer<std::size_t, type_safe::arithmetic_policy_defaul
 ///
 /// \module Basic Types
 using sint = type_safe::integer<std::ptrdiff_t, type_safe::arithmetic_policy_default>;
+
+/// Standard distance type.
+///
+/// It is a type-safe signed integer that can represent difference of memory addresses.
+/// \notes For more details consult [here](https://github.com/foonathan/type_safe).
+///
+/// \module Basic Types
+using distance_t = std::ptrdiff_t; // TODO: XXX: check what we need to use: type_safe::distance_t;
 
 /// Coercion rules for [numeric type](standardese://jules::numeric/).
 /// \module Coercion Rules

@@ -31,7 +31,7 @@ public:
   ///
   /// \notes It depends on the slice that created it, and will be invalidated if have
   /// longer lifetime than the slice.
-  class iterator : public std::iterator<std::input_iterator_tag, uint, std::ptrdiff_t, void*, uint>
+  class iterator : public std::iterator<std::input_iterator_tag, index_t, distance_t, void*, index_t>
   {
     friend class base_slice<N>;
 
@@ -46,7 +46,7 @@ public:
 
     constexpr auto operator++() -> iterator&
     {
-      auto i = uint{0ul};
+      auto i = index_t{0ul};
       for (; i < N - 1; ++i) {
         indexes_[i] = (indexes_[i] + 1) % slice_->extents[i];
         if (indexes_[i] != 0)
@@ -72,20 +72,20 @@ public:
     /// `incompatible_comparison`.
     constexpr auto operator!=(const iterator& other) const { return !(*this == other); }
 
-    constexpr auto operator*() const -> reference { return (*slice_)(indexes_); }
+    constexpr auto operator*() const -> index_t { return (*slice_)(indexes_); }
 
     /// \notes You should not call this function.
-    auto operator-> () const -> pointer
+    auto operator-> () const -> void*
     {
       DEBUG_ASSERT(false, debug::module{}, debug::level::invalid_state, "you should not call this function");
       return nullptr;
     }
 
   private:
-    constexpr iterator(const base_slice* slice, std::array<uint, N> indexes) : slice_{slice}, indexes_{indexes} {}
+    constexpr iterator(const base_slice* slice, std::array<index_t, N> indexes) : slice_{slice}, indexes_{indexes} {}
 
     const base_slice* slice_;
-    std::array<uint, N> indexes_;
+    std::array<index_t, N> indexes_;
   };
 
   /// \group Constructor
@@ -95,13 +95,13 @@ public:
   /// \param strides Number of skip positions in each dimension.
   ///   It defaults to consistent strides based on the `extents`.
   /// \notes If `strides` are inferred, `extents` cannot be zero.
-  constexpr base_slice(uint start, std::array<uint, N> extents, std::array<uint, N> strides)
+  constexpr base_slice(index_t start, std::array<index_t, N> extents, std::array<index_t, N> strides)
     : start{start}, extents{extents}, strides{strides}
   {
   }
 
   /// \group Constructor
-  constexpr base_slice(uint start, std::array<uint, N> extents) : start{start}, extents{extents}
+  constexpr base_slice(index_t start, std::array<index_t, N> extents) : start{start}, extents{extents}
   {
     auto tmp = size();
     for (auto i = N; i > 0ul; --i) {
@@ -127,18 +127,18 @@ public:
   /// \group Index
   /// Returns the memory position of the index.
   /// \param indexes Index that can be either an array or more than one argument.
-  constexpr auto operator()(const std::array<uint, N>& indexes) const -> uint
+  constexpr auto operator()(const std::array<index_t, N>& indexes) const -> index_t
   {
     return std::inner_product(std::begin(indexes), std::end(indexes), std::begin(strides), start);
   }
 
   /// \group Index
   template <typename... Args, typename = detail::n_indexes_enabler<N, Args...>>
-  constexpr auto operator()(Args&&... indexes) const -> uint
+  constexpr auto operator()(Args&&... indexes) const -> index_t
   {
     static_assert(sizeof...(Args) == N, "invalid number of arguments");
-    // static_assert(all(std::is_convertible<Args, uint>::value...), "indexes must be convertible to uint");
-    auto arg = std::array<uint, N>{std::forward<Args>(indexes)...};
+    // static_assert(all(std::is_convertible<Args, index_t>::value...), "indexes must be convertible to index_t");
+    auto arg = std::array<index_t, N>{{std::forward<Args>(indexes)...}};
     return (*this)(arg);
   }
 
@@ -155,16 +155,16 @@ public:
   constexpr auto cbegin() const -> iterator { return {this, {}}; }
   constexpr auto cend() const -> iterator { return {this, end_index()}; }
 
-  uint start = 0ul;                                   //< Start position.
-  std::array<uint, N> extents = repeat<N, uint>(0ul); //< Size in each dimension.
-  std::array<uint, N> strides = repeat<N, uint>(1ul); //< Skip in each dimension.
+  index_t start = 0ul;                                      //< Start position.
+  std::array<index_t, N> extents = repeat<N, index_t>(0ul); //< Size in each dimension.
+  std::array<index_t, N> strides = repeat<N, index_t>(1ul); //< Skip in each dimension.
 
 private:
   auto end_index() const { return end_index_impl(std::make_index_sequence<N>()); }
 
-  template <std::size_t... I> auto end_index_impl(std::index_sequence<I...>) const -> std::array<uint, N>
+  template <std::size_t... I> auto end_index_impl(std::index_sequence<I...>) const -> std::array<index_t, N>
   {
-    return {(I == N - 1 ? extents[I] : 0ul)...};
+    return {{(I == N - 1 ? extents[I] : 0ul)...}};
   }
 };
 
@@ -181,7 +181,7 @@ template <> class base_slice<1>
 public:
   /// **TODO**: No documentation, consult `jules::base_slice<N>::iterator`.
   /// \notes For this specialization, the iterator does not depend on the parent slice.
-  class iterator : public std::iterator<std::input_iterator_tag, uint, std::ptrdiff_t, void*, uint>
+  class iterator : public std::iterator<std::input_iterator_tag, index_t, distance_t, void*, index_t>
   {
     friend class base_slice<1>;
 
@@ -211,24 +211,24 @@ public:
 
     constexpr auto operator!=(const iterator& other) const { return !(*this == other); }
 
-    constexpr auto operator*() const -> reference { return index_; }
+    constexpr auto operator*() const -> index_t { return index_; }
 
     /// \notes You should not call this function.
-    auto operator-> () const -> pointer
+    auto operator-> () const -> void*
     {
       DEBUG_ASSERT(false, debug::module{}, debug::level::invalid_state, "you should not call this function");
       return nullptr;
     }
 
   private:
-    constexpr iterator(uint index, uint stride) : index_{index}, stride_{stride} {}
+    constexpr iterator(index_t index, index_t stride) : index_{index}, stride_{stride} {}
 
-    uint index_;
-    uint stride_;
+    index_t index_;
+    index_t stride_;
   };
 
   /// Unsigned integer that represents all possibles extents when applied to an array.
-  static constexpr auto all = uint{0ul};
+  static constexpr auto all = index_t{0ul};
 
   /// \group Constructor
   /// \param start Start position of the slicing. It defaults to 0ul.
@@ -236,10 +236,10 @@ public:
   ///   It defaults to `base_slice<N>::all`.
   /// \param strides Number of skip positions in each dimension.
   ///   It defaults to consistent strides based on the `extents`.
-  constexpr base_slice(uint start, uint extent, uint stride) : start{start}, extent{extent}, stride{stride} {}
+  constexpr base_slice(index_t start, index_t extent, index_t stride) : start{start}, extent{extent}, stride{stride} {}
 
   /// \group Constructor
-  constexpr base_slice(uint start, uint extent) : start{start}, extent{extent} {}
+  constexpr base_slice(index_t start, index_t extent) : start{start}, extent{extent} {}
 
   /// \group Constructor
   constexpr base_slice() = default;
@@ -255,7 +255,7 @@ public:
 
   /// \group Index
   /// Returns the memory position of the `index`.
-  constexpr auto operator()(uint index) const -> uint { return start + index * stride; }
+  constexpr auto operator()(index_t index) const -> index_t { return start + index * stride; }
 
   constexpr auto begin() const -> iterator { return cbegin(); }
   constexpr auto end() const -> iterator { return cend(); }
@@ -263,9 +263,9 @@ public:
   constexpr auto cbegin() const -> iterator { return {start, stride}; }
   constexpr auto cend() const -> iterator { return {start + stride * extent, stride}; }
 
-  uint start = 0ul;  //< Start position.
-  uint extent = all; //< Number of position.
-  uint stride = 1ul; //< Skip positions.
+  index_t start = 0ul;  //< Start position.
+  index_t extent = all; //< Number of position.
+  index_t stride = 1ul; //< Skip positions.
 };
 
 } // namespace jules

@@ -14,9 +14,9 @@ namespace jules
 namespace detail
 {
 
-template <typename T, std::size_t N> class iterator_from_slice : public std::iterator<std::forward_iterator_tag, T>
+template <typename T, std::size_t N> class iterator_from_slice : public std::iterator<std::forward_iterator_tag, T, distance_t>
 {
-  template <typename, std::size_t> friend class ref_array;
+  template <typename, std::size_t> friend class ::jules::ref_array;
 
 public:
   constexpr iterator_from_slice() = default;
@@ -44,9 +44,9 @@ public:
 
   constexpr auto operator!=(const iterator_from_slice& other) const { return !(*this == other); }
 
-  constexpr auto operator*() -> typename decltype(*this)::reference { return data_[*it_]; }
+  constexpr auto operator*() -> T& { return data_[*it_]; }
 
-  constexpr auto operator-> () -> typename decltype(*this)::pointer { return data_ + *it_; }
+  constexpr auto operator-> () -> T* { return data_ + *it_; }
 
 private:
   iterator_from_slice(T* data, typename base_slice<N>::iterator it) : data_{data}, it_{std::move(it)} {}
@@ -70,15 +70,15 @@ public:
   using value_type = T;
   static constexpr auto order = N;
 
-  using size_type = uint;
-  using difference_type = sint;
+  using size_type = index_t;
+  using difference_type = distance_t;
 
   using iterator = detail::iterator_from_slice<T, N>;
   using const_iterator = detail::iterator_from_slice<const T, N>;
 
   /// *TODO*: Explain why the user should probably not call this function.
   /// In C++17, we can provide a helper that generates a view with more security.
-  ref_array(T* data, base_slice<N>& descriptor) : data_{data}, descriptor_{descriptor} {}
+  ref_array(T* data, base_slice<N> descriptor) : data_{data}, descriptor_{descriptor} {}
 
   ref_array(const ref_array& source) = delete;
   ref_array(ref_array&& source) noexcept = delete;
@@ -100,8 +100,7 @@ public:
     static_assert(Array::order == N, "array order mismatch");
     static_assert(std::is_assignable<T&, typename Array::value_type>::value, "incompatible assignment");
 
-    DEBUG_ASSERT(descriptor_.extents == source.descriptor().extents, debug::module{}, debug::level::extents_check,
-                 "extents mismatch");
+    DEBUG_ASSERT(this->extents() == source.extents(), debug::module{}, debug::level::extents_check, "extents mismatch");
     auto it = source.begin();
     for (auto& elem : *this)
       elem = *it++;
@@ -129,6 +128,7 @@ public:
   auto cbegin() const -> const_iterator { return {data_, descriptor_.begin()}; }
   auto cend() const -> const_iterator { return {data_, descriptor_.end()}; }
 
+  auto extents() const { return descriptor_.extents; }
   auto descriptor() const { return descriptor_; }
   auto data() const { return data_; }
 
