@@ -2,6 +2,7 @@
 #define JULES_ARRAY_REF_ARRAY_H
 
 #include <jules/array/detail/common.hpp>
+#include <jules/array/detail/slicing.hpp>
 #include <jules/array/slice.hpp>
 #include <jules/core/debug.hpp>
 #include <jules/core/type.hpp>
@@ -143,13 +144,30 @@ public:
   /// \group Indexing
   auto operator[](index_t i) const -> ref_array<const T, N - 1> { return static_cast<ref_array<const T, N>>(*this)[i]; }
 
-  template <typename... Args> auto operator()(Args&&... args) -> detail::indirect_request<ind_array<T, N>, Args...>;
-  template <typename... Args> auto operator()(Args&&... args) -> detail::slice_request<ref_array<T, N>, Args...>;
-  template <typename... Args> auto operator()(Args&&... args) -> detail::element_request<T&, Args...>;
+  template <typename... Args> auto operator()(Args&&... args) -> detail::indirect_request<ind_array<T, N>, Args...>
+  {
+    static_assert(sizeof...(args) == N, "invalid number of arguments");
+    auto slicing = detail::indirect_slicing(descriptor_, std::forward<Args>(args)...);
+    return {data_, slicing.first, std::move(slicing.second)};
+  }
 
-  template <typename... Args> auto operator()(Args&&... args) const -> detail::indirect_request<ind_array<const T, N>, Args...>;
-  template <typename... Args> auto operator()(Args&&... args) const -> detail::slice_request<ref_array<const T, N>, Args...>;
-  template <typename... Args> auto operator()(Args&&... args) const -> detail::element_request<const T&, Args...>;
+  template <typename... Args> auto operator()(Args&&... args) -> detail::slice_request<ref_array<T, N>, Args...>
+  {
+    static_assert(sizeof...(args) == N, "invalid number of arguments");
+    auto slice = detail::default_slicing(descriptor_, std::forward<Args>(args)...);
+    return {data_, slice};
+  }
+
+  template <typename... Args> auto operator()(Args&&... args) -> detail::element_request<T&, Args...>
+  {
+    static_assert(sizeof...(args) == N, "invalid number of arguments");
+    return data_[descriptor_(index_t{std::forward<Args>(args)}...)];
+  }
+
+  template <typename... Args> auto operator()(Args&&... args) const
+  {
+    return static_cast<ref_array<const T, N>>(*this)(std::forward<Args>(args)...);
+  }
 
   auto begin() -> iterator { return {data_, descriptor_.begin()}; }
   auto end() -> iterator { return {data_, descriptor_.end()}; }
