@@ -3,7 +3,9 @@
 
 #include <jules/array/detail/common.hpp>
 #include <jules/array/ref_array.hpp>
+#include <jules/base/numeric.hpp>
 #include <jules/core/type.hpp>
+#include <jules/base/async.hpp>
 
 #include <cstring>
 #include <memory>
@@ -27,37 +29,90 @@ public:
   using size_type = index_t;
   using difference_type = distance_t;
 
-  base_array();
-  ~base_array();
+  ~base_array()
+  {
+    clear();
+  }
 
-  template <typename... Dims, typename = detail::n_indexes_enabler<N, Dims...>> explicit base_array(Dims... dims);
+  base_array() : ref_array<T, N>{nullptr, {}} {}
 
-  template <typename... Dims, typename = detail::n_indexes_enabler<N, Dims...>> base_array(const T& value, Dims... dims);
+  template <typename... Dims, typename = detail::n_indexes_enabler<N, Dims...>> explicit base_array(Dims... dims)
+    : ref_array<T, N>{allocate(prod_args(dims...)), {0u, {{ index_t{dims}... }}}}
+  {
+    create(detail::trivial_dispatch<T>(), this->data(), this->size());
+  }
+
+  template <typename... Dims, typename = detail::n_indexes_enabler<N, Dims...>> base_array(const T& value, Dims... dims)
+    : ref_array<T, N>{allocate(prod_args(dims...)), {0u, {{ index_t{dims}... }}}}
+  {
+    create(detail::trivial_dispatch<T>(), this->data(), this->size(), value);
+  }
 
   template <typename Iter, typename... Dims, typename R = typename std::iterator_traits<Iter>::value_type,
             typename = detail::n_indexes_enabler<N, Dims...>, typename = std::enable_if_t<std::is_convertible<R, T>::value>>
-  base_array(Iter iter, Dims... dims);
+  base_array(Iter iter, Dims... dims)
+    : ref_array<T, N>{allocate(prod_args(dims...)), {0u, {{ index_t{dims}... }}}}
+  {
+    create(detail::trivial_dispatch<T>(), this->data(), iter, this->size());
+  }
 
-  base_array(const base_array& source);
-  base_array(base_array&& source) noexcept;
+  base_array(const base_array& source)
+    : ref_array<T, N>{allocate(source.size()), source.descriptor_}
+  {
+    create(detail::trivial_dispatch<T>(), this->data(), source.data(), this->size());
+  }
 
-  template <typename Array, typename = detail::array_request<void, Array>> base_array(const Array& source);
+  base_array(base_array&& source) noexcept
+    :ref_array<T, N>{move_ptr(source.data_), std::move(source.descriptor_)}
+  {
+  }
 
-  auto operator=(const base_array& source) -> base_array&;
-  auto operator=(base_array&& source) noexcept -> base_array&;
+  template <typename Array, typename = detail::array_request<void, Array>> base_array(const Array& source)
+    : ref_array<T, N>{allocate(source.size()), {0u, source.extents()}}
+  {
+    static_assert(std::is_constructible<T, const typename Array::value_type&>::value, "incompatible value types");
+    create(detail::trivial_dispatch<T>(), this->data(), source.begin(), this->size());
+  }
 
-  template <typename Array> auto operator=(const Array& source) -> detail::array_request<base_array&, Array>;
+  auto operator=(const base_array& source) -> base_array&
+  {
+    clear();
+    this->data_ = allocate(source.size());
+    this->descriptor_ = source.descriptor_;
+    create(detail::trivial_dispatch<T>(), this->data(), source.data(), source->size());
+    return *this;
+  }
 
-  auto begin() -> iterator { return data_; }
-  auto end() -> iterator { return data_ + size(); }
+  auto operator=(base_array&& source) noexcept -> base_array&
+  {
+    clear();
+    this->data_ = move_ptr(source.data_);
+    this->descriptor_ = std::move(source.descriptor_);
+    return *this;
+  }
 
-  auto begin() const -> const_iterator { return cbegin(); }
-  auto end() const -> const_iterator { return cend(); }
+  template <typename Array> auto operator=(const Array& source) -> detail::array_request<base_array&, Array>
+  {
+    clear();
+    this->data_ = allocate(source.size());
+    this->descriptor_ = {0, source.extents()};
+    create(detail::trivial_dispatch<T>(), this->data(), source.begin(), source.size());
+    return *this;
+  }
 
-  auto cbegin() const -> const_iterator { return data_; }
-  auto cend() const -> const_iterator { return data_ + size(); }
+  auto begin() -> iterator { return this->data(); }
+  auto end() -> iterator { return this->data() + this->size(); }
+
+  auto begin() const -> const_iterator { return this->cbegin(); }
+  auto end() const -> const_iterator { return this->cend(); }
+
+  auto cbegin() const -> const_iterator { return this->data(); }
+  auto cend() const -> const_iterator { return this->data() + this->size(); }
+
+  auto data() { return this->data_; }
 
 private:
+  // TODO: before specializing, put these methods in a class
   static T* allocate(index_t size) { return reinterpret_cast<T*>(new storage_type[size]); }
   static void deallocate(T* data, index_t) { delete[] reinterpret_cast<storage_type*>(data); }
 
@@ -68,16 +123,15 @@ private:
 
   template <typename... Args> static void create(detail::non_trivial_tag, T* data, index_t size, Args&&... args)
   {
-    auto current = index{0u};
+    auto current = index_t{0u};
     try {
       for (; current < size; ++current)
         ::new (static_cast<void*>(data + current)) T(std::forward<Args>(args)...);
     } catch (...) {
-      for (auto i = index{0u}; i != current; ++j)
+      for (auto i = index_t{0u}; i != current; ++i)
         static_cast<T*>(data + i)->~T();
       throw;
     }
-    return current;
   }
 
   template <typename It> static void create(detail::trivial_tag, T* to, It from, index_t size)
@@ -92,12 +146,20 @@ private:
     std::uninitialized_copy_n(from, size, to);
   }
 
-  static void destroy(detail::trivial_tag, T* data, index_t size) {}
+  static void destroy(detail::trivial_tag, T*, index_t) {}
 
   static void destroy(detail::non_trivial_tag, T* data, index_t size)
   {
     for (auto i = index_t{0u}; i < size; ++i) // use jules::seq (verify other files)
       data[i].~T();
+  }
+
+  void clear()
+  {
+    if (this->data()) {
+      destroy(detail::trivial_dispatch<T>(), this->data(), this->size());
+      deallocate(this->data(), this->size());
+    }
   }
 };
 

@@ -29,7 +29,7 @@ namespace detail
 
 // Enablers
 template <std::size_t N, typename... Types>
-using n_indexes_enabler = std::enable_if_t<N == sizeof...(Types) && all(std::is_convertible<Types, uint>::value...)>;
+using n_indexes_enabler = std::enable_if_t<N == sizeof...(Types) && all_args(std::is_convertible<Types, uint>::value...)>;
 
 // Request checks
 

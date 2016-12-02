@@ -137,7 +137,7 @@ public:
   constexpr auto operator()(Args&&... indexes) const -> index_t
   {
     static_assert(sizeof...(Args) == N, "invalid number of arguments");
-    // static_assert(all(std::is_convertible<Args, index_t>::value...), "indexes must be convertible to index_t");
+    // static_assert(all_args(std::is_convertible<Args, index_t>::value...), "indexes must be convertible to index_t");
     auto arg = std::array<index_t, N>{{std::forward<Args>(indexes)...}};
     return (*this)(arg);
   }
