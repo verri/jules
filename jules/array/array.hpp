@@ -3,9 +3,9 @@
 
 #include <jules/array/detail/common.hpp>
 #include <jules/array/ref_array.hpp>
+#include <jules/base/async.hpp>
 #include <jules/base/numeric.hpp>
 #include <jules/core/type.hpp>
-#include <jules/base/async.hpp>
 
 #include <cstring>
 #include <memory>
@@ -29,47 +29,40 @@ public:
   using size_type = index_t;
   using difference_type = distance_t;
 
-  ~base_array()
-  {
-    clear();
-  }
+  ~base_array() { clear(); }
 
   base_array() : ref_array<T, N>{nullptr, {}} {}
 
-  template <typename... Dims, typename = detail::n_indexes_enabler<N, Dims...>> explicit base_array(Dims... dims)
-    : ref_array<T, N>{allocate(prod_args(dims...)), {0u, {{ index_t{dims}... }}}}
+  template <typename... Dims, typename = detail::n_indexes_enabler<N, Dims...>>
+  explicit base_array(Dims... dims) : ref_array<T, N>{allocate(prod_args(dims...)), {0u, {{index_t{dims}...}}}}
   {
     create(detail::trivial_dispatch<T>(), this->data(), this->size());
   }
 
-  template <typename... Dims, typename = detail::n_indexes_enabler<N, Dims...>> base_array(const T& value, Dims... dims)
-    : ref_array<T, N>{allocate(prod_args(dims...)), {0u, {{ index_t{dims}... }}}}
+  template <typename... Dims, typename = detail::n_indexes_enabler<N, Dims...>>
+  base_array(const T& value, Dims... dims) : ref_array<T, N>{allocate(prod_args(dims...)), {0u, {{index_t{dims}...}}}}
   {
     create(detail::trivial_dispatch<T>(), this->data(), this->size(), value);
   }
 
   template <typename Iter, typename... Dims, typename R = typename std::iterator_traits<Iter>::value_type,
             typename = detail::n_indexes_enabler<N, Dims...>, typename = std::enable_if_t<std::is_convertible<R, T>::value>>
-  base_array(Iter iter, Dims... dims)
-    : ref_array<T, N>{allocate(prod_args(dims...)), {0u, {{ index_t{dims}... }}}}
+  base_array(Iter iter, Dims... dims) : ref_array<T, N>{allocate(prod_args(dims...)), {0u, {{index_t{dims}...}}}}
   {
     create(detail::trivial_dispatch<T>(), this->data(), iter, this->size());
   }
 
-  base_array(const base_array& source)
-    : ref_array<T, N>{allocate(source.size()), source.descriptor_}
+  base_array(const base_array& source) : ref_array<T, N>{allocate(source.size()), source.descriptor_}
   {
     create(detail::trivial_dispatch<T>(), this->data(), source.data(), this->size());
   }
 
-  base_array(base_array&& source) noexcept
-    :ref_array<T, N>{move_ptr(source.data_), std::move(source.descriptor_)}
-  {
-  }
+  base_array(base_array&& source) noexcept : ref_array<T, N>{move_ptr(source.data_), std::move(source.descriptor_)} {}
 
-  template <typename Array, typename = detail::array_request<void, Array>> base_array(const Array& source)
-    : ref_array<T, N>{allocate(source.size()), {0u, source.extents()}}
+  template <typename Array, typename = detail::array_request<void, Array>>
+  base_array(const Array& source) : ref_array<T, N>{allocate(source.size()), {0u, source.extents()}}
   {
+    static_assert(Array::order == N, "array order mismatch");
     static_assert(std::is_constructible<T, const typename Array::value_type&>::value, "incompatible value types");
     create(detail::trivial_dispatch<T>(), this->data(), source.begin(), this->size());
   }
@@ -93,6 +86,8 @@ public:
 
   template <typename Array> auto operator=(const Array& source) -> detail::array_request<base_array&, Array>
   {
+    static_assert(Array::order == N, "array order mismatch");
+    static_assert(std::is_assignable<T&, typename Array::value_type>::value, "incompatible assignment");
     clear();
     this->data_ = allocate(source.size());
     this->descriptor_ = {0, source.extents()};

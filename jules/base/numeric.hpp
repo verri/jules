@@ -21,8 +21,7 @@ constexpr auto repeat_impl(const T& value, std::index_sequence<I...>) -> std::ar
   return {{((void)I, value)...}};
 }
 
-struct forward_arithmetic
-{
+struct forward_arithmetic {
   template <typename T> decltype(auto) operator+(T&& value) { return std::forward<T>(value); }
   template <typename T> decltype(auto) operator-(T&& value) { return std::forward<T>(value); }
   template <typename T> decltype(auto) operator*(T&& value) { return std::forward<T>(value); }
@@ -53,17 +52,26 @@ auto prod(Rng&& rng, const T& start = static_cast<T>(1u))
   return prod(ranges::begin(rng), ranges::end(rng), start);
 }
 
-constexpr auto prod_args() -> detail::forward_arithmetic { return{}; }
+constexpr auto prod_args() -> detail::forward_arithmetic { return {}; }
 
-template <typename T, typename... Args> constexpr auto prod_args(const T& arg, Args&&... args) { return arg * prod_args(std::forward<Args>(args)...); }
+template <typename T, typename... Args> constexpr auto prod_args(const T& arg, Args&&... args)
+{
+  return arg * prod_args(std::forward<Args>(args)...);
+}
 
 constexpr auto all_args() { return true; }
 
-template <typename... Args> constexpr auto all_args(bool arg, Args&&... args) { return arg && all_args(std::forward<Args>(args)...); }
+template <typename... Args> constexpr auto all_args(bool arg, Args&&... args)
+{
+  return arg && all_args(std::forward<Args>(args)...);
+}
 
 constexpr auto any_args() { return false; }
 
-template <typename... Args> constexpr auto any_args(bool arg, Args&&... args) { return arg || any_args(std::forward<Args>(args)...); }
+template <typename... Args> constexpr auto any_args(bool arg, Args&&... args)
+{
+  return arg || any_args(std::forward<Args>(args)...);
+}
 
 } // namespace jules
 
