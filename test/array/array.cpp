@@ -2,4 +2,8 @@
 
 #include <catch.hpp>
 
-TEST_CASE("array", "[array]") { auto matrix = jules::matrix<>(); }
+TEST_CASE("array", "[array]")
+{
+  auto vector = jules::vector<>();
+  auto matrix = jules::matrix<>();
+}

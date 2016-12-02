@@ -19,7 +19,7 @@ namespace jules
 /// \module N-Dimensional Array
 template <typename T, std::size_t N> class ref_array
 {
-  static_assert(N > 0u, "Invalid array dimension.");
+  static_assert(N > 0u, "invalid array dimension");
 
   template <typename, std::size_t> friend class ref_array;
 
