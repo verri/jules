@@ -146,7 +146,7 @@ private:
   base_slice<N> descriptor_;
 };
 
-/// 1-D Array reference Specialization.
+/// 1-D Array reference specialization.
 ///
 /// This class is used internally by `jules` to represent a view of an concrete array.
 ///
