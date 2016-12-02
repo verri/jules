@@ -83,6 +83,7 @@ index_t slicing_size(const std::array<index_t, N>& extents, const Rng& rng, Args
 template <std::size_t D, std::size_t N> index_t slicing_size(const std::array<index_t, N>&) { return 1; }
 
 // Default slicing Helpers
+// TODO: XXX: It may be wrong, since the data is stored column-wise now.
 
 template <std::size_t D, std::size_t N, typename... Args> void do_slice(base_slice<N>& result, index_t i, Args&&... args)
 {

@@ -1,6 +1,6 @@
 SUFFIXES += .d
 
-SRC = array/slice.cpp array/ref_array.cpp
+SRC = array/slice.cpp array/ref_array.cpp array/ind_array.cpp
 
 # SRC = array/array_detail.cpp array/array.cpp array/slice.cpp \
 # 	dataframe/column.cpp dataframe/dataframe.cpp dataframe/column_detail.cpp \

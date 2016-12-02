@@ -115,6 +115,7 @@ public:
   template <typename... Args> auto operator()(Args&&... args) -> detail::element_request<T&, Args...>
   {
     static_assert(sizeof...(args) == N, "invalid number of arguments");
+    // TODO: check boundaries
     return data_[descriptor_(index_t{std::forward<Args>(args)}...)];
   }
 
