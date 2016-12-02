@@ -84,7 +84,7 @@ public:
     DEBUG_ASSERT(i <= row_count(), debug::module{}, debug::level::boundary_check, "out of range");
 
     const auto start = descriptor_.start + descriptor_.strides[0] * i;
-    std::array<std::size_t, N - 1> extents, strides;
+    std::array<index_t, N - 1> extents, strides;
 
     const auto& e = extents();
     const auto& s = descriptor_.strides;
@@ -141,7 +141,7 @@ public:
   auto row_count() const { return extents()[1]; }
   auto column_count() const { return extents()[2]; }
 
-private:
+protected:
   T* data_;
   base_slice<N> descriptor_;
 };
@@ -238,7 +238,7 @@ public:
     return {data_, new_slice};
   }
 
-  auto operator()(std::size_t i) -> T& { return (*this)[i]; }
+  auto operator()(index_t i) -> T& { return (*this)[i]; }
 
   template <typename Arg> decltype(auto) operator()(Arg&& arg) const
   {
@@ -260,7 +260,7 @@ public:
   auto size() const { return descriptor_.size(); }
   auto length() const { return size(); }
 
-private:
+protected:
   T* data_;
   base_slice<1> descriptor_;
 };

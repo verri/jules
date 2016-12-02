@@ -290,7 +290,7 @@ public:
     return {data_, new_slice.extent, std::move(indexes)};
   }
 
-  auto operator()(std::size_t i) -> T& { return (*this)[i]; }
+  auto operator()(index_t i) -> T& { return (*this)[i]; }
 
   template <typename Rng, typename U = range::range_value_t<Rng>, CONCEPT_REQUIRES_(range::Range<Rng>())>
   auto operator()(const Rng& rng) const -> ind_array<const T, 1>
@@ -309,7 +309,7 @@ public:
     return {data_, new_slice.extent, std::move(indexes)};
   }
 
-  auto operator()(std::size_t i) const -> const T& { return (*this)[i]; }
+  auto operator()(index_t i) const -> const T& { return (*this)[i]; }
 
   auto begin() -> iterator { return {data_, indexes_.begin()}; }
   auto end() -> iterator { return {data_, indexes_.end()}; }
