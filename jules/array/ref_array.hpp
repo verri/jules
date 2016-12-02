@@ -2,62 +2,15 @@
 #define JULES_ARRAY_REF_ARRAY_H
 
 #include <jules/array/detail/common.hpp>
+#include <jules/array/detail/iterator.hpp>
 #include <jules/array/detail/slicing.hpp>
 #include <jules/array/slice.hpp>
 #include <jules/core/debug.hpp>
 #include <jules/core/range.hpp>
 #include <jules/core/type.hpp>
 
-#include <iterator>
-
 namespace jules
 {
-
-namespace detail
-{
-
-template <typename T, std::size_t N> class iterator_from_slice : public std::iterator<std::forward_iterator_tag, T, distance_t>
-{
-  template <typename, std::size_t> friend class ::jules::ref_array;
-
-public:
-  constexpr iterator_from_slice() = default;
-
-  constexpr iterator_from_slice(const iterator_from_slice& source) = default;
-  constexpr iterator_from_slice(iterator_from_slice&& source) noexcept = default;
-
-  constexpr iterator_from_slice& operator=(const iterator_from_slice& source) = default;
-  constexpr iterator_from_slice& operator=(iterator_from_slice&& source) noexcept = default;
-
-  constexpr auto operator++() -> iterator_from_slice&
-  {
-    ++it_;
-    return *this;
-  }
-
-  constexpr auto operator++(int) -> iterator_from_slice
-  {
-    auto copy = *this;
-    ++(*this);
-    return copy;
-  }
-
-  constexpr auto operator==(const iterator_from_slice& other) const { return it_ == other.it_; }
-
-  constexpr auto operator!=(const iterator_from_slice& other) const { return !(*this == other); }
-
-  constexpr auto operator*() -> T& { return data_[*it_]; }
-
-  constexpr auto operator-> () -> T* { return data_ + *it_; }
-
-private:
-  iterator_from_slice(T* data, typename base_slice<N>::iterator it) : data_{data}, it_{std::move(it)} {}
-
-  T* data_ = nullptr;
-  typename base_slice<N>::iterator it_;
-};
-
-} // namespace detail
 
 /// Array reference.
 ///
@@ -77,8 +30,8 @@ public:
   using size_type = index_t;
   using difference_type = distance_t;
 
-  using iterator = detail::iterator_from_slice<T, N>;
-  using const_iterator = detail::iterator_from_slice<const T, N>;
+  using iterator = detail::iterator_from_indexes<T, typename base_slice<N>::iterator>;
+  using const_iterator = detail::iterator_from_indexes<const T, typename base_slice<N>::iterator>;
 
   /// *TODO*: Explain why the user should probably not call this function.
   /// In C++17, we can provide a helper that generates a view with more security.
@@ -208,8 +161,8 @@ public:
   using size_type = index_t;
   using difference_type = distance_t;
 
-  using iterator = detail::iterator_from_slice<T, 1>;
-  using const_iterator = detail::iterator_from_slice<const T, 1>;
+  using iterator = detail::iterator_from_indexes<T, typename base_slice<1>::iterator>;
+  using const_iterator = detail::iterator_from_indexes<const T, typename base_slice<1>::iterator>;
 
   /// *TODO*: Explain why the user should probably not call this function.
   /// In C++17, we can provide a helper that generates a view with more security.
