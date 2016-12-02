@@ -124,10 +124,24 @@ public:
   operator ref_array<const T, N>() const { return {data_, descriptor_}; }
 
   /// \group Indexing
-  auto operator[](index_t i) -> ref_array<T, N - 1>;
+  auto operator[](index_t i) -> ref_array<T, N - 1>
+  {
+    DEBUG_ASSERT(i <= row_count(), debug::module{}, debug::level::boundary_check, "out of range");
+
+    const auto start = descriptor_.start + descriptor_.strides[0] * i;
+    std::array<std::size_t, N - 1> extents, strides;
+
+    const auto& e = extents();
+    const auto& s = descriptor_.strides;
+
+    std::copy(e.begin() + 1, e.end(), extents.begin());
+    std::copy(s.begin() + 1, s.end(), strides.begin());
+
+    return {data_, {start, extents, strides}};
+  }
 
   /// \group Indexing
-  auto operator[](index_t i) const -> ref_array<const T, N - 1>;
+  auto operator[](index_t i) const -> ref_array<const T, N - 1> { return static_cast<ref_array<const T, N>>(*this)[i]; }
 
   template <typename... Args> auto operator()(Args&&... args) -> detail::indirect_request<ind_array<T, N>, Args...>;
   template <typename... Args> auto operator()(Args&&... args) -> detail::slice_request<ref_array<T, N>, Args...>;
