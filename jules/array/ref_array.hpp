@@ -66,6 +66,8 @@ template <typename T, std::size_t N> class ref_array
 {
   static_assert(N > 1, "Invalid array dimension.");
 
+  template <typename, std::size_t> friend class ref_array;
+
 public:
   using value_type = T;
   static constexpr auto order = N;
@@ -115,9 +117,25 @@ public:
     auto it = source.begin();
     for (auto& elem : *this)
       elem = std::move(*it++);
-
     return *this;
   }
+
+  /// Implicitly convertable to hold const values.
+  operator ref_array<const T, N>() const { return {data_, descriptor_}; }
+
+  /// \group Indexing
+  auto operator[](index_t i) -> ref_array<T, N - 1>;
+
+  /// \group Indexing
+  auto operator[](index_t i) const -> ref_array<const T, N - 1>;
+
+  template <typename... Args> auto operator()(Args&&... args) -> detail::indirect_request<ind_array<T, N>, Args...>;
+  template <typename... Args> auto operator()(Args&&... args) -> detail::slice_request<ref_array<T, N>, Args...>;
+  template <typename... Args> auto operator()(Args&&... args) -> detail::element_request<T&, Args...>;
+
+  template <typename... Args> auto operator()(Args&&... args) const -> detail::indirect_request<ind_array<const T, N>, Args...>;
+  template <typename... Args> auto operator()(Args&&... args) const -> detail::slice_request<ref_array<const T, N>, Args...>;
+  template <typename... Args> auto operator()(Args&&... args) const -> detail::element_request<const T&, Args...>;
 
   auto begin() -> iterator { return {data_, descriptor_.begin()}; }
   auto end() -> iterator { return {data_, descriptor_.end()}; }
@@ -128,9 +146,13 @@ public:
   auto cbegin() const -> const_iterator { return {data_, descriptor_.begin()}; }
   auto cend() const -> const_iterator { return {data_, descriptor_.end()}; }
 
-  auto extents() const { return descriptor_.extents; }
   auto descriptor() const { return descriptor_; }
   auto data() const { return data_; }
+  auto extents() const { return descriptor_.extents; }
+  auto size() const { return descriptor_.size(); }
+
+  auto row_count() const { return extents()[1]; }
+  auto column_count() const { return extents()[2]; }
 
 private:
   T* data_;
