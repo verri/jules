@@ -84,6 +84,8 @@ namespace detail
 template <typename R, typename T> using array_request = std::enable_if_t<is_array_v<T>(), R>;
 template <typename R, typename T> using not_array_request = std::enable_if_t<!is_array_v<T>(), R>;
 
+} // namespace detail
+
 // Helpers for operators
 
 template <typename It, typename F, std::size_t M>
@@ -99,7 +101,6 @@ auto make_expr_array(const LhsIt& lhs_first, const LhsIt& lhs_last, const RhsIt&
   return {lhs_first, lhs_last, rhs_first, rhs_last, f, extent};
 }
 
-} // namespace detail
 } // namespace jules
 
 #endif // JULES_ARRAY_DETAIL_COMMON_H

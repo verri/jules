@@ -33,10 +33,10 @@ public:
   using iterator = detail::iterator_from_indexes<T, typename base_slice<N>::iterator>;
   using const_iterator = detail::iterator_from_indexes<const T, typename base_slice<N>::iterator>;
 
-  /// *TODO*: Explain why the user should probably not call this function.
+  /// *TODO*: Explain why the user should probably not call these functions.
   /// In C++17, we can provide a helper that generates a view with more security.
+  ref_array() = default;
   ref_array(T* data, base_slice<N> descriptor) : data_{data}, descriptor_{descriptor} {}
-
   ref_array(const ref_array& source) = delete;
   ref_array(ref_array&& source) noexcept = delete;
 

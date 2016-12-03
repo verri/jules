@@ -52,6 +52,13 @@ public:
     this->create(detail::trivial_dispatch<T>(), this->data(), iter, this->size());
   }
 
+  base_array(recursive_initializer_list_t<T, N> values)
+  {
+    this->descriptor_ = this->calculate_descriptor(values);
+    this->data_ = this->allocate(this->descriptor_.size());
+    this->create(detail::trivial_dispatch<T>(), this->data(), values, this->descriptor_);
+  }
+
   base_array(const base_array& source) : ref_array<T, N>{this->allocate(source.size()), source.descriptor_}
   {
     this->create(detail::trivial_dispatch<T>(), this->data(), source.data(), this->size());
@@ -114,6 +121,40 @@ private:
       this->deallocate(this->data(), this->size());
     }
   }
+
+  static auto calculate_descriptor(recursive_initializer_list_t<T, N> values) -> base_slice<N>
+  {
+    std::array<index_t, N> extents;
+
+    calculate_descriptor_fill(extents, values, 0u);
+    DEBUG_ASSERT(calculate_descriptor_check(extents, values, 0u), debug::module{}, debug::level::boundary_check,
+                 "invalid initializer");
+
+    return {0u, extents};
+  }
+
+  template <typename List> static auto calculate_descriptor_fill(std::array<index_t, N>& extents, List values, index_t pos)
+  {
+    DEBUG_ASSERT(values.size() > 0, debug::module{}, debug::level::boundary_check, "invalid initializer");
+    extents[pos] = values.size();
+    calculate_descriptor_fill(extents, *values.begin(), pos + 1);
+  }
+
+  static auto calculate_descriptor_fill(std::array<index_t, N>&, const T&, index_t) {}
+
+  template <typename List> static auto calculate_descriptor_check(const std::array<index_t, N>& extents, List values, index_t pos)
+  {
+    if (values.size() != extents[pos])
+      return false;
+
+    for (auto subvalues : values)
+      if (!calculate_descriptor_check(extents, subvalues, pos + 1))
+        return false;
+
+    return true;
+  }
+
+  static constexpr auto calculate_descriptor_check(const std::array<index_t, N>&, const T&, index_t) { return true; }
 };
 
 template <typename T> class base_array<T, 1> : public ref_array<T, 1>, private detail::array_allocator<T>
@@ -144,8 +185,10 @@ public:
     this->create(detail::trivial_dispatch<T>(), this->data(), this->size(), value);
   }
 
+  base_array(std::initializer_list<T> values) : base_array(values.begin(), values.end()) {}
+
   template <typename Iter, typename U = range::iterator_value_t<Iter>, CONCEPT_REQUIRES_(range::RandomAccessIterator<Iter>())>
-  base_array(Iter first, Iter last) : ref_array<T, 1>{this->allocate(last - first), {0u, last - first}}
+  base_array(Iter first, Iter last) : ref_array<T, 1>{this->allocate(last - first), {0u, static_cast<index_t>(last - first)}}
   {
     static_assert(std::is_constructible<T, const U&>::value, "incompatible value types");
     this->create(detail::trivial_dispatch<T>(), this->data(), first, this->size());

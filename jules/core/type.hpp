@@ -1,6 +1,7 @@
 #ifndef JULES_CORE_TYPE_H
 #define JULES_CORE_TYPE_H
 
+#include <initializer_list>
 #include <string>
 #include <utility>
 
@@ -120,6 +121,18 @@ template <typename T> struct trivial_dispatch_helper<T, std::enable_if_t<std::is
 template <typename T> auto trivial_dispatch() { return typename trivial_dispatch_helper<T>::type{}; }
 
 } // namespace detail
+
+// Recursive initializer_list
+
+template <typename T, std::size_t N> struct recursive_initializer_list {
+  using type = std::initializer_list<typename recursive_initializer_list<T, N - 1>::type>;
+};
+
+template <typename T> struct recursive_initializer_list<T, 0> {
+  using type = T;
+};
+
+template <typename T, std::size_t N> using recursive_initializer_list_t = typename recursive_initializer_list<T, N>::type;
 
 } // namespace jules
 
