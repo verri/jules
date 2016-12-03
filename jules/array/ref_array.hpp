@@ -4,7 +4,6 @@
 #include <jules/array/detail/common.hpp>
 #include <jules/array/detail/iterator.hpp>
 #include <jules/array/detail/slicing.hpp>
-#include <jules/array/ind_array.hpp>
 #include <jules/array/slice.hpp>
 #include <jules/core/debug.hpp>
 #include <jules/core/range.hpp>
