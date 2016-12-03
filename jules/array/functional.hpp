@@ -61,7 +61,7 @@
 #define BINARY_APPLY_OPERATION(TX__, X__, TY__, Y__)                                                                             \
   template <UNPACK TX__, UNPACK TY__, typename Operator> auto apply(UNPACK X__ lhs, UNPACK Y__ rhs, const Operator& op)          \
   {                                                                                                                              \
-    DEBUG_ASSERT(lhs.extents() == rhs.extents(), debug::module{}, debug::level::extents_check, "extents mismatch"); \
+    DEBUG_ASSERT(lhs.extents() == rhs.extents(), debug::module{}, debug::level::extents_check, "extents mismatch");              \
     return make_expr_array(lhs.begin(), lhs.end(), rhs.begin(), rhs.end(), op, lhs.extents());                                   \
   }
 
@@ -74,8 +74,8 @@
   }
 
 #define BINARY_RIGHT_TYPE_OPERATION(TX__, X__, OP__)                                                                             \
-  template <UNPACK TX__, typename U, typename = std::enable_if_t<!is_array<U>()>> \
-  auto operator OP__(UNPACK X__ lhs, const U& rhs)      \
+  template <UNPACK TX__, typename U, typename = std::enable_if_t<!is_array<U>()>>                                                \
+  auto operator OP__(UNPACK X__ lhs, const U& rhs)                                                                               \
   {                                                                                                                              \
     using Value = typename std::decay_t<UNPACK X__>::value_type;                                                                 \
     return apply(lhs, [&rhs](const Value& lhs) { return lhs OP__ rhs; });                                                        \
@@ -86,7 +86,7 @@
   auto operator OP__(const U& lhs, UNPACK Y__ rhs)                                                                               \
   {                                                                                                                              \
     using Value = typename std::decay_t<UNPACK Y__>::value_type;                                                                 \
-    return apply(rhs, [&lhs](const Value& rhs) { return lhs OP__ rhs; });                                                         \
+    return apply(rhs, [&lhs](const Value& rhs) { return lhs OP__ rhs; });                                                        \
   }
 
 //=== Unary ===//
@@ -105,10 +105,10 @@
   }
 
 #define UNARY_OPERATION(TX__, X__, N__, OP__)                                                                                    \
-  template <UNPACK TX__> auto operator OP__(UNPACK X__ operand) \
+  template <UNPACK TX__> auto operator OP__(UNPACK X__ operand)                                                                  \
   {                                                                                                                              \
     using Value = typename std::decay_t<UNPACK X__>::value_type;                                                                 \
-    return apply(operand, [](const Value& a) { return OP__ a; });                                                                 \
+    return apply(operand, [](const Value& a) { return OP__ a; });                                                                \
   }
 
 //=== Call X-Macro ===/

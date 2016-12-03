@@ -1,3 +1,6 @@
+// Whoever pursues righteousness and kindness will find life, righteousness, and honor.
+// Proverbs 21:21 (ESV)
+
 #ifndef JULES_ARRAY_DETAIL_COMMON_H
 #define JULES_ARRAY_DETAIL_COMMON_H
 
@@ -48,15 +51,6 @@ using slice_request =
 template <typename Return, typename... Args>
 using indirect_request = std::enable_if_t<!all_args(index_or_slice<Args>()...), Return>;
 
-// // TODO: Helpers for operators
-//
-// template <typename It, typename F, std::size_t M>
-// unary_expr_array<It, F, M> make_expr_array(const It&, const It&, const F&, const std::array<std::size_t, M>&);
-//
-// template <typename LhsIt, typename RhsIt, typename F, std::size_t M>
-// binary_expr_array<LhsIt, RhsIt, F, M> make_expr_array(const LhsIt&, const LhsIt&, const RhsIt&, const RhsIt&, const F&,
-//                                                           const std::array<std::size_t, M>&);
-
 } // namespace detail
 
 // Concept checking
@@ -89,6 +83,21 @@ namespace detail
 
 template <typename R, typename T> using array_request = std::enable_if_t<is_array_v<T>(), R>;
 template <typename R, typename T> using not_array_request = std::enable_if_t<!is_array_v<T>(), R>;
+
+// Helpers for operators
+
+template <typename It, typename F, std::size_t M>
+auto make_expr_array(It first, It last, const F& f, typename base_slice<M>::extent_type extent) -> unary_expr_array<It, F, M>
+{
+  return {first, last, f, extent};
+}
+
+template <typename LhsIt, typename RhsIt, typename F, std::size_t M>
+auto make_expr_array(const LhsIt& lhs_first, const LhsIt& lhs_last, const RhsIt& rhs_first, const RhsIt& rhs_last, const F& f,
+                     typename base_slice<M>::extent_type extent) -> binary_expr_array<LhsIt, RhsIt, F, M>
+{
+  return {lhs_first, lhs_last, rhs_first, rhs_last, f, extent};
+}
 
 } // namespace detail
 } // namespace jules

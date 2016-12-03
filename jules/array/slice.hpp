@@ -1,3 +1,6 @@
+// Even a fool who keeps silent is considered wise; when he closes his lips, he is deemed intelligent.
+// Proverbs 17:28 (ESV)
+
 #ifndef JULES_ARRAY_SLICE_H
 #define JULES_ARRAY_SLICE_H
 
@@ -27,6 +30,8 @@ template <std::size_t N> class base_slice
   static_assert(N > 0, "Slice cannot have dimension 0.");
 
 public:
+  using extent_type = std::array<index_t, N>;
+
   /// `InputIterator` which gives the memory positions of a slice.
   ///
   /// \notes It depends on the slice that created it, and will be invalidated if have
@@ -82,10 +87,10 @@ public:
     }
 
   private:
-    constexpr iterator(const base_slice* slice, std::array<index_t, N> indexes) : slice_{slice}, indexes_{indexes} {}
+    constexpr iterator(const base_slice* slice, extent_type indexes) : slice_{slice}, indexes_{indexes} {}
 
     const base_slice* slice_;
-    std::array<index_t, N> indexes_;
+    extent_type indexes_;
   };
 
   /// \group Constructor
@@ -95,13 +100,12 @@ public:
   /// \param strides Number of skip positions in each dimension.
   ///   It defaults to consistent strides based on the `extents`.
   /// \notes If `strides` are inferred, `extents` cannot be zero.
-  constexpr base_slice(index_t start, std::array<index_t, N> extents, std::array<index_t, N> strides)
-    : start{start}, extents{extents}, strides{strides}
+  constexpr base_slice(index_t start, extent_type extents, extent_type strides) : start{start}, extents{extents}, strides{strides}
   {
   }
 
   /// \group Constructor
-  constexpr base_slice(index_t start, std::array<index_t, N> extents) : start{start}, extents{extents}
+  constexpr base_slice(index_t start, extent_type extents) : start{start}, extents{extents}
   {
     auto tmp = size();
     for (auto i = N; i > 0ul; --i) {
@@ -127,7 +131,7 @@ public:
   /// \group Index
   /// Returns the memory position of the index.
   /// \param indexes Index that can be either an array or more than one argument.
-  constexpr auto operator()(const std::array<index_t, N>& indexes) const -> index_t
+  constexpr auto operator()(const extent_type& indexes) const -> index_t
   {
     return std::inner_product(std::begin(indexes), std::end(indexes), std::begin(strides), start);
   }
@@ -138,7 +142,7 @@ public:
   {
     static_assert(sizeof...(Args) == N, "invalid number of arguments");
     // static_assert(all_args(std::is_convertible<Args, index_t>::value...), "indexes must be convertible to index_t");
-    auto arg = std::array<index_t, N>{{std::forward<Args>(indexes)...}};
+    auto arg = extent_type{{std::forward<Args>(indexes)...}};
     return (*this)(arg);
   }
 
@@ -155,14 +159,14 @@ public:
   constexpr auto cbegin() const -> iterator { return {this, {}}; }
   constexpr auto cend() const -> iterator { return {this, end_index()}; }
 
-  index_t start = 0ul;                                      //< Start position.
-  std::array<index_t, N> extents = repeat<N, index_t>(0ul); //< Size in each dimension.
-  std::array<index_t, N> strides = repeat<N, index_t>(1ul); //< Skip in each dimension.
+  index_t start = 0ul;                           //< Start position.
+  extent_type extents = repeat<N, index_t>(0ul); //< Size in each dimension.
+  extent_type strides = repeat<N, index_t>(1ul); //< Skip in each dimension.
 
 private:
   auto end_index() const { return end_index_impl(std::make_index_sequence<N>()); }
 
-  template <std::size_t... I> auto end_index_impl(std::index_sequence<I...>) const -> std::array<index_t, N>
+  template <std::size_t... I> auto end_index_impl(std::index_sequence<I...>) const -> extent_type
   {
     return {{(I == N - 1 ? extents[I] : 0ul)...}};
   }
@@ -179,6 +183,8 @@ private:
 template <> class base_slice<1>
 {
 public:
+  using extent_type = index_t;
+
   /// **TODO**: No documentation, consult `jules::base_slice<N>::iterator`.
   /// \notes For this specialization, the iterator does not depend on the parent slice.
   class iterator : public std::iterator<std::input_iterator_tag, index_t, distance_t, void*, index_t>
