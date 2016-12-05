@@ -37,9 +37,11 @@ TEST_CASE("base array", "[base_array]")
   std::iota(std::begin(x), std::end(x), 0);
   base_array<int, 2> matrix3(x, 4u, 5u); // matrix 4x5 with values 0..19
 
-  auto result = std::mismatch(std::begin(x), std::end(x), matrix3.data());
-  CHECK(result.first == std::end(x));
-  CHECK(result.second == matrix3.data() + matrix3.size());
+  {
+    auto result = std::mismatch(std::begin(x), std::end(x), matrix3.data());
+    CHECK(result.first == std::end(x));
+    CHECK(result.second == matrix3.data() + matrix3.size());
+  }
 
   // base_array<int, 2> matrix10(3, 4u, 5u, 4u); // shouldn't not compile
 
@@ -47,15 +49,35 @@ TEST_CASE("base array", "[base_array]")
   vector1 = 0;
 
   x[3] = x[7] = x[11] = x[15] = x[19] = 0;
-  result = std::mismatch(std::begin(x), std::end(x), matrix3.data());
-  CHECK(result.first == std::end(x));
-  CHECK(result.second == matrix3.data() + 4);
+  {
+    auto result = std::mismatch(std::begin(x), std::end(x), matrix3.data());
+    CHECK(result.first == std::end(x));
+    CHECK(result.second == matrix3.end());
+  }
 
-  // auto&& expr0 =
-  //   jules::make_expr_array<2>(matrix1.begin(), matrix1.end(), matrix2.begin(), matrix2.end(),
-  //                          [](const int& a, const int& b) { return a + b; }, matrix1.extents());
+  REQUIRE(matrix1.extents() == matrix2.extents());
+  auto&& expr0 = jules::make_expr_array<2>(matrix1.begin(), matrix1.end(), matrix2.begin(), matrix2.end(),
+                                           [](const int& a, const int& b) { return a + b; }, matrix1.extents());
 
-  // auto&& expr1 = matrix1 + matrix2;
-  // auto&& expr2 = matrix1[0] + matrix2[1];
-  // auto&& expr3 = matrix1 + base_array<double, 0>(1.0);
+  auto&& expr1 = jules::apply(matrix1, matrix2, [](int a, int b) { return a + b; });
+  auto&& expr2 = matrix1 + matrix2;
+
+  CHECK(expr1.extents() == expr2.extents());
+  {
+    auto result = std::mismatch(expr1.begin(), expr1.end(), expr2.begin());
+    CHECK(result.first == expr1.end());
+    CHECK(result.second == expr2.end());
+  }
+
+  auto&& expr3 = jules::apply(matrix1, [](int a) { return -a; });
+  auto&& expr4 = -matrix1;
+  CHECK(expr3.extents() == expr4.extents());
+  {
+    auto result = std::mismatch(expr3.begin(), expr3.end(), expr4.begin());
+    CHECK(result.first == expr3.end());
+    CHECK(result.second == expr4.end());
+  }
+
+  auto vector2 = eval(matrix1[0] + matrix2[1]);
+  static_assert(std::is_same<decltype(vector2), jules::vector<int>>::value, "it should be a vector");
 }

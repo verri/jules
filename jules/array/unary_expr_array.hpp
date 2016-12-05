@@ -15,7 +15,9 @@ namespace jules
 template <typename It, typename Op, std::size_t N> class unary_expr_array
 {
 public:
-  using value_type = decltype(std::declval<Op>()(std::declval<typename It::value_type>()));
+  using iterator_value_type = typename std::iterator_traits<It>::value_type;
+
+  using value_type = decltype(std::declval<Op>()(std::declval<iterator_value_type>()));
   static constexpr auto order = N;
 
   using size_type = index_t;
@@ -65,13 +67,14 @@ public:
   using const_iterator = iterator;
 
 public:
-  unary_expr_array(It it_first, It it_last, const Op& op, base_slice<N> descriptor)
-    : it_first_{it_first}, it_last_{it_last}, op_{op}, descriptor_{descriptor}
+  unary_expr_array(It it_first, It it_last, const Op& op, typename base_slice<N>::extent_type extents)
+    : it_first_{it_first}, it_last_{it_last}, op_{op}, descriptor_{0u, extents}
   {
   }
 
-  unary_expr_array(const unary_expr_array& source) = delete;
-  unary_expr_array(unary_expr_array&& source) noexcept = delete;
+  // TODO: XXX: with C++17 theses constructors can be deleted.
+  unary_expr_array(const unary_expr_array& source) = default;
+  unary_expr_array(unary_expr_array&& source) noexcept = default;
 
   auto operator=(const unary_expr_array& source) -> unary_expr_array& = delete;
   auto operator=(unary_expr_array&& source) noexcept -> unary_expr_array& = delete;
@@ -79,11 +82,11 @@ public:
   auto begin() const -> const_iterator { return cbegin(); }
   auto end() const -> const_iterator { return cend(); }
 
-  auto cbegin() -> const_iterator { return {it_first_, op_}; }
-  auto cend() -> const_iterator { return {it_last_, op_}; }
+  auto cbegin() const -> const_iterator { return {it_first_, op_}; }
+  auto cend() const -> const_iterator { return {it_last_, op_}; }
 
-  auto descriptor() const { return std::make_tuple(it_first_, it_last_, descriptor_); }
-  auto extents() const { return descriptor_.extents; }
+  auto descriptor() const { return std::make_tuple(it_first_, it_last_, extents()); }
+  auto extents() const { return descriptor_.dimensions(); }
   auto size() const { return descriptor_.size(); }
 
 private:

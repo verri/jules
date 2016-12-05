@@ -132,8 +132,8 @@ public:
   auto extents() const { return descriptor_.extents; }
   auto size() const { return descriptor_.size(); }
 
-  auto row_count() const { return extents()[1]; }
-  auto column_count() const { return extents()[2]; }
+  auto row_count() const { return extents()[0]; }
+  auto column_count() const { return extents()[1]; }
 
 protected:
   T* data_;

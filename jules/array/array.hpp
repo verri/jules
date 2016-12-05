@@ -114,6 +114,7 @@ public:
   auto cend() const -> const_iterator { return this->data() + this->size(); }
 
   auto data() { return this->data_; }
+  auto data() const { return this->data_; }
 
 private:
   void clear()
@@ -197,13 +198,21 @@ public:
   }
 
   template <typename Rng, typename U = range::range_value_t<Rng>, CONCEPT_REQUIRES_(range::Range<Rng>())>
-  base_array(Rng&& rng) : ref_array<T, 1>{this->allocate(range::size(rng), {0u, range::size(rng)})}
+  base_array(const Rng& rng) : ref_array<T, 1>{this->allocate(range::size(rng), {0u, range::size(rng)})}
   {
     static_assert(std::is_constructible<T, const U&>::value, "incompatible value types");
     // TODO: XXX: check! short circuit should guarantee that order is not called if is not
     // an array.
     static_assert(!is_array<Rng>() || Rng::order == 1, "array order mismatch");
     this->create(detail::trivial_dispatch<T>(), this->data(), range::begin(rng), this->size());
+  }
+
+  template <typename Array, typename = detail::array_request<void, Array>>
+  base_array(const Array& source) : ref_array<T, 1>{this->allocate(source.size()), {0u, source.extents()}}
+  {
+    static_assert(Array::order == 1, "array order mismatch");
+    static_assert(std::is_constructible<T, const typename Array::value_type&>::value, "incompatible value types");
+    this->create(detail::trivial_dispatch<T>(), this->data(), source.begin(), this->size());
   }
 
   base_array(const base_array& source) : ref_array<T, 1>{this->allocate(source.size()), source.descriptor_}
@@ -251,6 +260,7 @@ public:
   auto cend() const -> const_iterator { return this->data() + this->size(); }
 
   auto data() { return this->data_; }
+  auto data() const { return this->data_; }
 
 private:
   void clear()

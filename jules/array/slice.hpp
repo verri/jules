@@ -130,6 +130,8 @@ public:
   /// Effectively the product of the extents.
   constexpr auto size() const { return prod(extents); }
 
+  constexpr auto dimensions() const { return extents; }
+
   /// \group Index
   /// Returns the memory position of the index.
   /// \param indexes Index that can be either an array or more than one argument.
@@ -161,10 +163,7 @@ public:
   constexpr auto cbegin() const -> iterator { return {this, {}}; }
   constexpr auto cend() const -> iterator { return {this, end_index()}; }
 
-  constexpr auto drop_dimension() const -> base_slice<N-1>
-  {
-    return drop_dimension_impl(std::make_index_sequence<N - 1>{});
-  }
+  constexpr auto drop_dimension() const -> base_slice<N - 1> { return drop_dimension_impl(std::make_index_sequence<N - 1>{}); }
 
   index_t start = 0ul;                           //< Start position.
   extent_type extents = repeat<N, index_t>(0ul); //< Size in each dimension.
@@ -178,7 +177,8 @@ private:
     return {{(I == N - 1 ? extents[I] : 0ul)...}};
   }
 
-  template <std::size_t... I> auto drop_dimension_impl(std::index_sequence<I...>) const -> base_slice<N-1> {
+  template <std::size_t... I> auto drop_dimension_impl(std::index_sequence<I...>) const -> base_slice<N - 1>
+  {
     return {start, {extents[I + 1]...}, {strides[I + 1]...}};
   }
 };
@@ -269,6 +269,8 @@ public:
 
   /// Effectively the product of the extents.
   constexpr auto size() const { return extent; }
+
+  constexpr auto dimensions() const { return extent; }
 
   /// \group Index
   /// Returns the memory position of the `index`.

@@ -64,7 +64,7 @@
   template <UNPACK TX__, UNPACK TY__, typename Operator> auto apply(UNPACK X__ lhs, UNPACK Y__ rhs, const Operator& op)          \
   {                                                                                                                              \
     DEBUG_ASSERT(lhs.extents() == rhs.extents(), debug::module{}, debug::level::extents_check, "extents mismatch");              \
-    return make_expr_array<N>(lhs.begin(), lhs.end(), rhs.begin(), rhs.end(), op, lhs.extents());                                   \
+    return make_expr_array<N>(lhs.begin(), lhs.end(), rhs.begin(), rhs.end(), op, lhs.extents());                                \
   }
 
 #define BINARY_OPERATION(TX__, X__, TY__, Y__, OP__)                                                                             \
@@ -103,7 +103,7 @@
 #define UNARY_APPLY_OPERATION(TX__, X__, N__)                                                                                    \
   template <UNPACK TX__, typename Operator> auto apply(UNPACK X__ operand, const Operator& op)                                   \
   {                                                                                                                              \
-    return make_expr_array<N>(operand.begin(), operand.end(), op, operand.extents());                                               \
+    return make_expr_array<N>(operand.begin(), operand.end(), op, operand.extents());                                            \
   }
 
 #define UNARY_OPERATION(TX__, X__, N__, OP__)                                                                                    \

@@ -38,15 +38,15 @@ public:
   using iterator = detail::iterator_from_indexes<T, typename vector_type::iterator>;
   using const_iterator = detail::iterator_from_indexes<const T, typename vector_type::iterator>;
 
-  /// *TODO*: Explain why the user should probably not call this function.
+  /// *TODO*: Explain why the user should probably not call these functions.
   /// In C++17, we can provide a helper that generates a view with more security.
+  ind_array() = default;
   ind_array(T* data, std::array<index_t, N> extents, vector_type indexes)
     : data_{data}, descriptor_{0ul, extents}, indexes_(std::move(indexes))
   {
   }
-
-  ind_array(const ind_array& source) = delete;
-  ind_array(ind_array&& source) noexcept = delete;
+  ind_array(const ind_array& source) = default;
+  ind_array(ind_array&& source) noexcept = default;
 
   ~ind_array() = default;
 
@@ -173,8 +173,8 @@ public:
   auto extents() const { return descriptor_.extents; }
   auto size() const { return indexes_.size(); }
 
-  auto row_count() const { return extents()[1]; }
-  auto column_count() const { return extents()[2]; }
+  auto row_count() const { return extents()[0]; }
+  auto column_count() const { return extents()[1]; }
 
 private:
   auto row(index_t i) const

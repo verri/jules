@@ -15,8 +15,10 @@ namespace jules
 template <typename LhsIt, typename RhsIt, typename Op, size_t N> class binary_expr_array
 {
 public:
-  using value_type =
-    decltype(std::declval<Op>()(std::declval<typename LhsIt::value_type>(), std::declval<typename RhsIt::value_type>()));
+  using lhs_value_type = typename std::iterator_traits<LhsIt>::value_type;
+  using rhs_value_type = typename std::iterator_traits<RhsIt>::value_type;
+
+  using value_type = decltype(std::declval<Op>()(std::declval<lhs_value_type>(), std::declval<rhs_value_type>()));
   static constexpr auto order = N;
 
   using size_type = index_t;
@@ -24,7 +26,7 @@ public:
 
   class iterator : public std::iterator<std::input_iterator_tag, value_type, distance_t>
   {
-    template <typename, typename, std::size_t> friend class binary_expr_array;
+    template <typename, typename, typename, std::size_t> friend class binary_expr_array;
 
   public:
     constexpr iterator() = delete;
@@ -58,7 +60,7 @@ public:
     constexpr auto operator-> () -> value_type* { return nullptr; }
 
   private:
-    iterator(RhsIt rhs, LhsIt lhs, const Op& op) : rhs_{rhs}, lhs_{lhs}, op_{op} {}
+    iterator(LhsIt lhs, RhsIt rhs, const Op& op) : lhs_{lhs}, rhs_{rhs}, op_{op} {}
 
     LhsIt lhs_;
     RhsIt rhs_;
@@ -68,13 +70,15 @@ public:
   using const_iterator = iterator;
 
 public:
-  binary_expr_array(LhsIt lhs_first, LhsIt lhs_last, RhsIt rhs_first, RhsIt rhs_last, const Op& op, base_slice<N> descriptor)
-    : lhs_first_{lhs_first}, lhs_last_{lhs_last}, rhs_first_{rhs_first}, rhs_last_{rhs_last}, op_{op}, descriptor_{descriptor}
+  binary_expr_array(LhsIt lhs_first, LhsIt lhs_last, RhsIt rhs_first, RhsIt rhs_last, const Op& op,
+                    typename base_slice<N>::extent_type extents)
+    : lhs_first_{lhs_first}, lhs_last_{lhs_last}, rhs_first_{rhs_first}, rhs_last_{rhs_last}, op_{op}, descriptor_{0u, extents}
   {
   }
 
-  binary_expr_array(const binary_expr_array& source) = delete;
-  binary_expr_array(binary_expr_array&& source) noexcept = delete;
+  // TODO: XXX: with guaranteed copy elision these constructors can be deleted.
+  binary_expr_array(const binary_expr_array& source) = default;
+  binary_expr_array(binary_expr_array&& source) noexcept = default;
 
   auto operator=(const binary_expr_array& source) -> binary_expr_array& = delete;
   auto operator=(binary_expr_array&& source) noexcept -> binary_expr_array& = delete;
@@ -82,11 +86,11 @@ public:
   auto begin() const -> const_iterator { return cbegin(); }
   auto end() const -> const_iterator { return cend(); }
 
-  auto cbegin() -> const_iterator { return {lhs_first_, op_}; }
-  auto cend() -> const_iterator { return {lhs_last_, op_}; }
+  auto cbegin() const -> const_iterator { return {lhs_first_, rhs_first_, op_}; }
+  auto cend() const -> const_iterator { return {lhs_last_, rhs_last_, op_}; }
 
-  auto descriptor() const { return std::make_tuple(lhs_first_, lhs_last_, rhs_first_, rhs_last_, descriptor_); }
-  auto extents() const { return descriptor_.extents; }
+  auto descriptor() const { return std::make_tuple(lhs_first_, lhs_last_, rhs_first_, rhs_last_, extents()); }
+  auto extents() const { return descriptor_.dimensions(); }
   auto size() const { return descriptor_.size(); }
 
 private:
