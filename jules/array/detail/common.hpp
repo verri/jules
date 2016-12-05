@@ -90,13 +90,13 @@ template <typename R, typename T> using not_array_request = std::enable_if_t<!is
 
 // Helpers for operators
 
-template <typename It, typename F, std::size_t M>
+template <std::size_t M, typename It, typename F>
 auto make_expr_array(It first, It last, const F& f, typename base_slice<M>::extent_type extent) -> unary_expr_array<It, F, M>
 {
   return {first, last, f, extent};
 }
 
-template <typename LhsIt, typename RhsIt, typename F, std::size_t M>
+template <std::size_t M, typename LhsIt, typename RhsIt, typename F>
 auto make_expr_array(const LhsIt& lhs_first, const LhsIt& lhs_last, const RhsIt& rhs_first, const RhsIt& rhs_last, const F& f,
                      typename base_slice<M>::extent_type extent) -> binary_expr_array<LhsIt, RhsIt, F, M>
 {

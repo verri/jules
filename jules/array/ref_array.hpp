@@ -84,17 +84,9 @@ public:
   auto operator[](index_t i) -> ref_array<T, N - 1>
   {
     DEBUG_ASSERT(i <= row_count(), debug::module{}, debug::level::boundary_check, "out of range");
-
-    const auto start = descriptor_.start + descriptor_.strides[0] * i;
-    std::array<index_t, N - 1> extents, strides;
-
-    const auto& e = extents();
-    const auto& s = descriptor_.strides;
-
-    std::copy(e.begin() + 1, e.end(), extents.begin());
-    std::copy(s.begin() + 1, s.end(), strides.begin());
-
-    return {data_, {start, extents, strides}};
+    auto descriptor = this->descriptor_.drop_dimension();
+    descriptor.start = descriptor_.start + descriptor_.strides[0] * i;
+    return {data_, descriptor};
   }
 
   /// \group Indexing
