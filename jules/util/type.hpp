@@ -1,5 +1,7 @@
-#ifndef JULES_UTIL_TYPE_H
+// Copyright (c) 2016 Filipe Verri <filipeverri@gmail.com>
+
 #define JULES_UTIL_TYPE_H
+#ifndef JULES_UTIL_TYPE_H
 
 #include <type_traits>
 

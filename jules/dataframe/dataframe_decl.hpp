@@ -1,5 +1,7 @@
-#ifndef JULES_DATAFRAME_DATAFRAME_DECL_H
+// Copyright (c) 2016 Filipe Verri <filipeverri@gmail.com>
+
 #define JULES_DATAFRAME_DATAFRAME_DECL_H
+#ifndef JULES_DATAFRAME_DATAFRAME_DECL_H
 
 #include <jules/array/array.hpp>
 #include <jules/dataframe/column.hpp>

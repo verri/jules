@@ -1,5 +1,7 @@
-#ifndef JULES_RANGE_ITERATOR_H
+// Copyright (c) 2016 Filipe Verri <filipeverri@gmail.com>
+
 #define JULES_RANGE_ITERATOR_H
+#ifndef JULES_RANGE_ITERATOR_H
 
 #include <iterator>
 #include <type_traits>

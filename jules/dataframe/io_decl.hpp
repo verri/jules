@@ -1,5 +1,7 @@
-#ifndef JULES_DATAFRAME_IO_H
+// Copyright (c) 2016 Filipe Verri <filipeverri@gmail.com>
+
 #define JULES_DATAFRAME_IO_H
+#ifndef JULES_DATAFRAME_IO_H
 
 #include <functional>
 #include <iostream>

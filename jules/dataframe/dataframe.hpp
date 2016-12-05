@@ -1,5 +1,7 @@
-#ifndef JULES_DATAFRAME_DATAFRAME_H
+// Copyright (c) 2016 Filipe Verri <filipeverri@gmail.com>
+
 #define JULES_DATAFRAME_DATAFRAME_H
+#ifndef JULES_DATAFRAME_DATAFRAME_H
 
 #include <jules/dataframe/dataframe_decl.hpp>
 #include <jules/range/range.hpp>

@@ -1,5 +1,7 @@
-#ifndef JULES_UTIL_ASYNC_H
+// Copyright (c) 2016 Filipe Verri <filipeverri@gmail.com>
+
 #define JULES_UTIL_ASYNC_H
+#ifndef JULES_UTIL_ASYNC_H
 
 #include <jules/core/type.hpp>
 #include <jules/util/type.hpp>

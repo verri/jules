@@ -1,5 +1,7 @@
-#ifndef JULES_DATAFRAME_DETAIL_STORAGE_H
+// Copyright (c) 2016 Filipe Verri <filipeverri@gmail.com>
+
 #define JULES_DATAFRAME_DETAIL_STORAGE_H
+#ifndef JULES_DATAFRAME_DETAIL_STORAGE_H
 
 #include <jules/core/type.hpp>
 #include <jules/util/async.hpp>

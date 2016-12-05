@@ -1,5 +1,7 @@
-#ifndef JULES_UTIL_NUMERIC_H
+// Copyright (c) 2016 Filipe Verri <filipeverri@gmail.com>
+
 #define JULES_UTIL_NUMERIC_H
+#ifndef JULES_UTIL_NUMERIC_H
 
 #include <jules/range/range.hpp>
 

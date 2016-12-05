@@ -1,5 +1,7 @@
-#ifndef JULES_UTIL_ALGORITHM_H
+// Copyright (c) 2016 Filipe Verri <filipeverri@gmail.com>
+
 #define JULES_UTIL_ALGORITHM_H
+#ifndef JULES_UTIL_ALGORITHM_H
 
 #include <utility>
 

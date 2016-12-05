@@ -1,5 +1,7 @@
-#ifndef JULES_RANGE_TOKENIZED_H
+// Copyright (c) 2016 Filipe Verri <filipeverri@gmail.com>
+
 #define JULES_RANGE_TOKENIZED_H
+#ifndef JULES_RANGE_TOKENIZED_H
 
 #include <boost/range/iterator_range.hpp>
 #include <regex>

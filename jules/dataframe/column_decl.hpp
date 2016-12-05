@@ -1,5 +1,7 @@
-#ifndef JULES_DATAFRAME_COLUMN_DECL_H
+// Copyright (c) 2016 Filipe Verri <filipeverri@gmail.com>
+
 #define JULES_DATAFRAME_COLUMN_DECL_H
+#ifndef JULES_DATAFRAME_COLUMN_DECL_H
 
 #include <jules/core/type.hpp>
 #include <jules/dataframe/column_view.hpp>

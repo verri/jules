@@ -1,5 +1,7 @@
-#ifndef JULES_FORMULA_EXPRESSION_H
+// Copyright (c) 2016 Filipe Verri <filipeverri@gmail.com>
+
 #define JULES_FORMULA_EXPRESSION_H
+#ifndef JULES_FORMULA_EXPRESSION_H
 
 #include <jules/dataframe/dataframe.hpp>
 #include <jules/formula/expression_decl.hpp>
