@@ -66,8 +66,7 @@ static inline auto cat_helper(const std::array<T, N>& head, const T& tail, std::
   return {{head[I]..., tail}};
 }
 
-template <typename T, std::size_t N>
-static inline auto cat(const std::array<T, N>& head, const T& tail) -> std::array<T, N + 1>
+template <typename T, std::size_t N> static inline auto cat(const std::array<T, N>& head, const T& tail) -> std::array<T, N + 1>
 {
   return detail::cat_helper(head, tail, std::make_index_sequence<N>());
 }
