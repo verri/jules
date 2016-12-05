@@ -1,3 +1,5 @@
+// Copyright (c) 2016 Filipe Verri <filipeverri@gmail.com>
+
 // Even a fool who keeps silent is considered wise; when he closes his lips, he is deemed intelligent.
 // Proverbs 17:28 (ESV)
 

@@ -1,3 +1,5 @@
+// Copyright (c) 2016 Filipe Verri <filipeverri@gmail.com>
+
 #ifndef JULES_BASE_NUMERIC_H
 #define JULES_BASE_NUMERIC_H
 

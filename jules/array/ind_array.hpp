@@ -1,3 +1,5 @@
+// Copyright (c) 2016 Filipe Verri <filipeverri@gmail.com>
+
 #ifndef JULES_ARRAY_IND_ARRAY_H
 #define JULES_ARRAY_IND_ARRAY_H
 

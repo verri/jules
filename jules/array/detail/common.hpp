@@ -1,3 +1,5 @@
+// Copyright (c) 2016 Filipe Verri <filipeverri@gmail.com>
+
 // Whoever pursues righteousness and kindness will find life, righteousness, and honor.
 // Proverbs 21:21 (ESV)
 
