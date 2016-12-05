@@ -7,19 +7,12 @@
 #include <string>
 #include <utility>
 
-#include <type_safe/floating_point.hpp>
-#include <type_safe/integer.hpp>
-
 namespace jules
 {
 
 /// Standard numeric type.
-///
-/// It is a type-safe double-precision floating-point.
-/// \notes For more details consult [here](https://github.com/foonathan/type_safe).
-///
 /// \module Basic Types
-using numeric = type_safe::floating_point<double>;
+using numeric = double;
 
 /// Standard string type.
 ///
@@ -29,42 +22,26 @@ using numeric = type_safe::floating_point<double>;
 using string = std::string;
 
 /// Standard unsigned type.
-///
-/// It is a type-safe unsigned integer that can represent memory addresses.
-/// \notes For more details consult [here](https://github.com/foonathan/type_safe).
-///
 /// \module Basic Types
-using uint = type_safe::integer<std::size_t, type_safe::arithmetic_policy_default>;
+using uinteger = std::uint32_t;
 
 /// Standard index type.
-///
-/// It is a type-safe unsigned integer that can represent memory addresses.
-/// \notes For more details consult [here](https://github.com/foonathan/type_safe).
-///
 /// \module Basic Types
-using index_t = std::size_t; // TODO: XXX: check what we need to use: type_safe::index_t;
+using index_t = std::size_t;
 
 /// Standard signed type.
-///
-/// It is a type-safe signed integer that can represent difference of memory addresses.
-/// \notes For more details consult [here](https://github.com/foonathan/type_safe).
-///
 /// \module Basic Types
-using sint = type_safe::integer<std::ptrdiff_t, type_safe::arithmetic_policy_default>;
+using integer = std::int64_t;
 
 /// Standard distance type.
-///
-/// It is a type-safe signed integer that can represent difference of memory addresses.
-/// \notes For more details consult [here](https://github.com/foonathan/type_safe).
-///
 /// \module Basic Types
-using distance_t = std::ptrdiff_t; // TODO: XXX: check what we need to use: type_safe::distance_t;
+using distance_t = std::ptrdiff_t;
 
 /// Coercion rules for [numeric type](standardese://jules::numeric/).
 /// \module Coercion Rules
 struct numeric_rule {
   using type = numeric;
-  static auto coerce_from(const string& value) -> type { return {std::stod(value)}; }
+  static auto coerce_from(const string& value) -> type { return std::stod(value); }
 };
 
 /// Coercion rules for [string type](standardese://jules::string/).

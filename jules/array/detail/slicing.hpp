@@ -4,7 +4,6 @@
 #define JULES_ARRAY_DETAIL_SLICING_H
 
 #include <jules/array/slice.hpp>
-#include <jules/base/numeric.hpp>
 #include <jules/core/debug.hpp>
 #include <jules/core/range.hpp>
 #include <jules/core/type.hpp>
@@ -51,13 +50,27 @@ template <std::size_t N> auto stride(base_slice<N>& slice, index_t i = 0u) -> in
   return slice_accessor<N>::stride(slice, i);
 }
 
-auto drop(const std::array<index_t, 1>& array) { return array[0]; }
+static inline auto drop(const std::array<index_t, 1>& array) { return array[0]; }
 
 template <std::size_t N> auto drop(const std::array<index_t, N>& array) { return array; }
 
-auto undrop(index_t value) -> std::array<index_t, 1> { return {{value}}; }
+static inline auto undrop(index_t value) -> std::array<index_t, 1> { return {{value}}; }
 
 template <std::size_t N> auto undrop(const std::array<index_t, N>& array) { return array; }
+
+// Concatening arrays
+
+template <typename T, std::size_t N, std::size_t... I>
+static inline auto cat_helper(const std::array<T, N>& head, const T& tail, std::index_sequence<I...>) -> std::array<T, N + 1>
+{
+  return {{head[I]..., tail}};
+}
+
+template <typename T, std::size_t N>
+static inline auto cat(const std::array<T, N>& head, const T& tail) -> std::array<T, N + 1>
+{
+  return detail::cat_helper(head, tail, std::make_index_sequence<N>());
+}
 
 // Slicing size
 

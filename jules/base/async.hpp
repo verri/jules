@@ -1,7 +1,7 @@
 // Copyright (c) 2016 Filipe Verri <filipeverri@gmail.com>
 
-#ifndef JULES_UTIL_ASYNC_H
-#define JULES_UTIL_ASYNC_H
+#ifndef JULES_BASE_ASYNC_H
+#define JULES_BASE_ASYNC_H
 
 #include <type_traits>
 #include <utility>
@@ -28,4 +28,4 @@ template <typename T> T* move_ptr(T*& pointer)
 
 } // namespace jules
 
-#endif // JULES_UTIL_ASYNC_H
+#endif // JULES_BASE_ASYNC_H

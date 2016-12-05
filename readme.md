@@ -7,14 +7,13 @@ Dependencies
 ------------
 
  - C++14 compiler
- - [type_safe](https://github.com/foonathan/type_safe)
  - [debug_assert](https://github.com/foonathan/debug_assert)
  - [range-v3](https://github.com/ericniebler/range-v3)
 
 Documentation
 -------------
 
-Generated with [standardese](https://github.com/foonathan/standardese),
+Generated with [standardese](https://github.com/foonathan/standardese).
 
 - [Modules](modules)
 - [Entities](entities)

@@ -34,12 +34,6 @@ struct forward_arithmetic {
   template <typename T> friend decltype(auto) operator/(T&& value, forward_arithmetic) { return std::forward<T>(value); }
 };
 
-template <typename T, std::size_t N, std::size_t... I>
-static std::array<T, N + 1> cat_helper(const std::array<T, N>& head, const T& tail, std::index_sequence<I...>)
-{
-  return {{head[I]..., tail}};
-}
-
 } // namespace detail
 
 template <std::size_t N, typename T> constexpr auto repeat(const T& value)
@@ -89,11 +83,6 @@ constexpr auto any_args() { return false; }
 template <typename... Args> constexpr auto any_args(bool arg, Args&&... args)
 {
   return arg || any_args(std::forward<Args>(args)...);
-}
-
-template <typename T, std::size_t N> static std::array<T, N + 1> cat(const std::array<T, N>& head, const T& tail)
-{
-  return detail::cat_helper(head, tail, std::make_index_sequence<N>());
 }
 
 } // namespace jules

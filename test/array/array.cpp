@@ -81,3 +81,28 @@ TEST_CASE("base array", "[base_array]")
   auto vector2 = eval(matrix1[0] + matrix2[1]);
   static_assert(std::is_same<decltype(vector2), jules::vector<int>>::value, "it should be a vector");
 }
+
+TEST_CASE("as_vector", "[array]")
+{
+  auto array = std::array<jules::integer, 5>{{1, 2, 3, 4, 5}};
+  auto vector1 = jules::to_vector<jules::integer>(array);
+  auto vector2 = jules::as_vector(array);
+  auto vector3 = jules::as_vector(jules::integer{1}, 2, 3, 4, 5);
+
+  static_assert(std::is_same<decltype(vector1), decltype(vector2)>::value, "should be the same type");
+  static_assert(std::is_same<decltype(vector2), decltype(vector3)>::value, "should be the same type");
+
+  CHECK(vector1.length() == vector2.length());
+  {
+    auto result = std::mismatch(vector1.begin(), vector1.end(), vector2.begin());
+    CHECK(result.first == vector1.end());
+    CHECK(result.second == vector2.end());
+  }
+
+  CHECK(vector3.length() == vector2.length());
+  {
+    auto result = std::mismatch(vector3.begin(), vector3.end(), vector2.begin());
+    CHECK(result.first == vector3.end());
+    CHECK(result.second == vector2.end());
+  }
+}
