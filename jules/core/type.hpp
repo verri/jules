@@ -63,13 +63,13 @@ public:
   /// Access the `I`-th type.
   template <std::size_t I> using type = typename std::tuple_element<I, types>::type;
 
-  /// Retrives the number of types.
+  /// Retrieves the number of types.
   static constexpr auto type_count() { return sizeof...(Rules); }
 
   /// Access the `I`-th rule.
   template <std::size_t I> using rule = typename std::tuple_element<I, rules>::type;
 
-  /// Retrives the number of rules.
+  /// Retrieves the number of rules.
   static constexpr auto rule_count() { return sizeof...(Rules); }
 };
 
