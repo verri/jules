@@ -1,18 +1,26 @@
 #include "benchmark.hpp"
-#include "jules/array/array.hpp"
+#include "jules/array/all.hpp"
 
 #include <chrono>
 
-constexpr std::size_t N = 10000;
+constexpr auto N = 10000u;
 
 void f(void*) {}
 static volatile auto use = f;
 
-template <typename T, std::size_t N> std::ostream& operator<<(std::ostream& os, const jules::detail::ref_ndarray<T, N>& array)
+template <typename T> std::ostream& operator<<(std::ostream& os, const jules::ref_array<T, 1>& array)
 {
   os << "{ ";
-  for (auto&& subarray : array)
-    os << subarray << ' ';
+  for (const auto& value : array)
+    os << value << ' ';
+  return os << '}';
+}
+
+template <typename T, std::size_t N> std::ostream& operator<<(std::ostream& os, const jules::ref_array<T, N>& array)
+{
+  os << "{ ";
+  for (auto i = 0u; i < array.row_count(); ++i)
+    os << array[i] << ' ';
   return os << '}';
 }
 
@@ -26,12 +34,12 @@ int main()
   auto vector = PrintInfo([&] { return jules::vector<double>(N * N); });
 
   std::cout << "\nFilling odd lines using slice." << std::endl;
-  PrintInfo([&] { vector(slice(0, 0, 2)) = 1.0; });
+  PrintInfo([&] { vector(slice(0u, 0u, 2u)) = 1.0; });
 
   std::cout << "\nFilling even lines using indirect indexing." << std::endl;
-  PrintInfo([&] { vector(seq(1, N * N, 2)) = 2.0; });
+  PrintInfo([&] { vector(seq(1u, N * N, 2u)) = 2.0; });
 
-  if (N < 5)
+  if (N <= 10)
     std::cout << "\nVector: " << vector << std::endl;
   use(&vector);
 
@@ -43,16 +51,19 @@ int main()
   PrintInfo([&] { matrix(slice(0, 0, 2), slice()) = 1.0; });
 
   std::cout << "\nFilling even lines using indirect indexing." << std::endl;
-  PrintInfo([&] { matrix(seq(1, N, 2), seq(0, N)) = 2.0; });
+  PrintInfo([&] { matrix(seq(1, N, 2), seq(0u, N)) = 2.0; });
 
-  if (N < 5)
+  if (N <= 10)
     std::cout << "\nMatrix: " << matrix << std::endl;
 
-  std::cout << "\nFilling matrix using mixed indexing." << std::endl;
-  PrintInfo([&] { matrix(seq(0, N, 2), slice(0, 0, 2)) = 2.0; });
-  PrintInfo([&] { matrix(slice(1, 0, 2), seq(1, N, 2)) = 1.0; });
+  std::cout << "\nZeroing..." << std::endl;
+  PrintInfo([&] { matrix() = 0.0; });
 
-  if (N < 5)
+  std::cout << "\nFilling matrix using mixed indexing." << std::endl;
+  PrintInfo([&] { matrix(seq(0u, N, 2u), slice(0u, 0u, 2u)) = 1.0; });
+  PrintInfo([&] { matrix(slice(1u, 0u, 2u), seq(1u, N, 2u)) = 2.0; });
+
+  if (N <= 10)
     std::cout << "\nMatrix: " << matrix << std::endl;
 
   use(&matrix);

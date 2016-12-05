@@ -68,7 +68,7 @@ public:
 
   base_array(base_array&& source) noexcept : ref_array<T, N>{move_ptr(source.data_), std::move(source.descriptor_)} {}
 
-  template <typename Array, typename = detail::array_request<void, Array>>
+  template <typename Array, typename = array_request<void, Array>>
   base_array(const Array& source) : ref_array<T, N>{this->allocate(source.size()), {0u, source.extents()}}
   {
     static_assert(Array::order == N, "array order mismatch");
@@ -93,7 +93,7 @@ public:
     return *this;
   }
 
-  template <typename Array> auto operator=(const Array& source) -> detail::array_request<base_array&, Array>
+  template <typename Array> auto operator=(const Array& source) -> array_request<base_array&, Array>
   {
     static_assert(Array::order == N, "array order mismatch");
     static_assert(std::is_assignable<T&, typename Array::value_type>::value, "incompatible assignment");
@@ -197,7 +197,8 @@ public:
     this->create(detail::trivial_dispatch<T>(), this->data(), first, this->size());
   }
 
-  template <typename Rng, typename U = range::range_value_t<Rng>, CONCEPT_REQUIRES_(range::Range<Rng>())>
+  template <typename Rng, typename U = range::range_value_t<Rng>, CONCEPT_REQUIRES_(range::Range<Rng>()),
+            typename = array_fallback<void, Rng>>
   base_array(const Rng& rng) : ref_array<T, 1>{this->allocate(range::size(rng), {0u, range::size(rng)})}
   {
     static_assert(std::is_constructible<T, const U&>::value, "incompatible value types");
@@ -207,7 +208,7 @@ public:
     this->create(detail::trivial_dispatch<T>(), this->data(), range::begin(rng), this->size());
   }
 
-  template <typename Array, typename = detail::array_request<void, Array>>
+  template <typename Array, typename = array_request<void, Array>>
   base_array(const Array& source) : ref_array<T, 1>{this->allocate(source.size()), {0u, source.extents()}}
   {
     static_assert(Array::order == 1, "array order mismatch");
@@ -239,7 +240,7 @@ public:
     return *this;
   }
 
-  template <typename Array> auto operator=(const Array& source) -> detail::array_request<base_array&, Array>
+  template <typename Array> auto operator=(const Array& source) -> array_request<base_array&, Array>
   {
     static_assert(Array::order == 1, "array order mismatch");
     static_assert(std::is_assignable<T&, typename Array::value_type>::value, "incompatible assignment");

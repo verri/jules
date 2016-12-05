@@ -78,15 +78,10 @@ struct is_array<binary_expr_array<LhsIt, RhsIt, F, N>> : public std::true_type {
 
 template <typename T> constexpr auto is_array_v() { return is_array<std::decay_t<T>>::value; }
 
-namespace detail
-{
-
 // Request checks for arrays
 
 template <typename R, typename T> using array_request = std::enable_if_t<is_array_v<T>(), R>;
-template <typename R, typename T> using not_array_request = std::enable_if_t<!is_array_v<T>(), R>;
-
-} // namespace detail
+template <typename R, typename T> using array_fallback = std::enable_if_t<!is_array_v<T>(), R>;
 
 // Helpers for operators
 

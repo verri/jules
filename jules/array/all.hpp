@@ -7,6 +7,7 @@
 #include <jules/array/binary_expr_array.hpp>
 #include <jules/array/functional.hpp>
 #include <jules/array/ind_array.hpp>
+#include <jules/array/numeric.hpp>
 #include <jules/array/ref_array.hpp>
 #include <jules/array/slice.hpp>
 #include <jules/array/unary_expr_array.hpp>

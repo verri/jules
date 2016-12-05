@@ -4,6 +4,7 @@
 #define JULES_ARRAY_DETAIL_SLICING_H
 
 #include <jules/array/slice.hpp>
+#include <jules/base/numeric.hpp>
 #include <jules/core/debug.hpp>
 #include <jules/core/range.hpp>
 #include <jules/core/type.hpp>
@@ -50,6 +51,14 @@ template <std::size_t N> auto stride(base_slice<N>& slice, index_t i = 0u) -> in
   return slice_accessor<N>::stride(slice, i);
 }
 
+auto drop(const std::array<index_t, 1>& array) { return array[0]; }
+
+template <std::size_t N> auto drop(const std::array<index_t, N>& array) { return array; }
+
+auto undrop(index_t value) -> std::array<index_t, 1> { return {{value}}; }
+
+template <std::size_t N> auto undrop(const std::array<index_t, N>& array) { return array; }
+
 // Slicing size
 
 static inline auto seq_size(index_t start, index_t stop, index_t step)
@@ -60,6 +69,8 @@ static inline auto seq_size(index_t start, index_t stop, index_t step)
 
   return size;
 }
+
+template <std::size_t D, std::size_t N> index_t slicing_size(const std::array<index_t, N>&) { return 1; }
 
 template <std::size_t D, std::size_t N, typename... Args>
 index_t slicing_size(const std::array<index_t, N>& extents, index_t, Args&&... args)
@@ -82,10 +93,10 @@ index_t slicing_size(const std::array<index_t, N>& extents, const Rng& rng, Args
   return range::size(rng) * slicing_size<D + 1>(extents, std::forward<Args>(args)...);
 }
 
-template <std::size_t D, std::size_t N> index_t slicing_size(const std::array<index_t, N>&) { return 1; }
-
 // Default slicing Helpers
 // TODO: XXX: It may be wrong, since the data is stored column-wise now.
+
+template <std::size_t D, std::size_t N> void do_slice(base_slice<N>&) { static_assert(N == D, "invalid number of arguments"); }
 
 template <std::size_t D, std::size_t N, typename... Args> void do_slice(base_slice<N>& result, index_t i, Args&&... args)
 {
@@ -115,8 +126,6 @@ void do_slice(base_slice<N>& result, const base_slice<1>& slice, Args&&... args)
   do_slice<D + 1>(result, std::forward<Args>(args)...);
 }
 
-template <std::size_t D, std::size_t N> void do_slice(base_slice<N>&) { static_assert(N == D, "invalid number of arguments"); }
-
 template <std::size_t N, typename... Args> base_slice<N> default_slicing(const base_slice<N>& source, Args&&... args)
 {
   static_assert(sizeof...(args) == N, "invalid number of arguments");
@@ -126,6 +135,13 @@ template <std::size_t N, typename... Args> base_slice<N> default_slicing(const b
 }
 
 // Indirect Slicing Helpers
+
+template <std::size_t D, std::size_t N>
+void do_slice(std::array<index_t, N>&, std::vector<index_t>& indexes, const base_slice<N>& slice, std::array<index_t, D> ix)
+{
+  static_assert(D == N, "invalid number of arguments");
+  indexes.push_back(slice(drop(ix)));
+}
 
 template <std::size_t D, std::size_t N, typename... Args>
 void do_slice(std::array<index_t, N>& extents, std::vector<index_t>& indexes, const base_slice<N>& slice,
@@ -174,20 +190,13 @@ void do_slice(std::array<index_t, N>& extents, std::vector<index_t>& indexes, co
     do_slice(extents, indexes, slice, cat(ix, i), std::forward<Args>(args)...);
 }
 
-template <std::size_t D, std::size_t N, typename... Args>
-void do_slice(std::array<index_t, N>&, std::vector<index_t>& indexes, const base_slice<N>& slice, std::array<index_t, D> ix)
-{
-  static_assert(D == N, "invalid number of arguments");
-  indexes.push_back(slice(ix));
-}
-
 template <std::size_t N, typename... Args>
 std::pair<std::array<index_t, N>, std::vector<index_t>> indirect_slicing(const base_slice<N>& slice, Args&&... args)
 {
   static_assert(sizeof...(args) == N, "invalid number of arguments");
 
   std::pair<std::array<index_t, N>, std::vector<index_t>> result;
-  result.second.reserve(slicing_size<0>(slice.extents(), std::forward<Args>(args)...));
+  result.second.reserve(slicing_size<0>(undrop(slice.dimensions()), std::forward<Args>(args)...));
 
   do_slice(result.first, result.second, slice, std::array<index_t, 0>{}, std::forward<Args>(args)...);
 

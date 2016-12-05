@@ -39,13 +39,13 @@ public:
   /// In C++17, we can provide a helper that generates a view with more security.
   ref_array() = default;
   ref_array(T* data, base_slice<N> descriptor) : data_{data}, descriptor_{descriptor} {}
-  ref_array(const ref_array& source) = delete;
-  ref_array(ref_array&& source) noexcept = delete;
+  ref_array(const ref_array& source) = default;
+  ref_array(ref_array&& source) noexcept = default;
 
   ~ref_array() = default;
 
   /// \group Assignment
-  template <typename U> auto operator=(const U& source) -> detail::not_array_request<ref_array&, U>
+  template <typename U> auto operator=(const U& source) -> array_fallback<ref_array&, U>
   {
     static_assert(std::is_assignable<T&, U>::value, "incompatible assignment");
     for (auto& elem : *this)
@@ -54,7 +54,7 @@ public:
   }
 
   /// \group Assignment
-  template <typename Array> auto operator=(const Array& source) -> detail::array_request<ref_array&, Array>
+  template <typename Array> auto operator=(const Array& source) -> array_request<ref_array&, Array>
   {
     static_assert(Array::order == N, "array order mismatch");
     static_assert(std::is_assignable<T&, typename Array::value_type>::value, "incompatible assignment");
@@ -91,6 +91,9 @@ public:
 
   /// \group Indexing
   auto operator[](index_t i) const -> ref_array<const T, N - 1> { return static_cast<ref_array<const T, N>>(*this)[i]; }
+
+  auto operator()() -> ref_array<T, N>& { return *this; }
+  auto operator()() const -> ref_array<T, N>& { return *this; }
 
   template <typename... Args> auto operator()(Args&&... args) -> detail::indirect_request<ind_array<T, N>, Args...>
   {
@@ -161,15 +164,15 @@ public:
 
   /// *TODO*: Explain why the user should probably not call this function.
   /// In C++17, we can provide a helper that generates a view with more security.
+  ref_array() = default;
   ref_array(T* data, base_slice<1> descriptor) : data_{data}, descriptor_{descriptor} {}
-
-  ref_array(const ref_array& source) = delete;
-  ref_array(ref_array&& source) noexcept = delete;
+  ref_array(const ref_array& source) = default;
+  ref_array(ref_array&& source) noexcept = default;
 
   ~ref_array() = default;
 
   /// \group Assignment
-  template <typename U> auto operator=(const U& source) -> detail::not_array_request<ref_array&, U>
+  template <typename U> auto operator=(const U& source) -> array_fallback<ref_array&, U>
   {
     static_assert(std::is_assignable<T&, U>::value, "incompatible assignment");
     for (auto& elem : *this)
@@ -178,7 +181,7 @@ public:
   }
 
   /// \group Assignment
-  template <typename Array> auto operator=(const Array& source) -> detail::array_request<ref_array&, Array>
+  template <typename Array> auto operator=(const Array& source) -> array_request<ref_array&, Array>
   {
     static_assert(Array::order == 1, "array order mismatch");
     static_assert(std::is_assignable<T&, typename Array::value_type>::value, "incompatible assignment");
@@ -223,21 +226,32 @@ public:
   {
     static_assert(std::is_convertible<U, index_t>::value, "arbitrary ranges must contain indexes");
     auto slicing = detail::indirect_slicing(this->descriptor_, rng);
-    return {data_, slicing.first, std::move(slicing.second)};
+    return {data_, slicing.first[0], std::move(slicing.second)};
   }
 
   auto operator()(const base_slice<1>& slice) -> ref_array<T, 1>
   {
-    auto new_slice = default_slicing(this->descriptor_, slice);
+    auto new_slice = detail::default_slicing(this->descriptor_, slice);
     return {data_, new_slice};
   }
 
   auto operator()(index_t i) -> T& { return (*this)[i]; }
 
-  template <typename Arg> decltype(auto) operator()(Arg&& arg) const
+  template <typename Rng, typename U = range::range_value_t<Rng>, CONCEPT_REQUIRES_(range::Range<Rng>())>
+  auto operator()(const Rng& rng) const -> ind_array<T, 1>
   {
-    return static_cast<ref_array<const T, 1>>(*this)(std::forward<Arg>(arg));
+    static_assert(std::is_convertible<U, index_t>::value, "arbitrary ranges must contain indexes");
+    auto slicing = detail::indirect_slicing(this->descriptor_, rng);
+    return {data_, slicing.first[0], std::move(slicing.second)};
   }
+
+  auto operator()(const base_slice<1>& slice) const -> ref_array<T, 1>
+  {
+    auto new_slice = default_slicing(this->descriptor_, slice);
+    return {data_, new_slice};
+  }
+
+  auto operator()(index_t i) const -> T& { return (*this)[i]; }
 
   auto begin() -> iterator { return {data_, descriptor_.begin()}; }
   auto end() -> iterator { return {data_, descriptor_.end()}; }

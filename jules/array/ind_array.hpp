@@ -35,8 +35,8 @@ public:
   using size_type = index_t;
   using difference_type = distance_t;
 
-  using iterator = detail::iterator_from_indexes<T, typename vector_type::iterator>;
-  using const_iterator = detail::iterator_from_indexes<const T, typename vector_type::iterator>;
+  using iterator = detail::iterator_from_indexes<T, typename vector_type::const_iterator>;
+  using const_iterator = detail::iterator_from_indexes<const T, typename vector_type::const_iterator>;
 
   /// *TODO*: Explain why the user should probably not call these functions.
   /// In C++17, we can provide a helper that generates a view with more security.
@@ -51,7 +51,7 @@ public:
   ~ind_array() = default;
 
   /// \group Assignment
-  template <typename U> auto operator=(const U& source) -> detail::not_array_request<ind_array&, U>
+  template <typename U> auto operator=(const U& source) -> array_fallback<ind_array&, U>
   {
     static_assert(std::is_assignable<T&, U>::value, "incompatible assignment");
     for (auto& elem : *this)
@@ -60,7 +60,7 @@ public:
   }
 
   /// \group Assignment
-  template <typename Array> auto operator=(const Array& source) -> detail::array_request<ind_array&, Array>
+  template <typename Array> auto operator=(const Array& source) -> array_request<ind_array&, Array>
   {
     static_assert(Array::order == N, "array order mismatch");
     static_assert(std::is_assignable<T&, typename Array::value_type>::value, "incompatible assignment");
@@ -218,15 +218,15 @@ public:
 
   /// *TODO*: Explain why the user should probably not call this function.
   /// In C++17, we can provide a helper that generates a view with more security.
+  ind_array() = default;
   ind_array(T* data, index_t extent, vector_type indexes) : data_{data}, descriptor_{0ul, extent}, indexes_(std::move(indexes)) {}
-
-  ind_array(const ind_array& source) = delete;
-  ind_array(ind_array&& source) noexcept = delete;
+  ind_array(const ind_array& source) = default;
+  ind_array(ind_array&& source) noexcept = default;
 
   ~ind_array() = default;
 
   /// \group Assignment
-  template <typename U> auto operator=(const U& source) -> detail::not_array_request<ind_array&, U>
+  template <typename U> auto operator=(const U& source) -> array_fallback<ind_array&, U>
   {
     static_assert(std::is_assignable<T&, U>::value, "incompatible assignment");
     for (auto& elem : *this)
@@ -235,7 +235,7 @@ public:
   }
 
   /// \group Assignment
-  template <typename Array> auto operator=(const Array& source) -> detail::array_request<ind_array&, Array>
+  template <typename Array> auto operator=(const Array& source) -> array_request<ind_array&, Array>
   {
     static_assert(Array::order == 1, "array order mismatch");
     static_assert(std::is_assignable<T&, typename Array::value_type>::value, "incompatible assignment");
