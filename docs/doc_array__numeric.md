@@ -1,3 +1,6 @@
+---
+---
+
 # Header file `array/numeric.hpp`<a id="array/numeric.hpp"></a>
 
 ``` cpp

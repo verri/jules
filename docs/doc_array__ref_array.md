@@ -1,3 +1,6 @@
+---
+---
+
 # Header file `array/ref_array.hpp`<a id="array/ref_array.hpp"></a>
 
 ``` cpp

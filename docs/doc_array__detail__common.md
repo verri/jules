@@ -1,3 +1,6 @@
+---
+---
+
 # Header file `array/detail/common.hpp`<a id="array/detail/common.hpp"></a>
 
 ``` cpp

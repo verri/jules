@@ -1,3 +1,6 @@
+---
+---
+
 # Header file `util/algorithm.hpp`<a id="util/algorithm.hpp"></a>
 
 ``` cpp

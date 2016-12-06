@@ -1,3 +1,6 @@
+---
+---
+
   - [BASE\_NDARRAY](doc_array__functional.html#array/functional.hpp "BASE_NDARRAY")
 
   - [BINARY\_APPLY\_COMBINATIONS](doc_array__functional.html#array/functional.hpp "BINARY_APPLY_COMBINATIONS")

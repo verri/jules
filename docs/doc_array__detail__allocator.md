@@ -1,3 +1,6 @@
+---
+---
+
 # Header file `array/detail/allocator.hpp`<a id="array/detail/allocator.hpp"></a>
 
 ``` cpp

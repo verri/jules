@@ -1,3 +1,6 @@
+---
+---
+
 # Header file `array/slice.hpp`<a id="array/slice.hpp"></a>
 
 ``` cpp

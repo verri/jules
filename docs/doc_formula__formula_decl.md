@@ -1,3 +1,6 @@
+---
+---
+
 # Header file `formula/formula_decl.hpp`<a id="formula/formula_decl.hpp"></a>
 
 ``` cpp

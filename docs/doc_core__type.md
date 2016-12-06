@@ -1,3 +1,6 @@
+---
+---
+
 # Header file `core/type.hpp`<a id="core/type.hpp"></a>
 
 ``` cpp

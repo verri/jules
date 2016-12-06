@@ -1,3 +1,6 @@
+---
+---
+
   - ## Basic Types
     
       - [jules::distance\_t](doc_core__type.html#jules::distance_t "jules::distance_t") - Standard distance type.

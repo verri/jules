@@ -1,3 +1,6 @@
+---
+---
+
 # Header file `core/debug.hpp`<a id="core/debug.hpp"></a>
 
 ``` cpp

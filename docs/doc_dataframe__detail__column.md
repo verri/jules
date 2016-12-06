@@ -1,3 +1,6 @@
+---
+---
+
 # Header file `dataframe/detail/column.hpp`<a id="dataframe/detail/column.hpp"></a>
 
 ``` cpp

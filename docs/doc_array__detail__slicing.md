@@ -1,3 +1,6 @@
+---
+---
+
 # Header file `array/detail/slicing.hpp`<a id="array/detail/slicing.hpp"></a>
 
 ``` cpp

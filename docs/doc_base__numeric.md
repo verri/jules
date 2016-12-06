@@ -1,3 +1,6 @@
+---
+---
+
 # Header file `base/numeric.hpp`<a id="base/numeric.hpp"></a>
 
 ``` cpp

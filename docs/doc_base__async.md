@@ -1,3 +1,6 @@
+---
+---
+
 # Header file `base/async.hpp`<a id="base/async.hpp"></a>
 
 ``` cpp

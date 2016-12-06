@@ -1,3 +1,6 @@
+---
+---
+
 # Header file `array/functional.hpp`<a id="array/functional.hpp"></a>
 
 ``` cpp

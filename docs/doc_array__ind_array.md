@@ -1,3 +1,6 @@
+---
+---
+
 # Header file `array/ind_array.hpp`<a id="array/ind_array.hpp"></a>
 
 ``` cpp
