@@ -61,7 +61,7 @@ public:
   /// 3) Constructs the array with copies of elements with value `value` and dimensions `dims`.
   ///
   /// 4) Constructs the array with dimensions `dims`.  Elements are initialized with
-  ///  elements from iterating the `RandomAccessIterator` `iter`.
+  ///  elements from iterating `iter`.
   ///
   /// 5) Constructs the array from a `recursive_initialized_list`.
   ///
@@ -94,7 +94,7 @@ public:
 
   /// \group Constructors
   template <typename Iter, typename... Dims, typename R = range::iterator_value_t<Iter>,
-            CONCEPT_REQUIRES_(range::RandomAccessIterator<Iter>()), typename = detail::n_indexes_enabler<N, Dims...>>
+            typename = detail::n_indexes_enabler<N, Dims...>>
   base_array(Iter iter, Dims... dims) : ref_array<T, N>{this->allocate(prod_args(dims...)), {0u, {{index_t{dims}...}}}}
   {
     static_assert(std::is_convertible<R, T>::value, "iterator values are not compatible");

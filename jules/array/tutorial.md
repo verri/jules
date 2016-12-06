@@ -46,3 +46,46 @@ auto g = a; // Copy constructor.
 auto h = std::move(b); // Move constructor.
 auto i = jules::vector<>(d + e); // Vector from other vector-like structures. See section TODO.
 ```
+
+The function `jules::as_vector` can be used to construct a vector whose
+elements type is inferred.
+
+``` cpp
+auto j = jules::as_vector(values);
+static_assert(std::is_same<typename decltype(j)::value_type, jules::numeric>::value, "");
+
+auto k = jules::as_vector(1, 2u, 3l);
+static_assert(
+  std::is_same<typename decltype(k)::value_type,
+               std::common_type_t<decltype(1), decltype(2u), decltype(3l)>,
+"")
+```
+
+For higher dimensional arrays, the constructor are basically the same.  Consult
+[the reference](standardese://jules::base_array<T, 1>::base_array/) for
+a comprehensive list.
+
+``` cpp
+
+auto a = jules::matrix<>(); // Empty matrix.
+auto b = jules::matrix<>(5u, 2u); // 5x2 matrix.
+auto c = jules::matrix<>(3.14, 5u, 2u); // 5x2 matrix with elements 3.14.
+
+jules::numeric values[] = {0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9};
+
+// 3x3 matrix with elements from an iterator.
+// THe matrix is filled columns-first.
+auto d = jules::matrix<>(std::begin(values), 3u, 3u);
+
+// 3x3 matrix from a recursive initializer_list.
+auto e = jules::matrix<>{
+  {0.1, 0.4, 0.7},
+  {0.2, 0.5, 0.8},
+  {0.3, 0.6, 0.9},
+};
+
+auto f = a; // Copy constructor.
+auto g = std::move(b); // Move constructor.
+auto i = jules::matrix<>(d + e); // Matrix from other matrix-like structures. See section TODO.
+
+```

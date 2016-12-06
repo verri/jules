@@ -52,7 +52,7 @@ public:
     base_array(Dims... dims);
     template <typename ... Dims, typename = detail::n_indexes_enabler<N, Dims...>>
     base_array(const T& value, Dims... dims);
-    template <typename Iter, typename ... Dims, typename R = range::iterator_value_t<Iter>, int _concept_requires_97 = 42, typename std::enable_if<(_concept_requires_97==43)||(range::RandomAccessIterator<Iter>()), int>::type=0, typename = detail::n_indexes_enabler<N, Dims...>>
+    template <typename Iter, typename ... Dims, typename R = range::iterator_value_t<Iter>, typename = detail::n_indexes_enabler<N, Dims...>>
     base_array(Iter iter, Dims... dims);
     base_array(recursive_initializer_list_t<T, N> values);
     base_array(const base_array& source);
@@ -152,7 +152,7 @@ Signed integer type that can store differences between sizes.
 (3)  template <typename ... Dims, typename = detail::n_indexes_enabler<N, Dims...>>
      base_array(const T& value, Dims... dims);
 
-(4)  template <typename Iter, typename ... Dims, typename R = range::iterator_value_t<Iter>, int _concept_requires_97 = 42, typename std::enable_if<(_concept_requires_97==43)||(range::RandomAccessIterator<Iter>()), int>::type=0, typename = detail::n_indexes_enabler<N, Dims...>>
+(4)  template <typename Iter, typename ... Dims, typename R = range::iterator_value_t<Iter>, typename = detail::n_indexes_enabler<N, Dims...>>
      base_array(Iter iter, Dims... dims);
 
 (5)  base_array(recursive_initializer_list_t<T, N> values);
@@ -173,7 +173,7 @@ Constructs a new array from a variety of data sources.
 
 3)  Constructs the array with copies of elements with value `value` and dimensions `dims`.
 
-4)  Constructs the array with dimensions `dims`.  Elements are initialized with elements from iterating the `RandomAccessIterator` `iter`.
+4)  Constructs the array with dimensions `dims`.  Elements are initialized with elements from iterating `iter`.
 
 5)  Constructs the array from a `recursive_initialized_list`.
 
