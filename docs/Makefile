@@ -1,4 +1,3 @@
-all: standardese_modules.md
-
-standardese_modules.md:
+all:
 	standardese -I .. ../jules
+	sh check_files.sh
