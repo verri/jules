@@ -23,6 +23,11 @@ Generated with [standardese](https://github.com/foonathan/standardese).
 - [Entities](standardese_entities.html)
 - [Files](standardese_files.html)
 
+Tutorial
+--------
+
+- [Array](array__tutorial.html)
+
 Acknowledgements
 ----------------
 
