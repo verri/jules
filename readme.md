@@ -13,11 +13,8 @@ Dependencies
 Documentation
 -------------
 
-Generated with [standardese](https://github.com/foonathan/standardese).
-
-- [Modules](modules)
-- [Entities](entities)
-- [Files](files)
+Generated with [standardese](https://github.com/foonathan/standardese) 
+[here](https://verri.github.io/jules/).
 
 Acknowledgements
 ----------------
