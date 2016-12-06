@@ -8,3 +8,7 @@ gems:
   - jekyll-coffeescript
   - jekyll-paginate
 highlighter: rouge
+defaults:
+  -
+    values:
+      layout: "default"
