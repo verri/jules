@@ -1,11 +1,10 @@
 // Copyright (c) 2016 Filipe Verri <filipeverri@gmail.com>
 
-#define JULES_DATAFRAME_DETAIL_STORAGE_H
 #ifndef JULES_DATAFRAME_DETAIL_STORAGE_H
+#define JULES_DATAFRAME_DETAIL_STORAGE_H
 
+#include <jules/base/async.hpp>
 #include <jules/core/type.hpp>
-#include <jules/util/async.hpp>
-#include <jules/util/type.hpp>
 
 #include <algorithm>
 #include <iterator>
@@ -54,12 +53,12 @@ public:
 };
 
 template <typename Coercion>
-class column_interface : public generate_virtual_coercions<column_interface<Coercion>, Coercion, Coercion::ntypes() - 1>
+class column_interface : public generate_virtual_coercions<column_interface<Coercion>, Coercion, Coercion::type_count() - 1>
 {
 private:
   using column_interface_ptr = std::unique_ptr<column_interface>;
   using coercion_rules = Coercion;
-  using base = generate_virtual_coercions<column_interface<Coercion>, Coercion, Coercion::ntypes() - 1>;
+  using base = generate_virtual_coercions<column_interface<Coercion>, Coercion, Coercion::type_count() - 1>;
 
 public:
   column_interface() = default;
@@ -214,12 +213,12 @@ public:
 };
 
 template <typename T, typename Coercion>
-class column_model : public generate_concrete_coercions<T, Coercion, Coercion::ntypes() - 1>
+class column_model : public generate_concrete_coercions<T, Coercion, Coercion::type_count() - 1>
 {
   static_assert(!std::is_reference<T>::value, "column_model type can not be a reference");
 
 public:
-  using generate_concrete_coercions<T, Coercion, Coercion::ntypes() - 1>::generate_concrete_coercions;
+  using generate_concrete_coercions<T, Coercion, Coercion::type_count() - 1>::generate_concrete_coercions;
 
   column_model() = default;
 

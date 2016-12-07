@@ -1,21 +1,21 @@
-#include "jules/dataframe/detail/column.hpp"
+#include "jules/dataframe/detail/column_model.hpp"
 
 #include <algorithm>
 #include <catch.hpp>
 #include <iterator>
 #include <numeric>
 
-TEST_CASE("coercion", "[coercion]")
+TEST_CASE("Column model", "[dataframe]")
 {
   using namespace jules;
   using namespace jules::detail;
 
-  using column_interface_ptr = std::unique_ptr<column_interface<default_coercion_rules>>;
+  using column_interface_ptr = std::unique_ptr<column_interface<coercion_rules>>;
 
-  column_interface_ptr icolumn{new column_model<int, default_coercion_rules>};
+  column_interface_ptr icolumn{new column_model<int, coercion_rules>};
   // Learns the coercions: int -(explicit)-> double
   //                       int -(implicit)-> double -(explicit)-> std::string
-  column_interface_ptr dcolumn{new column_model<double, default_coercion_rules>};
+  column_interface_ptr dcolumn{new column_model<double, coercion_rules>};
   // Learns the coercions: double -(implicit)-> double
   //                       double -(explicit)-> std::string
 

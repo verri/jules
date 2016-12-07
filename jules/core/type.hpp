@@ -99,6 +99,13 @@ template <typename T> struct trivial_dispatch_helper<T, std::enable_if_t<std::is
 
 template <typename T> auto trivial_dispatch() { return typename trivial_dispatch_helper<T>::type{}; }
 
+// Tag type utility
+
+template <typename T> struct tag {
+  static_assert(std::is_same<T, std::decay_t<T>>::value, "type cannot have qualifiers");
+  using untag = T;
+};
+
 } // namespace detail
 
 // Recursive initializer_list
