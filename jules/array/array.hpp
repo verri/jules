@@ -349,8 +349,9 @@ public:
   /// 2) Move assignment.
   ///
   /// 3) Assignment from array-like structures.
-  auto operator=(const base_array& source) -> base_array&
+  auto operator=(const base_array& source) & -> base_array&
   {
+    DEBUG_ASSERT(this != &source, debug::module{}, debug::level::invalid_argument, "self assignment");
     this->clear();
     this->data_ = this->allocate(source.size());
     this->descriptor_ = source.descriptor_;
@@ -359,8 +360,9 @@ public:
   }
 
   /// \group Assignment
-  auto operator=(base_array&& source) noexcept -> base_array&
+  auto operator=(base_array&& source) & noexcept -> base_array&
   {
+    DEBUG_ASSERT(this != &source, debug::module{}, debug::level::invalid_argument, "self assignment");
     this->clear();
     this->data_ = move_ptr(source.data_);
     this->descriptor_ = std::move(source.descriptor_);
@@ -368,7 +370,7 @@ public:
   }
 
   /// \group Assignment
-  template <typename Array> auto operator=(const Array& source) -> array_request<base_array&, Array>
+  template <typename Array> auto operator=(const Array& source) & -> array_request<base_array&, Array>
   {
     static_assert(Array::order == 1, "array order mismatch");
     static_assert(std::is_assignable<T&, typename Array::value_type>::value, "incompatible assignment");

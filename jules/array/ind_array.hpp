@@ -214,7 +214,7 @@ public:
   using difference_type = distance_t;
 
   using iterator = detail::iterator_from_indexes<T, typename vector_type::iterator>;
-  using const_iterator = detail::iterator_from_indexes<const T, typename vector_type::iterator>;
+  using const_iterator = detail::iterator_from_indexes<const T, typename vector_type::const_iterator>;
 
   /// *TODO*: Explain why the user should probably not call this function.
   /// In C++17, we can provide a helper that generates a view with more security.
