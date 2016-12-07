@@ -108,8 +108,47 @@ TEST_CASE("Matrix tutorial", "[matrix]")
     CHECK(all(second_column_even_rows == jules::matrix<long>{{4}, {6}}));
     CHECK(all(second_column_odd_rows == jules::matrix<long>{{5}, {7}}));
 
-    // // Constructors from expression.
-    // auto y = jules::matrix<long>(x + x(jules::seq(x.length(), 0u) - 1u));
-    // CHECK(all(y == 9));
+    // Constructors from expression.
+    auto r_inv = eval(jules::seq(x.row_count(), 0u) - 1u);
+    auto c_inv = eval(jules::seq(x.column_count(), 0u) - 1u);
+
+    auto y = jules::matrix<long>(x + x(r_inv, c_inv));
+    CHECK(all(y == 15));
+  }
+
+  SECTION("Assignments")
+  {
+    auto x = jules::matrix<long>{
+      {0, 4, 8, 12},  //
+      {1, 5, 9, 13},  //
+      {2, 6, 10, 14}, //
+      {3, 7, 11, 15}, //
+    };
+
+    auto y = jules::matrix<long>(-20l, 20u, 10u);
+    auto z = jules::matrix<long>(-10l, 5u, 12u);
+
+    y = x;
+    CHECK(all(x == y));
+
+    z = std::move(x);
+    CHECK(all(y == z));
+
+    x = z(jules::slice(0u, jules::slice::all, 2u), jules::slice(0u, jules::slice::all, 2u));
+    CHECK(all(x == jules::matrix<long>{{0, 8}, {2, 10}}));
+
+    x = z(jules::seq(0u, z.row_count(), 2u), jules::seq(0u, z.column_count(), 2u));
+    CHECK(all(x == jules::matrix<long>{{0, 8}, {2, 10}}));
+
+    z = x + x;
+    CHECK(all(z == 2 * x));
+
+    x = eval(x + x);
+    CHECK(all(x == z));
+
+    // This one is tricky. We must guarantee that the memory of x is not freed before the
+    // expression is evaluated.
+    x = x - x;
+    CHECK(all(x == jules::matrix<long>(0, x.row_count(), x.column_count())));
   }
 }

@@ -143,7 +143,7 @@ public:
     clear(this->data(), this->size());
     this->data_ = this->allocate(source.size());
     this->descriptor_ = source.descriptor_;
-    this->create(detail::trivial_dispatch<T>(), this->data(), source.data(), source->size());
+    this->create(detail::trivial_dispatch<T>(), this->data(), source.data(), source.size());
     return *this;
   }
 
@@ -162,10 +162,16 @@ public:
   {
     static_assert(Array::order == N, "array order mismatch");
     static_assert(std::is_assignable<T&, typename Array::value_type>::value, "incompatible assignment");
-    clear(this->data(), this->size());
+
+    auto old_data = this->data();
+    auto old_size = this->size();
+
     this->data_ = this->allocate(source.size());
     this->descriptor_ = {0, source.extents()};
     this->create(detail::trivial_dispatch<T>(), this->data(), source.begin(), source.size());
+
+    clear(old_data, old_size);
+
     return *this;
   }
 
