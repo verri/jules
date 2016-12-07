@@ -38,11 +38,17 @@ public:
   ///
   /// \notes It depends on the slice that created it, and will be invalidated if have
   /// longer lifetime than the slice.
-  class iterator : public std::iterator<std::input_iterator_tag, index_t, distance_t, void*, index_t>
+  class iterator
   {
     friend class base_slice<N>;
 
   public:
+    using iterator_category = std::input_iterator_tag;
+    using value_type = index_t;
+    using difference_type = distance_t;
+    using pointer = void*;
+    using reference = index_t;
+
     iterator() = delete;
 
     constexpr iterator(const iterator& source) = default;
@@ -79,10 +85,10 @@ public:
     /// `incompatible_comparison`.
     constexpr auto operator!=(const iterator& other) const { return !(*this == other); }
 
-    constexpr auto operator*() const -> index_t { return (*slice_)(indexes_); }
+    constexpr auto operator*() const -> reference { return (*slice_)(indexes_); }
 
     /// \notes You should not call this function.
-    auto operator-> () const -> void*
+    auto operator-> () const -> pointer
     {
       DEBUG_ASSERT(false, debug::module{}, debug::level::invalid_state, "you should not call this function");
       return nullptr;
@@ -198,11 +204,17 @@ public:
 
   /// **TODO**: No documentation, consult `jules::base_slice<N>::iterator`.
   /// \notes For this specialization, the iterator does not depend on the parent slice.
-  class iterator : public std::iterator<std::input_iterator_tag, index_t, distance_t, void*, index_t>
+  class iterator
   {
     friend class base_slice<1>;
 
   public:
+    using iterator_category = std::input_iterator_tag;
+    using value_type = index_t;
+    using difference_type = distance_t;
+    using pointer = void*;
+    using reference = index_t;
+
     iterator() = delete;
 
     constexpr iterator(const iterator& source) = default;
@@ -228,10 +240,10 @@ public:
 
     constexpr auto operator!=(const iterator& other) const { return !(*this == other); }
 
-    constexpr auto operator*() const -> index_t { return index_; }
+    constexpr auto operator*() const -> reference { return index_; }
 
     /// \notes You should not call this function.
-    auto operator-> () const -> void*
+    auto operator-> () const -> pointer
     {
       DEBUG_ASSERT(false, debug::module{}, debug::level::invalid_state, "you should not call this function");
       return nullptr;
