@@ -1,12 +1,6 @@
 #include "jules/array/all.hpp"
 
-#include <functional>
-#include <type_traits>
-
 #include <catch.hpp>
-
-template <typename T, typename U> constexpr auto same_type(const T&, const U&) { return std::is_same<T, U>::value; }
-template <typename T, typename U> constexpr auto is(const U&) { return std::is_same<T, U>::value; }
 
 TEST_CASE("Vector tutorial", "[vector]")
 {
@@ -48,8 +42,10 @@ TEST_CASE("Vector tutorial", "[vector]")
     REQUIRE(all(c == d));
     REQUIRE(all(d == e));
 
-    // Constructors from slicing.
+    // Constructor from initializer list.
     auto x = jules::vector<long>{0, 1, 2, 3, 4, 5, 6, 7, 8, 9};
+
+    // Constructors from slicing.
     auto even = jules::vector<long>(x(jules::slice(0u, jules::slice::all, 2u)));
     auto odd = jules::vector<long>(x(jules::seq(1u, x.length(), 2u)));
 

@@ -106,22 +106,13 @@ index_t slicing_size(const std::array<index_t, N>& extents, const Rng& rng, Args
 }
 
 // Default slicing Helpers
-// TODO: XXX: It may be wrong, since the data is stored column-wise now.
+
+template <std::size_t D, std::size_t N> void do_slice(base_slice<N>&);
+template <std::size_t D, std::size_t N, typename... Args>
+void do_slice(base_slice<N>& result, const base_slice<1>& slice, Args&&... args);
+template <std::size_t D, std::size_t N, typename... Args> void do_slice(base_slice<N>& result, index_t i, Args&&... args);
 
 template <std::size_t D, std::size_t N> void do_slice(base_slice<N>&) { static_assert(N == D, "invalid number of arguments"); }
-
-template <std::size_t D, std::size_t N, typename... Args> void do_slice(base_slice<N>& result, index_t i, Args&&... args)
-{
-  static_assert(N - D - 1 == sizeof...(args), "invalid number of arguments");
-
-  CHECK_BOUNDS(i, extent(result, D));
-
-  result.start += stride(result, D) * i;
-  extent(result, D) = 1u;
-  stride(result, D) = 1u;
-
-  do_slice<D + 1>(result, std::forward<Args>(args)...);
-}
 
 template <std::size_t D, std::size_t N, typename... Args>
 void do_slice(base_slice<N>& result, const base_slice<1>& slice, Args&&... args)
@@ -133,7 +124,20 @@ void do_slice(base_slice<N>& result, const base_slice<1>& slice, Args&&... args)
 
   result.start += stride(result, D) * slice.start;
   stride(result, D) = stride(result, D) * slice.stride;
-  extent(result, D) = slice.extent > 0u ? slice.extent : (extent(result, D) - slice.start) / slice.stride + (slice.start % 2);
+  extent(result, D) = slice.extent > 0u ? slice.extent : seq_size(slice.start, extent(result, D), slice.stride);
+
+  do_slice<D + 1>(result, std::forward<Args>(args)...);
+}
+
+template <std::size_t D, std::size_t N, typename... Args> void do_slice(base_slice<N>& result, index_t i, Args&&... args)
+{
+  static_assert(N - D - 1 == sizeof...(args), "invalid number of arguments");
+
+  CHECK_BOUNDS(i, extent(result, D));
+
+  result.start += stride(result, D) * i;
+  extent(result, D) = 1u;
+  stride(result, D) = 1u;
 
   do_slice<D + 1>(result, std::forward<Args>(args)...);
 }
@@ -149,27 +153,29 @@ template <std::size_t N, typename... Args> base_slice<N> default_slicing(const b
 // Indirect Slicing Helpers
 
 template <std::size_t D, std::size_t N>
-void do_slice(std::array<index_t, N>&, std::vector<index_t>& indexes, const base_slice<N>& slice, std::array<index_t, D> ix)
+void do_slice(const std::array<index_t, N>& extents, std::vector<index_t>& indexes, const base_slice<N>& slice,
+              std::array<index_t, D> old_ix, std::array<index_t, D> new_ix)
 {
   static_assert(D == N, "invalid number of arguments");
-  indexes.push_back(slice(drop(ix)));
+  const auto descriptor = base_slice<N>{0u, drop(extents)};
+  indexes[descriptor(drop(new_ix))] = slice(drop(old_ix));
 }
 
 template <std::size_t D, std::size_t N, typename... Args>
 void do_slice(std::array<index_t, N>& extents, std::vector<index_t>& indexes, const base_slice<N>& slice,
-              std::array<index_t, D> ix, index_t i, Args&&... args)
+              std::array<index_t, D> old_ix, std::array<index_t, D> new_ix, index_t i, Args&&... args)
 {
   static_assert(N - D - 1 == sizeof...(args), "invalid number of arguments");
 
   CHECK_BOUNDS(i, extent(slice, D));
 
   extents[D] = 1;
-  do_slice(extents, indexes, slice, cat(ix, i), std::forward<Args>(args)...);
+  do_slice(extents, indexes, slice, cat(old_ix, i), cat(new_ix, index_t{0u}), std::forward<Args>(args)...);
 }
 
 template <std::size_t D, std::size_t N, typename... Args>
 void do_slice(std::array<index_t, N>& extents, std::vector<index_t>& indexes, const base_slice<N>& slice,
-              std::array<index_t, D> ix, const base_slice<1>& rng_base, Args&&... args)
+              std::array<index_t, D> old_ix, std::array<index_t, D> new_ix, const base_slice<1>& rng_base, Args&&... args)
 {
   static_assert(N - D - 1 == sizeof...(args), "invalid number of arguments");
 
@@ -182,14 +188,15 @@ void do_slice(std::array<index_t, N>& extents, std::vector<index_t>& indexes, co
 
   extents[D] = rng.size();
 
+  auto pos = index_t{0u};
   for (index_t i : rng)
-    do_slice(extents, indexes, slice, cat(ix, i), std::forward<Args>(args)...);
+    do_slice(extents, indexes, slice, cat(old_ix, i), cat(new_ix, pos++), std::forward<Args>(args)...);
 }
 
 template <std::size_t D, std::size_t N, typename Rng, typename... Args, typename T = range::range_value_t<Rng>,
           CONCEPT_REQUIRES_(range::Range<Rng>())>
 void do_slice(std::array<index_t, N>& extents, std::vector<index_t>& indexes, const base_slice<N>& slice,
-              std::array<index_t, D> ix, const Rng& rng, Args&&... args)
+              std::array<index_t, D> old_ix, std::array<index_t, D> new_ix, const Rng& rng, Args&&... args)
 {
   static_assert(std::is_convertible<T, index_t>::value, "arbitrary ranges must contain indexes");
   static_assert(N - D - 1 == sizeof...(args), "invalid number of arguments");
@@ -198,8 +205,9 @@ void do_slice(std::array<index_t, N>& extents, std::vector<index_t>& indexes, co
 
   extents[D] = range::size(rng);
 
+  auto pos = index_t{0u};
   for (index_t i : rng)
-    do_slice(extents, indexes, slice, cat(ix, i), std::forward<Args>(args)...);
+    do_slice(extents, indexes, slice, cat(old_ix, i), cat(new_ix, pos++), std::forward<Args>(args)...);
 }
 
 template <std::size_t N, typename... Args>
@@ -208,9 +216,9 @@ std::pair<std::array<index_t, N>, std::vector<index_t>> indirect_slicing(const b
   static_assert(sizeof...(args) == N, "invalid number of arguments");
 
   std::pair<std::array<index_t, N>, std::vector<index_t>> result;
-  result.second.reserve(slicing_size<0>(undrop(slice.dimensions()), std::forward<Args>(args)...));
+  result.second.resize(slicing_size<0>(undrop(slice.dimensions()), std::forward<Args>(args)...));
 
-  do_slice(result.first, result.second, slice, std::array<index_t, 0>{}, std::forward<Args>(args)...);
+  do_slice(result.first, result.second, slice, std::array<index_t, 0>{}, std::array<index_t, 0>{}, std::forward<Args>(args)...);
 
   return result;
 }
