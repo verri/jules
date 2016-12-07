@@ -1,6 +1,60 @@
 // Copyright (c) 2016 Filipe Verri <filipeverri@gmail.com>
 
+#ifndef JULES_DATAFRAME_COLUMN_H
 #define JULES_DATAFRAME_COLUMN_H
+
+#include <jules/core/range.hpp>
+#include <jules/core/type.hpp>
+#include <jules/dataframe/detail/column_model.hpp>
+
+#include <memory>
+
+namespace jules
+{
+
+template <typename Coercion> class base_column
+{
+  template <typename T> using model_t = detail::column_model<T, Coercion>;
+  using interface_t = detail::column_interface<Coercion>;
+  using model_ptr_t = std::unique_ptr<interface_t>;
+
+public:
+  template <typename T> base_column(string name, std::initializer_list<T> values);
+  template <typename T> base_column(string name, const T& value, index_t size);
+  template <typename T> base_column(std::initializer_list<T> values);
+  template <typename T> base_column(const T& value, index_t size);
+  template <typename Rng, typename R = range::range_value_t<Rng>> base_column(string name, const Rng& rng);
+  template <typename Rng, typename R = range::range_value_t<Rng>> base_column(const Rng& rng);
+
+  base_column(const base_column& source);
+  base_column(base_column&& source) noexcept = default;
+
+  auto operator=(const base_column& source) -> base_column&;
+  auto operator=(base_column&& source) noexcept -> base_column& = default;
+
+  template <typename T> auto coerce_to() & -> base_column&;
+  template <typename T> auto can_coerce_to() const { return model_->template can_coerce_to<T>(); }
+
+  auto elements_type() const { return model_->elements_type(); }
+
+  auto size() const { return model_->size(); }
+  auto extents() const { return size(); }
+
+  auto name() -> string& { return name_; }
+  auto name() const -> const string& { return name_; }
+
+private:
+  string name_;
+  model_ptr_t model_;
+};
+
+using column = base_column<coercion_rules>;
+
+} // namespace jules
+
+#endif // JULES_DATAFRAME_COLUMN_H
+
+// TODO: XXX: delete everything below
 #ifndef JULES_DATAFRAME_COLUMN_H
 
 #include <jules/dataframe/column_decl.hpp>

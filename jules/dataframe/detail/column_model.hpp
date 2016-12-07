@@ -1,7 +1,7 @@
 // Copyright (c) 2016 Filipe Verri <filipeverri@gmail.com>
 
-#ifndef JULES_DATAFRAME_DETAIL_STORAGE_H
-#define JULES_DATAFRAME_DETAIL_STORAGE_H
+#ifndef JULES_DATAFRAME_DETAIL_COLUMN_MODEL_H
+#define JULES_DATAFRAME_DETAIL_COLUMN_MODEL_H
 
 #include <jules/base/async.hpp>
 #include <jules/core/type.hpp>
@@ -19,7 +19,7 @@ namespace detail
 {
 template <typename T, typename Coercion> class column_model;
 
-template <typename Eraser, typename Coercion, size_t I>
+template <typename Eraser, typename Coercion, std::size_t I>
 class generate_virtual_coercions : public generate_virtual_coercions<Eraser, Coercion, I - 1>
 {
 private:
@@ -240,4 +240,4 @@ public:
 } // namespace detail
 } // namespace jules
 
-#endif // JULES_DATAFRAME_DETAIL_STORAGE_H
+#endif // JULES_DATAFRAME_DETAIL_COLUMN_MODEL_H
