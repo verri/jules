@@ -61,10 +61,10 @@
   BINARY_LEFT_TYPE_OPERATION(TX__, X__, OP__)
 
 #define BINARY_APPLY_OPERATION(TX__, X__, TY__, Y__)                                                                             \
-  template <UNPACK TX__, UNPACK TY__, typename Operator> auto apply(UNPACK X__ lhs, UNPACK Y__ rhs, const Operator& op)          \
+  template <UNPACK TX__, UNPACK TY__, typename Operator> auto apply(UNPACK X__ lhs, UNPACK Y__ rhs, Operator&& op)               \
   {                                                                                                                              \
     DEBUG_ASSERT(lhs.extents() == rhs.extents(), debug::module{}, debug::level::extents_check, "extents mismatch");              \
-    return make_expr_array<N>(lhs.begin(), lhs.end(), rhs.begin(), rhs.end(), op, lhs.extents());                                \
+    return make_expr_array<N>(lhs.begin(), lhs.end(), rhs.begin(), rhs.end(), std::forward<Operator>(op), lhs.extents());        \
   }
 
 #define BINARY_OPERATION(TX__, X__, TY__, Y__, OP__)                                                                             \
@@ -76,19 +76,17 @@
   }
 
 #define BINARY_RIGHT_TYPE_OPERATION(TX__, X__, OP__)                                                                             \
-  template <UNPACK TX__, typename U, typename = std::enable_if_t<!is_array<U>()>>                                                \
-  auto operator OP__(UNPACK X__ lhs, const U& rhs)                                                                               \
+  template <UNPACK TX__, typename U, typename = std::enable_if_t<!is_array_v<U>()>> auto operator OP__(UNPACK X__ lhs, U rhs)    \
   {                                                                                                                              \
     using Value = typename std::decay_t<UNPACK X__>::value_type;                                                                 \
-    return apply(lhs, [&rhs](const Value& lhs) { return lhs OP__ rhs; });                                                        \
+    return apply(lhs, [rhs = std::move(rhs)](const Value& lhs) { return lhs OP__ rhs; });                                        \
   }
 
 #define BINARY_LEFT_TYPE_OPERATION(TY__, Y__, OP__)                                                                              \
-  template <UNPACK TY__, typename U, typename = std::enable_if_t<!is_array<U>()>>                                                \
-  auto operator OP__(const U& lhs, UNPACK Y__ rhs)                                                                               \
+  template <UNPACK TY__, typename U, typename = std::enable_if_t<!is_array_v<U>()>> auto operator OP__(U lhs, UNPACK Y__ rhs)    \
   {                                                                                                                              \
     using Value = typename std::decay_t<UNPACK Y__>::value_type;                                                                 \
-    return apply(rhs, [&lhs](const Value& rhs) { return lhs OP__ rhs; });                                                        \
+    return apply(rhs, [lhs = std::move(lhs)](const Value& rhs) { return lhs OP__ rhs; });                                        \
   }
 
 //=== Unary ===//
@@ -101,9 +99,9 @@
   UNARY_OPERATION(TX__, X__, N__, !)
 
 #define UNARY_APPLY_OPERATION(TX__, X__, N__)                                                                                    \
-  template <UNPACK TX__, typename Operator> auto apply(UNPACK X__ operand, const Operator& op)                                   \
+  template <UNPACK TX__, typename Operator> auto apply(UNPACK X__ operand, Operator&& op)                                        \
   {                                                                                                                              \
-    return make_expr_array<N>(operand.begin(), operand.end(), op, operand.extents());                                            \
+    return make_expr_array<N>(operand.begin(), operand.end(), std::forward<Operator>(op), operand.extents());                    \
   }
 
 #define UNARY_OPERATION(TX__, X__, N__, OP__)                                                                                    \

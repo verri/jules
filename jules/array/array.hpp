@@ -318,7 +318,7 @@ public:
   /// \group Constructors
   template <typename Rng, typename U = range::range_value_t<Rng>, CONCEPT_REQUIRES_(range::Range<Rng>()),
             typename = array_fallback<void, Rng>>
-  base_array(const Rng& rng) : ref_array<T, 1>{this->allocate(range::size(rng), {0u, range::size(rng)})}
+  base_array(const Rng& rng) : ref_array<T, 1>{this->allocate(range::size(rng)), {0u, range::size(rng)}}
   {
     static_assert(std::is_constructible<T, const U&>::value, "incompatible value types");
     this->create(detail::trivial_dispatch<T>(), this->data(), range::begin(rng), this->size());

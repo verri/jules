@@ -86,16 +86,17 @@ template <typename R, typename T> using array_fallback = std::enable_if_t<!is_ar
 // Helpers for operators
 
 template <std::size_t M, typename It, typename F>
-auto make_expr_array(It first, It last, const F& f, typename base_slice<M>::extent_type extent) -> unary_expr_array<It, F, M>
+auto make_expr_array(It first, It last, F&& f, typename base_slice<M>::extent_type extent)
+  -> unary_expr_array<It, std::decay_t<F>, M>
 {
-  return {first, last, f, extent};
+  return {first, last, std::forward<F>(f), extent};
 }
 
 template <std::size_t M, typename LhsIt, typename RhsIt, typename F>
-auto make_expr_array(LhsIt lhs_first, LhsIt lhs_last, RhsIt rhs_first, RhsIt rhs_last, const F& f,
-                     typename base_slice<M>::extent_type extent) -> binary_expr_array<LhsIt, RhsIt, F, M>
+auto make_expr_array(LhsIt lhs_first, LhsIt lhs_last, RhsIt rhs_first, RhsIt rhs_last, F&& f,
+                     typename base_slice<M>::extent_type extent) -> binary_expr_array<LhsIt, RhsIt, std::decay_t<F>, M>
 {
-  return {lhs_first, lhs_last, rhs_first, rhs_last, f, extent};
+  return {lhs_first, lhs_last, rhs_first, rhs_last, std::forward<F>(f), extent};
 }
 
 } // namespace jules

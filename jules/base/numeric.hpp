@@ -59,7 +59,7 @@ auto prod(Iter first, Sent last, const T& start = static_cast<T>(1u))
 }
 
 template <typename Rng, typename T = range::range_value_t<Rng>, CONCEPT_REQUIRES_(range::Range<Rng>())>
-auto prod(Rng&& rng, const T& start = static_cast<T>(1u))
+auto prod(const Rng& rng, const T& start = static_cast<T>(1u))
 {
   return prod(ranges::begin(rng), ranges::end(rng), start);
 }
@@ -76,6 +76,19 @@ constexpr auto all_args() { return true; }
 template <typename... Args> constexpr auto all_args(bool arg, Args&&... args)
 {
   return arg && all_args(std::forward<Args>(args)...);
+}
+
+template <typename Iter, typename Sent, CONCEPT_REQUIRES_(range::Sentinel<Sent, Iter>())> auto all(Iter first, Sent last)
+{
+  while (first != last)
+    if (!static_cast<bool>(*first++))
+      return false;
+  return true;
+}
+
+template <typename Rng, CONCEPT_REQUIRES_(range::Range<Rng>())> auto all(const Rng& rng)
+{
+  return all(ranges::begin(rng), ranges::end(rng));
 }
 
 constexpr auto any_args() { return false; }

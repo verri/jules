@@ -18,18 +18,23 @@ public:
   using lhs_value_type = typename std::iterator_traits<LhsIt>::value_type;
   using rhs_value_type = typename std::iterator_traits<RhsIt>::value_type;
 
-  using value_type = decltype(std::declval<Op>()(std::declval<lhs_value_type>(), std::declval<rhs_value_type>()));
+  using value_type = decltype(std::declval<Op&>()(std::declval<lhs_value_type>(), std::declval<rhs_value_type>()));
   static constexpr auto order = N;
 
   using size_type = index_t;
   using difference_type = distance_t;
 
-  class iterator : public std::iterator<std::input_iterator_tag, value_type, distance_t>
+  class iterator
   {
-    template <typename, typename, typename, std::size_t> friend class binary_expr_array;
-
   public:
-    constexpr iterator() = delete;
+    using iterator_category = std::input_iterator_tag;
+    using value_type = decltype(std::declval<Op&>()(std::declval<lhs_value_type>(), std::declval<rhs_value_type>()));
+    using difference_type = distance_t;
+    using pointer = void*;
+    using reference = value_type;
+
+    constexpr iterator() = default;
+    constexpr iterator(LhsIt lhs, RhsIt rhs, const binary_expr_array* source) : lhs_{lhs}, rhs_{rhs}, source_{source} {}
 
     constexpr iterator(const iterator& source) = default;
     constexpr iterator(iterator&& source) noexcept = default;
@@ -55,16 +60,14 @@ public:
 
     constexpr auto operator!=(const iterator& other) const { return !(*this == other); }
 
-    constexpr auto operator*() -> value_type { return op_(*lhs_, *rhs_); }
+    constexpr auto operator*() -> reference { return source_->op_(*lhs_, *rhs_); }
 
-    constexpr auto operator-> () -> value_type* { return nullptr; }
+    constexpr auto operator-> () -> pointer { return nullptr; }
 
   private:
-    iterator(LhsIt lhs, RhsIt rhs, const Op& op) : lhs_{lhs}, rhs_{rhs}, op_{op} {}
-
     LhsIt lhs_;
     RhsIt rhs_;
-    Op op_;
+    const binary_expr_array* source_;
   };
 
   using const_iterator = iterator;
@@ -86,8 +89,8 @@ public:
   auto begin() const -> const_iterator { return cbegin(); }
   auto end() const -> const_iterator { return cend(); }
 
-  auto cbegin() const -> const_iterator { return {lhs_first_, rhs_first_, op_}; }
-  auto cend() const -> const_iterator { return {lhs_last_, rhs_last_, op_}; }
+  auto cbegin() const -> const_iterator { return {lhs_first_, rhs_first_, this}; }
+  auto cend() const -> const_iterator { return {lhs_last_, rhs_last_, this}; }
 
   auto descriptor() const { return std::make_tuple(lhs_first_, lhs_last_, rhs_first_, rhs_last_, extents()); }
   auto extents() const { return descriptor_.dimensions(); }
@@ -96,7 +99,7 @@ public:
 private:
   LhsIt lhs_first_, lhs_last_;
   RhsIt rhs_first_, rhs_last_;
-  Op op_;
+  mutable Op op_; // TODO: XXX: is there a better solution?
   base_slice<N> descriptor_;
 };
 

@@ -15,20 +15,25 @@ namespace jules
 template <typename It, typename Op, std::size_t N> class unary_expr_array
 {
 public:
-  using iterator_value_type = typename std::iterator_traits<It>::value_type;
+  using iterator_reference = typename std::iterator_traits<It>::reference;
 
-  using value_type = decltype(std::declval<Op>()(std::declval<iterator_value_type>()));
+  using value_type = decltype(std::declval<Op&>()(std::declval<iterator_reference>()));
   static constexpr auto order = N;
 
   using size_type = index_t;
   using difference_type = distance_t;
 
-  class iterator : public std::iterator<std::input_iterator_tag, value_type, distance_t>
+  class iterator
   {
-    template <typename, typename, std::size_t> friend class unary_expr_array;
-
   public:
-    constexpr iterator() = delete;
+    using iterator_category = std::input_iterator_tag;
+    using value_type = decltype(std::declval<Op&>()(std::declval<iterator_reference>()));
+    using difference_type = distance_t;
+    using pointer = void*;
+    using reference = value_type;
+
+    constexpr iterator() = default;
+    constexpr iterator(It it, const unary_expr_array* source) : it_{it}, source_{source} {}
 
     constexpr iterator(const iterator& source) = default;
     constexpr iterator(iterator&& source) noexcept = default;
@@ -53,22 +58,20 @@ public:
 
     constexpr auto operator!=(const iterator& other) const { return !(*this == other); }
 
-    constexpr auto operator*() -> value_type { return op_(*it_); }
+    constexpr auto operator*() -> reference { return source_->op_(*it_); }
 
-    constexpr auto operator-> () -> value_type* { return nullptr; }
+    constexpr auto operator-> () -> iterator { return nullptr; }
 
   private:
-    iterator(It it, const Op& op) : it_{it}, op_{op} {}
-
     It it_;
-    Op op_;
+    const unary_expr_array* source_;
   };
 
   using const_iterator = iterator;
 
 public:
-  unary_expr_array(It it_first, It it_last, const Op& op, typename base_slice<N>::extent_type extents)
-    : it_first_{it_first}, it_last_{it_last}, op_{op}, descriptor_{0u, extents}
+  unary_expr_array(It it_first, It it_last, Op op, typename base_slice<N>::extent_type extents)
+    : it_first_{it_first}, it_last_{it_last}, op_{std::move(op)}, descriptor_{0u, extents}
   {
   }
 
@@ -82,8 +85,8 @@ public:
   auto begin() const -> const_iterator { return cbegin(); }
   auto end() const -> const_iterator { return cend(); }
 
-  auto cbegin() const -> const_iterator { return {it_first_, op_}; }
-  auto cend() const -> const_iterator { return {it_last_, op_}; }
+  auto cbegin() const -> iterator { return {it_first_, this}; }
+  auto cend() const -> iterator { return {it_last_, this}; }
 
   auto descriptor() const { return std::make_tuple(it_first_, it_last_, extents()); }
   auto extents() const { return descriptor_.dimensions(); }
@@ -91,7 +94,7 @@ public:
 
 private:
   It it_first_, it_last_;
-  Op op_;
+  mutable Op op_; // TODO: XXX: is there a better solution?
   base_slice<N> descriptor_;
 };
 

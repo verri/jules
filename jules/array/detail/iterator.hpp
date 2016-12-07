@@ -12,13 +12,17 @@ namespace jules
 {
 namespace detail
 {
-template <typename T, typename It> class iterator_from_indexes : public std::iterator<std::forward_iterator_tag, T, distance_t>
+template <typename T, typename It> class iterator_from_indexes
 {
-  template <typename, std::size_t> friend class ::jules::ref_array;
-  template <typename, std::size_t> friend class ::jules::ind_array;
-
 public:
+  using iterator_category = std::forward_iterator_tag;
+  using value_type = T;
+  using difference_type = distance_t;
+  using pointer = T*;
+  using reference = T&;
+
   constexpr iterator_from_indexes() = default;
+  constexpr iterator_from_indexes(T* data, It it) : data_{data}, it_{std::move(it)} {}
 
   constexpr iterator_from_indexes(const iterator_from_indexes& source) = default;
   constexpr iterator_from_indexes(iterator_from_indexes&& source) noexcept = default;
@@ -43,13 +47,11 @@ public:
 
   constexpr auto operator!=(const iterator_from_indexes& other) const { return !(*this == other); }
 
-  constexpr auto operator*() -> T& { return data_[*it_]; }
+  constexpr auto operator*() -> reference { return data_[*it_]; }
 
-  constexpr auto operator-> () -> T* { return data_ + *it_; }
+  constexpr auto operator-> () -> pointer { return data_ + *it_; }
 
 private:
-  iterator_from_indexes(T* data, It it) : data_{data}, it_{std::move(it)} {}
-
   T* data_ = nullptr;
   It it_;
 };
