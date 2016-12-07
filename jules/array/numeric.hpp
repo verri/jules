@@ -31,11 +31,17 @@ static inline auto seq(index_t start, index_t stop, index_t step = 1u) -> vector
   return indexes;
 }
 
-template <typename T, typename Rng, CONCEPT_REQUIRES_(range::Range<Rng>())> auto to_vector(const Rng& rng) -> vector<T>
+template <typename T, typename Rng, CONCEPT_REQUIRES_(range::Range<Rng>())>
+auto to_vector(const Rng& rng) -> array_fallback<vector<T>, Rng>
 {
   vector<T> vec(range::size(rng));
   range::copy(rng, vec.begin());
   return vec;
+}
+
+template <typename T, typename Array> auto to_vector(Array&& array) -> array_request<vector<T>, std::decay_t<Array>>
+{
+  return {std::forward<Array>(array)};
 }
 
 template <typename Rng, typename R = range::range_value_t<Rng>, CONCEPT_REQUIRES_(range::Range<Rng>())>

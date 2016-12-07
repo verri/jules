@@ -250,6 +250,18 @@ public:
   }
 
   /// \group Assignment
+  auto operator=(const ind_array<T, 1>& source) -> ind_array&
+  {
+    DEBUG_ASSERT(this->extents() == source.extents(), debug::module{}, debug::level::extents_check, "extents mismatch");
+    auto it = source.begin();
+    for (auto& elem : *this)
+      elem = *it++;
+    DEBUG_ASSERT(it == source.end(), debug::module{}, debug::level::unreachable, "should never happen");
+
+    return *this;
+  }
+
+  /// \group Assignment
   auto operator=(base_array<T, 1>&& source) noexcept -> ind_array&
   {
     auto it = source.begin();

@@ -1,7 +1,6 @@
 #include "jules/array/all.hpp"
 
 #include <functional>
-#include <iostream> // TODO
 #include <type_traits>
 
 #include <catch.hpp>
@@ -112,5 +111,44 @@ TEST_CASE("Vector tutorial", "[vector]")
     auto y_it = y.cbegin();
     while (x_it != x.cend() && y_it != y.cend())
       CHECK(*x_it++ == *y_it++);
+  }
+
+  SECTION("Length, size, and extents")
+  {
+    auto x = jules::vector<>(10u);
+    CHECK(x.length() == 10u);
+    CHECK(x.size() == 10u);
+    CHECK(x.extents() == x.size());
+  }
+
+  SECTION("Subvector assignment")
+  {
+    auto x = jules::to_vector<long>(jules::seq(0u, 10u));
+    const auto y = x;
+
+    x(jules::slice(0u, jules::slice::all, 2u)) = 0u;
+    CHECK(all(x == jules::as_vector(0, 1, 0, 3, 0, 5, 0, 7, 0, 9)));
+
+    x(jules::slice(1u, jules::slice::all, 2u)) = jules::vector<long>{2, 4, 6, 8, 10};
+    CHECK(all(x == jules::as_vector(0, 2, 0, 4, 0, 6, 0, 8, 0, 10)));
+
+    x(jules::slice(0u, jules::slice::all, 2u)) = y(jules::slice(1u, jules::slice::all, 2u));
+    CHECK(all(x == 1 + jules::to_vector<long>(jules::seq(0u, 10u))));
+
+    x() = 0;
+    CHECK(all(x == 0));
+
+    for (auto i = 0u; i < x.size(); ++i)
+      x(i) = y(y.length() - 1);
+    CHECK(all(x == 9));
+
+    x(jules::seq(0u, x.size())) = y();
+    CHECK(all(x == y));
+
+    x(jules::seq(0u, x.size(), 2u)) = y(jules::seq(1u, y.size(), 2u));
+    CHECK(all(x == jules::as_vector(1, 1, 3, 3, 5, 5, 7, 7, 9, 9)));
+
+    x(jules::seq(1u, x.size(), 2u)) = jules::vector<long>{2, 4, 6, 8, 10};
+    CHECK(all(x == jules::as_vector(1, 2, 3, 4, 5, 6, 7, 8, 9, 10)));
   }
 }

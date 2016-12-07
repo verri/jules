@@ -117,8 +117,8 @@ template <std::size_t D, std::size_t N, typename... Args> void do_slice(base_sli
   CHECK_BOUNDS(i, extent(result, D));
 
   result.start += stride(result, D) * i;
-  extent(result, D) = 1;
-  stride(result, D) = 1;
+  extent(result, D) = 1u;
+  stride(result, D) = 1u;
 
   do_slice<D + 1>(result, std::forward<Args>(args)...);
 }
@@ -133,7 +133,7 @@ void do_slice(base_slice<N>& result, const base_slice<1>& slice, Args&&... args)
 
   result.start += stride(result, D) * slice.start;
   stride(result, D) = stride(result, D) * slice.stride;
-  extent(result, D) = slice.extent > 0 ? slice.extent : (extent(result, D) - slice.start) / slice.stride;
+  extent(result, D) = slice.extent > 0u ? slice.extent : (extent(result, D) - slice.start) / slice.stride + (slice.start % 2);
 
   do_slice<D + 1>(result, std::forward<Args>(args)...);
 }

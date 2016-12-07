@@ -196,6 +196,18 @@ public:
   }
 
   /// \group Assignment
+  auto operator=(const ref_array<T, 1>& source) -> ref_array&
+  {
+    DEBUG_ASSERT(this->extents() == source.extents(), debug::module{}, debug::level::extents_check, "extents mismatch");
+    auto it = source.begin();
+    for (auto& elem : *this)
+      elem = *it++;
+    DEBUG_ASSERT(it == source.end(), debug::module{}, debug::level::unreachable, "should never happen");
+
+    return *this;
+  }
+
+  /// \group Assignment
   auto operator=(base_array<T, 1>&& source) noexcept -> ref_array&
   {
     auto it = source.begin();
@@ -222,7 +234,7 @@ public:
   }
 
   auto operator()() -> ref_array<T, 1>& { return *this; }
-  auto operator()() const -> ref_array<const T, 1>& { return *this; }
+  auto operator()() const -> ref_array<const T, 1> { return *this; }
 
   template <typename Rng, typename U = range::range_value_t<Rng>, CONCEPT_REQUIRES_(range::Range<Rng>())>
   auto operator()(const Rng& rng) -> ind_array<T, 1>
@@ -241,20 +253,20 @@ public:
   auto operator()(index_t i) -> T& { return (*this)[i]; }
 
   template <typename Rng, typename U = range::range_value_t<Rng>, CONCEPT_REQUIRES_(range::Range<Rng>())>
-  auto operator()(const Rng& rng) const -> ind_array<T, 1>
+  auto operator()(const Rng& rng) const -> ind_array<const T, 1>
   {
     static_assert(std::is_convertible<U, index_t>::value, "arbitrary ranges must contain indexes");
     auto slicing = detail::indirect_slicing(this->descriptor_, rng);
     return {data_, slicing.first[0], std::move(slicing.second)};
   }
 
-  auto operator()(const base_slice<1>& slice) const -> ref_array<T, 1>
+  auto operator()(const base_slice<1>& slice) const -> ref_array<const T, 1>
   {
-    auto new_slice = default_slicing(this->descriptor_, slice);
+    auto new_slice = detail::default_slicing(this->descriptor_, slice);
     return {data_, new_slice};
   }
 
-  auto operator()(index_t i) const -> T& { return (*this)[i]; }
+  auto operator()(index_t i) const -> const T& { return (*this)[i]; }
 
   auto begin() -> iterator { return {data_, descriptor_.begin()}; }
   auto end() -> iterator { return {data_, descriptor_.end()}; }
