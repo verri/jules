@@ -93,7 +93,7 @@ public:
   auto operator[](index_t i) const -> ref_array<const T, N - 1> { return static_cast<ref_array<const T, N>>(*this)[i]; }
 
   auto operator()() -> ref_array<T, N>& { return *this; }
-  auto operator()() const -> ref_array<const T, N>& { return *this; }
+  auto operator()() const -> ref_array<const T, N> { return *this; }
 
   template <typename... Args> auto operator()(Args&&... args) -> detail::indirect_request<ind_array<T, N>, Args...>
   {

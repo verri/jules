@@ -187,4 +187,48 @@ TEST_CASE("Matrix tutorial", "[matrix]")
     // CHECK(nrow == 10u);
     // CHECK(ncol == 10u);
   }
+
+  SECTION("Submatrix assignment")
+  {
+    auto x = jules::matrix<long>(jules::seq(0u, 6u).begin(), 2u, 3u);
+    const auto y = x;
+
+    REQUIRE(all(x == jules::matrix<long>{{0, 2, 4}, {1, 3, 5}}));
+    REQUIRE(all(y == x));
+
+    auto all_even = jules::slice(0u, jules::slice::all, 2u);
+
+    x(all_even, all_even) = -1;
+    CHECK(all(x == jules::matrix<long>{{-1, 2, -1}, {1, 3, 5}}));
+
+    x(all_even, all_even) = jules::matrix<long>{{-2, -3}};
+    CHECK(all(x == jules::matrix<long>{{-2, 2, -3}, {1, 3, 5}}));
+
+    x(all_even, all_even) = y(all_even, all_even);
+    CHECK(all(x == y));
+
+    x() = 0;
+    CHECK(all(x == 0));
+
+    for (auto i : jules::slice(0u, x.row_count()))
+      for (auto j : jules::slice(0u, x.column_count()))
+        x(i, j) = y(y.row_count() - 1, y.column_count() - 1);
+    CHECK(all(x == 5));
+
+    x(jules::seq(0u, x.row_count()), jules::seq(0u, x.column_count())) = y();
+    CHECK(all(x == y));
+
+    auto ix = jules::seq(0u, x.row_count(), 2u);
+    auto jx = jules::seq(0u, x.column_count(), 2u);
+
+    x(ix, jx) = y(ix + 1, jx);
+    CHECK(all(x == jules::matrix<long>{{1, 2, 5}, {1, 3, 5}}));
+
+    x(jules::seq(0u, 2u), 1u) = jules::matrix<long>{{4, 4}};
+    CHECK(all(x == jules::matrix<long>{{1, 4, 5}, {1, 4, 5}}));
+
+    x[0u] = jules::as_vector(jules::repeat<3>(0u));
+    x[1u] = -y[1u];
+    CHECK(all(x == jules::matrix<long>{{0, 0, 0}, {-1, -3, -5}}));
+  }
 }
