@@ -12,6 +12,9 @@
 
 #include <type_traits>
 
+/// TODO: XXΧ: There are no strong guarantees if an exceptions occurs. It possibly will
+/// cause a memory leak.
+
 namespace jules
 {
 
@@ -49,7 +52,7 @@ public:
   /// Signed integer type that can store differences between sizes.
   using difference_type = distance_t;
 
-  ~base_array() { clear(); }
+  ~base_array() { clear(this->data(), this->size()); }
 
   /// \group Constructors
   /// Constructs a new array from a variety of data sources.
@@ -136,7 +139,8 @@ public:
   /// 3) Assignment from array-like structures.
   auto operator=(const base_array& source) -> base_array&
   {
-    this->clear();
+    DEBUG_ASSERT(this != &source, debug::module{}, debug::level::invalid_argument, "self assignment");
+    clear(this->data(), this->size());
     this->data_ = this->allocate(source.size());
     this->descriptor_ = source.descriptor_;
     this->create(detail::trivial_dispatch<T>(), this->data(), source.data(), source->size());
@@ -146,7 +150,8 @@ public:
   /// \group Assignment
   auto operator=(base_array&& source) noexcept -> base_array&
   {
-    this->clear();
+    DEBUG_ASSERT(this != &source, debug::module{}, debug::level::invalid_argument, "self assignment");
+    clear(this->data(), this->size());
     this->data_ = move_ptr(source.data_);
     this->descriptor_ = std::move(source.descriptor_);
     return *this;
@@ -157,7 +162,7 @@ public:
   {
     static_assert(Array::order == N, "array order mismatch");
     static_assert(std::is_assignable<T&, typename Array::value_type>::value, "incompatible assignment");
-    this->clear();
+    clear(this->data(), this->size());
     this->data_ = this->allocate(source.size());
     this->descriptor_ = {0, source.extents()};
     this->create(detail::trivial_dispatch<T>(), this->data(), source.begin(), source.size());
@@ -192,11 +197,11 @@ public:
   auto data() const -> const value_type* { return this->data_; }
 
 private:
-  void clear()
+  static auto clear(T* data, index_t size)
   {
-    if (this->data()) {
-      this->destroy(detail::trivial_dispatch<T>(), this->data(), this->size());
-      this->deallocate(this->data(), this->size());
+    if (data) {
+      detail::array_allocator<T>::destroy(detail::trivial_dispatch<T>(), data, size);
+      detail::array_allocator<T>::deallocate(data, size);
     }
   }
 
@@ -266,7 +271,7 @@ public:
   /// Signed integer type that can store differences between sizes.
   using difference_type = distance_t;
 
-  ~base_array() { clear(); }
+  ~base_array() { clear(this->data(), this->size()); }
 
   /// \group Constructors
   /// Constructs a new vector from a variety of data sources.
@@ -352,10 +357,10 @@ public:
   auto operator=(const base_array& source) & -> base_array&
   {
     DEBUG_ASSERT(this != &source, debug::module{}, debug::level::invalid_argument, "self assignment");
-    this->clear();
+    clear(this->data(), this->size());
     this->data_ = this->allocate(source.size());
     this->descriptor_ = source.descriptor_;
-    this->create(detail::trivial_dispatch<T>(), this->data(), source.data(), source->size());
+    this->create(detail::trivial_dispatch<T>(), this->data(), source.data(), source.size());
     return *this;
   }
 
@@ -363,7 +368,7 @@ public:
   auto operator=(base_array&& source) & noexcept -> base_array&
   {
     DEBUG_ASSERT(this != &source, debug::module{}, debug::level::invalid_argument, "self assignment");
-    this->clear();
+    clear(this->data(), this->size());
     this->data_ = move_ptr(source.data_);
     this->descriptor_ = std::move(source.descriptor_);
     return *this;
@@ -374,10 +379,16 @@ public:
   {
     static_assert(Array::order == 1, "array order mismatch");
     static_assert(std::is_assignable<T&, typename Array::value_type>::value, "incompatible assignment");
-    this->clear();
+
+    auto old_data = this->data();
+    auto old_size = this->size();
+
     this->data_ = this->allocate(source.size());
-    this->descriptor_ = {0, source.extents()};
+    this->descriptor_ = {0u, source.extents()};
     this->create(detail::trivial_dispatch<T>(), this->data(), source.begin(), source.size());
+
+    clear(old_data, old_size);
+
     return *this;
   }
 
@@ -409,11 +420,11 @@ public:
   auto data() const -> const value_type* { return this->data_; }
 
 private:
-  void clear()
+  static auto clear(T* data, index_t size)
   {
-    if (this->data()) {
-      this->destroy(detail::trivial_dispatch<T>(), this->data(), this->size());
-      this->deallocate(this->data(), this->size());
+    if (data) {
+      detail::array_allocator<T>::destroy(detail::trivial_dispatch<T>(), data, size);
+      detail::array_allocator<T>::deallocate(data, size);
     }
   }
 };

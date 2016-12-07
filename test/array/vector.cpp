@@ -25,9 +25,9 @@ TEST_CASE("Vector tutorial", "[vector]")
     auto all_same2 = jules::vector<long>(10u);
     all_same2() = 3l;
 
-    CHECK(jules::all(all_same1 == 3l));
-    CHECK(jules::all(all_same2 == 3l));
-    CHECK(jules::all(all_same1 == all_same2));
+    CHECK(all(all_same1 == 3l));
+    CHECK(all(all_same2 == 3l));
+    CHECK(all(all_same1 == all_same2));
 
     auto values = std::array<long, 10>{{0, 1, 2, 3, 4, 5, 6, 7, 8, 9}};
 
@@ -44,23 +44,53 @@ TEST_CASE("Vector tutorial", "[vector]")
     // Copy and move constructors.
     auto e = [d]() -> jules::vector<long> { return {std::move(d)}; }();
 
-    REQUIRE(jules::all(a == b));
-    REQUIRE(jules::all(b == c));
-    REQUIRE(jules::all(c == d));
-    REQUIRE(jules::all(d == e));
+    REQUIRE(all(a == b));
+    REQUIRE(all(b == c));
+    REQUIRE(all(c == d));
+    REQUIRE(all(d == e));
 
     // Constructors from slicing.
     auto x = jules::vector<long>{0, 1, 2, 3, 4, 5, 6, 7, 8, 9};
-    auto even = jules::vector<long>(x(jules::slice(0u, 0u, 2u)));
-    auto odd = jules::vector<long>(x(jules::seq(1u, 10u, 2u)));
+    auto even = jules::vector<long>(x(jules::slice(0u, jules::slice::all, 2u)));
+    auto odd = jules::vector<long>(x(jules::seq(1u, x.length(), 2u)));
 
-    CHECK(jules::all(x == jules::as_vector(0, 1, 2, 3, 4, 5, 6, 7, 8, 9)));
-    CHECK(jules::all(x == jules::as_vector(values)));
-    CHECK(jules::all(even == jules::as_vector(0, 2, 4, 6, 8)));
-    CHECK(jules::all(odd == jules::as_vector(1, 3, 5, 7, 9)));
+    CHECK(all(x == jules::as_vector(0, 1, 2, 3, 4, 5, 6, 7, 8, 9)));
+    CHECK(all(x == jules::as_vector(values)));
+    CHECK(all(even == jules::as_vector(0, 2, 4, 6, 8)));
+    CHECK(all(odd == jules::as_vector(1, 3, 5, 7, 9)));
 
     // Constructors from expression.
-    auto y = jules::vector<long>(x + x(jules::seq(10u, 0u) - 1u));
-    CHECK(jules::all(y == 9));
+    auto y = jules::vector<long>(x + x(jules::seq(x.length(), 0u) - 1u));
+    CHECK(all(y == 9));
+  }
+
+  SECTION("Assignments")
+  {
+    auto x = jules::vector<long>{0, 1, 2, 3, 4, 5, 6, 7, 8, 9};
+    auto y = jules::vector<long>(-20l, 20u);
+    auto z = jules::vector<long>(-10l, 5u);
+
+    y = x;
+    CHECK(all(x == y));
+
+    z = std::move(x);
+    CHECK(all(y == z));
+
+    x = z(jules::slice(0u, jules::slice::all, 2u));
+    CHECK(all(x == jules::as_vector(0, 2, 4, 6, 8)));
+
+    x = z(jules::seq(0u, z.length(), 2u));
+    CHECK(all(x == jules::as_vector(0, 2, 4, 6, 8)));
+
+    z = x + x;
+    CHECK(all(z == jules::as_vector(0, 4, 8, 12, 16)));
+
+    x = eval(x + x);
+    CHECK(all(x == jules::as_vector(0, 4, 8, 12, 16)));
+
+    // This one is tricky. We must guarantee that the Memory of x is not freed before the
+    // expression is evaluated.
+    x = x - x;
+    CHECK(all(x == jules::as_vector(jules::repeat<5>(0))));
   }
 }
