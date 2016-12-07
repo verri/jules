@@ -2,7 +2,7 @@
 
 #include <catch.hpp>
 
-TEST_CASE("Vector tutorial", "[vector]")
+TEST_CASE("Vector tutorial", "[array]")
 {
   SECTION("Constructors")
   {

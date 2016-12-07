@@ -2,18 +2,7 @@
 
 #include <catch.hpp>
 
-TEST_CASE("array", "[array]")
-{
-  auto vector = jules::vector<>{1.0, 2.0, 3.0};
-
-  auto matrix = jules::matrix<>{
-    {1.0, 2.0, 3.0}, //
-    {4.0, 5.0, 6.0}, //
-    {7.0, 8.0, 9.0}, //
-  };
-}
-
-TEST_CASE("base array", "[base_array]")
+TEST_CASE("Basic array functionalities", "[array]")
 {
   using jules::base_array;
   using jules::base_slice;
@@ -82,7 +71,7 @@ TEST_CASE("base array", "[base_array]")
   static_assert(std::is_same<decltype(vector2), jules::vector<int>>::value, "it should be a vector");
 }
 
-TEST_CASE("as_vector", "[array]")
+TEST_CASE("Type inference for as_vector", "[array]")
 {
   auto array = std::array<jules::integer, 5>{{1, 2, 3, 4, 5}};
   auto vector1 = jules::to_vector<jules::integer>(array);

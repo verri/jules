@@ -4,7 +4,7 @@
 
 #include <vector>
 
-TEST_CASE("reference array", "[ref_array]")
+TEST_CASE("Basic reference array functionalities", "[array]")
 {
   using jules::base_slice;
   using jules::ref_array;

@@ -4,7 +4,7 @@
 
 #include <catch.hpp>
 
-TEST_CASE("unidimensional steps", "[base_slice]")
+TEST_CASE("Slice iterators", "[array]")
 {
   using jules::base_slice;
 
@@ -16,7 +16,7 @@ TEST_CASE("unidimensional steps", "[base_slice]")
   CHECK(r1.second == std::end(a1));
 }
 
-TEST_CASE("check column-wise storage", "[base_slice]")
+TEST_CASE("Column-wise storage", "[array]")
 {
   using jules::base_slice;
 
