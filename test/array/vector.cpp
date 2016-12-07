@@ -93,4 +93,24 @@ TEST_CASE("Vector tutorial", "[vector]")
     x = x - x;
     CHECK(all(x == jules::as_vector(jules::repeat<5>(0))));
   }
+
+  SECTION("Iterators")
+  {
+    auto x = jules::vector<long>(5u);
+    const auto y = jules::vector<long>(17l, 5u);
+
+    for (auto& value : x)
+      value = 42l;
+    CHECK(all(x == 42l));
+
+    auto it = x.begin();
+    for (auto value : y)
+      *it++ = value;
+    CHECK(all(x == 17l));
+
+    auto x_it = x.cbegin();
+    auto y_it = y.cbegin();
+    while (x_it != x.cend() && y_it != y.cend())
+      CHECK(*x_it++ == *y_it++);
+  }
 }
