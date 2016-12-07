@@ -151,4 +151,40 @@ TEST_CASE("Matrix tutorial", "[matrix]")
     x = x - x;
     CHECK(all(x == jules::matrix<long>(0, x.row_count(), x.column_count())));
   }
+
+  SECTION("Iterators")
+  {
+    auto x = jules::matrix<long>(5u, 5u);
+    const auto y = jules::matrix<long>(17l, 5u, 5u);
+
+    for (auto& value : x)
+      value = 42l;
+    CHECK(all(x == 42l));
+
+    auto it = x.begin();
+    for (auto value : y)
+      *it++ = value;
+    CHECK(all(x == 17l));
+
+    auto x_it = x.cbegin();
+    auto y_it = y.cbegin();
+    while (x_it != x.cend() && y_it != y.cend())
+      CHECK(*x_it++ == *y_it++);
+  }
+
+  SECTION("Number of rows and columns, size, and extents")
+  {
+    auto x = jules::matrix<>(5u, 20u);
+    CHECK(x.row_count() == 5u);
+    CHECK(x.column_count() == 20u);
+    CHECK(x.size() == 100u);
+    CHECK(jules::prod(x.extents()) == x.size());
+    CHECK(x.extents()[0] == 5u);
+    CHECK(x.extents()[1] == 20u);
+
+    // TODO: with C++17
+    // auto [nrow, ncol] = x.dimensions();
+    // CHECK(nrow == 10u);
+    // CHECK(ncol == 10u);
+  }
 }
