@@ -51,6 +51,7 @@ TEST_CASE("Vector tutorial", "[array]")
 
     CHECK(all(x == jules::as_vector(0, 1, 2, 3, 4, 5, 6, 7, 8, 9)));
     CHECK(all(x == jules::as_vector(values)));
+    CHECK(all(x == jules::as_vector(jules::matrix<long>(std::begin(values), 5u, 2u))));
     CHECK(all(even == jules::as_vector(0, 2, 4, 6, 8)));
     CHECK(all(odd == jules::as_vector(1, 3, 5, 7, 9)));
 
