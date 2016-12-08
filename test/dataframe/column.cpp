@@ -21,14 +21,14 @@ TEST_CASE("Column constructor using initializer list", "[dataframe]")
   REQUIRE(c_str_column.elements_type() == typeid(const char*));
   REQUIRE(toy_column.elements_type() == typeid(Toy));
 
-  REQUIRE(int_column.can_coerce_to<double>());
-  REQUIRE(int_column.can_coerce_to<std::string>());
+  REQUIRE(int_column.can_coerce<double>());
+  REQUIRE(int_column.can_coerce<std::string>());
 
-  REQUIRE(c_str_column.can_coerce_to<double>());
-  REQUIRE(c_str_column.can_coerce_to<std::string>());
+  REQUIRE(c_str_column.can_coerce<double>());
+  REQUIRE(c_str_column.can_coerce<std::string>());
 
-  REQUIRE(!toy_column.can_coerce_to<double>());
-  REQUIRE(!toy_column.can_coerce_to<std::string>());
+  REQUIRE(!toy_column.can_coerce<double>());
+  REQUIRE(!toy_column.can_coerce<std::string>());
 
   //   using jules::as_column;
   //   using jules::as_view;

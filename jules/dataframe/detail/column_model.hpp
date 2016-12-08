@@ -28,11 +28,11 @@ private:
   using base = generate_virtual_coercions<Eraser, Coercion, I - 1>;
 
 protected:
-  using base::coerce_to_;
-  using base::can_coerce_to_;
+  using base::coerce_;
+  using base::can_coerce_;
 
-  virtual column_interface_ptr coerce_to_(tag<type>) const = 0;
-  virtual bool can_coerce_to_(tag<type>) const = 0;
+  virtual column_interface_ptr coerce_(tag<type>) const = 0;
+  virtual bool can_coerce_(tag<type>) const = 0;
 
 public:
   ~generate_virtual_coercions() = default;
@@ -45,8 +45,8 @@ private:
   using type = typename Coercion::template type<0>;
 
 protected:
-  virtual column_interface_ptr coerce_to_(tag<type>) const = 0;
-  virtual bool can_coerce_to_(tag<type>) const = 0;
+  virtual column_interface_ptr coerce_(tag<type>) const = 0;
+  virtual bool can_coerce_(tag<type>) const = 0;
 
 public:
   ~generate_virtual_coercions() = default;
@@ -74,8 +74,8 @@ public:
   virtual column_interface_ptr clone() const = 0;
   virtual std::size_t size() const = 0;
 
-  template <typename T> column_interface_ptr coerce_to() const { return this->coerce_to_(tag<T>{}); }
-  template <typename T> bool can_coerce_to() const { return this->can_coerce_to_(tag<T>{}); }
+  template <typename T> column_interface_ptr coerce() const { return this->coerce_(tag<T>{}); }
+  template <typename T> bool can_coerce() const { return this->can_coerce_(tag<T>{}); }
 
   virtual std::type_index elements_type() const = 0;
 
@@ -83,11 +83,11 @@ public:
   template <typename T> const auto& downcast() const { return dynamic_cast<const column_model<T, coercion_rules>&>(*this); }
 
 protected:
-  using base::coerce_to_;
-  using base::can_coerce_to_;
+  using base::coerce_;
+  using base::can_coerce_;
 
-  template <typename T>[[noreturn]] column_interface_ptr coerce_to_(T) const { throw std::bad_cast{}; }
-  template <typename T> bool can_coerce_to_(T) const { return false; }
+  template <typename T>[[noreturn]] column_interface_ptr coerce_(T) const { throw std::bad_cast{}; }
+  template <typename T> bool can_coerce_(T) const { return false; }
 };
 
 // Default coercion rules.  If it is impossible to convert from T to type, this class is
@@ -99,9 +99,9 @@ private:
   using column_interface_ptr = std::unique_ptr<column_interface<Coercion>>;
 
 protected:
-  template <typename Iter>[[noreturn]] column_interface_ptr coerce_to_(Iter, Iter, tag<type>) const { throw std::bad_cast{}; }
+  template <typename Iter>[[noreturn]] column_interface_ptr coerce_(Iter, Iter, tag<type>) const { throw std::bad_cast{}; }
 
-  constexpr bool can_coerce_to_(tag<type>) const { return false; }
+  constexpr bool can_coerce_(tag<type>) const { return false; }
 };
 
 // User-defined coercion rules.  If it is possible to convert from T to type using ONLY a
@@ -117,7 +117,7 @@ private:
   using column_interface_ptr = std::unique_ptr<column_interface<Coercion>>;
 
 protected:
-  template <typename Iter> column_interface_ptr coerce_to_(Iter begin, Iter end, tag<type>) const
+  template <typename Iter> column_interface_ptr coerce_(Iter begin, Iter end, tag<type>) const
   {
     auto result = new column_model<type, Coercion>;
     auto d = defer([&result] { delete result; });
@@ -129,7 +129,7 @@ protected:
     return column_interface_ptr{move_ptr(result)};
   }
 
-  constexpr bool can_coerce_to_(tag<type>) const { return true; }
+  constexpr bool can_coerce_(tag<type>) const { return true; }
 };
 
 // Automatic coercion rules.  If it is possible to convert from T to type using a
@@ -142,7 +142,7 @@ private:
   using column_interface_ptr = std::unique_ptr<column_interface<Coercion>>;
 
 protected:
-  template <typename Iter> column_interface_ptr coerce_to_(Iter begin, Iter end, tag<type>) const
+  template <typename Iter> column_interface_ptr coerce_(Iter begin, Iter end, tag<type>) const
   {
     auto result = new column_model<type, Coercion>;
     auto d = defer([&result] { delete result; });
@@ -153,7 +153,7 @@ protected:
     return column_interface_ptr{move_ptr(result)};
   }
 
-  constexpr bool can_coerce_to_(tag<type>) const { return true; }
+  constexpr bool can_coerce_(tag<type>) const { return true; }
 };
 
 template <typename T, typename Coercion, std::size_t I>
@@ -168,14 +168,14 @@ private:
   using specific = specific_concrete_coercion<T, typename Coercion::template type<I>, Coercion, I>;
 
 protected:
-  using base::coerce_to_;
-  using base::can_coerce_to_;
-  using column_interface<Coercion>::coerce_to_;
-  using column_interface<Coercion>::can_coerce_to_;
+  using base::coerce_;
+  using base::can_coerce_;
+  using column_interface<Coercion>::coerce_;
+  using column_interface<Coercion>::can_coerce_;
 
-  column_interface_ptr coerce_to_(tag<type> tag) const final { return specific::coerce_to_(this->begin(), this->end(), tag); }
+  column_interface_ptr coerce_(tag<type> tag) const final { return specific::coerce_(this->begin(), this->end(), tag); }
 
-  bool can_coerce_to_(tag<type> tag) const final { return specific::can_coerce_to_(tag); }
+  bool can_coerce_(tag<type> tag) const final { return specific::can_coerce_(tag); }
 
 public:
   using generate_concrete_coercions<T, Coercion, I - 1>::generate_concrete_coercions;
@@ -197,12 +197,12 @@ private:
   using specific = specific_concrete_coercion<T, typename Coercion::template type<0>, Coercion, 0>;
 
 protected:
-  using column_interface<Coercion>::coerce_to_;
-  using column_interface<Coercion>::can_coerce_to_;
+  using column_interface<Coercion>::coerce_;
+  using column_interface<Coercion>::can_coerce_;
 
-  column_interface_ptr coerce_to_(tag<type> tag) const final { return specific::coerce_to_(this->begin(), this->end(), tag); }
+  column_interface_ptr coerce_(tag<type> tag) const final { return specific::coerce_(this->begin(), this->end(), tag); }
 
-  bool can_coerce_to_(tag<type> tag) const final { return specific::can_coerce_to_(tag); }
+  bool can_coerce_(tag<type> tag) const final { return specific::can_coerce_(tag); }
 
 public:
   using std::vector<T>::vector;

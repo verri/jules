@@ -24,14 +24,14 @@ TEST_CASE("Column model", "[dataframe]")
   CHECK(dcolumn->elements_type() != typeid(int));
   CHECK(icolumn->elements_type() != typeid(double));
 
-  CHECK(!icolumn->can_coerce_to<int>());
-  CHECK(icolumn->can_coerce_to<double>());
-  CHECK(!icolumn->can_coerce_to<unsigned int>());
-  CHECK(icolumn->can_coerce_to<std::string>());
+  CHECK(!icolumn->can_coerce<int>());
+  CHECK(icolumn->can_coerce<double>());
+  CHECK(!icolumn->can_coerce<unsigned int>());
+  CHECK(icolumn->can_coerce<std::string>());
 
-  CHECK(!dcolumn->can_coerce_to<int>());
-  CHECK(dcolumn->can_coerce_to<double>());
-  CHECK(dcolumn->can_coerce_to<std::string>());
+  CHECK(!dcolumn->can_coerce<int>());
+  CHECK(dcolumn->can_coerce<double>());
+  CHECK(dcolumn->can_coerce<std::string>());
 
   auto& ivec = icolumn->downcast<int>();
   ivec.resize(10);
@@ -43,14 +43,14 @@ TEST_CASE("Column model", "[dataframe]")
   std::vector<std::string> expected{"0.000000",  "3.141500",  "6.283000",  "9.424500",  "12.566000",
                                     "15.707500", "18.849000", "21.990500", "25.132000", "28.273500"};
 
-  auto scolumn = dcolumn->coerce_to<std::string>();
+  auto scolumn = dcolumn->coerce<std::string>();
   auto& svec = scolumn->downcast<std::string>();
 
   auto check = std::mismatch(svec.begin(), svec.end(), expected.begin());
   CHECK(check.first == svec.end());
   CHECK(check.second == expected.end());
 
-  auto back_to_dcolumn = scolumn->coerce_to<double>();
+  auto back_to_dcolumn = scolumn->coerce<double>();
   auto& back_to_dvec = back_to_dcolumn->downcast<double>();
 
   auto check_back = std::mismatch(dvec.begin(), dvec.end(), back_to_dvec.begin(), [](auto x, auto y) { return x == Approx(y); });
