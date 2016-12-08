@@ -44,6 +44,9 @@ int main()
   std::cout << "\nZeroing..." << std::endl;
   PrintInfo([&] { matrix() = 0.0; });
 
+  std::cout << "\nFast zeroing..." << std::endl;
+  PrintInfo([&] { matrix.fill(0.0); });
+
   std::cout << "\nFilling matrix using mixed indexing." << std::endl;
   PrintInfo([&] { matrix(seq(0u, N, 2u), slice(0u, 0u, 2u)) = 1.0; });
   PrintInfo([&] { matrix(slice(1u, 0u, 2u), seq(1u, N, 2u)) = 2.0; });

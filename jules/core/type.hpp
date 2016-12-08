@@ -113,6 +113,14 @@ template <typename T> struct recursive_initializer_list<T, 0> {
 
 template <typename T, std::size_t N> using recursive_initializer_list_t = typename recursive_initializer_list<T, N>::type;
 
+// In-place construction tag
+
+struct in_place_t {
+  constexpr explicit in_place_t() = default;
+};
+
+static constexpr in_place_t in_place{};
+
 } // namespace jules
 
 #endif // JULES_CORE_TYPE_H
