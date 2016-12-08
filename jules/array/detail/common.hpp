@@ -19,6 +19,7 @@ template <std::size_t> class base_slice;
 template <> class base_slice<1>;
 
 template <typename, std::size_t> class base_array;
+template <typename, std::size_t> class contiguous_array;
 template <typename, std::size_t> class ref_array;
 template <typename, std::size_t> class ind_array;
 
@@ -61,6 +62,9 @@ template <typename T> struct is_array : public std::false_type {
 };
 
 template <typename T, std::size_t N> struct is_array<base_array<T, N>> : public std::true_type {
+};
+
+template <typename T, std::size_t N> struct is_array<contiguous_array<T, N>> : public std::true_type {
 };
 
 template <typename T, std::size_t N> struct is_array<ref_array<T, N>> : public std::true_type {

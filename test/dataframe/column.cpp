@@ -34,26 +34,26 @@ TEST_CASE("Column constructor using initializer list", "[dataframe]")
   REQUIRE(!toy_column.can_coerce<string>());
 
   using jules::to_column;
-  //   using jules::as_view;
+  using jules::to_view;
 
   auto string_numbers = column{"1.0", "2.4", "3.3"};
   auto numeric_numbers = jules::to_column<numeric>(string_numbers);
-  //
-  //   auto v = as_view<numeric>(numeric_numbers);
-  //
-  //   CHECK(numeric_numbers.size() == v.size());
-  //   CHECK(!numeric_numbers.is_empty());
-  //
-  //   CHECK(v[0] == 1.0);
-  //   CHECK(v[1] == 2.4);
-  //   CHECK(v[2] == 3.3);
-  //
-  //   std::vector<numeric> tmp = {1.0, 2.0, 3.0};
-  //   column range_column(tmp);
-  //   CHECK(range_column.elements_type() == typeid(numeric));
-  //
-  //   static_assert(std::is_same<decltype(make_value(std::vector<numeric>{})), numeric>::value, "");
-  //   static_assert(std::is_same<decltype(make_value(v)), numeric>::value, "");
+
+  auto v = to_view<numeric>(numeric_numbers);
+
+  CHECK(numeric_numbers.size() == v.size());
+  CHECK(numeric_numbers.size() != 0u);
+
+  CHECK(v[0] == 1.0);
+  CHECK(v[1] == 2.4);
+  CHECK(v[2] == 3.3);
+
+  std::vector<numeric> tmp = {1.0, 2.0, 3.0};
+  column range_column(tmp);
+  CHECK(range_column.elements_type() == typeid(numeric));
+
+  static_assert(std::is_same<decltype(make_value(std::vector<numeric>{})), numeric>::value, "");
+  static_assert(std::is_same<decltype(make_value(v)), numeric>::value, "");
 }
 
 TEST_CASE("Column constructor inference", "[dataframe]")
@@ -77,24 +77,24 @@ TEST_CASE("Column constructor inference", "[dataframe]")
 //
 //   df.colbind(col);
 //   auto c = jules::as_column<numeric>(df.select(0));
-//   auto view = jules::as_view<numeric>(c);
-//   // auto impossible_view = jules::as_view<numeric>(jules::as_column<numeric>(df.select(0)));
+//   auto view = jules::to_view<numeric>(c);
+//   // auto impossible_view = jules::to_view<numeric>(jules::as_column<numeric>(df.select(0)));
 //
 //   for (std::size_t i = 0; i < df.rows_count(); ++i)
 //     CHECK(view[i] == i + 1);
 // }
 
-TEST_CASE("Column as_view vs as_vector", "[dataframe]")
+TEST_CASE("Column to_view vs as_vector", "[dataframe]")
 {
-  //   auto col = jules::column{{0, 1, 2, 3, 4, 5}};
-  //
-  //   auto view1 = jules::as_view<int>(col);
-  //   auto view2 = jules::as_view<int>(col);
-  //   auto vector = jules::as_vector<int>(col);
-  //
-  //   for (int i : jules::slice(0, col.size())) {
-  //     view1[i] = -1;
-  //     CHECK(view2[i] == -1);
-  //     CHECK(vector[i] == i);
-  //   }
+  auto col = jules::column{{0, 1, 2, 3, 4, 5}};
+
+  auto view1 = jules::to_view<int>(col);
+  auto view2 = jules::to_view<int>(col);
+  auto vector = jules::to_vector<int>(col);
+
+  for (int i : jules::slice(0, col.size())) {
+    view1[i] = -1;
+    CHECK(view2[i] == -1);
+    CHECK(vector[i] == i);
+  }
 }
