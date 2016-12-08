@@ -1,7 +1,7 @@
 SUFFIXES += .d
 
 SRC = array/slice.cpp array/ref_array.cpp array/ind_array.cpp array/array.cpp \
-			array/vector.cpp array/matrix.cpp
+			array/vector.cpp array/matrix.cpp array/blas.cpp
 
 # SRC = array/array_detail.cpp array/array.cpp array/slice.cpp \
 # 	dataframe/column.cpp dataframe/dataframe.cpp dataframe/column_detail.cpp \
@@ -11,6 +11,7 @@ OBJ := $(SRC:.cpp=.o) test_suite.o
 DEP := $(SRC:.cpp=.d) test_suite.d
 
 CXXFLAGS += -std=c++14 -O2 -Wall -Wextra -I.. -isystem../third_party/Catch/single_include
+LDFLAGS += -lblas
 
 NODEPS = clean
 
