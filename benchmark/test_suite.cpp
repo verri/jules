@@ -2,27 +2,12 @@
 #include "jules/array/all.hpp"
 
 #include <chrono>
+#include <iostream>
 
 constexpr auto N = 10000u;
 
 void f(void*) {}
 static volatile auto use = f;
-
-template <typename T> std::ostream& operator<<(std::ostream& os, const jules::ref_array<T, 1>& array)
-{
-  os << "{ ";
-  for (const auto& value : array)
-    os << value << ' ';
-  return os << '}';
-}
-
-template <typename T, std::size_t N> std::ostream& operator<<(std::ostream& os, const jules::ref_array<T, N>& array)
-{
-  os << "{ ";
-  for (auto i = 0u; i < array.row_count(); ++i)
-    os << array[i] << ' ';
-  return os << '}';
-}
 
 int main()
 {
