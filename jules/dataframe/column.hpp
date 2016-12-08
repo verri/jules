@@ -12,6 +12,10 @@
 namespace jules
 {
 
+template <typename Coercion> class base_column;
+template <typename T, typename C> auto to_column(const base_column<C>& column) -> base_column<C>;
+template <typename T, typename C> auto to_column(base_column<C>&& column) -> base_column<C>;
+
 template <typename Coercion> class base_column
 {
   template <typename T> using model_t = detail::column_model<T, Coercion>;
@@ -103,7 +107,12 @@ public:
     return model.data();
   }
 
+  template <typename T, typename C> friend auto to_column(const base_column<C>& column) -> base_column<C>;
+  template <typename T, typename C> friend auto to_column(base_column<C>&& column) -> base_column<C>;
+
 private:
+  base_column(string name, model_ptr_t&& model) : name_{std::move(name)}, model_{std::move(model)} {}
+
   string name_;
   model_ptr_t model_;
 };
