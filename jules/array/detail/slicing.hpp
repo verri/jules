@@ -23,32 +23,54 @@ namespace detail
 // Accessor helpers
 
 template <std::size_t N> struct slice_accessor {
-  static auto extent(const base_slice<N>& slice, index_t i) { return slice.extents[i]; }
-  static auto stride(const base_slice<N>& slice, index_t i) { return slice.strides[i]; }
-  static auto extent(base_slice<N>& slice, index_t i) -> index_t& { return slice.extents[i]; }
-  static auto stride(base_slice<N>& slice, index_t i) -> index_t& { return slice.strides[i]; }
+  static constexpr auto extent(const base_slice<N>& slice, index_t i) { return slice.extents[i]; }
+  static constexpr auto stride(const base_slice<N>& slice, index_t i) { return slice.strides[i]; }
+  static constexpr auto extent(base_slice<N>& slice, index_t i) -> index_t& { return slice.extents[i]; }
+  static constexpr auto stride(base_slice<N>& slice, index_t i) -> index_t& { return slice.strides[i]; }
+  static constexpr auto extents(const base_slice<N>& slice) { return slice.extents; }
+  static constexpr auto strides(const base_slice<N>& slice) { return slice.strides; }
+  static constexpr auto extents(base_slice<N>& slice) -> std::array<index_t, N>& { return slice.extents; }
+  static constexpr auto strides(base_slice<N>& slice) -> std::array<index_t, N>& { return slice.strides; }
 };
 
 template <> struct slice_accessor<1> {
-  static auto extent(const base_slice<1>& slice, index_t) { return slice.extent; }
-  static auto stride(const base_slice<1>& slice, index_t) { return slice.stride; }
-  static auto extent(base_slice<1>& slice, index_t) -> index_t& { return slice.extent; }
-  static auto stride(base_slice<1>& slice, index_t) -> index_t& { return slice.stride; }
+  static constexpr auto extent(const base_slice<1>& slice, index_t) { return slice.extent; }
+  static constexpr auto stride(const base_slice<1>& slice, index_t) { return slice.stride; }
+  static constexpr auto extent(base_slice<1>& slice, index_t) -> index_t& { return slice.extent; }
+  static constexpr auto stride(base_slice<1>& slice, index_t) -> index_t& { return slice.stride; }
+  static constexpr auto extents(const base_slice<1>& slice) { return slice.extent; }
+  static constexpr auto strides(const base_slice<1>& slice) { return slice.stride; }
+  static constexpr auto extents(base_slice<1>& slice) -> index_t& { return slice.extent; }
+  static constexpr auto strides(base_slice<1>& slice) -> index_t& { return slice.stride; }
 };
 
-template <std::size_t N> auto extent(const base_slice<N>& slice, index_t i = 0u) { return slice_accessor<N>::extent(slice, i); }
-
-template <std::size_t N> auto stride(const base_slice<N>& slice, index_t i = 0u) { return slice_accessor<N>::stride(slice, i); }
-
-template <std::size_t N> auto extent(base_slice<N>& slice, index_t i = 0u) -> index_t&
+template <std::size_t N> constexpr auto extent(const base_slice<N>& slice, index_t i = 0u)
 {
   return slice_accessor<N>::extent(slice, i);
 }
 
-template <std::size_t N> auto stride(base_slice<N>& slice, index_t i = 0u) -> index_t&
+template <std::size_t N> constexpr auto stride(const base_slice<N>& slice, index_t i = 0u)
 {
   return slice_accessor<N>::stride(slice, i);
 }
+
+template <std::size_t N> constexpr auto extent(base_slice<N>& slice, index_t i = 0u) -> index_t&
+{
+  return slice_accessor<N>::extent(slice, i);
+}
+
+template <std::size_t N> constexpr auto stride(base_slice<N>& slice, index_t i = 0u) -> index_t&
+{
+  return slice_accessor<N>::stride(slice, i);
+}
+
+template <std::size_t N> constexpr auto extents(const base_slice<N>& slice) { return slice_accessor<N>::extents(slice); }
+
+template <std::size_t N> constexpr auto strides(const base_slice<N>& slice) { return slice_accessor<N>::strides(slice); }
+
+template <std::size_t N> constexpr decltype(auto) extents(base_slice<N>& slice) { return slice_accessor<N>::extents(slice); }
+
+template <std::size_t N> constexpr decltype(auto) strides(base_slice<N>& slice) { return slice_accessor<N>::strides(slice); }
 
 static inline auto drop(const std::array<index_t, 1>& array) { return array[0]; }
 
@@ -216,7 +238,7 @@ std::pair<std::array<index_t, N>, std::vector<index_t>> indirect_slicing(const b
   static_assert(sizeof...(args) == N, "invalid number of arguments");
 
   std::pair<std::array<index_t, N>, std::vector<index_t>> result;
-  result.second.resize(slicing_size<0>(undrop(slice.dimensions()), std::forward<Args>(args)...));
+  result.second.resize(slicing_size<0>(undrop(extents(slice)), std::forward<Args>(args)...));
 
   do_slice(result.first, result.second, slice, std::array<index_t, 0>{}, std::array<index_t, 0>{}, std::forward<Args>(args)...);
 

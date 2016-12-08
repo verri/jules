@@ -89,7 +89,7 @@ public:
   auto cend() const -> iterator { return {it_last_, this}; }
 
   auto descriptor() const { return std::make_tuple(it_first_, it_last_, extents()); }
-  auto extents() const { return descriptor_.dimensions(); }
+  auto extents() const { return detail::extents(descriptor_); }
   auto size() const { return descriptor_.size(); }
 
 private:
