@@ -19,12 +19,43 @@ template <typename Coercion> class base_column
   using model_ptr_t = std::unique_ptr<interface_t>;
 
 public:
-  template <typename T> base_column(string name, std::initializer_list<T> values);
-  template <typename T> base_column(string name, const T& value, index_t size);
-  template <typename T> base_column(std::initializer_list<T> values);
-  template <typename T> base_column(const T& value, index_t size);
-  template <typename Rng, typename R = range::range_value_t<Rng>> base_column(string name, const Rng& rng);
-  template <typename Rng, typename R = range::range_value_t<Rng>> base_column(const Rng& rng);
+  template <typename T>
+  base_column(string name, std::initializer_list<T> values) : name_{std::move(name)}, model_{std::make_unique<model_t<T>>(values)}
+  {
+  }
+
+  template <typename T>
+  base_column(string name, const T& value, index_t size)
+    : name_{std::move(name)}, model_{std::make_unique<model_t<T>>(size, value)}
+  {
+  }
+
+  template <typename T> base_column(std::initializer_list<T> values) : model_{std::make_unique<model_t<T>>(values)} {}
+
+  template <typename T> base_column(const T& value, index_t size) : model_{std::make_unique<model_t<T>>(size, value)} {}
+
+  template <typename Rng, typename R = range::range_value_t<Rng>, CONCEPT_REQUIRES_(range::Range<Rng>())>
+  base_column(string name, const Rng& rng)
+    : name_{std::move(name)}, model_{std::make_unique<model_t<R>>(range::begin(rng), range::end(rng))}
+  {
+  }
+
+  template <typename Rng, typename R = range::range_value_t<Rng>, CONCEPT_REQUIRES_(range::Range<Rng>())>
+  base_column(const Rng& rng) : model_{std::make_unique<model_t<R>>(range::begin(rng), range::end(rng))}
+  {
+  }
+
+  template <typename Iter, typename Sent, typename R = range::iterator_value_t<Iter>,
+            CONCEPT_REQUIRES_(range::Sentinel<Sent, Iter>())>
+  base_column(string name, Iter first, Sent last) : name_{std::move(name)}, model_{std::make_unique<model_t<R>>(first, last)}
+  {
+  }
+
+  template <typename Iter, typename Sent, typename R = range::iterator_value_t<Iter>,
+            CONCEPT_REQUIRES_(range::Sentinel<Sent, Iter>())>
+  base_column(Iter first, Sent last) : model_{std::make_unique<model_t<R>>(first, last)}
+  {
+  }
 
   base_column(const base_column& source);
   base_column(base_column&& source) noexcept = default;
