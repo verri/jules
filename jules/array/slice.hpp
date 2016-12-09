@@ -136,7 +136,7 @@ public:
   /// Effectively the product of the extents.
   constexpr auto size() const { return prod(extents); }
 
-  constexpr auto dimensions() const { return extents; }
+  [[deprecated("to be removed in v0.2 series")]] constexpr auto dimensions() const { return extents; }
 
   /// \group Index
   /// Returns the memory position of the index.
@@ -282,7 +282,7 @@ public:
   /// Effectively the product of the extents.
   constexpr auto size() const { return extent; }
 
-  constexpr auto dimensions() const { return extent; }
+  [[deprecated("to be removed in v0.2 series")]] constexpr auto dimensions() const { return extent; }
 
   /// \group Index
   /// Returns the memory position of the `index`.

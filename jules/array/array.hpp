@@ -175,6 +175,22 @@ public:
     return *this;
   }
 
+  /// \group Fill
+  /// Fills the array.
+  auto fill(const T& value)
+  {
+    for (auto& elem : *this)
+      elem = value;
+  }
+
+  /// \group Fill
+  template <typename... Args> auto fill(in_place_t, Args&&... args)
+  {
+    DEBUG_ASSERT(this->data(), debug::module{}, debug::level::invalid_state, "array is empty");
+    detail::array_allocator<T>::destroy(detail::trivial_dispatch<T>(), this->data(), this->size());
+    detail::array_allocator<T>::create(detail::trivial_dispatch<T>(), this->data(), this->size(), std::forward<Args>(args)...);
+  }
+
   /// \group Begin
   /// Returns an iterator to the first element of the array.
   auto begin() -> iterator { return this->data(); }
@@ -396,6 +412,22 @@ public:
     clear(old_data, old_size);
 
     return *this;
+  }
+
+  /// \group Fill
+  /// Fills the array.
+  auto fill(const T& value)
+  {
+    for (auto& elem : *this)
+      elem = value;
+  }
+
+  /// \group Fill
+  template <typename... Args> auto fill(in_place_t, Args&&... args)
+  {
+    DEBUG_ASSERT(this->data(), debug::module{}, debug::level::invalid_state, "array is empty");
+    detail::array_allocator<T>::destroy(detail::trivial_dispatch<T>(), this->data(), this->size());
+    detail::array_allocator<T>::create(detail::trivial_dispatch<T>(), this->data(), this->size(), std::forward<Args>(args)...);
   }
 
   /// \group Begin

@@ -4,7 +4,7 @@
 
 #include <vector>
 
-TEST_CASE("indirect array", "[ind_array]")
+TEST_CASE("Basic indirect array functionalities", "[array]")
 {
   using jules::base_slice;
   using jules::ind_array;

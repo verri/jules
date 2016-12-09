@@ -2,27 +2,12 @@
 #include "jules/array/all.hpp"
 
 #include <chrono>
+#include <iostream>
 
 constexpr auto N = 10000u;
 
 void f(void*) {}
 static volatile auto use = f;
-
-template <typename T> std::ostream& operator<<(std::ostream& os, const jules::ref_array<T, 1>& array)
-{
-  os << "{ ";
-  for (const auto& value : array)
-    os << value << ' ';
-  return os << '}';
-}
-
-template <typename T, std::size_t N> std::ostream& operator<<(std::ostream& os, const jules::ref_array<T, N>& array)
-{
-  os << "{ ";
-  for (auto i = 0u; i < array.row_count(); ++i)
-    os << array[i] << ' ';
-  return os << '}';
-}
 
 int main()
 {
@@ -58,6 +43,9 @@ int main()
 
   std::cout << "\nZeroing..." << std::endl;
   PrintInfo([&] { matrix() = 0.0; });
+
+  std::cout << "\nFast zeroing..." << std::endl;
+  PrintInfo([&] { matrix.fill(0.0); });
 
   std::cout << "\nFilling matrix using mixed indexing." << std::endl;
   PrintInfo([&] { matrix(seq(0u, N, 2u), slice(0u, 0u, 2u)) = 1.0; });

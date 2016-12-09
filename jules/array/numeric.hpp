@@ -45,9 +45,15 @@ template <typename T, typename Array> auto to_vector(Array&& array) -> array_req
 }
 
 template <typename Rng, typename R = range::range_value_t<Rng>, CONCEPT_REQUIRES_(range::Range<Rng>())>
-auto as_vector(const Rng& rng) -> vector<R>
+auto as_vector(const Rng& rng) -> array_fallback<vector<R>, Rng>
 {
   return to_vector<R>(rng);
+}
+
+// If higher order, copy elements column-wise.
+template <typename Array> auto as_vector(Array&& array) -> array_request<vector<typename Array::value_type>, std::decay_t<Array>>
+{
+  return {array.begin(), array.end()};
 }
 
 template <typename... Args, typename = std::enable_if_t<(sizeof...(Args) > 1)>> auto as_vector(Args&&... args)
