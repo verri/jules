@@ -1,6 +1,40 @@
 // Copyright (c) 2016 Filipe Verri <filipeverri@gmail.com>
 
+#ifndef JULES_DATAFRAME_DATAFRAME_H
 #define JULES_DATAFRAME_DATAFRAME_H
+
+#include <jules/core/type.hpp>
+#include <jules/dataframe/column.hpp>
+
+#include <unordered_map>
+
+namespace jules
+{
+
+template <typename Coercion> class base_dataframe
+{
+public:
+  using column_type = base_column<Coercion>;
+
+  base_dataframe() = default;
+
+  operator bool() const { return column_count() > 0; }
+
+  auto row_count() const { return row_count_; }
+  auto column_count() const { return columns_.size(); }
+
+private:
+  index_t row_count_ = 0u;
+  std::vector<column_type> columns_;
+  std::unordered_map<string, index_t> indexes_;
+};
+
+using dataframe = base_dataframe<coercion_rules>;
+
+} // namespace jules
+
+#endif // JULES_DATAFRAME_DATAFRAME_H
+
 #ifndef JULES_DATAFRAME_DATAFRAME_H
 
 #include <jules/dataframe/dataframe_decl.hpp>
