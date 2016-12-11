@@ -2,6 +2,8 @@
 
 #include <catch.hpp>
 
+#include <vector>
+
 TEST_CASE("Null dataframe", "[dataframe]")
 {
   using jules::dataframe;
@@ -119,14 +121,22 @@ TEST_CASE("Invalid dataframe exception", "[dataframe]")
 
 TEST_CASE("Constructing a dataframe from a range of columns", "[dataframe]")
 {
-  //   using jules::column;
-  //   using jules::dataframe;
+  using jules::column;
+  using jules::dataframe;
 
-  //   auto columns = std::vector<column>{
-  //     {"a", {1, 2, 3}}, {"b", {'a', 'b', 'c'}}, {"c", {1.0, 2.0, 3.0}},
-  //   };
+  auto columns = std::vector<column>{
+    {"a", {1, 2, 3}}, {"b", {'a', 'b', 'c'}}, {"c", {1.0, 2.0, 3.0}},
+  };
 
-  //   auto df = dataframe(columns);
+  auto df = dataframe(columns);
+
+  CHECK(df.row_count() == 3u);
+  CHECK(df.column_count() == 3u);
+
+  auto df2 = dataframe(columns.begin() + 1, columns.end());
+
+  CHECK(df2.row_count() == 3u);
+  CHECK(df2.column_count() == 2u);
 
   //   CHECK(df.select("a").elements_type() == columns[0].elements_type());
   //   CHECK(df.select("b").elements_type() == columns[1].elements_type());

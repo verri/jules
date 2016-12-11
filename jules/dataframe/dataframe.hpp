@@ -3,9 +3,11 @@
 #ifndef JULES_DATAFRAME_DATAFRAME_H
 #define JULES_DATAFRAME_DATAFRAME_H
 
+#include <jules/core/range.hpp>
 #include <jules/core/type.hpp>
 #include <jules/dataframe/column.hpp>
 
+#include <algorithm>
 #include <unordered_map>
 
 namespace jules
@@ -18,10 +20,85 @@ public:
 
   base_dataframe() = default;
 
+  base_dataframe(std::initializer_list<column_type> columns) : base_dataframe(columns.begin(), columns.end(), columns.size()) {}
+
+  template <typename Rng, typename R = range::range_value_t<Rng>,
+            typename = std::enable_if_t<std::is_convertible<R, column_type>::value>, CONCEPT_REQUIRES_(range::Range<Rng>())>
+  base_dataframe(const Rng& rng) : base_dataframe(range::begin(rng), range::end(rng), range::size(rng))
+  {
+  }
+
+  template <typename Iter, typename Sent, typename R = range::iterator_value_t<Iter>,
+            typename = std::enable_if_t<std::is_convertible<R, column_type>::value>,
+            CONCEPT_REQUIRES_(range::Sentinel<Sent, Iter>()), CONCEPT_REQUIRES_(range::InputIterator<Iter>())>
+  base_dataframe(Iter first, Sent last) : base_dataframe(first, last, 0u)
+  {
+  }
+
+  template <typename Iter, typename Sent, typename R = range::iterator_value_t<Iter>,
+            typename = std::enable_if_t<std::is_convertible<R, column_type>::value>,
+            CONCEPT_REQUIRES_(range::Sentinel<Sent, Iter>()), CONCEPT_REQUIRES_(!range::InputIterator<Iter>())>
+  base_dataframe(Iter first, Sent last) : base_dataframe(first, last, range::distance(first, last))
+  {
+  }
+
+  template <typename Iter, typename Sent, typename R = range::iterator_value_t<Iter>,
+            typename = std::enable_if_t<std::is_convertible<R, column_type>::value>,
+            CONCEPT_REQUIRES_(range::Sentinel<Sent, Iter>())>
+  base_dataframe(Iter first, Sent last, index_t size_hint)
+  {
+    columns_.reserve(size_hint);
+
+    columns_.push_back(*first);
+    row_count_ = columns_.back().size();
+
+    auto ok = std::all_of(++first, last, [this](auto&& column) {
+      columns_.push_back(std::forward<decltype(column)>(column));
+      return columns_.back().size() == row_count_;
+    });
+
+    if (!ok)
+      throw std::runtime_error{"columns size mismatch"};
+
+    index_t i = 0;
+    for (auto& column : columns_) {
+      auto& colname = column.name();
+      if (!colname.empty()) {
+        if (indexes_.find(colname) != indexes_.end())
+          throw std::runtime_error{"repeated column name"};
+        indexes_[colname] = i++;
+      }
+    }
+  }
+
+  base_dataframe(const base_dataframe& source) = default;
+  base_dataframe(base_dataframe&& source) noexcept = default;
+
+  auto operator=(const base_dataframe& source) -> base_dataframe& = default;
+  auto operator=(base_dataframe&& source) noexcept -> base_dataframe& = default;
+
   operator bool() const { return column_count() > 0; }
 
   auto row_count() const { return row_count_; }
   auto column_count() const { return columns_.size(); }
+
+  auto begin() { return columns_.begin(); }
+  auto end() { return columns_.end(); }
+
+  auto begin() const { return columns_.begin(); }
+  auto end() const { return columns_.end(); }
+
+  auto cbegin() const { return columns_.cbegin(); }
+  auto cend() const { return columns_.cend(); }
+
+  auto rbegin() { return columns_.rbegin(); }
+  auto rend() { return columns_.rend(); }
+
+  auto rbegin() const { return columns_.rbegin(); }
+  auto rend() const { return columns_.rend(); }
+
+  auto crbegin() const { return columns_.crbegin(); }
+  auto crend() const { return columns_.crend(); }
 
 private:
   index_t row_count_ = 0u;
@@ -46,51 +123,6 @@ using dataframe = base_dataframe<coercion_rules>;
 
 namespace jules
 {
-template <typename Coercion> base_dataframe<Coercion>::base_dataframe(std::initializer_list<column_t> columns)
-{
-  auto size = columns.begin()->size();
-  if (!std::all_of(columns.begin() + 1, columns.end(), [size](auto& col) { return col.size() == size; }))
-    throw std::runtime_error{"columns size mismatch"};
-
-  nrow_ = size;
-  columns_.assign(columns.begin(), columns.end());
-
-  std::size_t i = 0;
-  for (auto& column : columns_) {
-    auto& colname = column.name();
-    if (!colname.empty()) {
-      if (colindexes_.find(colname) != colindexes_.end())
-        throw std::runtime_error{"repeated column name"};
-      colindexes_[colname] = i++;
-    }
-  }
-}
-
-template <typename Coercion>
-template <typename Range, typename, typename>
-base_dataframe<Coercion>::base_dataframe(const Range& rng)
-{
-  // TODO: specialize this construction to reserve size when rng knows its size.
-  std::vector<column_t> columns;
-  jules::range::copy(rng, std::back_inserter(columns));
-
-  auto size = columns.begin()->size();
-  if (!std::all_of(columns.begin() + 1, columns.end(), [size](auto& col) { return col.size() == size; }))
-    throw std::runtime_error{"columns size mismatch"};
-
-  nrow_ = size;
-  columns_.assign(columns.begin(), columns.end());
-
-  std::size_t i = 0;
-  for (auto& column : columns_) {
-    auto& colname = column.name();
-    if (!colname.empty()) {
-      if (colindexes_.find(colname) != colindexes_.end())
-        throw std::runtime_error{"repeated column name"};
-      colindexes_[colname] = i++;
-    }
-  }
-}
 
 template <typename Coercion> template <typename T> auto base_dataframe<Coercion>::columns() -> vector<base_column_view<T>>
 {
