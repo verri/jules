@@ -11,7 +11,7 @@ namespace jules
 template <typename T, typename C> auto to_column(const base_column<C>& column) -> base_column<C>
 {
   auto new_model = column.model_->template coerce<T>();
-  return {column.name(), std::move(new_model)};
+  return std::move(new_model);
 }
 
 template <typename T, typename C> auto to_column(base_column<C>&& column) -> base_column<C>

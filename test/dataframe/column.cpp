@@ -16,9 +16,9 @@ TEST_CASE("Column constructor using initializer list", "[dataframe]")
   struct Toy {
   };
 
-  auto int_column = column{"int", {1, 2, 3, 4, 5}};
-  auto c_str_column = column("char*", {"hello", "world"});
-  auto toy_column = column("toy", {Toy{}, Toy{}});
+  auto int_column = column{1, 2, 3, 4, 5};
+  auto c_str_column = column{"hello", "world"};
+  auto toy_column = column{Toy{}, Toy{}};
 
   REQUIRE(int_column.elements_type() == typeid(int));
   REQUIRE(c_str_column.elements_type() == typeid(const char*));
@@ -65,7 +65,7 @@ TEST_CASE("Column constructor inference", "[dataframe]")
 
   auto check_column = [](const column& col, const auto& value) { REQUIRE(col.elements_type() == value); };
 
-  check_column({"int", {1, 2, 3}}, typeid(int));
+  check_column({1, 2, 3}, typeid(int));
   check_column({1.0, 2.0, 3.0, 1.0}, typeid(numeric));
   check_column({"1.0"s, "2.0"s, "3.0"s, "1.0"s}, typeid(string));
 }

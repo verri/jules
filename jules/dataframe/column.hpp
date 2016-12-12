@@ -23,35 +23,12 @@ template <typename Coercion> class base_column
   using model_ptr_t = std::unique_ptr<interface_t>;
 
 public:
-  template <typename T>
-  base_column(string name, std::initializer_list<T> values) : name_{std::move(name)}, model_{std::make_unique<model_t<T>>(values)}
-  {
-  }
-
-  template <typename T>
-  base_column(string name, const T& value, index_t size)
-    : name_{std::move(name)}, model_{std::make_unique<model_t<T>>(size, value)}
-  {
-  }
-
   template <typename T> base_column(std::initializer_list<T> values) : model_{std::make_unique<model_t<T>>(values)} {}
 
   template <typename T> base_column(const T& value, index_t size) : model_{std::make_unique<model_t<T>>(size, value)} {}
 
   template <typename Rng, typename R = range::range_value_t<Rng>, CONCEPT_REQUIRES_(range::Range<Rng>())>
-  base_column(string name, const Rng& rng)
-    : name_{std::move(name)}, model_{std::make_unique<model_t<R>>(range::begin(rng), range::end(rng))}
-  {
-  }
-
-  template <typename Rng, typename R = range::range_value_t<Rng>, CONCEPT_REQUIRES_(range::Range<Rng>())>
   base_column(const Rng& rng) : model_{std::make_unique<model_t<R>>(range::begin(rng), range::end(rng))}
-  {
-  }
-
-  template <typename Iter, typename Sent, typename R = range::iterator_value_t<Iter>,
-            CONCEPT_REQUIRES_(range::Sentinel<Sent, Iter>())>
-  base_column(string name, Iter first, Sent last) : name_{std::move(name)}, model_{std::make_unique<model_t<R>>(first, last)}
   {
   }
 
@@ -61,13 +38,12 @@ public:
   {
   }
 
-  base_column(const base_column& source) : name_{source.name_}, model_{std::move(source.model_->clone())} {}
+  base_column(const base_column& source) : model_{std::move(source.model_->clone())} {}
 
   base_column(base_column&& source) noexcept = default;
 
   auto operator=(const base_column& source) -> base_column&
   {
-    name_ = source.name_;
     model_ = std::move(source.model_->clone());
     return *this;
   }
@@ -87,9 +63,6 @@ public:
   auto size() const { return model_->size(); }
   auto extents() const { return size(); }
   auto length() const { return size(); }
-
-  auto name() -> string& { return name_; }
-  auto name() const -> const string& { return name_; }
 
   template <typename T> auto data()
   {
@@ -111,9 +84,8 @@ public:
   template <typename T, typename C> friend auto to_column(base_column<C>&& column) -> base_column<C>;
 
 private:
-  base_column(string name, model_ptr_t&& model) : name_{std::move(name)}, model_{std::move(model)} {}
+  base_column(model_ptr_t&& model) : model_{std::move(model)} {}
 
-  string name_;
   model_ptr_t model_;
 };
 
