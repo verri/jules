@@ -124,7 +124,7 @@ TEST_CASE("Constructing a dataframe from a range of columns", "[dataframe]")
   using jules::column;
   using jules::dataframe;
 
-  auto columns = std::vector<column>{
+  auto columns = std::vector<dataframe::named_column_type>{
     {"a", {1, 2, 3}}, {"b", {'a', 'b', 'c'}}, {"c", {1.0, 2.0, 3.0}},
   };
 

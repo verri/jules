@@ -17,56 +17,63 @@ template <typename Coercion> class base_dataframe
 {
 public:
   using column_type = base_column<Coercion>;
+  struct named_column_type {
+    string name;
+    column_type column;
+  };
 
   base_dataframe() = default;
 
-  base_dataframe(std::initializer_list<column_type> columns) : base_dataframe(columns.begin(), columns.end(), columns.size()) {}
+  base_dataframe(std::initializer_list<named_column_type> elements)
+    : base_dataframe(elements.begin(), elements.end(), elements.size())
+  {
+  }
 
   template <typename Rng, typename R = range::range_value_t<Rng>,
-            typename = std::enable_if_t<std::is_convertible<R, column_type>::value>, CONCEPT_REQUIRES_(range::Range<Rng>())>
+            typename = std::enable_if_t<std::is_convertible<R, named_column_type>::value>, CONCEPT_REQUIRES_(range::Range<Rng>())>
   base_dataframe(const Rng& rng) : base_dataframe(range::begin(rng), range::end(rng), range::size(rng))
   {
   }
 
   template <typename Iter, typename Sent, typename R = range::iterator_value_t<Iter>,
-            typename = std::enable_if_t<std::is_convertible<R, column_type>::value>,
-            CONCEPT_REQUIRES_(range::Sentinel<Sent, Iter>()), CONCEPT_REQUIRES_(range::InputIterator<Iter>())>
+            typename = std::enable_if_t<std::is_convertible<R, named_column_type>::value>,
+            CONCEPT_REQUIRES_(range::Sentinel<Sent, Iter>() && range::InputIterator<Iter>())>
   base_dataframe(Iter first, Sent last) : base_dataframe(first, last, 0u)
   {
   }
 
   template <typename Iter, typename Sent, typename R = range::iterator_value_t<Iter>,
-            typename = std::enable_if_t<std::is_convertible<R, column_type>::value>,
-            CONCEPT_REQUIRES_(range::Sentinel<Sent, Iter>()), CONCEPT_REQUIRES_(!range::InputIterator<Iter>())>
+            typename = std::enable_if_t<std::is_convertible<R, named_column_type>::value>,
+            CONCEPT_REQUIRES_(range::Sentinel<Sent, Iter>() && !range::InputIterator<Iter>())>
   base_dataframe(Iter first, Sent last) : base_dataframe(first, last, range::distance(first, last))
   {
   }
 
   template <typename Iter, typename Sent, typename R = range::iterator_value_t<Iter>,
-            typename = std::enable_if_t<std::is_convertible<R, column_type>::value>,
+            typename = std::enable_if_t<std::is_convertible<R, named_column_type>::value>,
             CONCEPT_REQUIRES_(range::Sentinel<Sent, Iter>())>
   base_dataframe(Iter first, Sent last, index_t size_hint)
   {
-    columns_.reserve(size_hint);
+    elements_.reserve(size_hint);
 
-    columns_.push_back(*first);
-    row_count_ = columns_.back().size();
+    elements_.push_back(*first);
+    row_count_ = elements_.back().column.size();
 
     auto ok = std::all_of(++first, last, [this](auto&& column) {
-      columns_.push_back(std::forward<decltype(column)>(column));
-      return columns_.back().size() == row_count_;
+      elements_.push_back(std::forward<decltype(column)>(column));
+      return elements_.back().column.size() == row_count_;
     });
 
     if (!ok)
       throw std::runtime_error{"columns size mismatch"};
 
     index_t i = 0;
-    for (auto& column : columns_) {
-      auto& colname = column.name();
-      if (!colname.empty()) {
-        if (indexes_.find(colname) != indexes_.end())
+    for (auto& element : elements_) {
+      auto& name = element.name;
+      if (!name.empty()) {
+        if (indexes_.find(name) != indexes_.end())
           throw std::runtime_error{"repeated column name"};
-        indexes_[colname] = i++;
+        indexes_[name] = i++;
       }
     }
   }
@@ -80,29 +87,11 @@ public:
   operator bool() const { return column_count() > 0; }
 
   auto row_count() const { return row_count_; }
-  auto column_count() const { return columns_.size(); }
-
-  auto begin() { return columns_.begin(); }
-  auto end() { return columns_.end(); }
-
-  auto begin() const { return columns_.begin(); }
-  auto end() const { return columns_.end(); }
-
-  auto cbegin() const { return columns_.cbegin(); }
-  auto cend() const { return columns_.cend(); }
-
-  auto rbegin() { return columns_.rbegin(); }
-  auto rend() { return columns_.rend(); }
-
-  auto rbegin() const { return columns_.rbegin(); }
-  auto rend() const { return columns_.rend(); }
-
-  auto crbegin() const { return columns_.crbegin(); }
-  auto crend() const { return columns_.crend(); }
+  auto column_count() const { return elements_.size(); }
 
 private:
   index_t row_count_ = 0u;
-  std::vector<column_type> columns_;
+  std::vector<named_column_type> elements_;
   std::unordered_map<string, index_t> indexes_;
 };
 
