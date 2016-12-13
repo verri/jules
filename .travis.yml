@@ -1,0 +1,11 @@
+install: make get-deps git
+language: cpp
+compiler:
+  - clang
+  - gcc
+script:
+  - git submodule init
+  - git submodule update
+  - git clone https://github.com/ericniebler/range-v3.git third_party/
+  - git clone https://github.com/foonathan/debug_assert.git
+  - CXXFLAGS="-isystem../third_party/range-v3/include -isystem../third_party/range-v3/include" make test
