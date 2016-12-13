@@ -34,4 +34,4 @@ install:
   - git clone https://github.com/foonathan/debug_assert.git third_party/debug_assert
 
 script:
-  - CXXFLAGS="-isystem../third_party/range-v3/include -isystem../third_party/debug_assert" make test
+  - CXXFLAGS="-isystem../third_party/range-v3/include -isystem../third_party/debug_assert" LDFLAGS="-L/usr/lib/atlas-base/" make test
