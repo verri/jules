@@ -7,17 +7,6 @@ cache:
 matrix:
   include:
     - os: linux
-      env: COMPILER_NAME=gcc CXX=g++-6 CC=gcc-6
-      addons:
-        apt:
-          packages:
-            - g++-6
-            - libatlas-base-dev
-            - valgrind
-          sources: &sources
-            - llvm-toolchain-precise-3.8
-            - ubuntu-toolchain-r-test
-    - os: linux
       env: COMPILER_NAME=clang CXX=clang++-3.8 CC=clang-3.8
       addons:
         apt:
@@ -25,7 +14,9 @@ matrix:
             - clang-3.8
             - libatlas-base-dev
             - valgrind
-          sources: *sources
+          sources: &sources
+            - llvm-toolchain-precise-3.8
+            - ubuntu-toolchain-r-test
 
 install:
   - git submodule init
@@ -34,4 +25,4 @@ install:
   - git clone https://github.com/foonathan/debug_assert.git third_party/debug_assert
 
 script:
-  - CXXFLAGS="-isystem../third_party/range-v3/include -isystem../third_party/debug_assert" LDFLAGS="-L/usr/lib/atlas-base/" make test
+  - CXXFLAGS="-isystem../third_party/range-v3/include -isystem../third_party/debug_assert" make test
