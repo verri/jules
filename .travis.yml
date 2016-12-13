@@ -7,11 +7,12 @@ cache:
 matrix:
   include:
     - os: linux
-      env: COMPILER_NAME=gcc CXX=g++-5 CC=gcc-5
+      env: COMPILER_NAME=gcc CXX=g++-6 CC=gcc-6
       addons:
         apt:
           packages:
-            - g++-5
+            - g++-6
+            - libatlas-base-dev
           sources: &sources
             - llvm-toolchain-precise-3.8
             - ubuntu-toolchain-r-test
@@ -21,6 +22,7 @@ matrix:
         apt:
           packages:
             - clang-3.8
+            - libatlas-base-dev
           sources: *sources
 
 install:
