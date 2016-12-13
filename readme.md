@@ -9,11 +9,13 @@ Dependencies
  - C++14 compiler
  - [debug_assert](https://github.com/foonathan/debug_assert)
  - [range-v3](https://github.com/ericniebler/range-v3)
+ - [CBLAS](http://www.netlib.org/blas/) (optional)
+ - [Catch](https://github.com/philsquared/Catch.git) (testing)
 
 Documentation
 -------------
 
-Generated with [standardese](https://github.com/foonathan/standardese) 
+Generated with [standardese](https://github.com/foonathan/standardese)
 [here](https://verri.github.io/jules/).
 
 Acknowledgements
