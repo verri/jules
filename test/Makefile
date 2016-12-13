@@ -11,7 +11,7 @@ OBJ := $(SRC:.cpp=.o) test_suite.o
 DEP := $(SRC:.cpp=.d) test_suite.d
 
 CXXFLAGS += -std=c++14 -O2 -Wall -Wextra -I.. -isystem../third_party/Catch/single_include
-LDFLAGS += -lblas
+LDFLAGS += -lcblas
 
 NODEPS = clean
 
