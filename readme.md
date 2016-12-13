@@ -1,6 +1,8 @@
 jules
 =====
 
+[![Build Status](https://travis-ci.org/verri/jules.svg?branch=master)](https://travis-ci.org/verri/jules)
+
 `jules` is a statistical computing library that aims to provide R-like experience in modern C++.
 
 Dependencies
