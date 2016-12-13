@@ -13,6 +13,7 @@ matrix:
           packages:
             - g++-6
             - libatlas-base-dev
+            - valgrind
           sources: &sources
             - llvm-toolchain-precise-3.8
             - ubuntu-toolchain-r-test
@@ -23,6 +24,7 @@ matrix:
           packages:
             - clang-3.8
             - libatlas-base-dev
+            - valgrind
           sources: *sources
 
 install:
