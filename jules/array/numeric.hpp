@@ -31,12 +31,10 @@ static inline auto seq(index_t start, index_t stop, index_t step = 1u) -> vector
   return indexes;
 }
 
-template <typename T, typename Rng, CONCEPT_REQUIRES_(range::Range<Rng>())>
-auto to_vector(const Rng& rng) -> array_fallback<vector<T>, Rng>
+template <typename T, typename Rng, CONCEPT_REQUIRES_(range::Range<std::decay_t<Rng>>())>
+auto to_vector(Rng&& rng) -> array_fallback<vector<T>, std::decay_t<Rng>>
 {
-  vector<T> vec(range::size(rng));
-  range::copy(rng, vec.begin());
-  return vec;
+  return vector<T>(std::forward<Rng>(rng));
 }
 
 template <typename T, typename Array> auto to_vector(Array&& array) -> array_request<vector<T>, std::decay_t<Array>>
@@ -44,10 +42,11 @@ template <typename T, typename Array> auto to_vector(Array&& array) -> array_req
   return {std::forward<Array>(array)};
 }
 
-template <typename Rng, typename R = range::range_value_t<Rng>, CONCEPT_REQUIRES_(range::Range<Rng>())>
-auto as_vector(const Rng& rng) -> array_fallback<vector<R>, Rng>
+template <typename Rng, typename R = range::range_value_t<std::decay_t<Rng>>,
+          CONCEPT_REQUIRES_(range::Range<std::decay_t<Rng>>())>
+auto as_vector(Rng&& rng) -> array_fallback<vector<R>, std::decay_t<Rng>>
 {
-  return to_vector<R>(rng);
+  return to_vector<R>(std::forward<Rng>(rng));
 }
 
 // If higher order, copy elements column-wise.
