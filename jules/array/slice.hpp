@@ -49,7 +49,7 @@ public:
     using pointer = void*;
     using reference = index_t;
 
-    iterator() = delete;
+    iterator() = default;
 
     constexpr iterator(const iterator& source) = default;
     constexpr iterator(iterator&& source) noexcept = default;
@@ -215,7 +215,7 @@ public:
     using pointer = void*;
     using reference = index_t;
 
-    iterator() = delete;
+    iterator() = default;
 
     constexpr iterator(const iterator& source) = default;
     constexpr iterator(iterator&& source) noexcept = default;

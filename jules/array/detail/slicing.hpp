@@ -120,7 +120,7 @@ index_t slicing_size(const std::array<index_t, N>& extents, const base_slice<1>&
 }
 
 template <std::size_t D, std::size_t N, typename Rng, typename... Args, typename T = range::range_value_t<Rng>,
-          CONCEPT_REQUIRES_(range::Range<Rng>())>
+          CONCEPT_REQUIRES_(range::Range<Rng>() && !std::is_same<Rng, base_slice<1>>::value)>
 index_t slicing_size(const std::array<index_t, N>& extents, const Rng& rng, Args&&... args)
 {
   static_assert(std::is_convertible<T, index_t>::value, "arbitrary ranges must contain indexes");
@@ -215,7 +215,7 @@ void do_slice(std::array<index_t, N>& extents, std::vector<index_t>& indexes, co
 }
 
 template <std::size_t D, std::size_t N, typename Rng, typename... Args, typename T = range::range_value_t<Rng>,
-          CONCEPT_REQUIRES_(range::Range<Rng>())>
+          CONCEPT_REQUIRES_(range::Range<Rng>() && !std::is_same<Rng, base_slice<1>>::value)>
 void do_slice(std::array<index_t, N>& extents, std::vector<index_t>& indexes, const base_slice<N>& slice,
               std::array<index_t, D> ix, const Rng& rng, Args&&... args)
 {
