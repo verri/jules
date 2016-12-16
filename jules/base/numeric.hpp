@@ -73,6 +73,26 @@ template <typename T, typename... Args> constexpr auto prod_args(const T& arg, A
   return arg * prod_args(std::forward<Args>(args)...);
 }
 
+template <typename Iter, typename Sent, typename T = range::iterator_value_t<Iter>,
+          CONCEPT_REQUIRES_(range::Sentinel<Sent, Iter>())>
+auto sum(Iter first, Sent last, const T& start = static_cast<T>(1u))
+{
+  return std::accumulate(first, last, start);
+}
+
+template <typename Rng, typename T = range::range_value_t<Rng>, CONCEPT_REQUIRES_(range::Range<Rng>())>
+auto sum(const Rng& rng, const T& start = static_cast<T>(1u))
+{
+  return sum(ranges::begin(rng), ranges::end(rng), start);
+}
+
+constexpr auto sum_args() -> detail::forward_arithmetic { return {}; }
+
+template <typename T, typename... Args> constexpr auto sum_args(const T& arg, Args&&... args)
+{
+  return arg * sum_args(std::forward<Args>(args)...);
+}
+
 constexpr auto all_args() { return true; }
 
 template <typename... Args> constexpr auto all_args(bool arg, Args&&... args)
