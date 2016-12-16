@@ -331,8 +331,9 @@ public:
   }
 
   /// \group Constructors
-  template <typename Iter, typename U = range::iterator_value_t<Iter>>
-  base_array(Iter first, Iter last)
+  template <typename Iter, typename Sent, typename U = range::iterator_value_t<Iter>,
+            CONCEPT_REQUIRES_(range::Sentinel<Sent, Iter>())>
+  base_array(Iter first, Sent last)
     : ref_array<T, 1>{this->allocate(range::distance(first, last)), {0u, static_cast<index_t>(range::distance(first, last))}}
   {
     static_assert(std::is_constructible<T, const U&>::value, "incompatible value types");
