@@ -27,11 +27,30 @@ auto normal_pdf(const Array& array, T mu, T sigma)
   return apply(array, [ mu = std::move(mu), sigma = std::move(sigma) ](const auto& x) { return normal_pdf(x, mu, sigma); });
 }
 
+template <typename Dist> auto sample(Dist& dist) { return dist(random_engine); }
+
+template <typename Dist> auto sample(index_t n, Dist& dist)
+{
+  auto rng = range::view::generate_n([&] { return dist(random_engine); }, n);
+  return vector<bool>(rng);
+}
+
 static inline auto bernoulli_sample(index_t n, numeric p)
 {
-  const auto f = [dist = std::bernoulli_distribution(p)]() mutable { return dist(random_engine); };
-  auto rng = range::view::generate_n(f, n);
-  return vector<bool>(range::begin(rng), range::end(rng));
+  auto dist = std::bernoulli_distribution(p);
+  return sample(n, dist);
+}
+
+static inline auto bernoulli_sample(numeric p)
+{
+  auto dist = std::bernoulli_distribution(p);
+  return sample(dist);
+}
+
+static inline auto index_sample(index_t end)
+{
+  auto dist = std::uniform_int_distribution<index_t>(0u, end - 1);
+  return sample(dist);
 }
 
 } // namespace jules
