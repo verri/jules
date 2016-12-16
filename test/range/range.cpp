@@ -18,8 +18,7 @@ TEST_CASE("Basic range::view usage", "[range]")
   REQUIRE(ints_vector.size() == 10u);
   CHECK(all(ints_vector == as_vector(0, 1, 2, 3, 4, 5, 6, 7, 8, 9)));
 
-  auto numbers = view::numbers(0, 2) | view::take(5u);
-  auto numbers_vector = as_vector(numbers);
+  auto numbers_vector = as_vector(view::numbers(0, 2) | view::take(5u));
   REQUIRE(numbers_vector.size() == 5u);
   CHECK(all(numbers_vector == as_vector(0, 2, 4, 6, 8)));
 }
