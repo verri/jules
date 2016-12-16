@@ -14,6 +14,8 @@
 namespace jules
 {
 
+template <class T> constexpr auto pi = T(3.1415926535897932385);
+
 namespace detail
 {
 
@@ -97,6 +99,8 @@ template <typename... Args> constexpr auto any_args(bool arg, Args&&... args)
 {
   return arg || any_args(std::forward<Args>(args)...);
 }
+
+template <typename T> constexpr auto square(const T& value) { return value * value; }
 
 } // namespace jules
 
