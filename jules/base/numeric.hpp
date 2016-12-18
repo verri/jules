@@ -122,6 +122,12 @@ template <typename... Args> constexpr auto any_args(bool arg, Args&&... args)
 
 template <typename T> constexpr auto square(const T& value) { return value * value; }
 
+template <typename T> auto normal_pdf(const T& x, const T& mu, const T& sigma)
+{
+  auto sigma2 = 2 * square(sigma);
+  return std::exp(-square(x - mu)) / std::sqrt(sigma2 * pi<T>);
+}
+
 } // namespace jules
 
 #endif // JULES_BASE_NUMERIC_H
