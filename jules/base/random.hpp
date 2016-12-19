@@ -8,6 +8,7 @@
 
 #include <cmath>
 #include <random>
+#include <vector>
 
 namespace jules
 {
@@ -19,7 +20,8 @@ template <typename Dist> auto sample(Dist& dist) { return dist(random_engine); }
 template <typename Dist> auto sample(index_t n, Dist& dist)
 {
   auto rng = range::view::generate_n([&] { return dist(random_engine); }, n);
-  return vector<bool>(rng);
+  auto compatible_rng = rng | range::view::bounded;
+  return std::vector<bool>(range::begin(compatible_rng), range::end(compatible_rng));
 }
 
 static inline auto bernoulli_sample(index_t n, numeric p)
