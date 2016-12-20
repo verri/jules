@@ -430,6 +430,15 @@ public:
     detail::array_allocator<T>::create(detail::trivial_dispatch<T>(), this->data(), this->size(), std::forward<Args>(args)...);
   }
 
+  auto operator()(std::vector<index_t>&& indexes) -> ind_array<T, 1> { return {this->data_, indexes.size(), std::move(indexes)}; }
+
+  auto operator()(std::vector<index_t>&& indexes) const -> ind_array<const T, 1>
+  {
+    return {this->data_, indexes.size(), std::move(indexes)};
+  }
+
+  using ref_array<T, 1>::operator();
+
   /// \group Begin
   /// Returns an iterator to the first element of the array.
   auto begin() -> iterator { return this->data(); }

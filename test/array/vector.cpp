@@ -47,16 +47,24 @@ TEST_CASE("Vector tutorial", "[array]")
 
     // Constructors from slicing.
     auto even = jules::vector<long>(x(jules::slice(0u, jules::slice::all, 2u)));
-    auto odd = jules::vector<long>(x(jules::seq(1u, x.length(), 2u)));
+
+    auto odd_ix1 = jules::seq(1u, x.length() - 1u, 2u);
+    auto odd_ix2 = odd_ix1;
+
+    auto odd_slow = jules::vector<long>(x(odd_ix1));
+    auto odd_smart = jules::vector<long>(x()(std::move(odd_ix1)));
+    auto odd_fast = jules::vector<long>(x(std::move(odd_ix2)));
 
     CHECK(all(x == jules::as_vector(0, 1, 2, 3, 4, 5, 6, 7, 8, 9)));
     CHECK(all(x == jules::as_vector(values)));
     CHECK(all(x == jules::as_vector(jules::matrix<long>(std::begin(values), 5u, 2u))));
     CHECK(all(even == jules::as_vector(0, 2, 4, 6, 8)));
-    CHECK(all(odd == jules::as_vector(1, 3, 5, 7, 9)));
+    CHECK(all(odd_slow == jules::as_vector(1, 3, 5, 7, 9)));
+    CHECK(all(odd_smart == jules::as_vector(1, 3, 5, 7, 9)));
+    CHECK(all(odd_fast == jules::as_vector(1, 3, 5, 7, 9)));
 
     // Constructors from expression.
-    auto y = jules::vector<long>(x + x(jules::seq(x.length(), 0u) - 1u));
+    auto y = jules::vector<long>(x + x(jules::seq(x.length() - 1u, 0u, -1)));
     CHECK(all(y == 9));
   }
 
@@ -75,7 +83,7 @@ TEST_CASE("Vector tutorial", "[array]")
     x = z(jules::slice(0u, jules::slice::all, 2u));
     CHECK(all(x == jules::as_vector(0, 2, 4, 6, 8)));
 
-    x = z(jules::seq(0u, z.length(), 2u));
+    x = z(jules::seq(0u, z.length() - 1u, 2u));
     CHECK(all(x == jules::as_vector(0, 2, 4, 6, 8)));
 
     z = x + x;
@@ -120,7 +128,7 @@ TEST_CASE("Vector tutorial", "[array]")
 
   SECTION("Subvector assignment")
   {
-    auto x = jules::to_vector<long>(jules::seq(0u, 10u));
+    auto x = jules::to_vector<long>(jules::seq(0u, 10u - 1u));
     const auto y = x;
 
     x(jules::slice(0u, jules::slice::all, 2u)) = 0u;
@@ -130,7 +138,7 @@ TEST_CASE("Vector tutorial", "[array]")
     CHECK(all(x == jules::as_vector(0, 2, 0, 4, 0, 6, 0, 8, 0, 10)));
 
     x(jules::slice(0u, jules::slice::all, 2u)) = y(jules::slice(1u, jules::slice::all, 2u));
-    CHECK(all(x == 1 + jules::to_vector<long>(jules::seq(0u, 10u))));
+    CHECK(all(x == 1 + jules::to_vector<long>(jules::seq(0u, 10u - 1u))));
 
     x() = 0;
     CHECK(all(x == 0));
@@ -139,13 +147,13 @@ TEST_CASE("Vector tutorial", "[array]")
       x(i) = y(y.length() - 1);
     CHECK(all(x == 9));
 
-    x(jules::seq(0u, x.size())) = y();
+    x(jules::seq(0u, x.size() - 1u)) = y();
     CHECK(all(x == y));
 
-    x(jules::seq(0u, x.size(), 2u)) = y(jules::seq(1u, y.size(), 2u));
+    x(jules::seq(0u, x.size() - 1u, 2u)) = y(jules::seq(1u, y.size() - 1u, 2u));
     CHECK(all(x == jules::as_vector(1, 1, 3, 3, 5, 5, 7, 7, 9, 9)));
 
-    x(jules::seq(1u, x.size(), 2u)) = jules::vector<long>{2, 4, 6, 8, 10};
+    x(jules::seq(1u, x.size() - 1u, 2u)) = jules::vector<long>{2, 4, 6, 8, 10};
     CHECK(all(x == jules::as_vector(1, 2, 3, 4, 5, 6, 7, 8, 9, 10)));
   }
 }

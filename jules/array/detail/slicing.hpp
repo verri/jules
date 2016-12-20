@@ -98,10 +98,26 @@ template <typename T, std::size_t N> static inline auto cat(const T& head, const
 static inline auto seq_size(index_t start, index_t stop, index_t step)
 {
   auto size = (start < stop ? stop - start : start - stop);
-  size += size % step == 0 ? 0 : 1;
+  size += size % step == 0u ? 0u : 1u;
   size /= step;
 
   return size;
+}
+
+template <std::size_t D, std::size_t N> index_t slicing_size(const std::array<index_t, N>&);
+
+template <std::size_t D, std::size_t N, typename... Args>
+index_t slicing_size(const std::array<index_t, N>& extents, index_t, Args&&... args);
+
+template <std::size_t D, std::size_t N, typename... Args>
+index_t slicing_size(const std::array<index_t, N>& extents, const base_slice<1>& slice, Args&&... args);
+
+template <std::size_t D, std::size_t N, typename Rng, typename... Args, typename T = range::range_value_t<Rng>,
+          CONCEPT_REQUIRES_(range::Range<Rng>() && !std::is_same<Rng, base_slice<1>>::value)>
+index_t slicing_size(const std::array<index_t, N>& extents, const Rng& rng, Args&&... args)
+{
+  static_assert(std::is_convertible<T, index_t>::value, "arbitrary ranges must contain indexes");
+  return range::size(rng) * slicing_size<D + 1>(extents, std::forward<Args>(args)...);
 }
 
 template <std::size_t D, std::size_t N> index_t slicing_size(const std::array<index_t, N>&) { return 1; }
@@ -117,14 +133,6 @@ index_t slicing_size(const std::array<index_t, N>& extents, const base_slice<1>&
 {
   return (slice.size() == 0 ? seq_size(slice.start, extents[D], slice.stride) : slice.size()) *
          slicing_size<D + 1>(extents, std::forward<Args>(args)...);
-}
-
-template <std::size_t D, std::size_t N, typename Rng, typename... Args, typename T = range::range_value_t<Rng>,
-          CONCEPT_REQUIRES_(range::Range<Rng>() && !std::is_same<Rng, base_slice<1>>::value)>
-index_t slicing_size(const std::array<index_t, N>& extents, const Rng& rng, Args&&... args)
-{
-  static_assert(std::is_convertible<T, index_t>::value, "arbitrary ranges must contain indexes");
-  return range::size(rng) * slicing_size<D + 1>(extents, std::forward<Args>(args)...);
 }
 
 // Default slicing Helpers
@@ -175,6 +183,35 @@ template <std::size_t N, typename... Args> base_slice<N> default_slicing(const b
 // Indirect Slicing Helpers
 
 template <std::size_t D, std::size_t N>
+void do_slice(const std::array<index_t, N>&, std::vector<index_t>& indexes, const base_slice<N>& slice,
+              std::array<index_t, D> ix);
+
+template <std::size_t D, std::size_t N, typename... Args>
+void do_slice(std::array<index_t, N>& extents, std::vector<index_t>& indexes, const base_slice<N>& slice,
+              std::array<index_t, D> ix, index_t i, Args&&... args);
+
+template <std::size_t D, std::size_t N, typename... Args>
+void do_slice(std::array<index_t, N>& extents, std::vector<index_t>& indexes, const base_slice<N>& slice,
+              std::array<index_t, D> ix, const base_slice<1>& rng_base, Args&&... args);
+
+template <std::size_t D, std::size_t N, typename Rng, typename... Args, typename T = range::range_value_t<Rng>,
+          CONCEPT_REQUIRES_(range::Range<Rng>() && !std::is_same<Rng, base_slice<1>>::value)>
+void do_slice(std::array<index_t, N>& extents, std::vector<index_t>& indexes, const base_slice<N>& slice,
+              std::array<index_t, D> ix, const Rng& rng, Args&&... args)
+{
+  constexpr auto I = N - D - 1;
+  static_assert(std::is_convertible<T, index_t>::value, "arbitrary ranges must contain indexes");
+  static_assert(I == sizeof...(args), "invalid number of arguments");
+
+  CHECK_BOUNDS(*max(rng), extent(slice, I));
+
+  extents[I] = range::size(rng);
+
+  for (index_t i : rng)
+    do_slice(extents, indexes, slice, cat(i, ix), std::forward<Args>(args)...);
+}
+
+template <std::size_t D, std::size_t N>
 void do_slice(const std::array<index_t, N>&, std::vector<index_t>& indexes, const base_slice<N>& slice, std::array<index_t, D> ix)
 {
   static_assert(D == N, "invalid number of arguments");
@@ -209,23 +246,6 @@ void do_slice(std::array<index_t, N>& extents, std::vector<index_t>& indexes, co
     rng = base_slice<1>{rng_base.start, seq_size(rng_base.start, extent(slice, I), rng_base.stride), rng_base.stride};
 
   extents[I] = rng.size();
-
-  for (index_t i : rng)
-    do_slice(extents, indexes, slice, cat(i, ix), std::forward<Args>(args)...);
-}
-
-template <std::size_t D, std::size_t N, typename Rng, typename... Args, typename T = range::range_value_t<Rng>,
-          CONCEPT_REQUIRES_(range::Range<Rng>() && !std::is_same<Rng, base_slice<1>>::value)>
-void do_slice(std::array<index_t, N>& extents, std::vector<index_t>& indexes, const base_slice<N>& slice,
-              std::array<index_t, D> ix, const Rng& rng, Args&&... args)
-{
-  constexpr auto I = N - D - 1;
-  static_assert(std::is_convertible<T, index_t>::value, "arbitrary ranges must contain indexes");
-  static_assert(I == sizeof...(args), "invalid number of arguments");
-
-  CHECK_BOUNDS(*max(rng), extent(slice, I));
-
-  extents[I] = range::size(rng);
 
   for (index_t i : rng)
     do_slice(extents, indexes, slice, cat(i, ix), std::forward<Args>(args)...);

@@ -244,6 +244,13 @@ public:
     return {data_, slicing.first[0], std::move(slicing.second)};
   }
 
+  auto operator()(std::vector<index_t>&& indexes) -> ind_array<T, 1>
+  {
+    for (auto& index : indexes)
+      index = this->descriptor()(index);
+    return {this->data_, indexes.size(), std::move(indexes)};
+  }
+
   auto operator()(const base_slice<1>& slice) -> ref_array<T, 1>
   {
     auto new_slice = detail::default_slicing(this->descriptor_, slice);
@@ -258,6 +265,13 @@ public:
     static_assert(std::is_convertible<U, index_t>::value, "arbitrary ranges must contain indexes");
     auto slicing = detail::indirect_slicing(this->descriptor_, rng);
     return {data_, slicing.first[0], std::move(slicing.second)};
+  }
+
+  auto operator()(std::vector<index_t>&& indexes) const -> ind_array<const T, 1>
+  {
+    for (auto& index : indexes)
+      index = this->descriptor()(index);
+    return {this->data_, indexes.size(), std::move(indexes)};
   }
 
   auto operator()(const base_slice<1>& slice) const -> ref_array<const T, 1>
