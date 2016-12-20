@@ -297,6 +297,12 @@ public:
     return {data_, slicing.first.extent, std::move(indexes)};
   }
 
+  auto operator()(std::vector<index_t>&& indexes) -> ind_array<T, 1>
+  {
+    map_indexes(indexes);
+    return {this->data_, indexes.size(), std::move(indexes)};
+  }
+
   auto operator()(const base_slice<1>& slice) -> ind_array<T, 1>
   {
     auto new_slice = detail::default_slicing(descriptor_, slice);
@@ -314,6 +320,12 @@ public:
     auto slicing = detail::indirect_slicing(descriptor_, rng);
     auto indexes = map_indexes(slicing.second);
     return {data_, slicing.first.extent, std::move(indexes)};
+  }
+
+  auto operator()(std::vector<index_t>&& indexes) const -> ind_array<const T, 1>
+  {
+    map_indexes(indexes);
+    return {this->data_, indexes.size(), std::move(indexes)};
   }
 
   auto operator()(const base_slice<1>& slice) const -> ind_array<const T, 1>
@@ -348,6 +360,12 @@ private:
     for (index_t j : rng)
       indexes.push_back(indexes_[j]);
     return indexes;
+  }
+
+  auto map_indexes(std::vector<index_t>& indexes) const
+  {
+    for (auto& index : indexes)
+      index = indexes_[index];
   }
 
   T* data_;

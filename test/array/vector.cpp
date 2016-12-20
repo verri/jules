@@ -54,6 +54,7 @@ TEST_CASE("Vector tutorial", "[array]")
     auto odd_slow = jules::vector<long>(x(odd_ix1));
     auto odd_smart = jules::vector<long>(x()(std::move(odd_ix1)));
     auto odd_fast = jules::vector<long>(x(std::move(odd_ix2)));
+    auto odd_ind = jules::vector<long>(x(jules::seq(0u, x.length() - 1u))(jules::seq(1u, x.length() - 1u, 2u)));
 
     CHECK(all(x == jules::as_vector(0, 1, 2, 3, 4, 5, 6, 7, 8, 9)));
     CHECK(all(x == jules::as_vector(values)));
@@ -62,6 +63,7 @@ TEST_CASE("Vector tutorial", "[array]")
     CHECK(all(odd_slow == jules::as_vector(1, 3, 5, 7, 9)));
     CHECK(all(odd_smart == jules::as_vector(1, 3, 5, 7, 9)));
     CHECK(all(odd_fast == jules::as_vector(1, 3, 5, 7, 9)));
+    CHECK(all(odd_ind == jules::as_vector(1, 3, 5, 7, 9)));
 
     // Constructors from expression.
     auto y = jules::vector<long>(x + x(jules::seq(x.length() - 1u, 0u, -1)));
