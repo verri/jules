@@ -331,8 +331,9 @@ public:
   }
 
   /// \group Constructors
-  template <typename Iter, typename U = range::iterator_value_t<Iter>>
-  base_array(Iter first, Iter last)
+  template <typename Iter, typename Sent, typename U = range::iterator_value_t<Iter>,
+            CONCEPT_REQUIRES_(range::Sentinel<Sent, Iter>())>
+  base_array(Iter first, Sent last)
     : ref_array<T, 1>{this->allocate(range::distance(first, last)), {0u, static_cast<index_t>(range::distance(first, last))}}
   {
     static_assert(std::is_constructible<T, const U&>::value, "incompatible value types");
@@ -343,12 +344,13 @@ public:
   base_array(std::initializer_list<T> values) : base_array(values.begin(), values.end()) {}
 
   /// \group Constructors
-  template <typename Rng, typename U = range::range_value_t<Rng>, CONCEPT_REQUIRES_(range::Range<Rng>()),
-            typename = array_fallback<void, Rng>>
-  base_array(const Rng& rng) : ref_array<T, 1>{this->allocate(range::size(rng)), {0u, range::size(rng)}}
+  template <typename Rng, typename U = range::range_value_t<std::decay_t<Rng>>,
+            CONCEPT_REQUIRES_(range::Range<std::decay_t<Rng>>()), typename = array_fallback<void, std::decay_t<Rng>>>
+  base_array(Rng&& rng)
+    : ref_array<T, 1>{this->allocate(range::size(std::forward<Rng>(rng))), {0u, range::size(std::forward<Rng>(rng))}}
   {
     static_assert(std::is_constructible<T, const U&>::value, "incompatible value types");
-    this->create(detail::trivial_dispatch<T>(), this->data(), range::begin(rng), this->size());
+    this->create(detail::trivial_dispatch<T>(), this->data(), range::begin(std::forward<Rng>(rng)), this->size());
   }
 
   /// \group Constructors

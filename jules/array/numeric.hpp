@@ -29,12 +29,10 @@ static inline auto seq(const index_t start, const index_t stop, const distance_t
   return indexes;
 }
 
-template <typename T, typename Rng, CONCEPT_REQUIRES_(range::Range<Rng>())>
-auto to_vector(const Rng& rng) -> array_fallback<vector<T>, Rng>
+template <typename T, typename Rng, CONCEPT_REQUIRES_(range::Range<std::decay_t<Rng>>())>
+auto to_vector(Rng&& rng) -> array_fallback<vector<T>, std::decay_t<Rng>>
 {
-  vector<T> vec(range::size(rng));
-  range::copy(rng, vec.begin());
-  return vec;
+  return vector<T>(std::forward<Rng>(rng));
 }
 
 template <typename T, typename Array> auto to_vector(Array&& array) -> array_request<vector<T>, std::decay_t<Array>>
@@ -43,10 +41,11 @@ template <typename T, typename Array> auto to_vector(Array&& array) -> array_req
   return {std::forward<Array>(array)};
 }
 
-template <typename Rng, typename R = range::range_value_t<Rng>, CONCEPT_REQUIRES_(range::Range<Rng>())>
-auto as_vector(const Rng& rng) -> array_fallback<vector<R>, Rng>
+template <typename Rng, typename R = range::range_value_t<std::decay_t<Rng>>,
+          CONCEPT_REQUIRES_(range::Range<std::decay_t<Rng>>())>
+auto as_vector(Rng&& rng) -> array_fallback<vector<R>, std::decay_t<Rng>>
 {
-  return to_vector<R>(rng);
+  return to_vector<R>(std::forward<Rng>(rng));
 }
 
 // If higher order, copy elements column-wise.
@@ -61,6 +60,13 @@ template <typename... Args, typename = std::enable_if_t<(sizeof...(Args) > 1)>> 
   auto values = std::array<R, sizeof...(Args)>{{std::forward<Args>(args)...}};
   return vector<R>(std::make_move_iterator(std::begin(values)), std::make_move_iterator(std::end(values)));
 }
+
+template <typename Array, typename T = typename Array::value_type, typename = array_request<void, Array>>
+auto normal_pdf(const Array& array, T mu, T sigma)
+{
+  return apply(array, [ mu = std::move(mu), sigma = std::move(sigma) ](const auto& x) { return normal_pdf(x, mu, sigma); });
 }
+
+} // namespace jules
 
 #endif // JULES_ARRAY_NUMERIC_H
