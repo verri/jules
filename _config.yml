@@ -1,0 +1,14 @@
+github: [metadata]
+name: jules documentation
+description: Documentation of the jules library
+kramdown:
+  input: GFM
+  hard_wrap: false
+gems:
+  - jekyll-coffeescript
+  - jekyll-paginate
+highlighter: rouge
+defaults:
+  -
+    values:
+      layout: "default"
