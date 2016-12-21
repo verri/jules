@@ -3,5 +3,6 @@
 *.pyc
 *.gcno
 *.gcda
+*.gcov
 wiki
 git_stats

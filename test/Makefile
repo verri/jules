@@ -22,10 +22,6 @@ ifeq (0, $(words $(findstring $(MAKECMDGOALS), $(NODEPS))))
 -include $(DEP)
 endif
 
-test: test_suite
-	@echo "Running test suite..."
-	@valgrind --error-exitcode=1 --leak-check=full ./test_suite -d yes
-
 test_suite: $(OBJ)
 	@echo "Linking test suite..."
 	@$(CXX) $(CXXFLAGS) $(LDFLAGS) -o $@ $(OBJ)
@@ -40,6 +36,6 @@ test_suite: $(OBJ)
 
 clean:
 	@echo "Cleaning test..."
-	@find . -iname '*.[od]' -exec rm {} \;
+	@find . -name '*.[od]' -exec rm {} \;
 
 .PHONY: test clean
