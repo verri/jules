@@ -43,27 +43,35 @@ template <std::size_t N, typename T> constexpr auto repeat(const T& value)
   return detail::repeat_impl(value, std::make_index_sequence<N>());
 }
 
-template <typename Iter, typename Sent, CONCEPT_REQUIRES_(range::Sentinel<Sent, Iter>())> auto max(Iter first, Sent last)
+template <typename Iter, typename Sent, typename T = range::iterator_value_t<Iter>,
+          CONCEPT_REQUIRES_(range::Sentinel<Sent, Iter>())>
+auto max(Iter first, Sent last, T start = -numeric_traits<T>::infinity())
 {
-  return std::max_element(first, last);
+  for (; first != last; ++first)
+    if (start < *first)
+      start = *first;
+  return start;
 }
 
-template <typename Rng, CONCEPT_REQUIRES_(range::Range<Rng>())> auto max(const Rng& rng)
+template <typename Rng, typename T = range::range_value_t<Rng>, CONCEPT_REQUIRES_(range::Range<Rng>())>
+auto max(const Rng& rng, T start = -numeric_traits<T>::infinity())
 {
-  return std::max_element(range::begin(rng), range::end(rng));
+  return ::jules::max(range::begin(rng), range::end(rng), std::move(start));
 }
 
 template <typename Iter, typename Sent, typename T = range::iterator_value_t<Iter>,
           CONCEPT_REQUIRES_(range::Sentinel<Sent, Iter>())>
-auto prod(Iter first, Sent last, const T& start = static_cast<T>(1u))
+auto prod(Iter first, Sent last, T start = numeric_traits<T>::multiplicative_identity())
 {
-  return std::accumulate(first, last, start, std::multiplies<T>{});
+  for (; first != last; ++first)
+    start *= *first;
+  return start;
 }
 
 template <typename Rng, typename T = range::range_value_t<Rng>, CONCEPT_REQUIRES_(range::Range<Rng>())>
-auto prod(const Rng& rng, const T& start = static_cast<T>(1u))
+auto prod(const Rng& rng, T start = numeric_traits<T>::multiplicative_identity())
 {
-  return prod(ranges::begin(rng), ranges::end(rng), start);
+  return ::jules::prod(range::begin(rng), range::end(rng), std::move(start));
 }
 
 constexpr auto prod_args() -> detail::forward_arithmetic { return {}; }
@@ -75,15 +83,17 @@ template <typename T, typename... Args> constexpr auto prod_args(const T& arg, A
 
 template <typename Iter, typename Sent, typename T = range::iterator_value_t<Iter>,
           CONCEPT_REQUIRES_(range::Sentinel<Sent, Iter>())>
-auto sum(Iter first, Sent last, const T& start = static_cast<T>(1u))
+auto sum(Iter first, Sent last, T start = numeric_traits<T>::additive_identity())
 {
-  return std::accumulate(first, last, start);
+  for (; first != last; ++first)
+    start += *first;
+  return start;
 }
 
 template <typename Rng, typename T = range::range_value_t<Rng>, CONCEPT_REQUIRES_(range::Range<Rng>())>
-auto sum(const Rng& rng, const T& start = static_cast<T>(1u))
+auto sum(const Rng& rng, T start = numeric_traits<T>::additive_identity())
 {
-  return sum(ranges::begin(rng), ranges::end(rng), start);
+  return ::jules::sum(range::begin(rng), range::end(rng), std::move(start));
 }
 
 constexpr auto sum_args() -> detail::forward_arithmetic { return {}; }

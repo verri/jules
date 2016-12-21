@@ -25,7 +25,7 @@ template <typename T> auto& numbers(T start, T step = {})
 
 template <typename T> auto numbers_n(T start, ::jules::index_t n, T step = {})
 {
-  return numbers(start, step) | ::ranges::v3::view::take(n);
+  return numbers(start, step) | ::ranges::v3::view::take_exactly(n);
 }
 
 template <typename T> auto interval(T start, T end, T step)

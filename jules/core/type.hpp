@@ -4,6 +4,7 @@
 #define JULES_CORE_TYPE_H
 
 #include <initializer_list>
+#include <limits>
 #include <string>
 #include <utility>
 
@@ -120,6 +121,21 @@ struct in_place_t {
 };
 
 static constexpr in_place_t in_place{};
+
+// Arithmetic rules
+
+template <typename T> struct numeric_traits : std::numeric_limits<T> {
+  static constexpr auto additive_identity() { return static_cast<T>(0); }
+  static constexpr auto multiplicative_identity() { return static_cast<T>(1); }
+  static constexpr auto unbounded_min()
+  {
+    return std::numeric_limits<T>::has_infinity ? -std::numeric_limits<T>::infinity() : std::numeric_limits<T>::min();
+  }
+  static constexpr auto unbounded_max()
+  {
+    return std::numeric_limits<T>::has_infinity ? std::numeric_limits<T>::infinity() : std::numeric_limits<T>::max();
+  }
+};
 
 } // namespace jules
 

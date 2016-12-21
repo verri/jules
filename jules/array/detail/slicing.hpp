@@ -203,7 +203,7 @@ void do_slice(std::array<index_t, N>& extents, std::vector<index_t>& indexes, co
   static_assert(std::is_convertible<T, index_t>::value, "arbitrary ranges must contain indexes");
   static_assert(I == sizeof...(args), "invalid number of arguments");
 
-  CHECK_BOUNDS(*max(rng), extent(slice, I));
+  CHECK_BOUNDS(max(rng), extent(slice, I));
 
   extents[I] = range::size(rng);
 
