@@ -1,5 +1,7 @@
 *.swp
 *.swo
 *.pyc
+*.gcno
+*.gcda
 wiki
 git_stats

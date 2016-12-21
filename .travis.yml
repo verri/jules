@@ -26,3 +26,6 @@ install:
 
 script:
   - CXXFLAGS="-isystem../third_party/range-v3/include -isystem../third_party/debug_assert" make test
+
+after_success:
+  - bash <(curl -s https://codecov.io/bash)
