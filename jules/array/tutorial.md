@@ -1,11 +1,11 @@
 # What is an array?
 
-For `jules`, an `N`-dimensional array consists of a collection of variables of
+In `jules`, an `N`-dimensional array consists of a collection of variables of
 same type that can be selected by N indices. The order of dimensionality `N` is
 a compile-time constant. The size of each dimension, although fixed after
 construction, is calculated at run-time.
 
-In other words, an 1-dimensional array with 10 integer number is roughly
+In other words, an 1-dimensional array with 10 integer numbers is roughly
 equivalent to `int array[10]`, while a 2-dimensional array with dimensions
 5 and 2 to `int array[5][2]`. C arrays are contiguously stored in row-major
 order. `jules` arrays are also stored contiguously but in column-major order at
@@ -15,7 +15,7 @@ the free store.
 
 # Using arrays
 
-The simplest way to use array facilities in `jules` is to include the whole
+The simplest way to use all array facilities in `jules` is including the whole
 array module:
 
 ``` cpp
@@ -29,40 +29,55 @@ higher orders.  If the type `T` is not specified,
 
 # Constructors
 
-There are several ways to create a vector, see [this
+There are several ways to create a vector, see [the
 reference](standardese://jules::base_array<T, 1>::base_array/) for more details.
 
 ``` cpp
-auto a = jules::vector<>(); // Empty vector.
-auto b = jules::vector<>(10u); // Vector with 10 elements.
-auto c = jules::vector<>(3.14, 10u); // Vector with 10 elements containing 3.14.
+// An empty vector.
+auto a = jules::vector<>();
 
-jules::numeric values[] = {0.1, 0.2, 0.3, 0.4, 0.5};
+// A vector with 10 elements.
+// If elements types are trivial, they are non-initialized.
+// Otherwise, they are default initialized.
+auto b = jules::vector<>(10u);
 
-auto d = jules::vector<>(std::begin(values), std::end(values)); // Vector from range of iterators.
-auto e = jules::vector<>{0.1, 0.2, 0.3, 0.4, 0.5}; // Vector from initializer_list.
-auto f = jules::vector<>(values); // Vector from `Range`.
-auto g = a; // Copy constructor.
-auto h = std::move(b); // Move constructor.
-auto i = jules::vector<>(d + e); // Vector from other vector-like structures. See section TODO.
+// A vector with 10 elements containing copies of 3.14.
+auto c = jules::vector<>(3.14, 10u);
+
+auto values[] = {0.1, 0.2, 0.3, 0.4, 0.5};
+
+// A vector from range of iterators.
+auto d = jules::vector<>(std::begin(values), std::end(values));
+
+// A vector from initializer_list.
+auto e = jules::vector<>{0.1, 0.2, 0.3, 0.4, 0.5};
+
+// A vector from an object that satifies the `Range` concept.
+auto f = jules::vector<>(values);
+
+// Copy and move constructor.
+auto g = a;
+auto h = std::move(b);
+
+// A vector from other vector-like structures.
+// See section Array-like structures for more information.
+auto i = jules::vector<>(d + e);
 ```
 
 The function `jules::as_vector` can be used to construct a vector whose
 elements type is inferred.
 
 ``` cpp
+// An vector with elements whose type is inferred as double.
 auto j = jules::as_vector(values);
-static_assert(std::is_same<typename decltype(j)::value_type, jules::numeric>::value, "");
 
+// An vector with elements whose type is the common type of the arguments.
 auto k = jules::as_vector(1, 2u, 3l);
-static_assert(
-  std::is_same<typename decltype(k)::value_type,
-               std::common_type_t<decltype(1), decltype(2u), decltype(3l)>,
 "")
 ```
 
 For higher dimensional arrays, the constructor are basically the same.  Consult
-[the reference](standardese://jules::base_array<T, 1>::base_array/) for
+[the reference](standardese://jules::base_array<T, N>::base_array/) for
 a comprehensive list.
 
 ``` cpp
