@@ -123,11 +123,11 @@ public:
   base_array(base_array&& source) noexcept : ref_array<T, N>{move_ptr(source.data_), std::move(source.descriptor_)} {}
 
   /// \group Constructors
-  template <typename Array, typename = array_request<void, Array>>
-  base_array(const Array& source) : ref_array<T, N>{this->allocate(source.size()), {0u, source.extents()}}
+  template <typename A, typename = meta::requires<Array<A>>>
+  base_array(const A& source) : ref_array<T, N>{this->allocate(source.size()), {0u, source.extents()}}
   {
-    static_assert(Array::order == N, "array order mismatch");
-    static_assert(std::is_constructible<T, const typename Array::value_type&>::value, "incompatible value types");
+    static_assert(A::order == N, "array order mismatch");
+    static_assert(std::is_constructible<T, const typename A::value_type&>::value, "incompatible value types");
     this->create(detail::trivial_dispatch<T>(), this->data(), source.begin(), this->size());
   }
 
@@ -159,10 +159,10 @@ public:
   }
 
   /// \group Assignment
-  template <typename Array> auto operator=(const Array& source) -> array_request<base_array&, Array>
+  template <typename A> auto operator=(const A& source) -> meta::requires_t<base_array&, Array<A>>
   {
-    static_assert(Array::order == N, "array order mismatch");
-    static_assert(std::is_assignable<T&, typename Array::value_type>::value, "incompatible assignment");
+    static_assert(A::order == N, "array order mismatch");
+    static_assert(std::is_assignable<T&, typename A::value_type>::value, "incompatible assignment");
 
     auto old_data = this->data();
     auto old_size = this->size();
@@ -346,7 +346,7 @@ public:
 
   /// \group Constructors
   template <typename Rng, typename U = range::range_value_t<std::decay_t<Rng>>,
-            typename = meta::requires<range::Range<std::decay_t<Rng>>>, typename = array_fallback<void, std::decay_t<Rng>>>
+            typename = meta::requires<range::Range<std::decay_t<Rng>>, meta::negation<Array<std::decay_t<Rng>>>>>
   base_array(Rng&& rng)
     : ref_array<T, 1>{this->allocate(range::size(std::forward<Rng>(rng))), {0u, range::size(std::forward<Rng>(rng))}}
   {
@@ -364,11 +364,11 @@ public:
   base_array(base_array&& source) noexcept : ref_array<T, 1>{move_ptr(source.data_), std::move(source.descriptor_)} {}
 
   /// \group Constructors
-  template <typename Array, typename = array_request<void, Array>>
-  base_array(const Array& source) : ref_array<T, 1>{this->allocate(source.size()), {0u, source.extents()}}
+  template <typename A, typename = meta::requires<Array<A>>>
+  base_array(const A& source) : ref_array<T, 1>{this->allocate(source.size()), {0u, source.extents()}}
   {
-    static_assert(Array::order == 1, "array order mismatch");
-    static_assert(std::is_constructible<T, const typename Array::value_type&>::value, "incompatible value types");
+    static_assert(A::order == 1, "array order mismatch");
+    static_assert(std::is_constructible<T, const typename A::value_type&>::value, "incompatible value types");
     this->create(detail::trivial_dispatch<T>(), this->data(), source.begin(), this->size());
   }
 
@@ -400,10 +400,10 @@ public:
   }
 
   /// \group Assignment
-  template <typename Array> auto operator=(const Array& source) & -> array_request<base_array&, Array>
+  template <typename A, typename = meta::requires<A>> auto operator=(const A& source) & -> base_array&
   {
-    static_assert(Array::order == 1, "array order mismatch");
-    static_assert(std::is_assignable<T&, typename Array::value_type>::value, "incompatible assignment");
+    static_assert(A::order == 1, "array order mismatch");
+    static_assert(std::is_assignable<T&, typename A::value_type>::value, "incompatible assignment");
 
     auto old_data = this->data();
     auto old_size = this->size();

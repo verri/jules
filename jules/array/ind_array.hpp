@@ -52,19 +52,10 @@ public:
   ~ind_array() = default;
 
   /// \group Assignment
-  template <typename U> auto operator=(const U& source) -> array_fallback<ind_array&, U>
+  template <typename A> auto operator=(const A& source) -> meta::requires_t<ind_array&, Array<A>>
   {
-    static_assert(std::is_assignable<T&, U>::value, "incompatible assignment");
-    for (auto& elem : *this)
-      elem = source;
-    return *this;
-  }
-
-  /// \group Assignment
-  template <typename Array> auto operator=(const Array& source) -> array_request<ind_array&, Array>
-  {
-    static_assert(Array::order == N, "array order mismatch");
-    static_assert(std::is_assignable<T&, typename Array::value_type>::value, "incompatible assignment");
+    static_assert(A::order == N, "array order mismatch");
+    static_assert(std::is_assignable<T&, typename A::value_type>::value, "incompatible assignment");
 
     DEBUG_ASSERT(this->extents() == source.extents(), debug::module{}, debug::level::extents_check, "extents mismatch");
     auto it = source.begin();
@@ -72,6 +63,15 @@ public:
       elem = *it++;
     DEBUG_ASSERT(it == source.end(), debug::module{}, debug::level::unreachable, "should never happen");
 
+    return *this;
+  }
+
+  /// \group Assignment
+  template <typename U> auto operator=(const U& source) -> meta::fallback_t<ind_array&, Array<U>>
+  {
+    static_assert(std::is_assignable<T&, U>::value, "incompatible assignment");
+    for (auto& elem : *this)
+      elem = source;
     return *this;
   }
 
@@ -227,19 +227,10 @@ public:
   ~ind_array() = default;
 
   /// \group Assignment
-  template <typename U> auto operator=(const U& source) -> array_fallback<ind_array&, U>
+  template <typename A> auto operator=(const A& source) -> meta::requires_t<ind_array&, Array<A>>
   {
-    static_assert(std::is_assignable<T&, U>::value, "incompatible assignment");
-    for (auto& elem : *this)
-      elem = source;
-    return *this;
-  }
-
-  /// \group Assignment
-  template <typename Array> auto operator=(const Array& source) -> array_request<ind_array&, Array>
-  {
-    static_assert(Array::order == 1, "array order mismatch");
-    static_assert(std::is_assignable<T&, typename Array::value_type>::value, "incompatible assignment");
+    static_assert(A::order == 1, "array order mismatch");
+    static_assert(std::is_assignable<T&, typename A::value_type>::value, "incompatible assignment");
 
     DEBUG_ASSERT(this->extents() == source.extents(), debug::module{}, debug::level::extents_check, "extents mismatch");
     auto it = source.begin();
@@ -247,6 +238,15 @@ public:
       elem = *it++;
     DEBUG_ASSERT(it == source.end(), debug::module{}, debug::level::unreachable, "should never happen");
 
+    return *this;
+  }
+
+  /// \group Assignment
+  template <typename U> auto operator=(const U& source) -> meta::fallback_t<ind_array&, Array<U>>
+  {
+    static_assert(std::is_assignable<T&, U>::value, "incompatible assignment");
+    for (auto& elem : *this)
+      elem = source;
     return *this;
   }
 
