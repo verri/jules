@@ -27,37 +27,28 @@ namespace jules
     }
     
     template <typename T>
-    struct is_array;
+    struct Array;
     
     template <typename T, std::size_t N>
-    struct is_array<base_array<T, N>>;
+    struct Array<base_array<T, N>>;
     
     template <typename T, std::size_t N>
-    struct is_array<ref_array<T, N>>;
+    struct Array<ref_array<T, N>>;
     
     template <typename T, std::size_t N>
-    struct is_array<ind_array<T, N>>;
+    struct Array<ind_array<T, N>>;
     
     template <typename It, typename F, std::size_t N>
-    struct is_array<unary_expr_array<It, F, N>>;
+    struct Array<unary_expr_array<It, F, N>>;
     
     template <typename LhsIt, typename RhsIt, typename F, std::size_t N>
-    struct is_array<binary_expr_array<LhsIt, RhsIt, F, N>>;
-    
-    template <typename T>
-    constexpr auto is_array_v();
-    
-    template <typename R, typename T>
-    using array_request = std::enable_if_t<is_array_v<T>(), R>;
-    
-    template <typename R, typename T>
-    using array_fallback = std::enable_if_t<!is_array_v<T>(), R>;
+    struct Array<binary_expr_array<LhsIt, RhsIt, F, N>>;
     
     template <std::size_t M, typename It, typename F>
-    unary_expr_array<It, F, M> make_expr_array(It first, It last, const F& f, typename base_slice<M>::extent_type extent);
+    unary_expr_array<It, std::decay_t<F>, M> make_expr_array(It first, It last, F&& f, typename base_slice<M>::extent_type extent);
     
     template <std::size_t M, typename LhsIt, typename RhsIt, typename F>
-    binary_expr_array<LhsIt, RhsIt, F, M> make_expr_array(LhsIt lhs_first, LhsIt lhs_last, RhsIt rhs_first, RhsIt rhs_last, const F& f, typename base_slice<M>::extent_type extent);
+    binary_expr_array<LhsIt, RhsIt, std::decay_t<F>, M> make_expr_array(LhsIt lhs_first, LhsIt lhs_last, RhsIt rhs_first, RhsIt rhs_last, F&& f, typename base_slice<M>::extent_type extent);
 }
 ```
 

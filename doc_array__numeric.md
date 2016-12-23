@@ -8,17 +8,24 @@
 
 namespace jules
 {
-    vector<index_t> seq(index_t start, index_t stop, index_t step = 1u);
+    std::vector<index_t> seq(const index_t start, const index_t stop, const distance_t step = 1);
     
-    template <typename T, typename Rng, int _concept_requires_34 = 42, typename std::enable_if<(_concept_requires_34==43)||(range::Range<Rng>()), int>::type=0>
-    /*
-    */>vector<T> to_vector(const Rng& rng);
+    template <typename T, typename A>
+    meta::requires_t<vector<T>, Array<std::decay_t<A>>> to_vector(A&& array);
     
-    template <typename Rng, typename R = range::range_value_t<Rng>, int _concept_requires_41 = 42, typename std::enable_if<(_concept_requires_41==43)||(range::Range<Rng>()), int>::type=0>
-    /*
-    */>vector<R> as_vector(const Rng& rng);
+    template <typename T, typename Rng, typename = meta::requires<range::Range<std::decay_t<Rng>>>>
+    meta::fallback_t<vector<T>, Array<std::decay_t<Rng>>> to_vector(Rng&& rng);
+    
+    template <typename A>
+    meta::requires_t<vector<typename A::value_type>, Array<std::decay_t<A>>> as_vector(A&& array);
+    
+    template <typename Rng, typename R = range::range_value_t<std::decay_t<Rng>>, typename = meta::requires<range::Range<std::decay_t<Rng>>>>
+    meta::fallback_t<vector<R>, Array<std::decay_t<Rng>>> as_vector(Rng&& rng);
     
     template <typename ... Args, typename = std::enable_if_t<(sizeof...(Args)>1)>>
     auto as_vector(Args&&... args);
+    
+    template <typename A, typename T = typename A::value_type, typename = meta::requires<Array<A>>>
+    auto normal_pdf(const A& array, T mu, T sigma);
 }
 ```

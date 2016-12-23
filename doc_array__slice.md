@@ -89,10 +89,19 @@ This class is used internally by `jules` to represent the position of elements o
 
 ``` cpp
 class iterator
-: public std::iterator<std::input_iterator_tag, index_t, distance_t, void *, index_t>
 {
 public:
-    iterator() = delete;
+    using iterator_category = std::input_iterator_tag;
+    
+    using value_type = index_t;
+    
+    using difference_type = distance_t;
+    
+    using pointer = void*;
+    
+    using reference = index_t;
+    
+    iterator() = default;
     
     constexpr iterator(const iterator& source) = default;
     
@@ -110,9 +119,9 @@ public:
     
     constexpr auto operator!=(const iterator& other) const;
     
-    constexpr index_t operator*() const;
+    constexpr reference operator*() const;
     
-    void* operator->() const;
+    pointer operator->() const;
 };
 ```
 
@@ -139,7 +148,7 @@ constexpr auto operator!=(const iterator& other) const;
 #### Operator `jules::base_slice::iterator::operator->`<a id="jules::base_slice-N-::iterator::operator--()const"></a>
 
 ``` cpp
-void* operator->() const;
+pointer operator->() const;
 ```
 
 *Notes*: You should not call this function.
@@ -258,10 +267,19 @@ This specialization is useful for slicing multidimensional arrays.
 
 ``` cpp
 class iterator
-: public std::iterator<std::input_iterator_tag, index_t, distance_t, void *, index_t>
 {
 public:
-    iterator() = delete;
+    using iterator_category = std::input_iterator_tag;
+    
+    using value_type = index_t;
+    
+    using difference_type = distance_t;
+    
+    using pointer = void*;
+    
+    using reference = index_t;
+    
+    iterator() = default;
     
     constexpr iterator(const iterator& source) = default;
     
@@ -279,9 +297,9 @@ public:
     
     constexpr auto operator!=(const iterator& other) const;
     
-    constexpr index_t operator*() const;
+    constexpr reference operator*() const;
     
-    void* operator->() const;
+    pointer operator->() const;
 };
 ```
 
@@ -292,7 +310,7 @@ public:
 #### Operator `jules::base_slice<1>::iterator::operator->`<a id="jules::base_slice-1-::iterator::operator--()const"></a>
 
 ``` cpp
-void* operator->() const;
+pointer operator->() const;
 ```
 
 *Notes*: You should not call this function.

@@ -53,6 +53,13 @@ namespace jules
     
     template <typename T, std::size_t N>
     using recursive_initializer_list_t = typename recursive_initializer_list<T, N>::type;
+    
+    struct in_place_t;
+    
+    constexpr in_place_t{} in_place;
+    
+    template <typename T>
+    struct numeric_traits;
 }
 ```
 

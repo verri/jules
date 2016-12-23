@@ -13,6 +13,13 @@ Dependencies
  - C++14 compiler
  - [debug_assert](https://github.com/foonathan/debug_assert)
  - [range-v3](https://github.com/ericniebler/range-v3)
+ - [CBLAS](http://www.netlib.org/blas/) (optional)
+ - [Catch](https://github.com/philsquared/Catch.git) (testing)
+
+Tutorial
+--------
+
+- [Array](array__tutorial.html)
 
 Documentation
 -------------
@@ -23,10 +30,10 @@ Generated with [standardese](https://github.com/foonathan/standardese).
 - [Entities](standardese_entities.html)
 - [Files](standardese_files.html)
 
-Tutorial
---------
+Contributing
+------------
 
-- [Array](array__tutorial.html)
+[Source code](https://github.com/verri/jules) hosted at [GitHub](https://github.com).
 
 Acknowledgements
 ----------------

@@ -45,10 +45,10 @@ public:
     
     ~ref_array() = default;
     
+    template <typename A>
+    meta::requires_t<ref_array&, Array<A>> operator=(const A& source);
     template <typename U>
-    array_fallback<ref_array&, U> operator=(const U& source);
-    template <typename Array>
-    array_request<ref_array&, Array> operator=(const Array& source);
+    meta::fallback_t<ref_array&, Array<U>> operator=(const U& source);
     ref_array& operator=(base_array<T, N>&& source) noexcept;
     
     operator ref_array<const T, N>() const;
@@ -58,7 +58,7 @@ public:
     
     ref_array<T, N>& operator()();
     
-    ref_array<T, N>& operator()() const;
+    ref_array<const T, N> operator()() const;
     
     template <typename ... Args>
     detail::indirect_request<ind_array<T, N>, Args...> operator()(Args&&... args);
@@ -118,11 +118,11 @@ ref_array() = default;
 ### Function template `jules::ref_array::operator=`<a id="jules::ref_array-T,N-"></a>
 
 ``` cpp
-(1)  template <typename U>
-     array_fallback<ref_array&, U> operator=(const U& source);
+(1)  template <typename A>
+     meta::requires_t<ref_array&, Array<A>> operator=(const A& source);
 
-(2)  template <typename Array>
-     array_request<ref_array&, Array> operator=(const Array& source);
+(2)  template <typename U>
+     meta::fallback_t<ref_array&, Array<U>> operator=(const U& source);
 
 (3)  ref_array& operator=(base_array<T, N>&& source) noexcept;
 ```
@@ -174,10 +174,11 @@ public:
     
     ~ref_array() = default;
     
+    template <typename A>
+    meta::requires_t<ref_array&, Array<A>> operator=(const A& source);
     template <typename U>
-    array_fallback<ref_array&, U> operator=(const U& source);
-    template <typename Array>
-    array_request<ref_array&, Array> operator=(const Array& source);
+    meta::fallback_t<ref_array&, Array<U>> operator=(const U& source);
+    ref_array& operator=(const ref_array<T, 1>& source);
     ref_array& operator=(base_array<T, 1>&& source) noexcept;
     
     operator ref_array<const T, 1>() const;
@@ -185,21 +186,27 @@ public:
     T& operator[](index_t i);
     const T& operator[](index_t i) const;
     
-    template <typename Rng, typename U = range::range_value_t<Rng>, int _concept_requires_224 = 42, typename std::enable_if<(_concept_requires_224==43)||(range::Range<Rng>()), int>::type=0>
-    /*
-    */>ind_array<T, 1> operator()(const Rng& rng);
+    ref_array<T, 1>& operator()();
+    
+    ref_array<const T, 1> operator()() const;
+    
+    template <typename Rng, typename U = range::range_value_t<Rng>, typename = meta::requires<range::Range<Rng>>>
+    ind_array<T, 1> operator()(const Rng& rng);
+    
+    ind_array<T, 1> operator()(std::vector<index_t>&& indexes);
     
     ref_array<T, 1> operator()(const base_slice<1>& slice);
     
     T& operator()(index_t i);
     
-    template <typename Rng, typename U = range::range_value_t<Rng>, int _concept_requires_240 = 42, typename std::enable_if<(_concept_requires_240==43)||(range::Range<Rng>()), int>::type=0>
-    /*
-    */>ind_array<T, 1> operator()(const Rng& rng) const;
+    template <typename Rng, typename U = range::range_value_t<Rng>, typename = meta::requires<range::Range<Rng>>>
+    ind_array<const T, 1> operator()(const Rng& rng) const;
     
-    ref_array<T, 1> operator()(const base_slice<1>& slice) const;
+    ind_array<const T, 1> operator()(std::vector<index_t>&& indexes) const;
     
-    T& operator()(index_t i) const;
+    ref_array<const T, 1> operator()(const base_slice<1>& slice) const;
+    
+    const T& operator()(index_t i) const;
     
     iterator begin();
     
@@ -245,13 +252,15 @@ ref_array() = default;
 ### Function template `jules::ref_array<T, 1>::operator=`<a id="jules::ref_array-T,1-"></a>
 
 ``` cpp
-(1)  template <typename U>
-     array_fallback<ref_array&, U> operator=(const U& source);
+(1)  template <typename A>
+     meta::requires_t<ref_array&, Array<A>> operator=(const A& source);
 
-(2)  template <typename Array>
-     array_request<ref_array&, Array> operator=(const Array& source);
+(2)  template <typename U>
+     meta::fallback_t<ref_array&, Array<U>> operator=(const U& source);
 
-(3)  ref_array& operator=(base_array<T, 1>&& source) noexcept;
+(3)  ref_array& operator=(const ref_array<T, 1>& source);
+
+(4)  ref_array& operator=(base_array<T, 1>&& source) noexcept;
 ```
 
 ### Conversion operator `jules::ref_array<T, 1>::operator ref_array<const T, 1>`<a id="jules::ref_array-T,1-::operatorref_array-constT,1-()const"></a>

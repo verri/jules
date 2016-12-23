@@ -47,10 +47,10 @@ public:
     
     ~ind_array() = default;
     
+    template <typename A>
+    meta::requires_t<ind_array&, Array<A>> operator=(const A& source);
     template <typename U>
-    array_fallback<ind_array&, U> operator=(const U& source);
-    template <typename Array>
-    array_request<ind_array&, Array> operator=(const Array& source);
+    meta::fallback_t<ind_array&, Array<U>> operator=(const U& source);
     ind_array& operator=(base_array<T, N>&& source) noexcept;
     
     operator ind_array<const T, N>() const;
@@ -117,11 +117,11 @@ ind_array() = default;
 ### Function template `jules::ind_array::operator=`<a id="jules::ind_array-T,N-"></a>
 
 ``` cpp
-(1)  template <typename U>
-     array_fallback<ind_array&, U> operator=(const U& source);
+(1)  template <typename A>
+     meta::requires_t<ind_array&, Array<A>> operator=(const A& source);
 
-(2)  template <typename Array>
-     array_request<ind_array&, Array> operator=(const Array& source);
+(2)  template <typename U>
+     meta::fallback_t<ind_array&, Array<U>> operator=(const U& source);
 
 (3)  ind_array& operator=(base_array<T, N>&& source) noexcept;
 ```
@@ -163,7 +163,7 @@ public:
     
     using iterator = detail::iterator_from_indexes<T, typename vector_type::iterator>;
     
-    using const_iterator = detail::iterator_from_indexes<const T, typename vector_type::iterator>;
+    using const_iterator = detail::iterator_from_indexes<const T, typename vector_type::const_iterator>;
     
     ind_array() = default;
     
@@ -175,10 +175,11 @@ public:
     
     ~ind_array() = default;
     
+    template <typename A>
+    meta::requires_t<ind_array&, Array<A>> operator=(const A& source);
     template <typename U>
-    array_fallback<ind_array&, U> operator=(const U& source);
-    template <typename Array>
-    array_request<ind_array&, Array> operator=(const Array& source);
+    meta::fallback_t<ind_array&, Array<U>> operator=(const U& source);
+    ind_array& operator=(const ind_array<T, 1>& source);
     ind_array& operator=(base_array<T, 1>&& source) noexcept;
     
     operator ind_array<const T, 1>() const;
@@ -186,17 +187,19 @@ public:
     T& operator[](index_t i);
     const T& operator[](index_t i) const;
     
-    template <typename Rng, typename U = range::range_value_t<Rng>, int _concept_requires_278 = 42, typename std::enable_if<(_concept_requires_278==43)||(range::Range<Rng>()), int>::type=0>
-    /*
-    */>ind_array<T, 1> operator()(const Rng& rng);
+    template <typename Rng, typename U = range::range_value_t<Rng>, typename = meta::requires<range::Range<Rng>>>
+    ind_array<T, 1> operator()(const Rng& rng);
+    
+    ind_array<T, 1> operator()(std::vector<index_t>&& indexes);
     
     ind_array<T, 1> operator()(const base_slice<1>& slice);
     
     T& operator()(index_t i);
     
-    template <typename Rng, typename U = range::range_value_t<Rng>, int _concept_requires_297 = 42, typename std::enable_if<(_concept_requires_297==43)||(range::Range<Rng>()), int>::type=0>
-    /*
-    */>ind_array<const T, 1> operator()(const Rng& rng) const;
+    template <typename Rng, typename U = range::range_value_t<Rng>, typename = meta::requires<range::Range<Rng>>>
+    ind_array<const T, 1> operator()(const Rng& rng) const;
+    
+    ind_array<const T, 1> operator()(std::vector<index_t>&& indexes) const;
     
     ind_array<const T, 1> operator()(const base_slice<1>& slice) const;
     
@@ -241,13 +244,15 @@ ind_array() = default;
 ### Function template `jules::ind_array<T, 1>::operator=`<a id="jules::ind_array-T,1-"></a>
 
 ``` cpp
-(1)  template <typename U>
-     array_fallback<ind_array&, U> operator=(const U& source);
+(1)  template <typename A>
+     meta::requires_t<ind_array&, Array<A>> operator=(const A& source);
 
-(2)  template <typename Array>
-     array_request<ind_array&, Array> operator=(const Array& source);
+(2)  template <typename U>
+     meta::fallback_t<ind_array&, Array<U>> operator=(const U& source);
 
-(3)  ind_array& operator=(base_array<T, 1>&& source) noexcept;
+(3)  ind_array& operator=(const ind_array<T, 1>& source);
+
+(4)  ind_array& operator=(base_array<T, 1>&& source) noexcept;
 ```
 
 ### Conversion operator `jules::ind_array<T, 1>::operator ind_array<const T, 1>`<a id="jules::ind_array-T,1-::operatorind_array-constT,1-()const"></a>

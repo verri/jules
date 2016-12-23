@@ -19,36 +19,55 @@ namespace jules
     template <std::size_t N, typename T>
     constexpr auto repeat(const T& value);
     
-    template <typename Iter, typename Sent, int _concept_requires_44 = 42, typename std::enable_if<(_concept_requires_44==43)||(range::Sentinel<Sent, Iter>()), int>::type=0>
-    /*
-    */> max(Iter first, Sent last);
+    template <typename Iter, typename Sent, typename T = range::iterator_value_t<Iter>, typename = meta::requires<range::Sentinel<Sent, Iter>>>
+    auto max(Iter first, Sent last, T start = -numeric_traits<T>::infinity());
     
-    template <typename Rng, int _concept_requires_49 = 42, typename std::enable_if<(_concept_requires_49==43)||(range::Range<Rng>()), int>::type=0>
-    /*
-    */> max(const Rng& rng);
+    template <typename Rng, typename T = range::range_value_t<Rng>, typename = meta::requires<range::Range<Rng>>>
+    auto max(const Rng& rng, T start = -numeric_traits<T>::infinity());
     
-    template <typename Iter, typename Sent, typename T = range::iterator_value_t<Iter>, int _concept_requires_55 = 42, typename std::enable_if<(_concept_requires_55==43)||(range::Sentinel<Sent, Iter>()), int>::type=0>
-    /*
-    */> prod(Iter first, Sent last, const T& start = static_cast<T>(1u));
+    template <typename Iter, typename Sent, typename T = range::iterator_value_t<Iter>, typename = meta::requires<range::Sentinel<Sent, Iter>>>
+    auto prod(Iter first, Sent last, T start = numeric_traits<T>::multiplicative_identity());
     
-    template <typename Rng, typename T = range::range_value_t<Rng>, int _concept_requires_61 = 42, typename std::enable_if<(_concept_requires_61==43)||(range::Range<Rng>()), int>::type=0>
-    /*
-    */> prod(Rng&& rng, const T& start = static_cast<T>(1u));
+    template <typename Rng, typename T = range::range_value_t<Rng>, typename = meta::requires<range::Range<Rng>>>
+    auto prod(const Rng& rng, T start = numeric_traits<T>::multiplicative_identity());
     
     constexpr detail::forward_arithmetic prod_args();
     
     template <typename T, typename ... Args>
     constexpr auto prod_args(const T& arg, Args&&... args);
     
+    template <typename Iter, typename Sent, typename T = range::iterator_value_t<Iter>, typename = meta::requires<range::Sentinel<Sent, Iter>>>
+    auto sum(Iter first, Sent last, T start = numeric_traits<T>::additive_identity());
+    
+    template <typename Rng, typename T = range::range_value_t<Rng>, typename = meta::requires<range::Range<Rng>>>
+    auto sum(const Rng& rng, T start = numeric_traits<T>::additive_identity());
+    
+    constexpr detail::forward_arithmetic sum_args();
+    
+    template <typename T, typename ... Args>
+    constexpr auto sum_args(const T& arg, Args&&... args);
+    
     constexpr auto all_args();
     
     template <typename ... Args>
     constexpr auto all_args(bool arg, Args&&... args);
     
+    template <typename Iter, typename Sent, typename = meta::requires<range::Sentinel<Sent, Iter>>>
+    auto all(Iter first, Sent last);
+    
+    template <typename Rng, typename = meta::requires<range::Range<Rng>>>
+    auto all(const Rng& rng);
+    
     constexpr auto any_args();
     
     template <typename ... Args>
     constexpr auto any_args(bool arg, Args&&... args);
+    
+    template <typename T>
+    constexpr auto square(const T& value);
+    
+    template <typename T>
+    auto normal_pdf(const T& x, const T& mu, const T& sigma);
 }
 ```
 

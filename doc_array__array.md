@@ -52,18 +52,22 @@ public:
     base_array(Dims... dims);
     template <typename ... Dims, typename = detail::n_indexes_enabler<N, Dims...>>
     base_array(const T& value, Dims... dims);
-    template <typename Iter, typename ... Dims, typename R = range::iterator_value_t<Iter>, typename = detail::n_indexes_enabler<N, Dims...>>
+    template <typename Iter, typename ... Dims, typename R = range::iterator_value_t<Iter>, typename = detail::n_indexes_enabler<N, Dims...>, typename = meta::requires<range::Iterator<Iter>>>
     base_array(Iter iter, Dims... dims);
     base_array(recursive_initializer_list_t<T, N> values);
     base_array(const base_array& source);
     base_array(base_array&& source) noexcept;
-    template <typename Array, typename = array_request<void, Array>>
-    base_array(const Array& source);
+    template <typename A, typename = meta::requires<Array<A>>>
+    base_array(const A& source);
     
     base_array& operator=(const base_array& source);
     base_array& operator=(base_array&& source) noexcept;
-    template <typename Array>
-    array_request<base_array&, Array> operator=(const Array& source);
+    template <typename A>
+    meta::requires_t<base_array&, Array<A>> operator=(const A& source);
+    
+    auto fill(const T& value);
+    template <typename ... Args>
+    auto fill(in_place_t, Args&&... args);
     
     iterator begin();
     const_iterator begin() const;
@@ -77,6 +81,8 @@ public:
     const value_type* data() const;
     
 private:
+    static auto clear(T* data, index_t size);
+    
     static base_slice<N> calculate_descriptor(recursive_initializer_list_t<T, N> values);
     
     static auto calculate_descriptor_fill(std::array<index_t, N>&, const T&, index_t);
@@ -152,7 +158,7 @@ Signed integer type that can store differences between sizes.
 (3)  template <typename ... Dims, typename = detail::n_indexes_enabler<N, Dims...>>
      base_array(const T& value, Dims... dims);
 
-(4)  template <typename Iter, typename ... Dims, typename R = range::iterator_value_t<Iter>, typename = detail::n_indexes_enabler<N, Dims...>>
+(4)  template <typename Iter, typename ... Dims, typename R = range::iterator_value_t<Iter>, typename = detail::n_indexes_enabler<N, Dims...>, typename = meta::requires<range::Iterator<Iter>>>
      base_array(Iter iter, Dims... dims);
 
 (5)  base_array(recursive_initializer_list_t<T, N> values);
@@ -161,8 +167,8 @@ Signed integer type that can store differences between sizes.
 
 (7)  base_array(base_array&& source) noexcept;
 
-(8)  template <typename Array, typename = array_request<void, Array>>
-     base_array(const Array& source);
+(8)  template <typename A, typename = meta::requires<Array<A>>>
+     base_array(const A& source);
 ```
 
 Constructs a new array from a variety of data sources.
@@ -194,8 +200,8 @@ Constructs a new array from a variety of data sources.
 
 (2)  base_array& operator=(base_array&& source) noexcept;
 
-(3)  template <typename Array>
-     array_request<base_array&, Array> operator=(const Array& source);
+(3)  template <typename A>
+     meta::requires_t<base_array&, Array<A>> operator=(const A& source);
 ```
 
 1)  Copy assignment.
@@ -203,6 +209,17 @@ Constructs a new array from a variety of data sources.
 2)  Move assignment.
 
 3)  Assignment from array-like structures.
+
+### Function `jules::base_array::fill`<a id="jules::base_array-T,N-"></a>
+
+``` cpp
+(1)  auto fill(const T& value);
+
+(2)  template <typename ... Args>
+     auto fill(in_place_t, Args&&... args);
+```
+
+Fills the array.
 
 ### Function `jules::base_array::begin`<a id="jules::base_array-T,N-"></a>
 
@@ -265,20 +282,28 @@ public:
     base_array();
     base_array(index_t length);
     base_array(const T& value, index_t length);
-    template <typename Iter, typename U = range::iterator_value_t<Iter>>
-    base_array(Iter first, Iter last);
+    template <typename Iter, typename Sent, typename U = range::iterator_value_t<Iter>, typename = meta::requires<range::Sentinel<Sent, Iter>>>
+    base_array(Iter first, Sent last);
     base_array(std::initializer_list<T> values);
-    template <typename Rng, typename U = range::range_value_t<Rng>, int _concept_requires_319 = 42, typename std::enable_if<(_concept_requires_319==43)||(range::Range<Rng>()), int>::type=0, typename = array_fallback<void, Rng>>
-    base_array(const Rng& rng);
+    template <typename Rng, typename U = range::range_value_t<std::decay_t<Rng>>, typename = meta::requires<range::Range<std::decay_t<Rng>>, meta::negation<Array<std::decay_t<Rng>>>>>
+    base_array(Rng&& rng);
     base_array(const base_array& source);
     base_array(base_array&& source) noexcept;
-    template <typename Array, typename = array_request<void, Array>>
-    base_array(const Array& source);
+    template <typename A, typename = meta::requires<Array<A>>>
+    base_array(const A& source);
     
-    base_array& operator=(const base_array& source);
-    base_array& operator=(base_array&& source) noexcept;
-    template <typename Array>
-    array_request<base_array&, Array> operator=(const Array& source);
+    base_array& operator=(const base_array& source) &;
+    base_array& operator=(base_array&& source) & noexcept;
+    template <typename A, typename = meta::requires<A>>
+    base_array& operator=(const A& source) &;
+    
+    auto fill(const T& value);
+    template <typename ... Args>
+    auto fill(in_place_t, Args&&... args);
+    
+    ind_array<T, 1> operator()(std::vector<index_t>&& indexes);
+    
+    ind_array<const T, 1> operator()(std::vector<index_t>&& indexes) const;
     
     iterator begin();
     const_iterator begin() const;
@@ -290,6 +315,9 @@ public:
     
     value_type* data();
     const value_type* data() const;
+    
+private:
+    static auto clear(T* data, index_t size);
 };
 ```
 
@@ -358,20 +386,20 @@ Signed integer type that can store differences between sizes.
 
 (3)  base_array(const T& value, index_t length);
 
-(4)  template <typename Iter, typename U = range::iterator_value_t<Iter>>
-     base_array(Iter first, Iter last);
+(4)  template <typename Iter, typename Sent, typename U = range::iterator_value_t<Iter>, typename = meta::requires<range::Sentinel<Sent, Iter>>>
+     base_array(Iter first, Sent last);
 
 (5)  base_array(std::initializer_list<T> values);
 
-(6)  template <typename Rng, typename U = range::range_value_t<Rng>, int _concept_requires_319 = 42, typename std::enable_if<(_concept_requires_319==43)||(range::Range<Rng>()), int>::type=0, typename = array_fallback<void, Rng>>
-     base_array(const Rng& rng);
+(6)  template <typename Rng, typename U = range::range_value_t<std::decay_t<Rng>>, typename = meta::requires<range::Range<std::decay_t<Rng>>, meta::negation<Array<std::decay_t<Rng>>>>>
+     base_array(Rng&& rng);
 
 (7)  base_array(const base_array& source);
 
 (8)  base_array(base_array&& source) noexcept;
 
-(9)  template <typename Array, typename = array_request<void, Array>>
-     base_array(const Array& source);
+(9)  template <typename A, typename = meta::requires<Array<A>>>
+     base_array(const A& source);
 ```
 
 Constructs a new vector from a variety of data sources.
@@ -397,12 +425,12 @@ Constructs a new vector from a variety of data sources.
 ### Copy assignment operator `jules::base_array<T, 1>::operator=`<a id="jules::base_array-T,1-"></a>
 
 ``` cpp
-(1)  base_array& operator=(const base_array& source);
+(1)  base_array& operator=(const base_array& source) &;
 
-(2)  base_array& operator=(base_array&& source) noexcept;
+(2)  base_array& operator=(base_array&& source) & noexcept;
 
-(3)  template <typename Array>
-     array_request<base_array&, Array> operator=(const Array& source);
+(3)  template <typename A, typename = meta::requires<A>>
+     base_array& operator=(const A& source) &;
 ```
 
 1)  Copy assignment.
@@ -410,6 +438,17 @@ Constructs a new vector from a variety of data sources.
 2)  Move assignment.
 
 3)  Assignment from array-like structures.
+
+### Function `jules::base_array<T, 1>::fill`<a id="jules::base_array-T,1-"></a>
+
+``` cpp
+(1)  auto fill(const T& value);
+
+(2)  template <typename ... Args>
+     auto fill(in_place_t, Args&&... args);
+```
+
+Fills the array.
 
 ### Function `jules::base_array<T, 1>::begin`<a id="jules::base_array-T,1-"></a>
 

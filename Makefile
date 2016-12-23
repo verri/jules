@@ -1,3 +1,3 @@
 all:
-	standardese -I .. ../jules
+	standardese /usr/include/jules
 	sh check_files.sh
