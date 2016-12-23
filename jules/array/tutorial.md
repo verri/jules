@@ -111,3 +111,35 @@ auto g = std::move(b);
 // See section "Lazy evaluation" for more information.
 auto i = jules::matrix<>(d + e);
 ```
+
+# Element accessing
+
+The most trivial array manipulation is accessing its elements.  As
+traditional C-arrays, one can access `jules` arrays using `operator[]`.
+
+```cpp
+auto matrix = jules::matrix<>(0.0, 3u, 3u);
+auto vector = jules::vector<>(0.0, 3u);
+
+vector[0u] = 1.0;
+// vector == {1.0, 0.0, 0.0}
+
+matrix[1u][1u] = vector[0u];
+// matrix == { {0.0, 0.0, 0.0}, {0.0, 1.0, 0.0}, {0.0, 0.0, 0.0} }
+```
+
+Alternatively (and potentially faster in most of the cases), one can
+use the `operator()` notation.
+
+```
+matrix(2u, 2u) = vector(0u);
+// matrix == { {0.0, 0.0, 0.0}, {0.0, 1.0, 0.0}, {0.0, 0.0, 1.0} }
+```
+
+Unlike C-arrays, one can assign entire sub-arrays if they have same
+dimensions.
+
+```cpp
+matrix[0u] = vector;
+// matrix == { {1.0, 0.0, 0.0}, {0.0, 1.0, 0.0}, {0.0, 0.0, 1.0} }
+```
