@@ -44,7 +44,7 @@ auto b = jules::vector<>(10u);
 // A vector with 10 elements containing copies of 3.14.
 auto c = jules::vector<>(3.14, 10u);
 
-auto values[] = {0.1, 0.2, 0.3, 0.4, 0.5};
+double values[] = {0.1, 0.2, 0.3, 0.4, 0.5};
 
 // A vector from range of iterators.
 auto d = jules::vector<>(std::begin(values), std::end(values));
@@ -60,7 +60,7 @@ auto g = a;
 auto h = std::move(b);
 
 // A vector from other vector-like structures.
-// See section Array-like structures for more information.
+// See section "Lazy evaluation" for more information.
 auto i = jules::vector<>(d + e);
 ```
 
@@ -68,39 +68,46 @@ The function `jules::as_vector` can be used to construct a vector whose
 elements type is inferred.
 
 ``` cpp
-// An vector with elements whose type is inferred as double.
+// A vector with elements whose type is inferred as double.
 auto j = jules::as_vector(values);
 
-// An vector with elements whose type is the common type of the arguments.
+// A vector with elements whose type is the common type of the arguments.
 auto k = jules::as_vector(1, 2u, 3l);
 "")
 ```
 
-For higher dimensional arrays, the constructor are basically the same.  Consult
-[the reference](standardese://jules::base_array<T, N>::base_array/) for
+For higher dimensional arrays, the constructors are basically the same.
+Consult [the reference](standardese://jules::base_array<T, N>::base_array/) for
 a comprehensive list.
 
 ``` cpp
+// An empty matrix.
+auto a = jules::matrix<>();
 
-auto a = jules::matrix<>(); // Empty matrix.
-auto b = jules::matrix<>(5u, 2u); // 5x2 matrix.
-auto c = jules::matrix<>(3.14, 5u, 2u); // 5x2 matrix with elements 3.14.
+// A matrix with 5 rows and 2 columns.
+auto b = jules::matrix<>(5u, 2u);
 
-jules::numeric values[] = {0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9};
+// A matrix with 5 rows and 2 columns filled with elements 3.14.
+auto c = jules::matrix<>(3.14, 5u, 2u);
 
-// 3x3 matrix with elements from an iterator.
-// THe matrix is filled columns-first.
+double values[] = {0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9};
+
+// A 3x3 matrix with elements from an iterator.
+// The matrix is filled in column-major order.
 auto d = jules::matrix<>(std::begin(values), 3u, 3u);
 
-// 3x3 matrix from a recursive initializer_list.
+// A 3x3 matrix from a recursive initializer_list.
 auto e = jules::matrix<>{
   {0.1, 0.4, 0.7},
   {0.2, 0.5, 0.8},
   {0.3, 0.6, 0.9},
 };
 
-auto f = a; // Copy constructor.
-auto g = std::move(b); // Move constructor.
-auto i = jules::matrix<>(d + e); // Matrix from other matrix-like structures. See section TODO.
+// Copy and move constructor.
+auto f = a;
+auto g = std::move(b);
 
+// A matrix from other matrix-like structures.
+// See section "Lazy evaluation" for more information.
+auto i = jules::matrix<>(d + e);
 ```
