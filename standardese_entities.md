@@ -71,6 +71,26 @@
 
   - [JULES\_CORE\_TYPE\_H](doc_core__type.html#core/type.hpp "JULES_CORE_TYPE_H")
 
+  - [JULES\_DATAFRAME\_COLUMN\_DECL\_H](doc_dataframe__column_decl.html#dataframe/column_decl.hpp "JULES_DATAFRAME_COLUMN_DECL_H")
+
+  - [JULES\_DATAFRAME\_COLUMN\_H](doc_dataframe__column.html#dataframe/column.hpp "JULES_DATAFRAME_COLUMN_H")
+
+  - [JULES\_DATAFRAME\_COLUMN\_VIEW\_DECL\_H](doc_dataframe__column_view_decl.html#dataframe/column_view_decl.hpp "JULES_DATAFRAME_COLUMN_VIEW_DECL_H")
+
+  - [JULES\_DATAFRAME\_COLUMN\_VIEW\_H](doc_dataframe__column_view.html#dataframe/column_view.hpp "JULES_DATAFRAME_COLUMN_VIEW_H")
+
+  - [JULES\_DATAFRAME\_DATAFRAME\_DECL\_H](doc_dataframe__dataframe_decl.html#dataframe/dataframe_decl.hpp "JULES_DATAFRAME_DATAFRAME_DECL_H")
+
+  - [JULES\_DATAFRAME\_DATAFRAME\_H](doc_dataframe__dataframe.html#dataframe/dataframe.hpp "JULES_DATAFRAME_DATAFRAME_H")
+
+  - [JULES\_DATAFRAME\_DETAIL\_STORAGE\_H](doc_dataframe__detail__column.html#dataframe/detail/column.hpp "JULES_DATAFRAME_DETAIL_STORAGE_H")
+
+  - [JULES\_DATAFRAME\_IO\_H](doc_dataframe__io_decl.html#dataframe/io_decl.hpp "JULES_DATAFRAME_IO_H")
+
+  - [JULES\_DATAFRAME\_ROW\_VIEW\_DECL\_H](doc_dataframe__row_view_decl.html#dataframe/row_view_decl.hpp "JULES_DATAFRAME_ROW_VIEW_DECL_H")
+
+  - [JULES\_DATAFRAME\_ROW\_VIEW\_H](doc_dataframe__row_view.html#dataframe/row_view.hpp "JULES_DATAFRAME_ROW_VIEW_H")
+
   - [JULES\_DEBUG\_LEVEL](doc_core__debug.html#core/debug.hpp "JULES_DEBUG_LEVEL")
 
   - [OPERATIONS\_LIST](doc_array__functional.html#array/functional.hpp "OPERATIONS_LIST")
