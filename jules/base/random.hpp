@@ -4,6 +4,7 @@
 #define JULES_BASE_RANDOM_H
 
 #include <jules/base/numeric.hpp>
+#include <jules/core/meta.hpp>
 #include <jules/core/range.hpp>
 
 #include <cmath>
@@ -42,7 +43,7 @@ static inline auto uniform_index_sample(index_t end)
   return sample(dist);
 }
 
-template <typename Rng, typename U = range::range_value_t<std::decay_t<Rng>>, CONCEPT_REQUIRES_(range::Range<Rng>())>
+template <typename Rng, typename U = range::range_value_t<std::decay_t<Rng>>, typename = meta::requires<range::Range<Rng>>>
 auto discrete_index_sample(Rng&& rng)
 {
   static_assert(std::is_convertible<U, double>::value, "weights must be convertible to double");

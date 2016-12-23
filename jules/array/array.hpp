@@ -8,6 +8,7 @@
 #include <jules/array/ref_array.hpp>
 #include <jules/base/async.hpp>
 #include <jules/base/numeric.hpp>
+#include <jules/core/meta.hpp>
 #include <jules/core/type.hpp>
 
 #include <type_traits>
@@ -97,7 +98,7 @@ public:
 
   /// \group Constructors
   template <typename Iter, typename... Dims, typename R = range::iterator_value_t<Iter>,
-            typename = detail::n_indexes_enabler<N, Dims...>, CONCEPT_REQUIRES_(range::Iterator<Iter>())>
+            typename = detail::n_indexes_enabler<N, Dims...>, typename = meta::requires<range::Iterator<Iter>>>
   base_array(Iter iter, Dims... dims) : ref_array<T, N>{this->allocate(prod_args(dims...)), {0u, {{index_t{dims}...}}}}
   {
     static_assert(std::is_convertible<R, T>::value, "iterator values are not compatible");
@@ -332,7 +333,7 @@ public:
 
   /// \group Constructors
   template <typename Iter, typename Sent, typename U = range::iterator_value_t<Iter>,
-            CONCEPT_REQUIRES_(range::Sentinel<Sent, Iter>())>
+            typename = meta::requires<range::Sentinel<Sent, Iter>>>
   base_array(Iter first, Sent last)
     : ref_array<T, 1>{this->allocate(range::distance(first, last)), {0u, static_cast<index_t>(range::distance(first, last))}}
   {
@@ -345,7 +346,7 @@ public:
 
   /// \group Constructors
   template <typename Rng, typename U = range::range_value_t<std::decay_t<Rng>>,
-            CONCEPT_REQUIRES_(range::Range<std::decay_t<Rng>>()), typename = array_fallback<void, std::decay_t<Rng>>>
+            typename = meta::requires<range::Range<std::decay_t<Rng>>>, typename = array_fallback<void, std::decay_t<Rng>>>
   base_array(Rng&& rng)
     : ref_array<T, 1>{this->allocate(range::size(std::forward<Rng>(rng))), {0u, range::size(std::forward<Rng>(rng))}}
   {

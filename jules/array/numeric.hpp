@@ -3,6 +3,7 @@
 
 #include <jules/array/array.hpp>
 #include <jules/core/debug.hpp>
+#include <jules/core/meta.hpp>
 #include <jules/core/type.hpp>
 
 #include <iterator>
@@ -29,7 +30,7 @@ static inline auto seq(const index_t start, const index_t stop, const distance_t
   return indexes;
 }
 
-template <typename T, typename Rng, CONCEPT_REQUIRES_(range::Range<std::decay_t<Rng>>())>
+template <typename T, typename Rng, typename = meta::requires<range::Range<std::decay_t<Rng>>>>
 auto to_vector(Rng&& rng) -> array_fallback<vector<T>, std::decay_t<Rng>>
 {
   return vector<T>(std::forward<Rng>(rng));
@@ -42,7 +43,7 @@ template <typename T, typename Array> auto to_vector(Array&& array) -> array_req
 }
 
 template <typename Rng, typename R = range::range_value_t<std::decay_t<Rng>>,
-          CONCEPT_REQUIRES_(range::Range<std::decay_t<Rng>>())>
+          typename = meta::requires<range::Range<std::decay_t<Rng>>>>
 auto as_vector(Rng&& rng) -> array_fallback<vector<R>, std::decay_t<Rng>>
 {
   return to_vector<R>(std::forward<Rng>(rng));

@@ -7,6 +7,7 @@
 #include <jules/array/detail/slicing.hpp>
 #include <jules/array/slice.hpp>
 #include <jules/core/debug.hpp>
+#include <jules/core/meta.hpp>
 #include <jules/core/type.hpp>
 
 #include <vector>
@@ -287,7 +288,7 @@ public:
     return data_[indexes_[descriptor_(i)]];
   }
 
-  template <typename Rng, typename U = range::range_value_t<Rng>, CONCEPT_REQUIRES_(range::Range<Rng>())>
+  template <typename Rng, typename U = range::range_value_t<Rng>, typename = meta::requires<range::Range<Rng>>>
   auto operator()(const Rng& rng) -> ind_array<T, 1>
   {
     static_assert(std::is_convertible<U, index_t>::value, "arbitrary ranges must contain indexes");
@@ -312,7 +313,7 @@ public:
 
   auto operator()(index_t i) -> T& { return (*this)[i]; }
 
-  template <typename Rng, typename U = range::range_value_t<Rng>, CONCEPT_REQUIRES_(range::Range<Rng>())>
+  template <typename Rng, typename U = range::range_value_t<Rng>, typename = meta::requires<range::Range<Rng>>>
   auto operator()(const Rng& rng) const -> ind_array<const T, 1>
   {
     static_assert(std::is_convertible<U, index_t>::value, "arbitrary ranges must contain indexes");
