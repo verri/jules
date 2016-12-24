@@ -7,7 +7,7 @@ cache:
 matrix:
   include:
     - os: linux
-      env: COMPILER_NAME=gcc CXX=g++-6 CC=gcc-6
+      env: COMPILER_NAME=gcc CXX=g++-6 CC=gcc-6 CXXFLAGS="-O0 -coverage -fno-inline -fno-inline-small-functions -fno-default-inline"
       addons:
         apt:
           packages:
@@ -18,7 +18,7 @@ matrix:
             - llvm-toolchain-precise-3.8
             - ubuntu-toolchain-r-test
     - os: linux
-      env: COMPILER_NAME=clang CXX=clang++-3.8 CC=clang-3.8
+      env: COMPILER_NAME=clang CXX=clang++-3.8 CC=clang-3.8 CXXFLAGS="-O2"
       addons:
         apt:
           packages:
