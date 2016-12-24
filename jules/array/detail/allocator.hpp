@@ -5,6 +5,7 @@
 
 #include <jules/array/detail/slicing.hpp>
 #include <jules/array/slice.hpp>
+#include <jules/core/meta.hpp>
 #include <jules/core/range.hpp>
 #include <jules/core/type.hpp>
 
@@ -41,7 +42,7 @@ template <typename T> struct array_allocator {
     }
   }
 
-  template <typename It, CONCEPT_REQUIRES_(range::Iterator<It>())>
+  template <typename It, typename = meta::requires<range::Iterator<It>>>
   static void create(detail::trivial_tag, T* to, It from, index_t size)
   {
     std::uninitialized_copy_n(from, size, to);
@@ -61,7 +62,7 @@ template <typename T> struct array_allocator {
     create_impl(to, values, descriptor);
   }
 
-  template <typename It, CONCEPT_REQUIRES_(range::Iterator<It>())>
+  template <typename It, typename = meta::requires<range::Iterator<It>>>
   static void create(detail::non_trivial_tag, T* to, It from, index_t size)
   {
     std::uninitialized_copy_n(from, size, to);

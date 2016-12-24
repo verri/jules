@@ -3,6 +3,7 @@
 #ifndef JULES_BASE_NUMERIC_H
 #define JULES_BASE_NUMERIC_H
 
+#include <jules/core/meta.hpp>
 #include <jules/core/range.hpp>
 
 #include <array>
@@ -44,7 +45,7 @@ template <std::size_t N, typename T> constexpr auto repeat(const T& value)
 }
 
 template <typename Iter, typename Sent, typename T = range::iterator_value_t<Iter>,
-          CONCEPT_REQUIRES_(range::Sentinel<Sent, Iter>())>
+          typename = meta::requires<range::Sentinel<Sent, Iter>>>
 auto max(Iter first, Sent last, T start = -numeric_traits<T>::infinity())
 {
   for (; first != last; ++first)
@@ -53,14 +54,14 @@ auto max(Iter first, Sent last, T start = -numeric_traits<T>::infinity())
   return start;
 }
 
-template <typename Rng, typename T = range::range_value_t<Rng>, CONCEPT_REQUIRES_(range::Range<Rng>())>
+template <typename Rng, typename T = range::range_value_t<Rng>, typename = meta::requires<range::Range<Rng>>>
 auto max(const Rng& rng, T start = -numeric_traits<T>::infinity())
 {
   return ::jules::max(range::begin(rng), range::end(rng), std::move(start));
 }
 
 template <typename Iter, typename Sent, typename T = range::iterator_value_t<Iter>,
-          CONCEPT_REQUIRES_(range::Sentinel<Sent, Iter>())>
+          typename = meta::requires<range::Sentinel<Sent, Iter>>>
 auto prod(Iter first, Sent last, T start = numeric_traits<T>::multiplicative_identity())
 {
   for (; first != last; ++first)
@@ -68,7 +69,7 @@ auto prod(Iter first, Sent last, T start = numeric_traits<T>::multiplicative_ide
   return start;
 }
 
-template <typename Rng, typename T = range::range_value_t<Rng>, CONCEPT_REQUIRES_(range::Range<Rng>())>
+template <typename Rng, typename T = range::range_value_t<Rng>, typename = meta::requires<range::Range<Rng>>>
 auto prod(const Rng& rng, T start = numeric_traits<T>::multiplicative_identity())
 {
   return ::jules::prod(range::begin(rng), range::end(rng), std::move(start));
@@ -82,7 +83,7 @@ template <typename T, typename... Args> constexpr auto prod_args(const T& arg, A
 }
 
 template <typename Iter, typename Sent, typename T = range::iterator_value_t<Iter>,
-          CONCEPT_REQUIRES_(range::Sentinel<Sent, Iter>())>
+          typename = meta::requires<range::Sentinel<Sent, Iter>>>
 auto sum(Iter first, Sent last, T start = numeric_traits<T>::additive_identity())
 {
   for (; first != last; ++first)
@@ -90,7 +91,7 @@ auto sum(Iter first, Sent last, T start = numeric_traits<T>::additive_identity()
   return start;
 }
 
-template <typename Rng, typename T = range::range_value_t<Rng>, CONCEPT_REQUIRES_(range::Range<Rng>())>
+template <typename Rng, typename T = range::range_value_t<Rng>, typename = meta::requires<range::Range<Rng>>>
 auto sum(const Rng& rng, T start = numeric_traits<T>::additive_identity())
 {
   return ::jules::sum(range::begin(rng), range::end(rng), std::move(start));
@@ -110,7 +111,7 @@ template <typename... Args> constexpr auto all_args(bool arg, Args&&... args)
   return arg && all_args(std::forward<Args>(args)...);
 }
 
-template <typename Iter, typename Sent, CONCEPT_REQUIRES_(range::Sentinel<Sent, Iter>())> auto all(Iter first, Sent last)
+template <typename Iter, typename Sent, typename = meta::requires<range::Sentinel<Sent, Iter>>> auto all(Iter first, Sent last)
 {
   while (first != last)
     if (!static_cast<bool>(*first++))
@@ -118,7 +119,7 @@ template <typename Iter, typename Sent, CONCEPT_REQUIRES_(range::Sentinel<Sent, 
   return true;
 }
 
-template <typename Rng, CONCEPT_REQUIRES_(range::Range<Rng>())> auto all(const Rng& rng)
+template <typename Rng, typename = meta::requires<range::Range<Rng>>> auto all(const Rng& rng)
 {
   return all(ranges::begin(rng), ranges::end(rng));
 }

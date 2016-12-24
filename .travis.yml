@@ -7,12 +7,23 @@ cache:
 matrix:
   include:
     - os: linux
+      env: COMPILER_NAME=gcc CXX=g++-6 CC=gcc-6
+      addons:
+        apt:
+          packages:
+            - g++-6
+            - libblas-dev
+            - valgrind
+          sources: &sources
+            - llvm-toolchain-precise-3.8
+            - ubuntu-toolchain-r-test
+    - os: linux
       env: COMPILER_NAME=clang CXX=clang++-3.8 CC=clang-3.8
       addons:
         apt:
           packages:
             - clang-3.8
-            - libatlas-base-dev
+            - libblas-dev
             - valgrind
           sources: &sources
             - llvm-toolchain-precise-3.8
@@ -28,4 +39,4 @@ script:
   - CXXFLAGS="-isystem../third_party/range-v3/include -isystem../third_party/debug_assert" make test
 
 after_success:
-  - bash <(curl -s https://codecov.io/bash) -x "llvm-cov gcov"
+  - if test "$COMPILER_NAME" == "gcc"; then bash <(curl -s https://codecov.io/bash); fi

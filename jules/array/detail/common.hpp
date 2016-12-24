@@ -57,31 +57,24 @@ using indirect_request = std::enable_if_t<!all_args(index_or_slice<Args>()...), 
 
 // Concept checking
 
-template <typename T> struct is_array : public std::false_type {
+template <typename T> struct Array : public std::false_type {
 };
 
-template <typename T, std::size_t N> struct is_array<base_array<T, N>> : public std::true_type {
+template <typename T, std::size_t N> struct Array<base_array<T, N>> : public std::true_type {
 };
 
-template <typename T, std::size_t N> struct is_array<ref_array<T, N>> : public std::true_type {
+template <typename T, std::size_t N> struct Array<ref_array<T, N>> : public std::true_type {
 };
 
-template <typename T, std::size_t N> struct is_array<ind_array<T, N>> : public std::true_type {
+template <typename T, std::size_t N> struct Array<ind_array<T, N>> : public std::true_type {
 };
 
-template <typename It, typename F, std::size_t N> struct is_array<unary_expr_array<It, F, N>> : public std::true_type {
+template <typename It, typename F, std::size_t N> struct Array<unary_expr_array<It, F, N>> : public std::true_type {
 };
 
 template <typename LhsIt, typename RhsIt, typename F, std::size_t N>
-struct is_array<binary_expr_array<LhsIt, RhsIt, F, N>> : public std::true_type {
+struct Array<binary_expr_array<LhsIt, RhsIt, F, N>> : public std::true_type {
 };
-
-template <typename T> constexpr auto is_array_v() { return is_array<std::decay_t<T>>::value; }
-
-// Request checks for arrays
-
-template <typename R, typename T> using array_request = std::enable_if_t<is_array_v<T>(), R>;
-template <typename R, typename T> using array_fallback = std::enable_if_t<!is_array_v<T>(), R>;
 
 // Helpers for operators
 

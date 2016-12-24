@@ -12,7 +12,7 @@ OBJ := $(SRC:.cpp=.o) test_suite.o
 DEP := $(SRC:.cpp=.d) test_suite.d
 
 CXXFLAGS += -std=c++14 -O2 -coverage -Wall -Wextra -I.. -isystem../third_party/Catch/single_include
-LDFLAGS += -lcblas
+LDFLAGS += -lblas
 
 NODEPS = clean
 
@@ -24,7 +24,7 @@ endif
 
 test_suite: $(OBJ)
 	@echo "Linking test suite..."
-	@$(CXX) $(CXXFLAGS) $(LDFLAGS) -o $@ $(OBJ)
+	@$(CXX) $(CXXFLAGS) -o $@ $(OBJ) $(LDFLAGS)
 
 %.o: %.cpp
 	@echo "Compiling ($<)..."

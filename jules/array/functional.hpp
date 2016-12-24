@@ -5,6 +5,7 @@
 
 #include <jules/array/detail/common.hpp>
 #include <jules/core/debug.hpp>
+#include <jules/core/meta.hpp>
 
 // TODO: XXX: think how to reuse the memory of a base_array&&
 
@@ -76,14 +77,14 @@
   }
 
 #define BINARY_RIGHT_TYPE_OPERATION(TX__, X__, OP__)                                                                             \
-  template <UNPACK TX__, typename U, typename = std::enable_if_t<!is_array_v<U>()>> auto operator OP__(UNPACK X__ lhs, U rhs)    \
+  template <UNPACK TX__, typename U, typename = meta::fallback<Array<U>>> auto operator OP__(UNPACK X__ lhs, U rhs)              \
   {                                                                                                                              \
     using Value = typename std::decay_t<UNPACK X__>::value_type;                                                                 \
     return apply(lhs, [rhs = std::move(rhs)](const Value& lhs) { return lhs OP__ rhs; });                                        \
   }
 
 #define BINARY_LEFT_TYPE_OPERATION(TY__, Y__, OP__)                                                                              \
-  template <UNPACK TY__, typename U, typename = std::enable_if_t<!is_array_v<U>()>> auto operator OP__(U lhs, UNPACK Y__ rhs)    \
+  template <UNPACK TY__, typename U, typename = meta::fallback<Array<U>>> auto operator OP__(U lhs, UNPACK Y__ rhs)              \
   {                                                                                                                              \
     using Value = typename std::decay_t<UNPACK Y__>::value_type;                                                                 \
     return apply(rhs, [lhs = std::move(lhs)](const Value& rhs) { return lhs OP__ rhs; });                                        \
