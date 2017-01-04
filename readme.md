@@ -26,7 +26,8 @@ Usage
 `jules` is a header-only library. Download the [latest release](https://github.com/verri/jules/releases/latest)
 and extract it to `/path/to/release`. The zip file already contains all mandatory dependencies.
 
-For Arch Linux users, install the AUR package [jules-git]() via [yaourt](https://archlinux.fr/yaourt-en), 
+For Arch Linux users, install the AUR package [jules-git](https://aur.archlinux.org/packages/jules-git) 
+via [yaourt](https://archlinux.fr/yaourt-en), 
 [makepkg](https://wiki.archlinux.org/index.php/Arch_User_Repository#Build_and_install_the_package),
 or any other method of your preference.
 
