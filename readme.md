@@ -18,6 +18,35 @@ Dependencies
  - [CBLAS](http://www.netlib.org/blas/) (optional)
  - [Catch](https://github.com/philsquared/Catch.git) (testing)
 
+Usage
+-----
+
+### Installation
+
+`jules` is a header-only library. Download the [latest release](https://github.com/verri/jules/releases/latest)
+and extract it to `/path/to/release`. The zip file already contains all mandatory dependencies.
+
+For Arch Linux users, install the AUR package [jules-git]() via [yaourt](https://archlinux.fr/yaourt-en), 
+[makepkg](https://wiki.archlinux.org/index.php/Arch_User_Repository#Build_and_install_the_package),
+or any other method of your preference.
+
+If you intend to use BLAS optimized functions, make sure CBLAS is installed.
+
+### Compilation
+
+Make sure to enable C++14 and to include the path where `jules` is installed. Arch Linux users do not need
+the `-isystem` option, since the library is already in the system path.
+
+```sh
+CXXFLAGS=-std=c++14 -isystem/path/to/release/include
+```
+
+If using BLAS, make sure to link it.
+
+```sh
+LDFLAGS=-lblas
+```
+
 Documentation
 -------------
 
