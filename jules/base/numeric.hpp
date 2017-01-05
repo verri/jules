@@ -40,18 +40,32 @@ struct forward_arithmetic {
 
 } // namespace detail
 
+/// \group Repeat
+///
+/// Repeats `value` `N` times.
+///
+/// \returns [std::array]() and [std::vector]() containing the repeated value if `N`
+///   is a template argument or not, respectively.
 template <std::size_t N, typename T> constexpr auto repeat(const T& value)
 {
   return detail::repeat_impl(value, std::make_index_sequence<N>());
 }
 
-template <typename T> auto repeat(index_t n, const T& value) { return std::vector<T>(n, value); }
+/// \group Repeat
+template <typename T> auto repeat(index_t N, const T& value) { return std::vector<T>(N, value); }
 
+/// \group Length
+///
+/// Returns the length of a `Range` or the distance of a pair of iterators.
+///
+/// \notes The value may be negative if random-access iterators are used and `first`
+///   is reachable from `last`.
 template <typename Iter, typename Sent, typename = meta::requires<range::Sentinel<Sent, Iter>>> auto length(Iter first, Sent last)
 {
   return range::distance(first, last);
 }
 
+/// \group Length
 template <typename Rng, typename = meta::requires<range::Range<Rng>>> auto length(const Rng& rng)
 {
   return ::jules::length(range::begin(rng), range::end(rng));
