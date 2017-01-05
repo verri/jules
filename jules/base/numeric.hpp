@@ -7,16 +7,17 @@
 #include <jules/core/range.hpp>
 
 #include <array>
-#include <functional>
-#include <numeric>
+#include <cmath>
 #include <type_traits>
 #include <utility>
+#include <vector>
 
 namespace jules
 {
 
 template <class T> constexpr auto pi = T(3.1415926535897932385);
 
+/// \exclude
 namespace detail
 {
 
@@ -44,9 +45,21 @@ template <std::size_t N, typename T> constexpr auto repeat(const T& value)
   return detail::repeat_impl(value, std::make_index_sequence<N>());
 }
 
+template <typename T> auto repeat(index_t n, const T& value) { return std::vector<T>(n, value); }
+
+template <typename Iter, typename Sent, typename = meta::requires<range::Sentinel<Sent, Iter>>> auto length(Iter first, Sent last)
+{
+  return range::distance(first, last);
+}
+
+template <typename Rng, typename = meta::requires<range::Range<Rng>>> auto length(const Rng& rng)
+{
+  return ::jules::length(range::begin(rng), range::end(rng));
+}
+
 template <typename Iter, typename Sent, typename T = range::iterator_value_t<Iter>,
           typename = meta::requires<range::Sentinel<Sent, Iter>>>
-auto max(Iter first, Sent last, T start = -numeric_traits<T>::infinity())
+auto max(Iter first, Sent last, T start = numeric_traits<T>::unbounded_min())
 {
   for (; first != last; ++first)
     if (start < *first)
@@ -55,9 +68,25 @@ auto max(Iter first, Sent last, T start = -numeric_traits<T>::infinity())
 }
 
 template <typename Rng, typename T = range::range_value_t<Rng>, typename = meta::requires<range::Range<Rng>>>
-auto max(const Rng& rng, T start = -numeric_traits<T>::infinity())
+auto max(const Rng& rng, T start = numeric_traits<T>::unbounded_min())
 {
   return ::jules::max(range::begin(rng), range::end(rng), std::move(start));
+}
+
+template <typename Iter, typename Sent, typename T = range::iterator_value_t<Iter>,
+          typename = meta::requires<range::Sentinel<Sent, Iter>>>
+auto min(Iter first, Sent last, T start = numeric_traits<T>::unbounded_max())
+{
+  for (; first != last; ++first)
+    if (start > *first)
+      start = *first;
+  return start;
+}
+
+template <typename Rng, typename T = range::range_value_t<Rng>, typename = meta::requires<range::Range<Rng>>>
+auto min(const Rng& rng, T start = numeric_traits<T>::unbounded_max())
+{
+  return ::jules::min(range::begin(rng), range::end(rng), std::move(start));
 }
 
 template <typename Iter, typename Sent, typename T = range::iterator_value_t<Iter>,
