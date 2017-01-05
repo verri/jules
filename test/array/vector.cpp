@@ -2,6 +2,8 @@
 
 #include <catch.hpp>
 
+static void (*volatile not_optimize_away)(void*) = [](void*) {};
+
 TEST_CASE("Vector tutorial", "[array]")
 {
   SECTION("Constructors")
@@ -35,7 +37,10 @@ TEST_CASE("Vector tutorial", "[array]")
     auto d = jules::vector<long>(values);
 
     // Copy and move constructors.
-    auto e = [d]() -> jules::vector<long> { return {std::move(d)}; }();
+    auto e = [d]() mutable -> jules::vector<long> {
+      not_optimize_away(&d);
+      return {std::move(d)};
+    }();
 
     REQUIRE(all(a == b));
     REQUIRE(all(b == c));
@@ -98,6 +103,9 @@ TEST_CASE("Vector tutorial", "[array]")
     // expression is evaluated.
     x = x - x;
     CHECK(all(x == jules::as_vector(jules::repeat<5>(0))));
+
+    x.fill(1);
+    CHECK(all(x == 1));
   }
 
   SECTION("Iterators")

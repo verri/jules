@@ -2,6 +2,8 @@
 
 #include <catch.hpp>
 
+static void (*volatile not_optimize_away)(void*) = [](void*) {};
+
 TEST_CASE("Matrix tutorial", "[array]")
 {
   SECTION("Constructors")
@@ -34,7 +36,10 @@ TEST_CASE("Matrix tutorial", "[array]")
     auto c = jules::matrix<long>(std::begin(values), 4u, 4u);
 
     // Copy and move constructors.
-    auto d = [c]() -> jules::matrix<long> { return {std::move(c)}; }();
+    auto d = [c]() mutable -> jules::matrix<long> {
+      not_optimize_away(&c);
+      return {std::move(c)};
+    }();
 
     REQUIRE(all(a == b));
     REQUIRE(all(b == c));
@@ -150,6 +155,9 @@ TEST_CASE("Matrix tutorial", "[array]")
     // expression is evaluated.
     x = x - x;
     CHECK(all(x == jules::matrix<long>(0, x.row_count(), x.column_count())));
+
+    x.fill(1);
+    CHECK(all(x == 1));
   }
 
   SECTION("Iterators")

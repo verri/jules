@@ -400,7 +400,7 @@ public:
   }
 
   /// \group Assignment
-  template <typename A, typename = meta::requires<A>> auto operator=(const A& source) & -> base_array&
+  template <typename A, typename = meta::requires<Array<A>>> auto operator=(const A& source) & -> base_array&
   {
     static_assert(A::order == 1, "array order mismatch");
     static_assert(std::is_assignable<T&, typename A::value_type>::value, "incompatible assignment");
