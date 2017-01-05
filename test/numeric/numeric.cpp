@@ -60,4 +60,19 @@ TEST_CASE("Base numeric utilities", "[numeric]")
     CHECK(jules::min(std::array<double, 0>{}) == std::numeric_limits<double>::infinity());
     CHECK(jules::max(std::array<double, 0>{}) == -std::numeric_limits<double>::infinity());
   }
+  SECTION("Logical")
+  {
+    auto a = jules::vector<bool>{true, false, true};
+    auto b = jules::vector<bool>{true, true, true};
+
+    CHECK(jules::any(a.begin(), a.end()));
+    CHECK(any(!a));
+    CHECK(!any(!b));
+
+    CHECK(!jules::all(a.begin(), a.end()));
+    CHECK(all(b));
+
+    CHECK(!jules::none(a.begin(), a.end()));
+    CHECK(none(!b));
+  }
 }
