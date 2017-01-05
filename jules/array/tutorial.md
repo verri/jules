@@ -73,7 +73,6 @@ auto j = jules::as_vector(values);
 
 // A vector with elements whose type is the common type of the arguments.
 auto k = jules::as_vector(1, 2u, 3l);
-"")
 ```
 
 For higher dimensional arrays, the constructors are basically the same.
@@ -128,8 +127,7 @@ matrix[1u][1u] = vector[0u];
 // matrix == { {0.0, 0.0, 0.0}, {0.0, 1.0, 0.0}, {0.0, 0.0, 0.0} }
 ```
 
-Alternatively (and potentially faster in most of the cases), one can
-use the `operator()` notation.
+Alternatively (and potentially faster), one can use the `operator()` notation.
 
 ```
 matrix(2u, 2u) = vector(0u);
