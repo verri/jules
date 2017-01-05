@@ -1,6 +1,32 @@
 ---
 ---
 
+  - ## Arithmetic
+    
+      - [jules::length(Iter, Sent)](doc_base__numeric.html#jules::length(Iter,Sent) "jules::length(Iter, Sent)") - Returns either the length of a `Range` or the distance of a pair of iterators.
+    
+      - [jules::length(const Rng &)](doc_base__numeric.html#jules::length(Iter,Sent) "jules::length(const Rng &)") - Returns either the length of a `Range` or the distance of a pair of iterators.
+    
+      - [jules::max(Iter, Sent, T)](doc_base__numeric.html#jules::max(Iter,Sent,T) "jules::max(Iter, Sent, T)") - Returns either the maximum element in a `Range` or in the sequence \[`first`, `last`).
+    
+      - [jules::max(const Rng &, T)](doc_base__numeric.html#jules::max(Iter,Sent,T) "jules::max(const Rng &, T)") - Returns either the maximum element in a `Range` or in the sequence \[`first`, `last`).
+    
+      - [jules::min(Iter, Sent, T)](doc_base__numeric.html#jules::min(Iter,Sent,T) "jules::min(Iter, Sent, T)") - Returns either the minimum element in a `Range` or in the sequence \[`first`, `last`).
+    
+      - [jules::min(const Rng &, T)](doc_base__numeric.html#jules::min(Iter,Sent,T) "jules::min(const Rng &, T)") - Returns either the minimum element in a `Range` or in the sequence \[`first`, `last`).
+    
+      - [jules::prod(Iter, Sent, T)](doc_base__numeric.html#jules::prod(Iter,Sent,T) "jules::prod(Iter, Sent, T)") - Returns either the product of the elements in a `Range` or in the sequence \[`first`, `last`).
+    
+      - [jules::prod(const Rng &, T)](doc_base__numeric.html#jules::prod(Iter,Sent,T) "jules::prod(const Rng &, T)") - Returns either the product of the elements in a `Range` or in the sequence \[`first`, `last`).
+    
+      - [jules::repeat(const T &)](doc_base__numeric.html#jules::repeat(constT&) "jules::repeat(const T &)") - Repeats `value` `N` times.
+    
+      - [jules::repeat(index\_t, const T &)](doc_base__numeric.html#jules::repeat(constT&) "jules::repeat(index_t, const T &)") - Repeats `value` `N` times.
+    
+      - [jules::sum(Iter, Sent, T)](doc_base__numeric.html#jules::sum(Iter,Sent,T) "jules::sum(Iter, Sent, T)") - Returns either the summation of the elements in a `Range` or in the sequence \[`first`, `last`).
+    
+      - [jules::sum(const Rng &, T)](doc_base__numeric.html#jules::sum(Iter,Sent,T) "jules::sum(const Rng &, T)") - Returns either the summation of the elements in a `Range` or in the sequence \[`first`, `last`).
+
   - ## Basic Types
     
       - [jules::distance\_t](doc_core__type.html#jules::distance_t "jules::distance_t") - Standard distance type.
@@ -24,6 +50,20 @@
       - [jules::numeric\_rule](doc_core__type.html#jules::numeric_rule "jules::numeric_rule") - Coercion rules for [numeric type](doc_core__type.html#jules::numeric).
     
       - [jules::string\_rule](doc_core__type.html#jules::string_rule "jules::string_rule") - Coercion rules for [string type](doc_core__type.html#jules::string).
+
+  - ## Logical
+    
+      - [jules::all(Iter, Sent)](doc_base__numeric.html#jules::all(Iter,Sent) "jules::all(Iter, Sent)") - Checks whether all elements in a `Range` or in the sequence \[`first`, `last`) are true.
+    
+      - [jules::all(const Rng &)](doc_base__numeric.html#jules::all(Iter,Sent) "jules::all(const Rng &)") - Checks whether all elements in a `Range` or in the sequence \[`first`, `last`) are true.
+    
+      - [jules::any(Iter, Sent)](doc_base__numeric.html#jules::any(Iter,Sent) "jules::any(Iter, Sent)") - Checks whether any of the elements in a `Range` or in the sequence \[`first`, `last`) are true.
+    
+      - [jules::any(const Rng &)](doc_base__numeric.html#jules::any(Iter,Sent) "jules::any(const Rng &)") - Checks whether any of the elements in a `Range` or in the sequence \[`first`, `last`) are true.
+    
+      - [jules::none(Iter, Sent)](doc_base__numeric.html#jules::none(Iter,Sent) "jules::none(Iter, Sent)") - Checks whether all elements in a `Range` or in the sequence \[`first`, `last`) are false.
+    
+      - [jules::none(const Rng &)](doc_base__numeric.html#jules::none(Iter,Sent) "jules::none(const Rng &)") - Checks whether all elements in a `Range` or in the sequence \[`first`, `last`) are false.
 
   - ## N-Dimensional Array
     

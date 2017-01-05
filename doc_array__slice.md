@@ -155,7 +155,7 @@ pointer operator->() const;
 
 -----
 
-### Constructor `jules::base_slice::base_slice`<a id="jules::base_slice-N-"></a>
+### Constructor `jules::base_slice::base_slice`<a id="jules::base_slice-N-::base_slice(index_t,extent_type,extent_type)"></a>
 
 ``` cpp
 (1)  constexpr base_slice(index_t start, extent_type extents, extent_type strides);
@@ -183,7 +183,7 @@ constexpr auto size() const;
 
 Effectively the product of the extents.
 
-### Function call operator `jules::base_slice::operator()`<a id="jules::base_slice-N-"></a>
+### Function call operator `jules::base_slice::operator()`<a id="jules::base_slice-N-::operator()(constextent_type&)const"></a>
 
 ``` cpp
 (1)  constexpr index_t operator()(const extent_type& indexes) const;
@@ -325,7 +325,7 @@ static constexpr auto all = index_t{0ul};
 
 Unsigned integer that represents all possibles extents when applied to an array.
 
-### Constructor `jules::base_slice<1>::base_slice`<a id="jules::base_slice-1-"></a>
+### Constructor `jules::base_slice<1>::base_slice`<a id="jules::base_slice-1-::base_slice(index_t,index_t,index_t)"></a>
 
 ``` cpp
 (1)  constexpr base_slice(index_t start, index_t extent, index_t stride);
@@ -347,7 +347,7 @@ constexpr auto size() const;
 
 Effectively the product of the extents.
 
-### Function call operator `jules::base_slice<1>::operator()`<a id="jules::base_slice-1-"></a>
+### Function call operator `jules::base_slice<1>::operator()`<a id="jules::base_slice-1-::operator()(index_t)const"></a>
 
 ``` cpp
 (1)  constexpr index_t operator()(index_t index) const;

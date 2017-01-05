@@ -115,7 +115,7 @@ ref_array() = default;
 
 *TODO*: Explain why the user should probably not call these functions. In C++17, we can provide a helper that generates a view with more security.
 
-### Function template `jules::ref_array::operator=`<a id="jules::ref_array-T,N-"></a>
+### Assignment operator `jules::ref_array::operator=`<a id="jules::ref_array-T,N-::operator=(constA&)"></a>
 
 ``` cpp
 (1)  template <typename A>
@@ -135,7 +135,7 @@ operator ref_array<const T, N>() const;
 
 Implicitly convertable to hold const values.
 
-### Array subscript operator `jules::ref_array::operator[]`<a id="jules::ref_array-T,N-"></a>
+### Array subscript operator `jules::ref_array::operator[]`<a id="jules::ref_array-T,N-::operator%5b%5d(index_t)"></a>
 
 ``` cpp
 (1)  ref_array<T, N-1> operator[](index_t i);
@@ -249,7 +249,7 @@ ref_array() = default;
 
 *TODO*: Explain why the user should probably not call this function. In C++17, we can provide a helper that generates a view with more security.
 
-### Function template `jules::ref_array<T, 1>::operator=`<a id="jules::ref_array-T,1-"></a>
+### Assignment operator `jules::ref_array<T, 1>::operator=`<a id="jules::ref_array-T,1-::operator=(constA&)"></a>
 
 ``` cpp
 (1)  template <typename A>
@@ -271,7 +271,7 @@ operator ref_array<const T, 1>() const;
 
 Implicitly convertable to hold const values.
 
-### Array subscript operator `jules::ref_array<T, 1>::operator[]`<a id="jules::ref_array-T,1-"></a>
+### Array subscript operator `jules::ref_array<T, 1>::operator[]`<a id="jules::ref_array-T,1-::operator%5b%5d(index_t)"></a>
 
 ``` cpp
 (1)  T& operator[](index_t i);

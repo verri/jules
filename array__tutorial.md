@@ -33,7 +33,7 @@ higher orders.  If the type `T` is not specified,
 # Constructors
 
 There are several ways to create a vector, see [the
-reference](doc_array__array.html#jules::base_array-T,1-) for more details.
+reference](doc_array__array.html#jules::base_array-T,1-::base_array()) for more details.
 
 ``` cpp
 // An empty vector.
@@ -76,11 +76,10 @@ auto j = jules::as_vector(values);
 
 // A vector with elements whose type is the common type of the arguments.
 auto k = jules::as_vector(1, 2u, 3l);
-"")
 ```
 
 For higher dimensional arrays, the constructors are basically the same.
-Consult [the reference](doc_array__array.html#jules::base_array-T,N-) for
+Consult [the reference](doc_array__array.html#jules::base_array-T,N-::base_array()) for
 a comprehensive list.
 
 ``` cpp
@@ -131,8 +130,7 @@ matrix[1u][1u] = vector[0u];
 // matrix == { {0.0, 0.0, 0.0}, {0.0, 1.0, 0.0}, {0.0, 0.0, 0.0} }
 ```
 
-Alternatively (and potentially faster in most of the cases), one can
-use the `operator()` notation.
+Alternatively (and potentially faster), one can use the `operator()` notation.
 
 ```
 matrix(2u, 2u) = vector(0u);

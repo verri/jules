@@ -125,13 +125,17 @@
     
       - [Array\<unary\_expr\_array\<It, F, N\>\>](doc_array__detail__common.html#array/detail/common.hpp "jules::Array\<unary_expr_array\<It, F, N\>\>")
     
-      - [all(Iter, Sent)](doc_base__numeric.html#base/numeric.hpp "jules::all(Iter, Sent)")
+      - [all(Iter, Sent)](doc_base__numeric.html#jules::all(Iter,Sent) "jules::all(Iter, Sent)") - Checks whether all elements in a `Range` or in the sequence \[`first`, `last`) are true.
     
-      - [all(const Rng &)](doc_base__numeric.html#base/numeric.hpp "jules::all(const Rng &)")
+      - [all(const Rng &)](doc_base__numeric.html#jules::all(Iter,Sent) "jules::all(const Rng &)") - Checks whether all elements in a `Range` or in the sequence \[`first`, `last`) are true.
     
       - [all\_args()](doc_base__numeric.html#base/numeric.hpp "jules::all_args()")
     
       - [all\_args(bool, Args &&...)](doc_base__numeric.html#base/numeric.hpp "jules::all_args(bool, Args &&...)")
+    
+      - [any(Iter, Sent)](doc_base__numeric.html#jules::any(Iter,Sent) "jules::any(Iter, Sent)") - Checks whether any of the elements in a `Range` or in the sequence \[`first`, `last`) are true.
+    
+      - [any(const Rng &)](doc_base__numeric.html#jules::any(Iter,Sent) "jules::any(const Rng &)") - Checks whether any of the elements in a `Range` or in the sequence \[`first`, `last`) are true.
     
       - [any\_args()](doc_base__numeric.html#base/numeric.hpp "jules::any_args()")
     
@@ -243,19 +247,31 @@
     
       - [integer](doc_core__type.html#jules::integer "jules::integer") - Standard signed type.
     
+      - [length(Iter, Sent)](doc_base__numeric.html#jules::length(Iter,Sent) "jules::length(Iter, Sent)") - Returns either the length of a `Range` or the distance of a pair of iterators.
+    
+      - [length(const Rng &)](doc_base__numeric.html#jules::length(Iter,Sent) "jules::length(const Rng &)") - Returns either the length of a `Range` or the distance of a pair of iterators.
+    
       - [make\_expr\_array(It, It, F &&, typename base\_slice\<M\>::extent\_type)](doc_array__detail__common.html#array/detail/common.hpp "jules::make_expr_array(It, It, F &&, typename base_slice\<M\>::extent_type)")
     
       - [make\_expr\_array(LhsIt, LhsIt, RhsIt, RhsIt, F &&, typename base\_slice\<M\>::extent\_type)](doc_array__detail__common.html#array/detail/common.hpp "jules::make_expr_array(LhsIt, LhsIt, RhsIt, RhsIt, F &&, typename base_slice\<M\>::extent_type)")
     
       - [matrix](doc_array__array.html#jules::matrix-T- "jules::matrix\<T\>") - Matrix aliasing.  Data type defaults to [jules::numeric](doc_core__type.html#jules::numeric).
     
-      - [max(Iter, Sent, T)](doc_base__numeric.html#base/numeric.hpp "jules::max(Iter, Sent, T)")
+      - [max(Iter, Sent, T)](doc_base__numeric.html#jules::max(Iter,Sent,T) "jules::max(Iter, Sent, T)") - Returns either the maximum element in a `Range` or in the sequence \[`first`, `last`).
     
-      - [max(const Rng &, T)](doc_base__numeric.html#base/numeric.hpp "jules::max(const Rng &, T)")
+      - [max(const Rng &, T)](doc_base__numeric.html#jules::max(Iter,Sent,T) "jules::max(const Rng &, T)") - Returns either the maximum element in a `Range` or in the sequence \[`first`, `last`).
+    
+      - [min(Iter, Sent, T)](doc_base__numeric.html#jules::min(Iter,Sent,T) "jules::min(Iter, Sent, T)") - Returns either the minimum element in a `Range` or in the sequence \[`first`, `last`).
+    
+      - [min(const Rng &, T)](doc_base__numeric.html#jules::min(Iter,Sent,T) "jules::min(const Rng &, T)") - Returns either the minimum element in a `Range` or in the sequence \[`first`, `last`).
     
       - [move\_ptr(T \*&)](doc_base__async.html#base/async.hpp "jules::move_ptr(T *&)")
     
       - [ndarray](doc_array__array.html#jules::ndarray-N,T- "jules::ndarray\<N, T\>") - N-Dimensional array aliasing.  Data type defaults to [jules::numeric](doc_core__type.html#jules::numeric).
+    
+      - [none(Iter, Sent)](doc_base__numeric.html#jules::none(Iter,Sent) "jules::none(Iter, Sent)") - Checks whether all elements in a `Range` or in the sequence \[`first`, `last`) are false.
+    
+      - [none(const Rng &)](doc_base__numeric.html#jules::none(Iter,Sent) "jules::none(const Rng &)") - Checks whether all elements in a `Range` or in the sequence \[`first`, `last`) are false.
     
       - [normal\_pdf(const A &, T, T)](doc_array__numeric.html#array/numeric.hpp "jules::normal_pdf(const A &, T, T)")
     
@@ -1427,9 +1443,9 @@
     
       - [operator~(const unary\_expr\_array\<It, Op, N\> &)](doc_array__functional.html#array/functional.hpp "jules::operator~(const unary_expr_array\<It, Op, N\> &)")
     
-      - [prod(Iter, Sent, T)](doc_base__numeric.html#base/numeric.hpp "jules::prod(Iter, Sent, T)")
+      - [prod(Iter, Sent, T)](doc_base__numeric.html#jules::prod(Iter,Sent,T) "jules::prod(Iter, Sent, T)") - Returns either the product of the elements in a `Range` or in the sequence \[`first`, `last`).
     
-      - [prod(const Rng &, T)](doc_base__numeric.html#base/numeric.hpp "jules::prod(const Rng &, T)")
+      - [prod(const Rng &, T)](doc_base__numeric.html#jules::prod(Iter,Sent,T) "jules::prod(const Rng &, T)") - Returns either the product of the elements in a `Range` or in the sequence \[`first`, `last`).
     
       - [prod\_args()](doc_base__numeric.html#base/numeric.hpp "jules::prod_args()")
     
@@ -1447,7 +1463,9 @@
     
       - [ref\_array](doc_array__ref_array.html#jules::ref_array-T,N- "jules::ref_array\<T, N\>") - Array reference.
     
-      - [repeat(const T &)](doc_base__numeric.html#base/numeric.hpp "jules::repeat(const T &)")
+      - [repeat(const T &)](doc_base__numeric.html#jules::repeat(constT&) "jules::repeat(const T &)") - Repeats `value` `N` times.
+    
+      - [repeat(index\_t, const T &)](doc_base__numeric.html#jules::repeat(constT&) "jules::repeat(index_t, const T &)") - Repeats `value` `N` times.
     
       - [sample(Dist &)](doc_base__random.html#base/random.hpp "jules::sample(Dist &)")
     
@@ -1463,9 +1481,9 @@
     
       - [string\_rule](doc_core__type.html#jules::string_rule "jules::string_rule") - Coercion rules for [string type](doc_core__type.html#jules::string).
     
-      - [sum(Iter, Sent, T)](doc_base__numeric.html#base/numeric.hpp "jules::sum(Iter, Sent, T)")
+      - [sum(Iter, Sent, T)](doc_base__numeric.html#jules::sum(Iter,Sent,T) "jules::sum(Iter, Sent, T)") - Returns either the summation of the elements in a `Range` or in the sequence \[`first`, `last`).
     
-      - [sum(const Rng &, T)](doc_base__numeric.html#base/numeric.hpp "jules::sum(const Rng &, T)")
+      - [sum(const Rng &, T)](doc_base__numeric.html#jules::sum(Iter,Sent,T) "jules::sum(const Rng &, T)") - Returns either the summation of the elements in a `Range` or in the sequence \[`first`, `last`).
     
       - [sum\_args()](doc_base__numeric.html#base/numeric.hpp "jules::sum_args()")
     
@@ -1551,8 +1569,6 @@
     
       - [extents(const base\_slice\<N\> &)](doc_array__detail__slicing.html#array/detail/slicing.hpp "jules::detail::extents(const base_slice\<N\> &)")
     
-      - [forward\_arithmetic](doc_base__numeric.html#base/numeric.hpp "jules::detail::forward_arithmetic")
-    
       - [index\_or\_slice()](doc_array__detail__common.html#array/detail/common.hpp "jules::detail::index_or_slice()")
     
       - [indirect\_request](doc_array__detail__common.html#array/detail/common.hpp "jules::detail::indirect_request\<Return, Args...\>")
@@ -1568,8 +1584,6 @@
       - [non\_trivial\_tag](doc_core__type.html#core/type.hpp "jules::detail::non_trivial_tag")
     
       - [number\_iterator](doc_core__detail__numbers.html#core/detail/numbers.hpp "jules::detail::number_iterator\<T\>")
-    
-      - [repeat\_impl(const T &, std::index\_sequence\<I...\>)](doc_base__numeric.html#base/numeric.hpp "jules::detail::repeat_impl(const T &, std::index_sequence\<I...\>)")
     
       - [seq\_size(index\_t, index\_t, index\_t)](doc_array__detail__slicing.html#array/detail/slicing.hpp "jules::detail::seq_size(index_t, index_t, index_t)")
     
@@ -1632,6 +1646,10 @@
       - [requires\_t](doc_core__meta.html#core/meta.hpp "jules::meta::requires_t\<R, Checks...\>")
     
       - [void\_t](doc_core__meta.html#core/meta.hpp "jules::meta::void_t\<\>")
+
+  - `jules::range`
+    
+      - [using directive](doc_core__range.html#core/range.hpp "jules::range::using directive")
 
   - `ranges::v3::view`
     

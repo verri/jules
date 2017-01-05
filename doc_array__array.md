@@ -147,7 +147,7 @@ using difference_type = distance_t;
 
 Signed integer type that can store differences between sizes.
 
-### Default constructor `jules::base_array::base_array`<a id="jules::base_array-T,N-"></a>
+### Default constructor `jules::base_array::base_array`<a id="jules::base_array-T,N-::base_array()"></a>
 
 ``` cpp
 (1)  base_array();
@@ -193,7 +193,7 @@ Constructs a new array from a variety of data sources.
 
 *Notes*: (5) Dimensions are inferred from the list, so it must have the same number of elements in each dimension.
 
-### Assignment operator `jules::base_array::operator=`<a id="jules::base_array-T,N-"></a>
+### Assignment operator `jules::base_array::operator=`<a id="jules::base_array-T,N-::operator=(constbase_array&)"></a>
 
 ``` cpp
 (1)  base_array& operator=(const base_array& source);
@@ -210,7 +210,7 @@ Constructs a new array from a variety of data sources.
 
 3)  Assignment from array-like structures.
 
-### Function `jules::base_array::fill`<a id="jules::base_array-T,N-"></a>
+### Function `jules::base_array::fill`<a id="jules::base_array-T,N-::fill(constT&)"></a>
 
 ``` cpp
 (1)  auto fill(const T& value);
@@ -221,7 +221,7 @@ Constructs a new array from a variety of data sources.
 
 Fills the array.
 
-### Function `jules::base_array::begin`<a id="jules::base_array-T,N-"></a>
+### Function `jules::base_array::begin`<a id="jules::base_array-T,N-::begin()"></a>
 
 ``` cpp
 (1)  iterator begin();
@@ -233,7 +233,7 @@ Fills the array.
 
 Returns an iterator to the first element of the array.
 
-### Function `jules::base_array::end`<a id="jules::base_array-T,N-"></a>
+### Function `jules::base_array::end`<a id="jules::base_array-T,N-::end()"></a>
 
 ``` cpp
 (1)  iterator end();
@@ -245,7 +245,7 @@ Returns an iterator to the first element of the array.
 
 Returns an iterator to the element following the last element of the container.
 
-### Function `jules::base_array::data`<a id="jules::base_array-T,N-"></a>
+### Function `jules::base_array::data`<a id="jules::base_array-T,N-::data()"></a>
 
 ``` cpp
 (1)  value_type* data();
@@ -294,7 +294,7 @@ public:
     
     base_array& operator=(const base_array& source) &;
     base_array& operator=(base_array&& source) & noexcept;
-    template <typename A, typename = meta::requires<A>>
+    template <typename A, typename = meta::requires<Array<A>>>
     base_array& operator=(const A& source) &;
     
     auto fill(const T& value);
@@ -304,6 +304,8 @@ public:
     ind_array<T, 1> operator()(std::vector<index_t>&& indexes);
     
     ind_array<const T, 1> operator()(std::vector<index_t>&& indexes) const;
+    
+    using ref_array<T, 1>::operator();
     
     iterator begin();
     const_iterator begin() const;
@@ -377,7 +379,7 @@ using difference_type = distance_t;
 
 Signed integer type that can store differences between sizes.
 
-### Default constructor `jules::base_array<T, 1>::base_array`<a id="jules::base_array-T,1-"></a>
+### Default constructor `jules::base_array<T, 1>::base_array`<a id="jules::base_array-T,1-::base_array()"></a>
 
 ``` cpp
 (1)  base_array();
@@ -422,14 +424,14 @@ Constructs a new vector from a variety of data sources.
 
 9)  Converting constructor.  Constructs a vector from other vector-like structures, e.g. expression arrays or sliced arrays.
 
-### Copy assignment operator `jules::base_array<T, 1>::operator=`<a id="jules::base_array-T,1-"></a>
+### Copy assignment operator `jules::base_array<T, 1>::operator=`<a id="jules::base_array-T,1-::operator=(constbase_array&)&"></a>
 
 ``` cpp
 (1)  base_array& operator=(const base_array& source) &;
 
 (2)  base_array& operator=(base_array&& source) & noexcept;
 
-(3)  template <typename A, typename = meta::requires<A>>
+(3)  template <typename A, typename = meta::requires<Array<A>>>
      base_array& operator=(const A& source) &;
 ```
 
@@ -439,7 +441,7 @@ Constructs a new vector from a variety of data sources.
 
 3)  Assignment from array-like structures.
 
-### Function `jules::base_array<T, 1>::fill`<a id="jules::base_array-T,1-"></a>
+### Function `jules::base_array<T, 1>::fill`<a id="jules::base_array-T,1-::fill(constT&)"></a>
 
 ``` cpp
 (1)  auto fill(const T& value);
@@ -450,7 +452,7 @@ Constructs a new vector from a variety of data sources.
 
 Fills the array.
 
-### Function `jules::base_array<T, 1>::begin`<a id="jules::base_array-T,1-"></a>
+### Function `jules::base_array<T, 1>::begin`<a id="jules::base_array-T,1-::begin()"></a>
 
 ``` cpp
 (1)  iterator begin();
@@ -462,7 +464,7 @@ Fills the array.
 
 Returns an iterator to the first element of the array.
 
-### Function `jules::base_array<T, 1>::end`<a id="jules::base_array-T,1-"></a>
+### Function `jules::base_array<T, 1>::end`<a id="jules::base_array-T,1-::end()"></a>
 
 ``` cpp
 (1)  iterator end();
@@ -474,7 +476,7 @@ Returns an iterator to the first element of the array.
 
 Returns an iterator to the element following the last element of the container.
 
-### Function `jules::base_array<T, 1>::data`<a id="jules::base_array-T,1-"></a>
+### Function `jules::base_array<T, 1>::data`<a id="jules::base_array-T,1-::data()"></a>
 
 ``` cpp
 (1)  value_type* data();
