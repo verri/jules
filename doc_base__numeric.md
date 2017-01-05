@@ -53,12 +53,12 @@ namespace jules
     template <typename Rng, typename = meta::requires<range::Range<Rng>>>
     auto any(const Rng& rng);
     
-    constexpr 'hidden' prod_args();
+    constexpr /*unspecified*/ prod_args();
     
     template <typename T, typename ... Args>
     constexpr auto prod_args(const T& arg, Args&&... args);
     
-    constexpr 'hidden' sum_args();
+    constexpr /*unspecified*/ sum_args();
     
     template <typename T, typename ... Args>
     constexpr auto sum_args(const T& arg, Args&&... args);
