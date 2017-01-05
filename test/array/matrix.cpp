@@ -54,6 +54,9 @@ TEST_CASE("Matrix tutorial", "[array]")
     };
     CHECK(all(x == a));
 
+    // Invalid initializer list
+    CHECK_THROWS((jules::matrix<int>{{1, 2}, {3, 4}, {1, 2, 3}}));
+
     // Constructors from slicing.
     auto even_ix = jules::slice(0u, jules::slice::all, 2u);
     auto odd_ix = jules::seq(1u, 4u - 1u, 2u);
