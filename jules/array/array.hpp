@@ -140,7 +140,7 @@ public:
   /// 3) Assignment from array-like structures.
   auto operator=(const base_array& source) -> base_array&
   {
-    DEBUG_ASSERT(this != &source, debug::module{}, debug::level::invalid_argument, "self assignment");
+    DEBUG_ASSERT(this != &source, debug::default_module, debug::level::invalid_argument, "self assignment");
     clear(this->data(), this->size());
     this->data_ = this->allocate(source.size());
     this->descriptor_ = source.descriptor_;
@@ -151,7 +151,7 @@ public:
   /// \group Assignment
   auto operator=(base_array&& source) noexcept -> base_array&
   {
-    DEBUG_ASSERT(this != &source, debug::module{}, debug::level::invalid_argument, "self assignment");
+    DEBUG_ASSERT(this != &source, debug::default_module, debug::level::invalid_argument, "self assignment");
     clear(this->data(), this->size());
     this->data_ = move_ptr(source.data_);
     this->descriptor_ = std::move(source.descriptor_);
@@ -187,7 +187,7 @@ public:
   /// \group Fill
   template <typename... Args> auto fill(in_place_t, Args&&... args)
   {
-    DEBUG_ASSERT(this->data(), debug::module{}, debug::level::invalid_state, "array is empty");
+    DEBUG_ASSERT(this->data(), debug::default_module, debug::level::invalid_state, "array is empty");
     detail::array_allocator<T>::destroy(detail::trivial_dispatch<T>(), this->data(), this->size());
     detail::array_allocator<T>::create(detail::trivial_dispatch<T>(), this->data(), this->size(), std::forward<Args>(args)...);
   }
@@ -233,7 +233,7 @@ private:
     std::array<index_t, N> extents;
 
     calculate_descriptor_fill(extents, values, 0u);
-    DEBUG_ASSERT(calculate_descriptor_check(extents, values, 0u), debug::module{}, debug::level::boundary_check,
+    DEBUG_ASSERT(calculate_descriptor_check(extents, values, 0u), debug::default_module, debug::level::boundary_check,
                  "invalid initializer");
 
     return {0u, extents};
@@ -241,7 +241,7 @@ private:
 
   template <typename List> static auto calculate_descriptor_fill(std::array<index_t, N>& extents, List values, index_t pos)
   {
-    DEBUG_ASSERT(values.size() > 0, debug::module{}, debug::level::boundary_check, "invalid initializer");
+    DEBUG_ASSERT(values.size() > 0, debug::default_module, debug::level::boundary_check, "invalid initializer");
     extents[pos] = values.size();
     calculate_descriptor_fill(extents, *values.begin(), pos + 1);
   }
@@ -381,7 +381,7 @@ public:
   /// 3) Assignment from array-like structures.
   auto operator=(const base_array& source) & -> base_array&
   {
-    DEBUG_ASSERT(this != &source, debug::module{}, debug::level::invalid_argument, "self assignment");
+    DEBUG_ASSERT(this != &source, debug::default_module, debug::level::invalid_argument, "self assignment");
     clear(this->data(), this->size());
     this->data_ = this->allocate(source.size());
     this->descriptor_ = source.descriptor_;
@@ -392,7 +392,7 @@ public:
   /// \group Assignment
   auto operator=(base_array&& source) & noexcept -> base_array&
   {
-    DEBUG_ASSERT(this != &source, debug::module{}, debug::level::invalid_argument, "self assignment");
+    DEBUG_ASSERT(this != &source, debug::default_module, debug::level::invalid_argument, "self assignment");
     clear(this->data(), this->size());
     this->data_ = move_ptr(source.data_);
     this->descriptor_ = std::move(source.descriptor_);
@@ -428,7 +428,7 @@ public:
   /// \group Fill
   template <typename... Args> auto fill(in_place_t, Args&&... args)
   {
-    DEBUG_ASSERT(this->data(), debug::module{}, debug::level::invalid_state, "array is empty");
+    DEBUG_ASSERT(this->data(), debug::default_module, debug::level::invalid_state, "array is empty");
     detail::array_allocator<T>::destroy(detail::trivial_dispatch<T>(), this->data(), this->size());
     detail::array_allocator<T>::create(detail::trivial_dispatch<T>(), this->data(), this->size(), std::forward<Args>(args)...);
   }

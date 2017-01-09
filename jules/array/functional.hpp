@@ -64,7 +64,7 @@
 #define BINARY_APPLY_OPERATION(TX__, X__, TY__, Y__)                                                                             \
   template <UNPACK TX__, UNPACK TY__, typename Operator> auto apply(UNPACK X__ lhs, UNPACK Y__ rhs, Operator&& op)               \
   {                                                                                                                              \
-    DEBUG_ASSERT(lhs.extents() == rhs.extents(), debug::module{}, debug::level::extents_check, "extents mismatch");              \
+    DEBUG_ASSERT(lhs.extents() == rhs.extents(), debug::default_module, debug::level::extents_check, "extents mismatch");        \
     return make_expr_array<N>(lhs.begin(), lhs.end(), rhs.begin(), rhs.end(), std::forward<Operator>(op), lhs.extents());        \
   }
 

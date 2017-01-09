@@ -51,11 +51,11 @@ public:
     static_assert(A::order == N, "array order mismatch");
     static_assert(std::is_assignable<T&, typename A::value_type>::value, "incompatible assignment");
 
-    DEBUG_ASSERT(this->extents() == source.extents(), debug::module{}, debug::level::extents_check, "extents mismatch");
+    DEBUG_ASSERT(this->extents() == source.extents(), debug::default_module, debug::level::extents_check, "extents mismatch");
     auto it = source.begin();
     for (auto& elem : *this)
       elem = *it++;
-    DEBUG_ASSERT(it == source.end(), debug::module{}, debug::level::unreachable, "should never happen");
+    DEBUG_ASSERT(it == source.end(), debug::default_module, debug::level::unreachable, "should never happen");
 
     return *this;
   }
@@ -84,7 +84,7 @@ public:
   /// \group Indexing
   auto operator[](index_t i) -> ref_array<T, N - 1>
   {
-    DEBUG_ASSERT(i <= row_count(), debug::module{}, debug::level::boundary_check, "out of range");
+    DEBUG_ASSERT(i <= row_count(), debug::default_module, debug::level::boundary_check, "out of range");
     auto descriptor = this->descriptor_.drop_dimension();
     descriptor.start = descriptor_.start + descriptor_.strides[0] * i;
     return {data_, descriptor};
@@ -178,11 +178,11 @@ public:
     static_assert(A::order == 1, "array order mismatch");
     static_assert(std::is_assignable<T&, typename A::value_type>::value, "incompatible assignment");
 
-    DEBUG_ASSERT(this->extents() == source.extents(), debug::module{}, debug::level::extents_check, "extents mismatch");
+    DEBUG_ASSERT(this->extents() == source.extents(), debug::default_module, debug::level::extents_check, "extents mismatch");
     auto it = source.begin();
     for (auto& elem : *this)
       elem = *it++;
-    DEBUG_ASSERT(it == source.end(), debug::module{}, debug::level::unreachable, "should never happen");
+    DEBUG_ASSERT(it == source.end(), debug::default_module, debug::level::unreachable, "should never happen");
 
     return *this;
   }
@@ -199,11 +199,11 @@ public:
   /// \group Assignment
   auto operator=(const ref_array<T, 1>& source) -> ref_array&
   {
-    DEBUG_ASSERT(this->extents() == source.extents(), debug::module{}, debug::level::extents_check, "extents mismatch");
+    DEBUG_ASSERT(this->extents() == source.extents(), debug::default_module, debug::level::extents_check, "extents mismatch");
     auto it = source.begin();
     for (auto& elem : *this)
       elem = *it++;
-    DEBUG_ASSERT(it == source.end(), debug::module{}, debug::level::unreachable, "should never happen");
+    DEBUG_ASSERT(it == source.end(), debug::default_module, debug::level::unreachable, "should never happen");
 
     return *this;
   }
@@ -223,14 +223,14 @@ public:
   /// \group Indexing
   auto operator[](index_t i) -> T&
   {
-    DEBUG_ASSERT(i <= length(), debug::module{}, debug::level::boundary_check, "out of range");
+    DEBUG_ASSERT(i <= length(), debug::default_module, debug::level::boundary_check, "out of range");
     return data_[descriptor_(i)];
   }
 
   /// \group Indexing
   auto operator[](index_t i) const -> const T&
   {
-    DEBUG_ASSERT(i <= length(), debug::module{}, debug::level::boundary_check, "out of range");
+    DEBUG_ASSERT(i <= length(), debug::default_module, debug::level::boundary_check, "out of range");
     return data_[descriptor_(i)];
   }
 

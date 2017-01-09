@@ -90,7 +90,7 @@ public:
     /// \notes You should not call this function.
     auto operator-> () const -> pointer
     {
-      DEBUG_ASSERT(false, debug::module{}, debug::level::invalid_state, "you should not call this function");
+      DEBUG_ASSERT(false, debug::default_module, debug::level::invalid_state, "you should not call this function");
       return nullptr;
     }
 
@@ -117,7 +117,7 @@ public:
   {
     auto tmp = size();
     for (auto i = N; i > 0ul; --i) {
-      DEBUG_ASSERT(extents[i - 1] != 0ul, debug::module{}, debug::level::invalid_argument,
+      DEBUG_ASSERT(extents[i - 1] != 0ul, debug::default_module, debug::level::invalid_argument,
                    "zero extents while inferring strides");
       tmp /= extents[i - 1];
       strides[i - 1] = tmp;
@@ -245,7 +245,7 @@ public:
     /// \notes You should not call this function.
     auto operator-> () const -> pointer
     {
-      DEBUG_ASSERT(false, debug::module{}, debug::level::invalid_state, "you should not call this function");
+      DEBUG_ASSERT(false, debug::default_module, debug::level::invalid_state, "you should not call this function");
       return nullptr;
     }
 

@@ -11,9 +11,10 @@
 #include <array>
 
 #define CHECK_BOUNDS(I, MAX)                                                                                                     \
-  DEBUG_ASSERT((I) < (MAX), debug::module{}, debug::level::boundary_check, "slicing out of array limits");
+  DEBUG_ASSERT((I) < (MAX), debug::default_module, debug::level::boundary_check, "slicing out of array limits");
 
-#define CHECK_STRIDE(VALUE) DEBUG_ASSERT((VALUE) > 0u, debug::module{}, debug::level::invalid_argument, "invalid slicing stride");
+#define CHECK_STRIDE(VALUE)                                                                                                      \
+  DEBUG_ASSERT((VALUE) > 0u, debug::default_module, debug::level::invalid_argument, "invalid slicing stride");
 
 namespace jules
 {
