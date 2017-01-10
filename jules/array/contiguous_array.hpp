@@ -32,8 +32,8 @@ public:
   contiguous_array(const contiguous_array& source) = default;
   contiguous_array(contiguous_array&& source) noexcept = default;
 
-  auto operator=(const contiguous_array& source) -> contiguous_array& = default;
-  auto operator=(contiguous_array&& source) noexcept -> contiguous_array& = default;
+  auto operator=(const contiguous_array& source) -> contiguous_array& = delete;
+  auto operator=(contiguous_array&& source) noexcept -> contiguous_array& = delete;
 
   operator contiguous_array<const T, N>() const { return {this->data(), {0u, this->extents()}}; }
 
