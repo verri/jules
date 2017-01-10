@@ -74,8 +74,6 @@ public:
 
   template <typename T> auto data() const
   {
-    if (elements_type() != typeid(T))
-      throw std::bad_cast{};
     const auto& model = this->model_->template downcast<T>();
     return model.data();
   }

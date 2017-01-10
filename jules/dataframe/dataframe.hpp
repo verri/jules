@@ -3,6 +3,7 @@
 #ifndef JULES_DATAFRAME_DATAFRAME_H
 #define JULES_DATAFRAME_DATAFRAME_H
 
+#include <jules/core/debug.hpp>
 #include <jules/core/range.hpp>
 #include <jules/core/type.hpp>
 #include <jules/dataframe/column.hpp>
@@ -64,15 +65,14 @@ public:
       return elements_.back().column.size() == row_count_;
     });
 
-    if (!ok)
-      throw std::runtime_error{"columns size mismatch"};
+    DEBUG_ASSERT(ok, debug::throwing_module, debug::level::invalid_argument, "columns size mismatch");
 
     index_t i = 0;
     for (auto& element : elements_) {
       auto& name = element.name;
       if (!name.empty()) {
-        if (indexes_.find(name) != indexes_.end())
-          throw std::runtime_error{"repeated column name"};
+        DEBUG_ASSERT(indexes_.find(name) == indexes_.end(), debug::throwing_module, debug::level::invalid_argument,
+                     "repeated column name");
         indexes_[name] = i++;
       }
     }

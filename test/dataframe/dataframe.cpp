@@ -113,10 +113,10 @@ TEST_CASE("Accessing rows of the dataframe", "[datafrae]")
 
 TEST_CASE("Invalid dataframe exception", "[dataframe]")
 {
-  //   using jules::dataframe;
+  using jules::dataframe;
 
-  //   auto create_invalid_dataframe = [] { return dataframe{{1, 2, 3, 4}, {1, 2}}; };
-  //   CHECK_THROWS(create_invalid_dataframe());
+  auto create_invalid_dataframe = [] { return dataframe{{"a", {1, 2, 3, 4}}, {"b", {1, 2}}}; };
+  CHECK_THROWS(create_invalid_dataframe());
 }
 
 TEST_CASE("Constructing a dataframe from a range of columns", "[dataframe]")
@@ -145,23 +145,21 @@ TEST_CASE("Constructing a dataframe from a range of columns", "[dataframe]")
 
 TEST_CASE("Assigning a null dataframe", "[dataframe]")
 {
-  //   using jules::dataframe;
+  using jules::dataframe;
 
-  //   dataframe some_df{{"int", {1, 2, 3, 4}}, {"const char*", {"hello", " ", "world", "!"}}};
+  dataframe some_df{{"int", {1, 2, 3, 4}}, {"const char*", {"hello", " ", "world", "!"}}};
+  CHECK(some_df);
 
-  //   CHECK(!some_df.is_empty());
-
-  //   some_df = {};
-  //   CHECK(some_df.is_empty());
+  some_df = {};
+  CHECK(!some_df);
 }
 
 TEST_CASE("Assigning a dataframe to itself", "[dataframe]")
 {
-  //   using jules::dataframe;
+  using jules::dataframe;
 
-  //   dataframe some_df{{"int", {1, 2, 3, 4}}, {"const char*", {"hello", " ", "world", "!"}}};
-
-  //   CHECK_NOTHROW(some_df = some_df);
+  dataframe some_df{{"int", {1, 2, 3, 4}}, {"const char*", {"hello", " ", "world", "!"}}};
+  CHECK_NOTHROW(some_df = some_df);
 }
 
 TEST_CASE("Reading an empty dataframe with header", "[dataframe]")
