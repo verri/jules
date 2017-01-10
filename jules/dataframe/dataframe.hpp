@@ -3,6 +3,8 @@
 #ifndef JULES_DATAFRAME_DATAFRAME_H
 #define JULES_DATAFRAME_DATAFRAME_H
 
+#include <jules/array/array.hpp>
+#include <jules/array/numeric.hpp>
 #include <jules/core/debug.hpp>
 #include <jules/core/range.hpp>
 #include <jules/core/type.hpp>
@@ -89,6 +91,19 @@ public:
   auto row_count() const { return row_count_; }
   auto column_count() const { return elements_.size(); }
 
+  auto column_types() const -> vector<std::type_index>
+  {
+    namespace view = ::jules::range::view;
+    return to_vector<std::type_index>(elements_ |
+                                      view::transform([](const auto& element) { return element.column.elements_type(); }));
+  }
+
+  auto names() const -> vector<jules::string>
+  {
+    namespace view = ::jules::range::view;
+    return to_vector<jules::string>(elements_ | view::transform([](const auto& element) { return element.name; }));
+  }
+
 private:
   index_t row_count_ = 0u;
   std::vector<named_column_type> elements_;
@@ -102,79 +117,6 @@ using dataframe = base_dataframe<coercion_rules>;
 #endif // JULES_DATAFRAME_DATAFRAME_H
 
 #ifndef JULES_DATAFRAME_DATAFRAME_H
-
-#include <jules/dataframe/dataframe_decl.hpp>
-#include <jules/range/range.hpp>
-
-#include <algorithm>
-#include <iterator>
-#include <regex>
-
-namespace jules
-{
-
-template <typename Coercion> template <typename T> auto base_dataframe<Coercion>::columns() -> vector<base_column_view<T>>
-{
-  using namespace adaptors;
-  return {(columns_ | transformed([](auto& column) { return as_view<T>(column); })).begin(), columns_.size()};
-}
-
-template <typename Coercion>
-template <typename T>
-auto base_dataframe<Coercion>::columns() const -> vector<base_column_view<const T>>
-{
-  using namespace adaptors;
-  return {(columns_ | transformed([](const auto& column) { return as_view<T>(column); })).begin(), columns_.size()};
-}
-
-template <typename Coercion> template <typename... T> auto base_dataframe<Coercion>::rows() -> vector<base_row_view<T...>>
-{
-  if (sizeof...(T) != this->columns_count())
-    throw std::runtime_error{"invalid number of columns inferred from column types"};
-
-  auto tuple = this->views<T...>(std::make_index_sequence<sizeof...(T)>());
-  return rows_helper(tuple, std::make_index_sequence<sizeof...(T)>(), this->rows_count());
-}
-
-template <typename Coercion>
-template <typename... T>
-auto base_dataframe<Coercion>::rows() const -> vector<base_row_view<const T...>>
-{
-  if (sizeof...(T) != this->columns_count())
-    throw std::runtime_error{"invalid number of columns inferred from column types"};
-
-  auto tuple = this->views<const T...>(std::make_index_sequence<sizeof...(T)>());
-  return rows_helper(tuple, std::make_index_sequence<sizeof...(T)>(), this->rows_count());
-}
-
-template <typename Coercion>
-template <typename... T, std::size_t... I>
-auto base_dataframe<Coercion>::views(std::index_sequence<I...>) -> std::tuple<base_column_view<T>...>
-{
-  return std::make_tuple(as_view<T>(this->columns_[I])...);
-}
-
-template <typename Coercion>
-template <typename... T, std::size_t... I>
-auto base_dataframe<Coercion>::views(std::index_sequence<I...>) const -> std::tuple<base_column_view<const T>...>
-{
-  return std::make_tuple(as_view<const T>(this->columns_[I])...);
-}
-
-template <typename Coercion>
-template <typename... T, std::size_t... I>
-auto base_dataframe<Coercion>::rows_helper(std::tuple<base_column_view<T>...>& columns, std::index_sequence<I...>,
-                                           std::size_t rows_count) -> vector<base_row_view<T...>>
-{
-  auto i = std::size_t{};
-  auto iter = jules::as_iterator([&] {
-    auto row_view = base_row_view<T...>{std::get<I>(columns)[i]...};
-    ++i;
-    return row_view;
-  });
-
-  return {iter, rows_count};
-}
 
 template <typename Coercion> base_dataframe<Coercion>& base_dataframe<Coercion>::colbind(const column_t& column)
 {
@@ -221,16 +163,6 @@ template <typename Coercion> base_dataframe<Coercion>& base_dataframe<Coercion>:
   return *this;
 }
 
-template <typename Coercion> auto base_dataframe<Coercion>::columns_elements_types() const -> vector<std::type_index>
-{
-  return to_vector<std::type_index>(columns_ | adaptors::transformed([](const column_t& col) { return col.elements_type(); }));
-}
-
-template <typename Coercion> auto base_dataframe<Coercion>::columns_names() const -> vector<std::string>
-{
-  return to_vector<std::string>(columns_ | adaptors::transformed([](const column_t& col) { return col.name(); }));
-}
-
 template <typename Coercion> auto base_dataframe<Coercion>::select(const std::string& name) const -> const column_t&
 {
   auto it = colindexes_.find(name);
@@ -247,40 +179,6 @@ template <typename Coercion> auto base_dataframe<Coercion>::select(const expr_t&
 template <typename Coercion> auto base_dataframe<Coercion>::select(const expr_list_t& expression_list) const -> base_dataframe
 {
   return expression_list.extract_from(*this);
-}
-
-template <typename Coercion> template <typename T> base_dataframe<Coercion>& base_dataframe<Coercion>::coerce_to()
-{
-  std::vector<column_t> new_columns;
-
-  new_columns.reserve(columns_.size());
-  std::transform(columns_.begin(), columns_.end(), std::back_inserter(new_columns),
-                 [](auto&& column) { return jules::as_column<T>(column); });
-
-  columns_ = std::move(new_columns);
-
-  return *this;
-}
-
-template <typename T, typename C> auto coerce_to(const base_dataframe<C>& dataframe) -> base_dataframe<C>
-{
-  base_dataframe<C> coerced;
-  for (std::size_t i = 0; dataframe.columns_count(); ++i)
-    coerced.colbind(jules::as_column<T>(dataframe.select(i)));
-  return coerced;
-}
-
-template <typename Coercion> template <typename T> bool base_dataframe<Coercion>::can_coerce_to() const
-{
-  for (auto&& column : columns_)
-    if (!column.template can_coerce_to<T>())
-      return false;
-  return true;
-}
-
-template <typename T, typename Coercion> bool can_coerce_to(const base_dataframe<Coercion>& dataframe)
-{
-  return dataframe.template can_coerce_to<T>();
 }
 
 template <typename Coercion> auto base_dataframe<Coercion>::read(std::istream& is, dataframe_read_options opt) -> base_dataframe
@@ -377,12 +275,5 @@ template <typename C> auto write(const base_dataframe<C>& df, std::ostream& os, 
 }
 
 template <typename C> auto write(const base_dataframe<C>& df, std::ostream& os) -> std::ostream& { return write(df, os, {}); };
-
-template <typename C> auto operator<<(std::ostream& os, const base_dataframe<C>& df) -> std::ostream&
-{
-  return write(df, os, {});
-}
-
-} // namespace jules
 
 #endif // JULES_DATAFRAME_DATAFRAME_H

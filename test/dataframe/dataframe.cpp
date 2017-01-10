@@ -1,4 +1,5 @@
 #include "jules/dataframe/dataframe.hpp"
+#include "jules/array/all.hpp"
 
 #include <catch.hpp>
 
@@ -138,9 +139,13 @@ TEST_CASE("Constructing a dataframe from a range of columns", "[dataframe]")
   CHECK(df2.row_count() == 3u);
   CHECK(df2.column_count() == 2u);
 
-  //   CHECK(df.select("a").elements_type() == columns[0].elements_type());
-  //   CHECK(df.select("b").elements_type() == columns[1].elements_type());
-  //   CHECK(df.select("c").elements_type() == columns[2].elements_type());
+  namespace view = jules::range::view;
+
+  auto types = jules::as_vector(columns | view::transform([](const auto& elem) { return elem.column.elements_type(); }));
+  CHECK(all(df.column_types() == types));
+
+  auto names = jules::as_vector(columns | view::transform([](const auto& elem) { return elem.name; }));
+  CHECK(all(df.names() == names));
 }
 
 TEST_CASE("Assigning a null dataframe", "[dataframe]")
