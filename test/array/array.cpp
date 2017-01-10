@@ -1,4 +1,5 @@
 #include "jules/array/all.hpp"
+#include "jules/base/numeric.hpp"
 
 #include <catch.hpp>
 
@@ -94,4 +95,16 @@ TEST_CASE("Type inference for as_vector", "[array]")
     CHECK(result.first == vector3.end());
     CHECK(result.second == vector2.end());
   }
+}
+
+TEST_CASE("Empty array operations", "[array]")
+{
+  auto empty = jules::vector<>();
+
+  CHECK(empty.size() == 0u);
+  CHECK(empty.begin() == empty.end());
+
+  CHECK(sum(empty) == 0.0);
+  CHECK(prod(empty) == 1.0);
+  CHECK(max(empty) == -std::numeric_limits<jules::numeric>::infinity());
 }

@@ -4,6 +4,7 @@
 #define JULES_ARRAY_UNARY_EXPR_ARRAY_H
 
 #include <jules/array/detail/common.hpp>
+#include <jules/array/detail/slicing.hpp>
 #include <jules/array/slice.hpp>
 #include <jules/core/type.hpp>
 

@@ -1,6 +1,12 @@
 jules
 =====
 
+[![Build Status](https://travis-ci.org/verri/jules.svg?branch=master)](https://travis-ci.org/verri/jules)
+[![codecov](https://codecov.io/gh/verri/jules/branch/master/graph/badge.svg)](https://codecov.io/gh/verri/jules)
+[![GitHub license](https://img.shields.io/badge/license-Zlib-blue.svg)](https://raw.githubusercontent.com/verri/jules/master/license.txt)
+[![Github Releases](https://img.shields.io/github/release/verri/jules.svg)](https://github.com/verri/jules/releases)
+[![AUR](https://img.shields.io/aur/version/jules-git.svg)](https://aur.archlinux.org/packages/jules-git)
+
 `jules` is a statistical computing library that aims to provide R-like experience in modern C++.
 
 Dependencies
@@ -9,11 +15,43 @@ Dependencies
  - C++14 compiler
  - [debug_assert](https://github.com/foonathan/debug_assert)
  - [range-v3](https://github.com/ericniebler/range-v3)
+ - [CBLAS](http://www.netlib.org/blas/) (optional)
+ - [Catch](https://github.com/philsquared/Catch.git) (testing)
+
+Usage
+-----
+
+### Installation
+
+`jules` is a header-only library. Download the [latest release](https://github.com/verri/jules/releases/latest)
+and extract it to `/path/to/release`. The zip file already contains all mandatory dependencies.
+
+For Arch Linux users, install the AUR package [jules-git](https://aur.archlinux.org/packages/jules-git) 
+via [yaourt](https://archlinux.fr/yaourt-en), 
+[makepkg](https://wiki.archlinux.org/index.php/Arch_User_Repository#Build_and_install_the_package),
+or any other method of your preference.
+
+If you intend to use BLAS optimized functions, make sure CBLAS is installed.
+
+### Compilation
+
+Make sure to enable C++14 and to include the path where `jules` is installed. Arch Linux users do not need
+the `-isystem` option, since the library is already in the system path.
+
+```sh
+CXXFLAGS=-std=c++14 -isystem/path/to/release/include
+```
+
+If using BLAS, make sure to link it.
+
+```sh
+LDFLAGS=-lblas
+```
 
 Documentation
 -------------
 
-Generated with [standardese](https://github.com/foonathan/standardese) 
+Generated with [standardese](https://github.com/foonathan/standardese)
 [here](https://verri.github.io/jules/).
 
 Acknowledgements

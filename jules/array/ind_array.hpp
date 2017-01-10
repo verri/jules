@@ -7,6 +7,7 @@
 #include <jules/array/detail/slicing.hpp>
 #include <jules/array/slice.hpp>
 #include <jules/core/debug.hpp>
+#include <jules/core/meta.hpp>
 #include <jules/core/type.hpp>
 
 #include <vector>
@@ -51,26 +52,26 @@ public:
   ~ind_array() = default;
 
   /// \group Assignment
-  template <typename U> auto operator=(const U& source) -> array_fallback<ind_array&, U>
+  template <typename A> auto operator=(const A& source) -> meta::requires_t<ind_array&, Array<A>>
   {
-    static_assert(std::is_assignable<T&, U>::value, "incompatible assignment");
+    static_assert(A::order == N, "array order mismatch");
+    static_assert(std::is_assignable<T&, typename A::value_type>::value, "incompatible assignment");
+
+    DEBUG_ASSERT(this->extents() == source.extents(), debug::default_module, debug::level::extents_check, "extents mismatch");
+    auto it = source.begin();
     for (auto& elem : *this)
-      elem = source;
+      elem = *it++;
+    DEBUG_ASSERT(it == source.end(), debug::default_module, debug::level::unreachable, "should never happen");
+
     return *this;
   }
 
   /// \group Assignment
-  template <typename Array> auto operator=(const Array& source) -> array_request<ind_array&, Array>
+  template <typename U> auto operator=(const U& source) -> meta::fallback_t<ind_array&, Array<U>>
   {
-    static_assert(Array::order == N, "array order mismatch");
-    static_assert(std::is_assignable<T&, typename Array::value_type>::value, "incompatible assignment");
-
-    DEBUG_ASSERT(this->extents() == source.extents(), debug::module{}, debug::level::extents_check, "extents mismatch");
-    auto it = source.begin();
+    static_assert(std::is_assignable<T&, U>::value, "incompatible assignment");
     for (auto& elem : *this)
-      elem = *it++;
-    DEBUG_ASSERT(it == source.end(), debug::module{}, debug::level::unreachable, "should never happen");
-
+      elem = source;
     return *this;
   }
 
@@ -89,7 +90,7 @@ public:
   /// \group Indexing
   auto operator[](index_t i) -> ind_array<T, N - 1>
   {
-    DEBUG_ASSERT(i <= row_count(), debug::module{}, debug::level::boundary_check, "out of range");
+    DEBUG_ASSERT(i <= row_count(), debug::default_module, debug::level::boundary_check, "out of range");
     auto row_info = row(i);
     return {data_, row_info.first, std::move(row_info.second)};
   }
@@ -98,7 +99,7 @@ public:
   auto operator[](index_t i) const -> ind_array<const T, N - 1>
   {
     // It is very expensive to convert to ind_array<const T, N>.
-    DEBUG_ASSERT(i <= row_count(), debug::module{}, debug::level::boundary_check, "out of range");
+    DEBUG_ASSERT(i <= row_count(), debug::default_module, debug::level::boundary_check, "out of range");
     auto row_info = row(i);
     return {data_, row_info.first, std::move(row_info.second)};
   }
@@ -226,7 +227,22 @@ public:
   ~ind_array() = default;
 
   /// \group Assignment
-  template <typename U> auto operator=(const U& source) -> array_fallback<ind_array&, U>
+  template <typename A> auto operator=(const A& source) -> meta::requires_t<ind_array&, Array<A>>
+  {
+    static_assert(A::order == 1, "array order mismatch");
+    static_assert(std::is_assignable<T&, typename A::value_type>::value, "incompatible assignment");
+
+    DEBUG_ASSERT(this->extents() == source.extents(), debug::default_module, debug::level::extents_check, "extents mismatch");
+    auto it = source.begin();
+    for (auto& elem : *this)
+      elem = *it++;
+    DEBUG_ASSERT(it == source.end(), debug::default_module, debug::level::unreachable, "should never happen");
+
+    return *this;
+  }
+
+  /// \group Assignment
+  template <typename U> auto operator=(const U& source) -> meta::fallback_t<ind_array&, Array<U>>
   {
     static_assert(std::is_assignable<T&, U>::value, "incompatible assignment");
     for (auto& elem : *this)
@@ -235,28 +251,13 @@ public:
   }
 
   /// \group Assignment
-  template <typename Array> auto operator=(const Array& source) -> array_request<ind_array&, Array>
-  {
-    static_assert(Array::order == 1, "array order mismatch");
-    static_assert(std::is_assignable<T&, typename Array::value_type>::value, "incompatible assignment");
-
-    DEBUG_ASSERT(this->extents() == source.extents(), debug::module{}, debug::level::extents_check, "extents mismatch");
-    auto it = source.begin();
-    for (auto& elem : *this)
-      elem = *it++;
-    DEBUG_ASSERT(it == source.end(), debug::module{}, debug::level::unreachable, "should never happen");
-
-    return *this;
-  }
-
-  /// \group Assignment
   auto operator=(const ind_array<T, 1>& source) -> ind_array&
   {
-    DEBUG_ASSERT(this->extents() == source.extents(), debug::module{}, debug::level::extents_check, "extents mismatch");
+    DEBUG_ASSERT(this->extents() == source.extents(), debug::default_module, debug::level::extents_check, "extents mismatch");
     auto it = source.begin();
     for (auto& elem : *this)
       elem = *it++;
-    DEBUG_ASSERT(it == source.end(), debug::module{}, debug::level::unreachable, "should never happen");
+    DEBUG_ASSERT(it == source.end(), debug::default_module, debug::level::unreachable, "should never happen");
 
     return *this;
   }
@@ -276,18 +277,18 @@ public:
   /// \group Indexing
   auto operator[](index_t i) -> T&
   {
-    DEBUG_ASSERT(i <= length(), debug::module{}, debug::level::boundary_check, "out of range");
+    DEBUG_ASSERT(i <= length(), debug::default_module, debug::level::boundary_check, "out of range");
     return data_[indexes_[descriptor_(i)]];
   }
 
   /// \group Indexing
   auto operator[](index_t i) const -> const T&
   {
-    DEBUG_ASSERT(i <= length(), debug::module{}, debug::level::boundary_check, "out of range");
+    DEBUG_ASSERT(i <= length(), debug::default_module, debug::level::boundary_check, "out of range");
     return data_[indexes_[descriptor_(i)]];
   }
 
-  template <typename Rng, typename U = range::range_value_t<Rng>, CONCEPT_REQUIRES_(range::Range<Rng>())>
+  template <typename Rng, typename U = range::range_value_t<Rng>, typename = meta::requires<range::Range<Rng>>>
   auto operator()(const Rng& rng) -> ind_array<T, 1>
   {
     static_assert(std::is_convertible<U, index_t>::value, "arbitrary ranges must contain indexes");
@@ -295,6 +296,12 @@ public:
     auto slicing = detail::indirect_slicing(descriptor_, rng);
     auto indexes = map_indexes(slicing.second);
     return {data_, slicing.first.extent, std::move(indexes)};
+  }
+
+  auto operator()(std::vector<index_t>&& indexes) -> ind_array<T, 1>
+  {
+    map_indexes(indexes);
+    return {this->data_, indexes.size(), std::move(indexes)};
   }
 
   auto operator()(const base_slice<1>& slice) -> ind_array<T, 1>
@@ -306,7 +313,7 @@ public:
 
   auto operator()(index_t i) -> T& { return (*this)[i]; }
 
-  template <typename Rng, typename U = range::range_value_t<Rng>, CONCEPT_REQUIRES_(range::Range<Rng>())>
+  template <typename Rng, typename U = range::range_value_t<Rng>, typename = meta::requires<range::Range<Rng>>>
   auto operator()(const Rng& rng) const -> ind_array<const T, 1>
   {
     static_assert(std::is_convertible<U, index_t>::value, "arbitrary ranges must contain indexes");
@@ -314,6 +321,12 @@ public:
     auto slicing = detail::indirect_slicing(descriptor_, rng);
     auto indexes = map_indexes(slicing.second);
     return {data_, slicing.first.extent, std::move(indexes)};
+  }
+
+  auto operator()(std::vector<index_t>&& indexes) const -> ind_array<const T, 1>
+  {
+    map_indexes(indexes);
+    return {this->data_, indexes.size(), std::move(indexes)};
   }
 
   auto operator()(const base_slice<1>& slice) const -> ind_array<const T, 1>
@@ -348,6 +361,12 @@ private:
     for (index_t j : rng)
       indexes.push_back(indexes_[j]);
     return indexes;
+  }
+
+  auto map_indexes(std::vector<index_t>& indexes) const
+  {
+    for (auto& index : indexes)
+      index = indexes_[index];
   }
 
   T* data_;

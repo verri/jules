@@ -30,8 +30,8 @@ template <> struct cblas<double> {
 
 template <typename T> auto product(const matrix<T>& lhs, const matrix<T>& rhs) -> matrix<T>
 {
-  DEBUG_ASSERT(lhs.size() > 0 && rhs.size() > 0, debug::module{}, debug::level::invalid_argument, "empty matrix");
-  DEBUG_ASSERT(lhs.column_count() == rhs.row_count(), debug::module{}, debug::level::invalid_argument, "invalid extents");
+  DEBUG_ASSERT(lhs.size() > 0 && rhs.size() > 0, debug::default_module, debug::level::invalid_argument, "empty matrix");
+  DEBUG_ASSERT(lhs.column_count() == rhs.row_count(), debug::default_module, debug::level::invalid_argument, "invalid extents");
 
   matrix<T> result(lhs.row_count(), rhs.column_count());
   auto k = lhs.column_count(); // same as rhs.row_count()

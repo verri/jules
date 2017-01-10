@@ -2,58 +2,58 @@
 #define JULES_ARRAY_NUMERIC_H
 
 #include <jules/array/array.hpp>
-#include <jules/array/detail/slicing.hpp>
+#include <jules/core/debug.hpp>
+#include <jules/core/meta.hpp>
 #include <jules/core/type.hpp>
 
 #include <iterator>
 #include <type_traits>
+#include <vector>
 
 namespace jules
 {
 
-static inline auto seq(index_t start, index_t stop, index_t step = 1u) -> vector<index_t>
+static inline auto seq(const index_t start, const index_t stop, const distance_t step = 1) -> std::vector<index_t>
 {
-  index_t size = detail::seq_size(start, stop, step);
-  vector<index_t> indexes(size);
+  DEBUG_ASSERT(step != 0, debug::default_module, debug::level::invalid_argument, "step cannot be zero");
+  DEBUG_ASSERT(start <= stop || step < 0, debug::default_module, debug::level::invalid_argument, "stop value is unreachable");
+  DEBUG_ASSERT(start >= stop || step > 0, debug::default_module, debug::level::invalid_argument, "stop value is unreachable");
 
-  if (start < stop) {
-    for (index_t i = 0; i < size; ++i) {
-      indexes[i] = start;
-      start += step;
-    }
-  } else {
-    for (index_t i = 0; i < size; ++i) {
-      indexes[i] = start;
-      start -= step;
-    }
-  }
+  const auto size = static_cast<index_t>((static_cast<distance_t>(stop) - static_cast<distance_t>(start)) / step + 1);
+
+  std::vector<index_t> indexes;
+  indexes.reserve(size);
+
+  for (auto i = start; indexes.size() < size; i += step)
+    indexes.push_back(i);
 
   return indexes;
 }
 
-template <typename T, typename Rng, CONCEPT_REQUIRES_(range::Range<Rng>())>
-auto to_vector(const Rng& rng) -> array_fallback<vector<T>, Rng>
+template <typename T, typename A> auto to_vector(A&& array) -> meta::requires_t<vector<T>, Array<std::decay_t<A>>>
 {
-  vector<T> vec(range::size(rng));
-  range::copy(rng, vec.begin());
-  return vec;
+  // TODO: Optimize if A is a temporary.
+  return {array.begin(), array.end()};
 }
 
-template <typename T, typename Array> auto to_vector(Array&& array) -> array_request<vector<T>, std::decay_t<Array>>
+template <typename T, typename Rng, typename = meta::requires<range::Range<std::decay_t<Rng>>>>
+auto to_vector(Rng&& rng) -> meta::fallback_t<vector<T>, Array<std::decay_t<Rng>>>
 {
-  return {std::forward<Array>(array)};
-}
-
-template <typename Rng, typename R = range::range_value_t<Rng>, CONCEPT_REQUIRES_(range::Range<Rng>())>
-auto as_vector(const Rng& rng) -> array_fallback<vector<R>, Rng>
-{
-  return to_vector<R>(rng);
+  return {std::forward<Rng>(rng)};
 }
 
 // If higher order, copy elements column-wise.
-template <typename Array> auto as_vector(Array&& array) -> array_request<vector<typename Array::value_type>, std::decay_t<Array>>
+template <typename A> auto as_vector(A&& array) -> meta::requires_t<vector<typename A::value_type>, Array<std::decay_t<A>>>
 {
+  // TODO: Optimize if A is a temporary.
   return {array.begin(), array.end()};
+}
+
+template <typename Rng, typename R = range::range_value_t<std::decay_t<Rng>>,
+          typename = meta::requires<range::Range<std::decay_t<Rng>>>>
+auto as_vector(Rng&& rng) -> meta::fallback_t<vector<R>, Array<std::decay_t<Rng>>>
+{
+  return to_vector<R>(std::forward<Rng>(rng));
 }
 
 template <typename... Args, typename = std::enable_if_t<(sizeof...(Args) > 1)>> auto as_vector(Args&&... args)
@@ -62,6 +62,13 @@ template <typename... Args, typename = std::enable_if_t<(sizeof...(Args) > 1)>> 
   auto values = std::array<R, sizeof...(Args)>{{std::forward<Args>(args)...}};
   return vector<R>(std::make_move_iterator(std::begin(values)), std::make_move_iterator(std::end(values)));
 }
+
+template <typename A, typename T = typename A::value_type, typename = meta::requires<Array<A>>>
+auto normal_pdf(const A& array, T mu, T sigma)
+{
+  return apply(array, [ mu = std::move(mu), sigma = std::move(sigma) ](const auto& x) { return normal_pdf(x, mu, sigma); });
 }
+
+} // namespace jules
 
 #endif // JULES_ARRAY_NUMERIC_H

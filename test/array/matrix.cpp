@@ -2,6 +2,8 @@
 
 #include <catch.hpp>
 
+static void (*volatile not_optimize_away)(void*) = [](void*) {};
+
 TEST_CASE("Matrix tutorial", "[array]")
 {
   SECTION("Constructors")
@@ -34,7 +36,10 @@ TEST_CASE("Matrix tutorial", "[array]")
     auto c = jules::matrix<long>(std::begin(values), 4u, 4u);
 
     // Copy and move constructors.
-    auto d = [c]() -> jules::matrix<long> { return {std::move(c)}; }();
+    auto d = [c]() mutable -> jules::matrix<long> {
+      not_optimize_away(&c);
+      return {std::move(c)};
+    }();
 
     REQUIRE(all(a == b));
     REQUIRE(all(b == c));
@@ -49,9 +54,12 @@ TEST_CASE("Matrix tutorial", "[array]")
     };
     CHECK(all(x == a));
 
+    // Invalid initializer list
+    CHECK_THROWS((jules::matrix<int>{{1, 2}, {3, 4}, {1, 2, 3}}));
+
     // Constructors from slicing.
     auto even_ix = jules::slice(0u, jules::slice::all, 2u);
-    auto odd_ix = jules::seq(1u, 4u, 2u);
+    auto odd_ix = jules::seq(1u, 4u - 1u, 2u);
     auto all_ix = jules::slice();
 
     auto even_rows = jules::matrix<long>(x(even_ix, all_ix));
@@ -109,8 +117,8 @@ TEST_CASE("Matrix tutorial", "[array]")
     CHECK(all(second_column_odd_rows == jules::matrix<long>{{5}, {7}}));
 
     // Constructors from expression.
-    auto r_inv = eval(jules::seq(x.row_count(), 0u) - 1u);
-    auto c_inv = eval(jules::seq(x.column_count(), 0u) - 1u);
+    const auto r_inv = jules::seq(x.row_count() - 1u, 0u, -1);
+    const auto c_inv = jules::seq(x.column_count() - 1u, 0u, -1);
 
     auto y = jules::matrix<long>(x + x(r_inv, c_inv));
     CHECK(all(y == 15));
@@ -137,7 +145,7 @@ TEST_CASE("Matrix tutorial", "[array]")
     x = z(jules::slice(0u, jules::slice::all, 2u), jules::slice(0u, jules::slice::all, 2u));
     CHECK(all(x == jules::matrix<long>{{0, 8}, {2, 10}}));
 
-    x = z(jules::seq(0u, z.row_count(), 2u), jules::seq(0u, z.column_count(), 2u));
+    x = z(jules::seq(0u, z.row_count() - 1u, 2u), jules::seq(0u, z.column_count() - 1u, 2u));
     CHECK(all(x == jules::matrix<long>{{0, 8}, {2, 10}}));
 
     z = x + x;
@@ -150,6 +158,9 @@ TEST_CASE("Matrix tutorial", "[array]")
     // expression is evaluated.
     x = x - x;
     CHECK(all(x == jules::matrix<long>(0, x.row_count(), x.column_count())));
+
+    x.fill(1);
+    CHECK(all(x == 1));
   }
 
   SECTION("Iterators")
@@ -190,7 +201,7 @@ TEST_CASE("Matrix tutorial", "[array]")
 
   SECTION("Submatrix assignment")
   {
-    auto x = jules::matrix<long>(jules::seq(0u, 6u).begin(), 2u, 3u);
+    auto x = jules::matrix<long>(jules::seq(0u, 6u - 1u).begin(), 2u, 3u);
     const auto y = x;
 
     REQUIRE(all(x == jules::matrix<long>{{0, 2, 4}, {1, 3, 5}}));
@@ -215,16 +226,16 @@ TEST_CASE("Matrix tutorial", "[array]")
         x(i, j) = y(y.row_count() - 1, y.column_count() - 1);
     CHECK(all(x == 5));
 
-    x(jules::seq(0u, x.row_count()), jules::seq(0u, x.column_count())) = y();
+    x(jules::seq(0u, x.row_count() - 1u), jules::seq(0u, x.column_count() - 1u)) = y();
     CHECK(all(x == y));
 
-    auto ix = jules::seq(0u, x.row_count(), 2u);
-    auto jx = jules::seq(0u, x.column_count(), 2u);
+    auto ix = jules::as_vector(jules::seq(0u, x.row_count() - 1u, 2u));
+    auto jx = jules::as_vector(jules::seq(0u, x.column_count() - 1u, 2u));
 
     x(ix, jx) = y(ix + 1, jx);
     CHECK(all(x == jules::matrix<long>{{1, 2, 5}, {1, 3, 5}}));
 
-    x(jules::seq(0u, 2u), 1u) = jules::matrix<long>{{4, 4}};
+    x(jules::seq(0u, 2u - 1u), 1u) = jules::matrix<long>{{4, 4}};
     CHECK(all(x == jules::matrix<long>{{1, 4, 5}, {1, 4, 5}}));
 
     x[0u] = jules::as_vector(jules::repeat<3>(0u));

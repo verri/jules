@@ -8,6 +8,7 @@
 #include <jules/array/ref_array.hpp>
 #include <jules/base/async.hpp>
 #include <jules/base/numeric.hpp>
+#include <jules/core/meta.hpp>
 #include <jules/core/type.hpp>
 
 #include <type_traits>
@@ -97,7 +98,7 @@ public:
 
   /// \group Constructors
   template <typename Iter, typename... Dims, typename R = range::iterator_value_t<Iter>,
-            typename = detail::n_indexes_enabler<N, Dims...>>
+            typename = detail::n_indexes_enabler<N, Dims...>, typename = meta::requires<range::Iterator<Iter>>>
   base_array(Iter iter, Dims... dims) : ref_array<T, N>{this->allocate(prod_args(dims...)), {0u, {{index_t{dims}...}}}}
   {
     static_assert(std::is_convertible<R, T>::value, "iterator values are not compatible");
@@ -122,11 +123,11 @@ public:
   base_array(base_array&& source) noexcept : ref_array<T, N>{move_ptr(source.data_), std::move(source.descriptor_)} {}
 
   /// \group Constructors
-  template <typename Array, typename = array_request<void, Array>>
-  base_array(const Array& source) : ref_array<T, N>{this->allocate(source.size()), {0u, source.extents()}}
+  template <typename A, typename = meta::requires<Array<A>>>
+  base_array(const A& source) : ref_array<T, N>{this->allocate(source.size()), {0u, source.extents()}}
   {
-    static_assert(Array::order == N, "array order mismatch");
-    static_assert(std::is_constructible<T, const typename Array::value_type&>::value, "incompatible value types");
+    static_assert(A::order == N, "array order mismatch");
+    static_assert(std::is_constructible<T, const typename A::value_type&>::value, "incompatible value types");
     this->create(detail::trivial_dispatch<T>(), this->data(), source.begin(), this->size());
   }
 
@@ -139,7 +140,7 @@ public:
   /// 3) Assignment from array-like structures.
   auto operator=(const base_array& source) -> base_array&
   {
-    DEBUG_ASSERT(this != &source, debug::module{}, debug::level::invalid_argument, "self assignment");
+    DEBUG_ASSERT(this != &source, debug::default_module, debug::level::invalid_argument, "self assignment");
     clear(this->data(), this->size());
     this->data_ = this->allocate(source.size());
     this->descriptor_ = source.descriptor_;
@@ -150,7 +151,7 @@ public:
   /// \group Assignment
   auto operator=(base_array&& source) noexcept -> base_array&
   {
-    DEBUG_ASSERT(this != &source, debug::module{}, debug::level::invalid_argument, "self assignment");
+    DEBUG_ASSERT(this != &source, debug::default_module, debug::level::invalid_argument, "self assignment");
     clear(this->data(), this->size());
     this->data_ = move_ptr(source.data_);
     this->descriptor_ = std::move(source.descriptor_);
@@ -158,10 +159,10 @@ public:
   }
 
   /// \group Assignment
-  template <typename Array> auto operator=(const Array& source) -> array_request<base_array&, Array>
+  template <typename A> auto operator=(const A& source) -> meta::requires_t<base_array&, Array<A>>
   {
-    static_assert(Array::order == N, "array order mismatch");
-    static_assert(std::is_assignable<T&, typename Array::value_type>::value, "incompatible assignment");
+    static_assert(A::order == N, "array order mismatch");
+    static_assert(std::is_assignable<T&, typename A::value_type>::value, "incompatible assignment");
 
     auto old_data = this->data();
     auto old_size = this->size();
@@ -186,7 +187,7 @@ public:
   /// \group Fill
   template <typename... Args> auto fill(in_place_t, Args&&... args)
   {
-    DEBUG_ASSERT(this->data(), debug::module{}, debug::level::invalid_state, "array is empty");
+    DEBUG_ASSERT(this->data(), debug::default_module, debug::level::invalid_state, "array is empty");
     detail::array_allocator<T>::destroy(detail::trivial_dispatch<T>(), this->data(), this->size());
     detail::array_allocator<T>::create(detail::trivial_dispatch<T>(), this->data(), this->size(), std::forward<Args>(args)...);
   }
@@ -232,7 +233,7 @@ private:
     std::array<index_t, N> extents;
 
     calculate_descriptor_fill(extents, values, 0u);
-    DEBUG_ASSERT(calculate_descriptor_check(extents, values, 0u), debug::module{}, debug::level::boundary_check,
+    DEBUG_ASSERT(calculate_descriptor_check(extents, values, 0u), debug::default_module, debug::level::boundary_check,
                  "invalid initializer");
 
     return {0u, extents};
@@ -240,7 +241,7 @@ private:
 
   template <typename List> static auto calculate_descriptor_fill(std::array<index_t, N>& extents, List values, index_t pos)
   {
-    DEBUG_ASSERT(values.size() > 0, debug::module{}, debug::level::boundary_check, "invalid initializer");
+    DEBUG_ASSERT(values.size() > 0, debug::default_module, debug::level::boundary_check, "invalid initializer");
     extents[pos] = values.size();
     calculate_descriptor_fill(extents, *values.begin(), pos + 1);
   }
@@ -331,8 +332,9 @@ public:
   }
 
   /// \group Constructors
-  template <typename Iter, typename U = range::iterator_value_t<Iter>>
-  base_array(Iter first, Iter last)
+  template <typename Iter, typename Sent, typename U = range::iterator_value_t<Iter>,
+            typename = meta::requires<range::Sentinel<Sent, Iter>>>
+  base_array(Iter first, Sent last)
     : ref_array<T, 1>{this->allocate(range::distance(first, last)), {0u, static_cast<index_t>(range::distance(first, last))}}
   {
     static_assert(std::is_constructible<T, const U&>::value, "incompatible value types");
@@ -343,12 +345,13 @@ public:
   base_array(std::initializer_list<T> values) : base_array(values.begin(), values.end()) {}
 
   /// \group Constructors
-  template <typename Rng, typename U = range::range_value_t<Rng>, CONCEPT_REQUIRES_(range::Range<Rng>()),
-            typename = array_fallback<void, Rng>>
-  base_array(const Rng& rng) : ref_array<T, 1>{this->allocate(range::size(rng)), {0u, range::size(rng)}}
+  template <typename Rng, typename U = range::range_value_t<std::decay_t<Rng>>,
+            typename = meta::requires<range::Range<std::decay_t<Rng>>, meta::negation<Array<std::decay_t<Rng>>>>>
+  base_array(Rng&& rng)
+    : ref_array<T, 1>{this->allocate(range::size(std::forward<Rng>(rng))), {0u, range::size(std::forward<Rng>(rng))}}
   {
     static_assert(std::is_constructible<T, const U&>::value, "incompatible value types");
-    this->create(detail::trivial_dispatch<T>(), this->data(), range::begin(rng), this->size());
+    this->create(detail::trivial_dispatch<T>(), this->data(), range::begin(std::forward<Rng>(rng)), this->size());
   }
 
   /// \group Constructors
@@ -361,11 +364,11 @@ public:
   base_array(base_array&& source) noexcept : ref_array<T, 1>{move_ptr(source.data_), std::move(source.descriptor_)} {}
 
   /// \group Constructors
-  template <typename Array, typename = array_request<void, Array>>
-  base_array(const Array& source) : ref_array<T, 1>{this->allocate(source.size()), {0u, source.extents()}}
+  template <typename A, typename = meta::requires<Array<A>>>
+  base_array(const A& source) : ref_array<T, 1>{this->allocate(source.size()), {0u, source.extents()}}
   {
-    static_assert(Array::order == 1, "array order mismatch");
-    static_assert(std::is_constructible<T, const typename Array::value_type&>::value, "incompatible value types");
+    static_assert(A::order == 1, "array order mismatch");
+    static_assert(std::is_constructible<T, const typename A::value_type&>::value, "incompatible value types");
     this->create(detail::trivial_dispatch<T>(), this->data(), source.begin(), this->size());
   }
 
@@ -378,7 +381,7 @@ public:
   /// 3) Assignment from array-like structures.
   auto operator=(const base_array& source) & -> base_array&
   {
-    DEBUG_ASSERT(this != &source, debug::module{}, debug::level::invalid_argument, "self assignment");
+    DEBUG_ASSERT(this != &source, debug::default_module, debug::level::invalid_argument, "self assignment");
     clear(this->data(), this->size());
     this->data_ = this->allocate(source.size());
     this->descriptor_ = source.descriptor_;
@@ -389,7 +392,7 @@ public:
   /// \group Assignment
   auto operator=(base_array&& source) & noexcept -> base_array&
   {
-    DEBUG_ASSERT(this != &source, debug::module{}, debug::level::invalid_argument, "self assignment");
+    DEBUG_ASSERT(this != &source, debug::default_module, debug::level::invalid_argument, "self assignment");
     clear(this->data(), this->size());
     this->data_ = move_ptr(source.data_);
     this->descriptor_ = std::move(source.descriptor_);
@@ -397,10 +400,10 @@ public:
   }
 
   /// \group Assignment
-  template <typename Array> auto operator=(const Array& source) & -> array_request<base_array&, Array>
+  template <typename A, typename = meta::requires<Array<A>>> auto operator=(const A& source) & -> base_array&
   {
-    static_assert(Array::order == 1, "array order mismatch");
-    static_assert(std::is_assignable<T&, typename Array::value_type>::value, "incompatible assignment");
+    static_assert(A::order == 1, "array order mismatch");
+    static_assert(std::is_assignable<T&, typename A::value_type>::value, "incompatible assignment");
 
     auto old_data = this->data();
     auto old_size = this->size();
@@ -425,10 +428,19 @@ public:
   /// \group Fill
   template <typename... Args> auto fill(in_place_t, Args&&... args)
   {
-    DEBUG_ASSERT(this->data(), debug::module{}, debug::level::invalid_state, "array is empty");
+    DEBUG_ASSERT(this->data(), debug::default_module, debug::level::invalid_state, "array is empty");
     detail::array_allocator<T>::destroy(detail::trivial_dispatch<T>(), this->data(), this->size());
     detail::array_allocator<T>::create(detail::trivial_dispatch<T>(), this->data(), this->size(), std::forward<Args>(args)...);
   }
+
+  auto operator()(std::vector<index_t>&& indexes) -> ind_array<T, 1> { return {this->data_, indexes.size(), std::move(indexes)}; }
+
+  auto operator()(std::vector<index_t>&& indexes) const -> ind_array<const T, 1>
+  {
+    return {this->data_, indexes.size(), std::move(indexes)};
+  }
+
+  using ref_array<T, 1>::operator();
 
   /// \group Begin
   /// Returns an iterator to the first element of the array.
