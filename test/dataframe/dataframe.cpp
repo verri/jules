@@ -85,15 +85,15 @@ TEST_CASE("Dataframe colbind", "[dataframe]")
 
 TEST_CASE("Dataframe select by name", "[dataframe]")
 {
-  //   using jules::dataframe;
-  //   using namespace std::literals::string_literals;
+  using jules::dataframe;
+  using namespace std::literals::string_literals;
 
-  //   dataframe df{{"int", {1, 2, 3, 4}}, {"str", {"h"s, " "s, "w"s, "0"s}}};
-  //   CHECK_THROWS(df.select(""));
-  //   CHECK_THROWS(df.select("h"));
-  //   CHECK(df.select("int").elements_type() == typeid(int));
-  //   CHECK(df.select("str").elements_type() == typeid(std::string));
-  //   CHECK(df.select("str").size() == 4);
+  dataframe df{{"int", {1, 2, 3, 4}}, {"str", {"h"s, " "s, "w"s, "0"s}}};
+  CHECK_THROWS(df.select(""));
+  CHECK_THROWS(df.select("h"));
+  CHECK(df.select("int").elements_type() == typeid(int));
+  CHECK(df.select("str").elements_type() == typeid(std::string));
+  CHECK(df.select("str").size() == 4);
 }
 
 TEST_CASE("Accessing rows of the dataframe", "[datafrae]")

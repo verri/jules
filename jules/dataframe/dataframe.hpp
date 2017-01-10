@@ -86,6 +86,19 @@ public:
   auto operator=(const base_dataframe& source) -> base_dataframe& = default;
   auto operator=(base_dataframe&& source) noexcept -> base_dataframe& = default;
 
+  auto select(index_t pos) const -> const column_type&
+  {
+    DEBUG_ASSERT(pos < elements_.size(), debug::throwing_module, debug::level::boundary_check, "invalid column index");
+    return elements_[pos].column;
+  }
+
+  auto select(const string& name) const -> const column_type&
+  {
+    auto it = indexes_.find(name);
+    DEBUG_ASSERT(it != indexes_.end(), debug::throwing_module, debug::level::invalid_argument, "column does not exist");
+    return elements_[it->second].column;
+  }
+
   operator bool() const { return column_count() > 0; }
 
   auto row_count() const { return row_count_; }
@@ -98,10 +111,10 @@ public:
                                       view::transform([](const auto& element) { return element.column.elements_type(); }));
   }
 
-  auto names() const -> vector<jules::string>
+  auto names() const -> vector<string>
   {
     namespace view = ::jules::range::view;
-    return to_vector<jules::string>(elements_ | view::transform([](const auto& element) { return element.name; }));
+    return to_vector<string>(elements_ | view::transform([](const auto& element) { return element.name; }));
   }
 
 private:
@@ -163,24 +176,6 @@ template <typename Coercion> base_dataframe<Coercion>& base_dataframe<Coercion>:
   return *this;
 }
 
-template <typename Coercion> auto base_dataframe<Coercion>::select(const std::string& name) const -> const column_t&
-{
-  auto it = colindexes_.find(name);
-  if (it == colindexes_.end())
-    throw std::out_of_range{"column does not exists"};
-  return columns_.at(it->second);
-}
-
-template <typename Coercion> auto base_dataframe<Coercion>::select(const expr_t& expression) const -> column_t
-{
-  return expression.extract_from(*this);
-}
-
-template <typename Coercion> auto base_dataframe<Coercion>::select(const expr_list_t& expression_list) const -> base_dataframe
-{
-  return expression_list.extract_from(*this);
-}
-
 template <typename Coercion> auto base_dataframe<Coercion>::read(std::istream& is, dataframe_read_options opt) -> base_dataframe
 {
   using namespace adaptors;
@@ -191,10 +186,10 @@ template <typename Coercion> auto base_dataframe<Coercion>::read(std::istream& i
 
   const auto as_range = [](auto&& match) { return make_iterator_range(match.first, match.second); };
 
-  std::string raw_data;
+  string raw_data;
   raw_data.assign(std::istreambuf_iterator<char>(is), std::istreambuf_iterator<char>());
 
-  std::vector<std::sub_match<std::string::iterator>> data;
+  std::vector<std::sub_match<string::iterator>> data;
   std::size_t ncol = 0;
 
   auto line_range = raw_data | tokenized(opt.line.regex, opt.line.separator ? -1 : 0, opt.line.flag);
@@ -221,7 +216,7 @@ template <typename Coercion> auto base_dataframe<Coercion>::read(std::istream& i
   base_dataframe<Coercion> df;
   if (opt.header && data.size() / ncol == 1) {
     for (std::size_t j = 0; j < ncol; ++j) {
-      base_column<Coercion> col(std::string{data[j].first, data[j].second}, std::string{}, 0);
+      base_column<Coercion> col(string{data[j].first, data[j].second}, string{}, 0);
       df.colbind(std::move(col));
     }
     return df;
@@ -230,9 +225,9 @@ template <typename Coercion> auto base_dataframe<Coercion>::read(std::istream& i
   for (std::size_t j = 0; j < ncol; ++j) {
     auto column_data =
       make_iterator_range(data.begin() + j + (opt.header ? ncol : 0), data.end()) | strided(ncol) | transformed([](auto&& match) {
-        return std::move(std::string{match.first, match.second});
+        return std::move(string{match.first, match.second});
       });
-    base_column<Coercion> col(opt.header ? std::string{data[j].first, data[j].second} : std::string{}, column_data);
+    base_column<Coercion> col(opt.header ? string{data[j].first, data[j].second} : string{}, column_data);
     df.colbind(std::move(col));
   }
   return df;
@@ -244,16 +239,16 @@ template <typename C> auto write(const base_dataframe<C>& df, std::ostream& os, 
     return os;
 
   std::vector<base_column<C>> coerced;
-  std::vector<column_view<const std::string>> data;
+  std::vector<column_view<const string>> data;
 
   for (std::size_t j = 0; j < df.columns_count(); ++j) {
     const auto& col = df.select(j);
 
-    if (col.elements_type() == typeid(std::string)) {
-      data.push_back(jules::as_view<std::string>(col));
+    if (col.elements_type() == typeid(string)) {
+      data.push_back(jules::as_view<string>(col));
     } else {
-      coerced.push_back(std::move(jules::as_column<std::string>(col)));
-      data.push_back(jules::as_view<std::string>(coerced.back()));
+      coerced.push_back(std::move(jules::as_column<string>(col)));
+      data.push_back(jules::as_view<string>(coerced.back()));
     }
   }
 
