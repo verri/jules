@@ -80,6 +80,8 @@ public:
     }
   }
 
+  base_dataframe(column_type column) : row_count_{column.size()}, elements_{{"", std::move(column)}} {}
+
   base_dataframe(const base_dataframe& source) = default;
   base_dataframe(base_dataframe&& source) noexcept = default;
 

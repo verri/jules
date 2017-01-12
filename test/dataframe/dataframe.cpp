@@ -148,6 +148,22 @@ TEST_CASE("Constructing a dataframe from a range of columns", "[dataframe]")
   CHECK(all(df.names() == names));
 }
 
+TEST_CASE("Implicit conversion from a column to a dataframe", "[dataframe]")
+{
+  using jules::column;
+  using jules::dataframe;
+  using jules::index_t;
+
+  const auto f = [](dataframe df, index_t size, std::type_index type) {
+    CHECK(df.row_count() == size);
+    CHECK(df.at(0u).column.elements_type() == type);
+  };
+
+  auto col = column{1, 2, 3, 4};
+  f(col, col.size(), col.elements_type());
+  f(std::move(col), col.size(), col.elements_type());
+}
+
 TEST_CASE("Assigning a null dataframe", "[dataframe]")
 {
   using jules::dataframe;
