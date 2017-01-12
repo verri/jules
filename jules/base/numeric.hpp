@@ -163,6 +163,26 @@ auto sum(const Rng& rng, T start = numeric_traits<T>::additive_identity())
   return ::jules::sum(range::begin(rng), range::end(rng), std::move(start));
 }
 
+/// \group Count
+///
+/// Returns the number of true elements in a `Range` or in the sequence [`first`, `last`).
+///
+/// \module Logical
+template <typename Iter, typename Sent, typename = meta::requires<range::Sentinel<Sent, Iter>>> auto count(Iter first, Sent last)
+{
+  auto n = index_t{0u};
+  for (; first != last; ++first)
+    if (*first)
+      ++n;
+  return n;
+}
+
+/// \group Count
+template <typename Rng, typename = meta::requires<range::Range<Rng>>> auto count(const Rng& rng)
+{
+  return ::jules::count(range::begin(rng), range::end(rng));
+}
+
 /// \group All
 ///
 /// Checks whether all elements in a `Range` or in the sequence [`first`, `last`) are true.
