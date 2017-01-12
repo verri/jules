@@ -18,21 +18,27 @@ TEST_CASE("Null dataframe", "[dataframe]")
 
 TEST_CASE("Null dataframe colbind", "[dataframe]")
 {
-  //   using jules::column;
-  //   using jules::dataframe;
+  using jules::column;
+  using jules::dataframe;
 
-  //   column a(0, 0);
-  //   dataframe null;
-  //   dataframe df = null.colbind(a).colbind(column(0, 0));
+  const auto a = column{0, 0, 0};
+  const auto null = dataframe();
 
-  //   CHECK_FALSE(null.is_null());
-  //   CHECK_FALSE(df.is_null());
+  auto df1 = null;
+  auto df2 = null;
 
-  //   CHECK(null.is_empty());
-  //   CHECK(df.is_empty());
+  df1.bind(a).bind(column{0, 0, 0});
+  df2.bind({{"", a}, {"", {0, 0, 0}}});
 
-  //   CHECK(df.rows_count() == 0);
-  //   CHECK(df.columns_count() == 2);
+  CHECK_FALSE(null);
+  CHECK(df1);
+  CHECK(df2);
+
+  CHECK(df1.row_count() == 3u);
+  CHECK(df1.column_count() == 2u);
+
+  CHECK(df2.row_count() == df1.row_count());
+  CHECK(df2.column_count() == df1.column_count());
 }
 
 TEST_CASE("Dataframe colbind", "[dataframe]")

@@ -69,7 +69,7 @@ public:
 
     DEBUG_ASSERT(ok, debug::throwing_module, debug::level::invalid_argument, "columns size mismatch");
 
-    index_t i = 0;
+    auto i = index_t{0u};
     for (auto& element : elements_) {
       auto& name = element.name;
       if (!name.empty()) {
@@ -88,6 +88,28 @@ public:
   auto operator=(const base_dataframe& source) -> base_dataframe& = default;
   auto operator=(base_dataframe&& source) noexcept -> base_dataframe& = default;
 
+  // other options are `bind_left`, `bind_right`, `bind_up`, `bind_down`, or something similar.
+  auto bind(base_dataframe other) -> base_dataframe&
+  {
+    for (const auto& name : other.names())
+      DEBUG_ASSERT(name.empty() || indexes_.find(name) == indexes_.end(), debug::throwing_module, debug::level::invalid_argument,
+                   "repeated column name");
+
+    if (*this)
+      DEBUG_ASSERT(row_count() == other.row_count(), debug::throwing_module, debug::level::invalid_argument,
+                   "invalid column size");
+    else
+      row_count_ = other.row_count();
+
+    for (auto& elem : other.elements_) {
+      if (!elem.name.empty())
+        indexes_[elem.name] = elements_.size();
+      elements_.push_back(std::move(elem));
+    }
+
+    return *this;
+  }
+
   // `select` will be part of dplyr-like operations.
   auto at(index_t pos) const -> const named_column_type&
   {
@@ -102,7 +124,7 @@ public:
     return elements_[it->second];
   }
 
-  operator bool() const { return column_count() > 0; }
+  operator bool() const { return column_count() > 0u; }
 
   auto row_count() const { return row_count_; }
   auto column_count() const { return elements_.size(); }
@@ -133,51 +155,6 @@ using dataframe = base_dataframe<coercion_rules>;
 #endif // JULES_DATAFRAME_DATAFRAME_H
 
 #ifndef JULES_DATAFRAME_DATAFRAME_H
-
-template <typename Coercion> base_dataframe<Coercion>& base_dataframe<Coercion>::colbind(const column_t& column)
-{
-  const auto& name = column.name();
-
-  if (!name.empty()) {
-    auto it = colindexes_.find(name);
-    if (it != colindexes_.end())
-      throw std::runtime_error{"column already exists"};
-  }
-
-  if (!is_null() && rows_count() != column.size())
-    throw std::runtime_error{"invalid column size"};
-
-  if (is_null())
-    nrow_ = column.size();
-
-  columns_.push_back(column);
-  if (!name.empty())
-    colindexes_[name] = columns_.size();
-
-  return *this;
-}
-
-template <typename Coercion> base_dataframe<Coercion>& base_dataframe<Coercion>::colbind(column_t&& column)
-{
-  auto& name = column.name();
-  if (!name.empty()) {
-    auto it = colindexes_.find(name);
-    if (it != colindexes_.end())
-      throw std::runtime_error{"column already exists"};
-  }
-
-  if (!is_null() && rows_count() != column.size())
-    throw std::runtime_error{"invalid column size"};
-
-  if (is_null())
-    nrow_ = column.size();
-
-  if (!name.empty())
-    colindexes_[name] = columns_.size();
-  columns_.push_back(std::move(column));
-
-  return *this;
-}
 
 template <typename Coercion> auto base_dataframe<Coercion>::read(std::istream& is, dataframe_read_options opt) -> base_dataframe
 {
