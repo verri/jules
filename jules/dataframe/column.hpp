@@ -3,6 +3,7 @@
 #ifndef JULES_DATAFRAME_COLUMN_H
 #define JULES_DATAFRAME_COLUMN_H
 
+#include <jules/core/meta.hpp>
 #include <jules/core/range.hpp>
 #include <jules/core/type.hpp>
 #include <jules/dataframe/detail/column_model.hpp>
@@ -27,13 +28,13 @@ public:
 
   template <typename T> base_column(const T& value, index_t size) : model_{std::make_unique<model_t<T>>(size, value)} {}
 
-  template <typename Rng, typename R = range::range_value_t<Rng>, CONCEPT_REQUIRES_(range::Range<Rng>())>
+  template <typename Rng, typename R = range::range_value_t<Rng>, typename = meta::requires<range::Range<Rng>>>
   base_column(const Rng& rng) : model_{std::make_unique<model_t<R>>(range::begin(rng), range::end(rng))}
   {
   }
 
   template <typename Iter, typename Sent, typename R = range::iterator_value_t<Iter>,
-            CONCEPT_REQUIRES_(range::Sentinel<Sent, Iter>())>
+            typename = meta::requires<range::Sentinel<Sent, Iter>>>
   base_column(Iter first, Sent last) : model_{std::make_unique<model_t<R>>(first, last)}
   {
   }

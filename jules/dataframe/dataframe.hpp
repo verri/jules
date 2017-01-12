@@ -6,6 +6,7 @@
 #include <jules/array/array.hpp>
 #include <jules/array/numeric.hpp>
 #include <jules/core/debug.hpp>
+#include <jules/core/meta.hpp>
 #include <jules/core/range.hpp>
 #include <jules/core/type.hpp>
 #include <jules/dataframe/column.hpp>
@@ -33,28 +34,29 @@ public:
   }
 
   template <typename Rng, typename R = range::range_value_t<Rng>,
-            typename = std::enable_if_t<std::is_convertible<R, named_column_type>::value>, CONCEPT_REQUIRES_(range::Range<Rng>())>
+            typename = std::enable_if_t<std::is_convertible<R, named_column_type>::value>,
+            typename = meta::requires<range::Range<Rng>>>
   base_dataframe(const Rng& rng) : base_dataframe(range::begin(rng), range::end(rng), range::size(rng))
   {
   }
 
   template <typename Iter, typename Sent, typename R = range::iterator_value_t<Iter>,
             typename = std::enable_if_t<std::is_convertible<R, named_column_type>::value>,
-            CONCEPT_REQUIRES_(range::Sentinel<Sent, Iter>() && range::InputIterator<Iter>())>
+            typename = meta::requires<range::Sentinel<Sent, Iter>, meta::negation<range::InputIterator<Iter>>>, int = 0>
   base_dataframe(Iter first, Sent last) : base_dataframe(first, last, 0u)
   {
   }
 
   template <typename Iter, typename Sent, typename R = range::iterator_value_t<Iter>,
             typename = std::enable_if_t<std::is_convertible<R, named_column_type>::value>,
-            CONCEPT_REQUIRES_(range::Sentinel<Sent, Iter>() && !range::InputIterator<Iter>())>
+            typename = meta::requires<range::Sentinel<Sent, Iter>, range::InputIterator<Iter>>>
   base_dataframe(Iter first, Sent last) : base_dataframe(first, last, range::distance(first, last))
   {
   }
 
   template <typename Iter, typename Sent, typename R = range::iterator_value_t<Iter>,
             typename = std::enable_if_t<std::is_convertible<R, named_column_type>::value>,
-            CONCEPT_REQUIRES_(range::Sentinel<Sent, Iter>())>
+            typename = meta::requires<range::Sentinel<Sent, Iter>>>
   base_dataframe(Iter first, Sent last, index_t size_hint)
   {
     elements_.reserve(size_hint);
