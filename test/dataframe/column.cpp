@@ -3,8 +3,6 @@
 
 #include <catch.hpp>
 
-#include <typeindex>
-
 template <typename Range, typename R = jules::range::range_value_t<Range>> auto make_value(const Range&) -> R { return {}; }
 
 TEST_CASE("Column constructor using initializer list", "[dataframe]")

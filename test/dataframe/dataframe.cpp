@@ -166,8 +166,11 @@ TEST_CASE("Implicit conversion from a column to a dataframe", "[dataframe]")
   };
 
   auto col = column{1, 2, 3, 4};
-  f(col, col.size(), col.elements_type());
-  f(std::move(col), col.size(), col.elements_type());
+  const auto size = col.size();
+  const auto type = col.elements_type();
+
+  f(col, size, type);
+  f(std::move(col), size, type);
 }
 
 TEST_CASE("Assigning a null dataframe", "[dataframe]")
