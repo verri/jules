@@ -86,17 +86,18 @@ public:
   auto operator=(const base_dataframe& source) -> base_dataframe& = default;
   auto operator=(base_dataframe&& source) noexcept -> base_dataframe& = default;
 
-  auto select(index_t pos) const -> const column_type&
+  // `select` will be part of dplyr-like operations.
+  auto at(index_t pos) const -> const named_column_type&
   {
     DEBUG_ASSERT(pos < elements_.size(), debug::throwing_module, debug::level::boundary_check, "invalid column index");
-    return elements_[pos].column;
+    return elements_[pos];
   }
 
-  auto select(const string& name) const -> const column_type&
+  auto at(const string& name) const -> const named_column_type&
   {
     auto it = indexes_.find(name);
     DEBUG_ASSERT(it != indexes_.end(), debug::throwing_module, debug::level::invalid_argument, "column does not exist");
-    return elements_[it->second].column;
+    return elements_[it->second];
   }
 
   operator bool() const { return column_count() > 0; }

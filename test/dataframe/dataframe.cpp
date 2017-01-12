@@ -89,11 +89,11 @@ TEST_CASE("Dataframe select by name", "[dataframe]")
   using namespace std::literals::string_literals;
 
   dataframe df{{"int", {1, 2, 3, 4}}, {"str", {"h"s, " "s, "w"s, "0"s}}};
-  CHECK_THROWS(df.select(""));
-  CHECK_THROWS(df.select("h"));
-  CHECK(df.select("int").elements_type() == typeid(int));
-  CHECK(df.select("str").elements_type() == typeid(std::string));
-  CHECK(df.select("str").size() == 4);
+  CHECK_THROWS(df.at(""));
+  CHECK_THROWS(df.at("h"));
+  CHECK(df.at("int").column.elements_type() == typeid(int));
+  CHECK(df.at("str").column.elements_type() == typeid(std::string));
+  CHECK(df.at("str").column.size() == 4);
 }
 
 TEST_CASE("Accessing rows of the dataframe", "[datafrae]")
@@ -261,13 +261,13 @@ TEST_CASE("Reading matrix of integers", "[dataframe]")
   //   my_dataframe idf;
 
   //   std::string -> double: Not OK
-  //   CHECK_FALSE(df.select(0).can_coerce_to<double>());
-  //   CHECK_THROWS(jules::as_column<double>(df.select(0)));
-  //   CHECK(df.select(0).can_coerce_to<int>());
+  //   CHECK_FALSE(df.at(0).can_coerce_to<double>());
+  //   CHECK_THROWS(jules::as_column<double>(df.at(0)));
+  //   CHECK(df.at(0).can_coerce_to<int>());
 
   //   for (std::size_t i = 0; i < df.columns_count(); ++i) {
-  //     idf.colbind(jules::as_column<int>(df.select(i)));
-  //     REQUIRE(idf.select(idf.columns_count() - 1).elements_type() == typeid(int));
+  //     idf.colbind(jules::as_column<int>(df.at(i)));
+  //     REQUIRE(idf.at(idf.columns_count() - 1).elements_type() == typeid(int));
   //   }
 
   //   coerce all columns
@@ -275,13 +275,13 @@ TEST_CASE("Reading matrix of integers", "[dataframe]")
   //   df.coerce_to<int>();
 
   //   int -> double: Not OK
-  //   CHECK_FALSE(idf.select(0).can_coerce_to<double>());
-  //   CHECK_THROWS(jules::as_column<double>(idf.select(0)));
-  //   CHECK(idf.select(0).can_coerce_to<int>());
+  //   CHECK_FALSE(idf.at(0).can_coerce_to<double>());
+  //   CHECK_THROWS(jules::as_column<double>(idf.at(0)));
+  //   CHECK(idf.at(0).can_coerce_to<int>());
 
   //   int -> std::string: OK
-  //   CHECK(idf.select(0).can_coerce_to<std::string>());
-  //   CHECK_NOTHROW(jules::as_column<std::string>(idf.select(0)));
+  //   CHECK(idf.at(0).can_coerce_to<std::string>());
+  //   CHECK_NOTHROW(jules::as_column<std::string>(idf.at(0)));
 
   //   CHECK(idf.columns_count() == N);
   //   CHECK(idf.rows_count() == N);
@@ -300,7 +300,7 @@ TEST_CASE("Reading an inconsistent dataframe", "[dataframe]")
   //   CHECK(df.columns_count() == 0);
   //   CHECK(df.is_null());
   //   CHECK(df.is_empty());
-  //   CHECK_THROWS(df.select(0));
+  //   CHECK_THROWS(df.at(0));
 }
 
 TEST_CASE("Reading and writing a well-formed dataframe", "[dataframe]")
@@ -332,15 +332,15 @@ TEST_CASE("Reading and writing a well-formed dataframe", "[dataframe]")
   //   auto mm = std::mismatch(cols.begin(), cols.end(), names.begin());
   //   CHECK(mm.first == cols.end());
 
-  //   CHECK_THROWS(df.select(-1));
-  //   CHECK_THROWS(df.select(4));
+  //   CHECK_THROWS(df.at(-1));
+  //   CHECK_THROWS(df.at(4));
 
-  //   auto c1 = df.select(0);
+  //   auto c1 = df.at(0);
   //   CHECK(c1.name() == "y");
 
-  //   auto c2 = df.select(1);
+  //   auto c2 = df.at(1);
   //   CHECK(c2.name() == "x");
 
-  //   auto c3 = df.select(2);
+  //   auto c3 = df.at(2);
   //   CHECK(c3.name() == "z");
 }
