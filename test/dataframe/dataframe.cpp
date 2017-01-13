@@ -83,7 +83,7 @@ TEST_CASE("Dataframe select by name", "[dataframe]")
   CHECK_THROWS(df.at(""));
   CHECK_THROWS(df.at("h"));
   CHECK(df.at("int").column.elements_type() == typeid(int));
-  CHECK(df.at("str").column.elements_type() == typeid(std::string));
+  CHECK(df.at("str").column.elements_type() == typeid(jules::string));
   CHECK(df.at("str").column.size() == 4);
 }
 
@@ -267,8 +267,8 @@ TEST_CASE("Reading matrix of integers", "[dataframe]")
   CHECK_THROWS(jules::to_column<double>(idf.at(0).column));
   CHECK(idf.at(0).column.can_coerce<int>());
 
-  // int -> std::string: OK
-  CHECK(idf.at(0).column.can_coerce<std::string>());
+  // int -> string: OK
+  CHECK(idf.at(0).column.can_coerce<jules::string>());
   CHECK_NOTHROW(jules::to_column<jules::string>(idf.at(0).column));
 
   CHECK(idf.column_count() == N);

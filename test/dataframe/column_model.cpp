@@ -14,10 +14,10 @@ TEST_CASE("Column model", "[dataframe]")
 
   column_interface_ptr icolumn{new column_model<int, coercion_rules>};
   // Learns the coercions: int -(explicit)-> double
-  //                       int -(implicit)-> double -(explicit)-> std::string
+  //                       int -(implicit)-> double -(explicit)-> string
   column_interface_ptr dcolumn{new column_model<double, coercion_rules>};
   // Learns the coercions: double -(implicit)-> double
-  //                       double -(explicit)-> std::string
+  //                       double -(explicit)-> string
 
   CHECK(icolumn->elements_type() == typeid(int));
   CHECK(dcolumn->elements_type() == typeid(double));
@@ -27,11 +27,11 @@ TEST_CASE("Column model", "[dataframe]")
   CHECK(!icolumn->can_coerce<int>());
   CHECK(icolumn->can_coerce<double>());
   CHECK(!icolumn->can_coerce<unsigned int>());
-  CHECK(icolumn->can_coerce<std::string>());
+  CHECK(icolumn->can_coerce<string>());
 
   CHECK(!dcolumn->can_coerce<int>());
   CHECK(dcolumn->can_coerce<double>());
-  CHECK(dcolumn->can_coerce<std::string>());
+  CHECK(dcolumn->can_coerce<string>());
 
   auto& ivec = icolumn->downcast<int>();
   ivec.resize(10);
@@ -40,11 +40,11 @@ TEST_CASE("Column model", "[dataframe]")
   auto& dvec = dcolumn->downcast<double>();
   std::transform(ivec.begin(), ivec.end(), std::back_inserter(dvec), [](int x) { return 3.1415 * x; });
 
-  std::vector<std::string> expected{"0.000000",  "3.141500",  "6.283000",  "9.424500",  "12.566000",
-                                    "15.707500", "18.849000", "21.990500", "25.132000", "28.273500"};
+  std::vector<string> expected{"0.000000",  "3.141500",  "6.283000",  "9.424500",  "12.566000",
+                               "15.707500", "18.849000", "21.990500", "25.132000", "28.273500"};
 
-  auto scolumn = dcolumn->coerce<std::string>();
-  auto& svec = scolumn->downcast<std::string>();
+  auto scolumn = dcolumn->coerce<string>();
+  auto& svec = scolumn->downcast<string>();
 
   auto check = std::mismatch(svec.begin(), svec.end(), expected.begin());
   CHECK(check.first == svec.end());
@@ -58,7 +58,7 @@ TEST_CASE("Column model", "[dataframe]")
   CHECK(check_back.second == back_to_dvec.end());
 
   CHECK_THROWS_AS(scolumn->downcast<int>(), std::bad_cast);
-  CHECK_NOTHROW(scolumn->downcast<std::string>());
+  CHECK_NOTHROW(scolumn->downcast<string>());
 
   auto clone = scolumn->clone();
   CHECK(clone->elements_type() == scolumn->elements_type());

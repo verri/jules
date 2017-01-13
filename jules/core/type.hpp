@@ -48,7 +48,7 @@ struct numeric_rule {
 /// Coercion rules for [string type](standardese://jules::string/).
 /// \module Coercion Rules
 struct string_rule {
-  using type = std::string;
+  using type = string;
   static auto coerce_from(const numeric& value) -> type { return std::to_string(static_cast<double>(value)); }
 };
 
