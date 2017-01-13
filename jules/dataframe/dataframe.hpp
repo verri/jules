@@ -30,7 +30,7 @@ public:
   };
 
   struct read_options {
-    read_options(std::regex line_regex = {R"(\n)"}, std::regex cell_regex = {R"(\t)"}, bool header = true)
+    read_options(std::regex line_regex = std::regex{R"(\n)"}, std::regex cell_regex = std::regex{R"(\t)"}, bool header = true)
       : line{std::move(line_regex), true, {}}, cell{std::move(cell_regex), true, {}}, header{header}
     {
     }
