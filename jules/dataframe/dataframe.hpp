@@ -13,6 +13,7 @@
 
 #include <algorithm>
 #include <iosfwd>
+#include <iterator>
 #include <regex>
 #include <unordered_map>
 
@@ -51,17 +52,17 @@ public:
   };
 
   struct write_options {
-    write_options(std::string line_separator = "\n", std::string cell_separator = "\t", bool header = true)
+    write_options(string line_separator = "\n", string cell_separator = "\t", bool header = true)
       : line{{std::move(line_separator)}}, cell{{std::move(cell_separator)}}, header{header}
     {
     }
 
     struct {
-      std::string separator;
+      string separator;
     } line;
 
     struct {
-      std::string separator;
+      string separator;
     } cell;
 
     bool header;
@@ -123,6 +124,8 @@ public:
     }
   }
 
+  base_dataframe(named_column_type elem) : row_count_{elem.column.size()} { elements_.push_back(std::move(elem)); }
+
   base_dataframe(column_type column) : row_count_{column.size()}, elements_{{"", std::move(column)}} {}
 
   base_dataframe(const base_dataframe& source) = default;
@@ -130,6 +133,69 @@ public:
 
   auto operator=(const base_dataframe& source) -> base_dataframe& = default;
   auto operator=(base_dataframe&& source) noexcept -> base_dataframe& = default;
+
+  static auto read(std::istream& is, read_options opt = {}) -> base_dataframe
+  {
+    namespace view = ::jules::range::view;
+
+    if (!is)
+      return {};
+
+    const auto as_range = [](auto&& match) { return range::make_iterator_range(match.first, match.second); };
+
+    auto raw_data = string();
+    raw_data.assign(std::istreambuf_iterator<char>(is), std::istreambuf_iterator<char>());
+
+    auto data = std::vector<std::sub_match<string::iterator>>();
+    auto ncol = index_t{0u};
+
+    auto line_range = raw_data | view::tokenize(opt.line.regex, opt.line.separator ? -1 : 0, opt.line.flag);
+
+    auto last_size = index_t{0u};
+    for (auto&& line : line_range) {
+      if (line.first == line.second)
+        continue;
+
+      const auto cells = as_range(line) | view::tokenize(opt.cell.regex, opt.cell.separator ? -1 : 0, opt.cell.flag);
+      for (auto&& cell : cells)
+        data.push_back(cell);
+
+      // TODO: For some reason, range::copy doesn't work here.
+      // range::copy(cells, std::back_inserter(data));
+
+      if (ncol == 0u)
+        ncol = data.size() - last_size;
+
+      DEBUG_ASSERT(ncol == 0u || data.size() - last_size == ncol, debug::throwing_module, debug::level::invalid_argument,
+                   "number of columns differ");
+
+      last_size = data.size();
+    }
+
+    if (ncol == 0)
+      return {};
+
+    auto df = base_dataframe();
+
+    // only header
+    if (opt.header && data.size() / ncol == 1) {
+      for (auto j : slice(0u, ncol))
+        df.bind(named_column_type{string(data[j].first, data[j].second), {}});
+      return df;
+    }
+
+    // optional header and data
+    for (auto j : slice(0u, ncol)) {
+      auto col_data = range::make_iterator_range(data.begin() + j + (opt.header ? ncol : 0), data.end()) | view::stride(ncol) |
+                      view::transform([](auto&& match) -> string {
+                        return {match.first, match.second};
+                      });
+      auto col = column_type(col_data | view::move);
+      df.bind(named_column_type{opt.header ? string{data[j].first, data[j].second} : string{}, std::move(col)});
+    }
+
+    return df;
+  }
 
   // other options are `bind_left`, `bind_right`, `bind_up`, `bind_down`, or something similar.
   auto bind(base_dataframe other) -> base_dataframe&
@@ -199,63 +265,6 @@ using dataframe = base_dataframe<coercion_rules>;
 
 #ifndef JULES_DATAFRAME_DATAFRAME_H
 
-template <typename Coercion> auto base_dataframe<Coercion>::read(std::istream& is, dataframe_read_options opt) -> base_dataframe
-{
-  using namespace adaptors;
-  using namespace range;
-
-  if (!is)
-    return {};
-
-  const auto as_range = [](auto&& match) { return make_iterator_range(match.first, match.second); };
-
-  string raw_data;
-  raw_data.assign(std::istreambuf_iterator<char>(is), std::istreambuf_iterator<char>());
-
-  std::vector<std::sub_match<string::iterator>> data;
-  std::size_t ncol = 0;
-
-  auto line_range = raw_data | tokenized(opt.line.regex, opt.line.separator ? -1 : 0, opt.line.flag);
-
-  std::size_t size = 0;
-  for (auto&& line : line_range) {
-    if (line.first == line.second)
-      continue;
-
-    copy(as_range(line) | tokenized(opt.cell.regex, opt.cell.separator ? -1 : 0, opt.cell.flag), std::back_inserter(data));
-
-    if (ncol == 0)
-      ncol = data.size() - size;
-
-    if (ncol != 0 && data.size() - size != ncol)
-      throw std::runtime_error{"number of columns differ"};
-
-    size = data.size();
-  }
-
-  if (ncol == 0)
-    return {};
-
-  base_dataframe<Coercion> df;
-  if (opt.header && data.size() / ncol == 1) {
-    for (std::size_t j = 0; j < ncol; ++j) {
-      base_column<Coercion> col(string{data[j].first, data[j].second}, string{}, 0);
-      df.colbind(std::move(col));
-    }
-    return df;
-  }
-
-  for (std::size_t j = 0; j < ncol; ++j) {
-    auto column_data =
-      make_iterator_range(data.begin() + j + (opt.header ? ncol : 0), data.end()) | strided(ncol) | transformed([](auto&& match) {
-        return std::move(string{match.first, match.second});
-      });
-    base_column<Coercion> col(opt.header ? string{data[j].first, data[j].second} : string{}, column_data);
-    df.colbind(std::move(col));
-  }
-  return df;
-}
-
 template <typename C> auto write(const base_dataframe<C>& df, std::ostream& os, dataframe_write_options opt) -> std::ostream&
 {
   if (df.rows_count() == 0 || df.columns_count() == 0)
@@ -291,7 +300,5 @@ template <typename C> auto write(const base_dataframe<C>& df, std::ostream& os, 
 
   return os;
 }
-
-template <typename C> auto write(const base_dataframe<C>& df, std::ostream& os) -> std::ostream& { return write(df, os, {}); };
 
 #endif // JULES_DATAFRAME_DATAFRAME_H

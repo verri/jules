@@ -3,6 +3,7 @@
 
 #include <catch.hpp>
 
+#include <sstream>
 #include <vector>
 
 TEST_CASE("Null dataframe", "[dataframe]")
@@ -43,22 +44,25 @@ TEST_CASE("Null dataframe colbind", "[dataframe]")
 
 TEST_CASE("Dataframe colbind", "[dataframe]")
 {
-  //   using jules::column;
-  //   using jules::dataframe;
+  using jules::column;
+  using jules::dataframe;
 
-  //   column c("c", 0, 0);
-  //   column a("a", 0, 0);
-  //   dataframe null;
-  //   dataframe df = null.colbind(c).colbind(a).colbind(column("b", 0, 0));
+  auto c = column(0, 0);
+  auto a = column(0, 0);
 
-  //   CHECK_FALSE(null.is_null());
-  //   CHECK_FALSE(df.is_null());
+  auto null = dataframe();
+  auto df = dataframe();
 
-  //   CHECK(null.is_empty());
-  //   CHECK(df.is_empty());
+  df.bind({{"c", c}}).bind({{"a", a}, {"b", column(0, 0)}});
 
-  //   CHECK(df.rows_count() == 0);
-  //   CHECK(df.columns_count() == 3);
+  CHECK_FALSE(null);
+  CHECK(df);
+
+  CHECK(null.row_count() == 0u);
+  CHECK(null.column_count() == 0u);
+
+  CHECK(df.row_count() == 0u);
+  CHECK(df.column_count() == 3u);
 
   //   auto cols = df.columns_names();
   //   auto nullcols = null.columns_names();
@@ -194,14 +198,13 @@ TEST_CASE("Assigning a dataframe to itself", "[dataframe]")
 
 TEST_CASE("Reading an empty dataframe with header", "[dataframe]")
 {
-  //   std::string input = "x\ty\tz\n";
+  std::stringstream stream("x\ty\tz\n");
 
-  //   std::stringstream stream(input);
+  auto df = jules::dataframe::read(stream);
 
-  //   auto df = jules::dataframe::read(stream);
-  //   CHECK(df.rows_count() == 0);
-  //   CHECK(df.columns_count() == 3);
-  //   CHECK(df.is_empty());
+  CHECK(df.row_count() == 0u);
+  CHECK(df.column_count() == 3u);
+  CHECK(all(df.names() == jules::as_vector("x", "y", "z")));
 }
 
 TEST_CASE("Reading an empty dataframe with line-break", "[dataframe]")

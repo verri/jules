@@ -24,6 +24,8 @@ template <typename Coercion> class base_column
   using model_ptr_t = std::unique_ptr<interface_t>;
 
 public:
+  base_column() : model_{nullptr} {}
+
   template <typename T> base_column(std::initializer_list<T> values) : model_{std::make_unique<model_t<T>>(values)} {}
 
   template <typename T> base_column(const T& value, index_t size) : model_{std::make_unique<model_t<T>>(size, value)} {}
@@ -61,7 +63,7 @@ public:
 
   auto elements_type() const { return model_->elements_type(); }
 
-  auto size() const { return model_->size(); }
+  auto size() const { return model_ ? model_->size() : 0u; }
   auto extents() const { return size(); }
   auto length() const { return size(); }
 
