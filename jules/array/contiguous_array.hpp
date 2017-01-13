@@ -35,7 +35,7 @@ public:
   auto operator=(const contiguous_array& source) -> contiguous_array& = delete;
   auto operator=(contiguous_array&& source) noexcept -> contiguous_array& = delete;
 
-  operator contiguous_array<const T, N>() const { return {this->data(), {0u, this->extents()}}; }
+  operator contiguous_array<const T, N>() const { return {this->data(), this->extents()}; }
 
   /// \group Begin
   /// Returns an iterator to the first element of the array.

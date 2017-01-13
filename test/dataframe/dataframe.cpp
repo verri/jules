@@ -333,24 +333,26 @@ TEST_CASE("Reading an inconsistent dataframe", "[dataframe]")
 
 TEST_CASE("Reading and writing a well-formed dataframe", "[dataframe]")
 {
-  //   using jules::dataframe;
+  using jules::dataframe;
 
-  //   std::string data = "y\tx\tz\n" + std::to_string(0.0) + "\t" + std::to_string(1.0) + "\t" + std::to_string(2.0) + "\n" +
-  //                      std::to_string(3.0) + "\t" + std::to_string(4.0) + "\t" + std::to_string(5.0) + "\n";
+  const auto data = "y\tx\tz\n" + std::to_string(0.0) + "\t" + std::to_string(1.0) + "\t" + std::to_string(2.0) + "\n" +
+                    std::to_string(3.0) + "\t" + std::to_string(4.0) + "\t" + std::to_string(5.0) + "\n";
 
-  //   std::stringstream is(data);
+  auto is = std::stringstream(data);
 
-  //   auto df = jules::dataframe::read(is);
-  //   CHECK(df.rows_count() == 2);
-  //   CHECK(df.columns_count() == 3);
+  auto df = jules::dataframe::read(is);
+  CHECK(df.row_count() == 2u);
+  CHECK(df.column_count() == 3u);
+  CHECK(df);
 
-  //   std::stringstream os1;
-  //   os1 << df;
-  //   CHECK(data == os1.str());
+  std::stringstream os1;
+  os1 << df;
+  CHECK(data == os1.str());
 
-  //   std::stringstream os2;
-  //   write(dataframe{{"y", {0, 3}}, {"x", {1, 4}}, {"z", {2, 5}}}, os2);
-  //   CHECK(data == os2.str());
+  std::stringstream os2;
+
+  dataframe{{"y", {0, 3}}, {"x", {1, 4}}, {"z", {2, 5}}}.write(os2);
+  CHECK(data == os2.str());
 
   //   auto cols = df.columns_names();
   //   std::array<std::string, 3> names{{"y", "x", "z"}};

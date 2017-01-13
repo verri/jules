@@ -10,6 +10,7 @@
 #include <jules/core/range.hpp>
 #include <jules/core/type.hpp>
 #include <jules/dataframe/column.hpp>
+#include <jules/dataframe/numeric.hpp>
 
 #include <algorithm>
 #include <iosfwd>
@@ -197,6 +198,47 @@ public:
     return df;
   }
 
+  auto write(std::ostream& os, write_options opt = {}) const -> std::ostream&
+  {
+    namespace view = ::jules::range::view;
+
+    if (!(*this))
+      return os;
+
+    std::vector<column_type> coerced; // hold temporary coerced values
+    std::vector<contiguous_array<const string, 1>> data;
+
+    coerced.reserve(column_count());
+    data.reserve(column_count());
+
+    const auto columns = elements_ | view::transform([](auto&& elem) -> const column_type& { return elem.column; });
+
+    for (const auto& col : columns) {
+      if (col.elements_type() == typeid(string)) {
+        data.push_back(to_view<string>(col));
+      } else {
+        coerced.push_back(to_column<string>(col));
+        data.push_back(to_view<string>(coerced.back()));
+      }
+    }
+
+    if (opt.header) {
+      os << elements_[0].name;
+      for (auto j = index_t{1u}; j < column_count(); ++j)
+        os << opt.cell.separator << elements_[j].name;
+      os << opt.line.separator;
+    }
+
+    for (auto i = index_t{0u}; i < row_count(); ++i) {
+      os << data[0][i];
+      for (auto j = index_t{1u}; j < column_count(); ++j)
+        os << opt.cell.separator << data[j][i];
+      os << opt.line.separator;
+    }
+
+    return os;
+  }
+
   // other options are `bind_left`, `bind_right`, `bind_up`, `bind_down`, or something similar.
   auto bind(base_dataframe other) -> base_dataframe&
   {
@@ -259,46 +301,17 @@ private:
 
 using dataframe = base_dataframe<coercion_rules>;
 
-} // namespace jules
-
-#endif // JULES_DATAFRAME_DATAFRAME_H
-
-#ifndef JULES_DATAFRAME_DATAFRAME_H
-
-template <typename C> auto write(const base_dataframe<C>& df, std::ostream& os, dataframe_write_options opt) -> std::ostream&
+template <typename Coercion> auto operator<<(std::ostream& os, const base_dataframe<Coercion>& df) -> std::ostream&
 {
-  if (df.rows_count() == 0 || df.columns_count() == 0)
-    return os;
-
-  std::vector<base_column<C>> coerced;
-  std::vector<column_view<const string>> data;
-
-  for (std::size_t j = 0; j < df.columns_count(); ++j) {
-    const auto& col = df.select(j);
-
-    if (col.elements_type() == typeid(string)) {
-      data.push_back(jules::as_view<string>(col));
-    } else {
-      coerced.push_back(std::move(jules::as_column<string>(col)));
-      data.push_back(jules::as_view<string>(coerced.back()));
-    }
-  }
-
-  if (opt.header) {
-    opt.cell.data(os, df.select(0).name());
-    for (std::size_t j = 1; j < df.columns_count(); ++j)
-      opt.cell.data(opt.cell.separator(os), df.select(j).name());
-    opt.line.separator(os);
-  }
-
-  for (std::size_t i = 0; i < df.rows_count(); ++i) {
-    opt.cell.data(os, data[0][i]);
-    for (std::size_t j = 1; j < df.columns_count(); ++j)
-      opt.cell.data(opt.cell.separator(os), data[j][i]);
-    opt.line.separator(os);
-  }
-
-  return os;
+  return df.write(os);
 }
+
+template <typename Coercion> auto operator>>(std::istream& is, base_dataframe<Coercion>& df) -> std::istream&
+{
+  df = base_dataframe<Coercion>::read(is);
+  return is;
+}
+
+} // namespace jules
 
 #endif // JULES_DATAFRAME_DATAFRAME_H
