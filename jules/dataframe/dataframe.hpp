@@ -12,6 +12,8 @@
 #include <jules/dataframe/column.hpp>
 
 #include <algorithm>
+#include <iosfwd>
+#include <regex>
 #include <unordered_map>
 
 namespace jules
@@ -21,9 +23,48 @@ template <typename Coercion> class base_dataframe
 {
 public:
   using column_type = base_column<Coercion>;
+
   struct named_column_type {
     string name;
     column_type column;
+  };
+
+  struct read_options {
+    read_options(std::regex line_regex = {R"(\n)"}, std::regex cell_regex = {R"(\t)"}, bool header = true)
+      : line{std::move(line_regex), true, {}}, cell{std::move(cell_regex), true, {}}, header{header}
+    {
+    }
+
+    struct {
+      std::regex regex;
+      bool separator;
+      std::regex_constants::match_flag_type flag;
+    } line;
+
+    struct {
+      std::regex regex;
+      bool separator;
+      std::regex_constants::match_flag_type flag;
+    } cell;
+
+    bool header;
+  };
+
+  struct write_options {
+    write_options(std::string line_separator = "\n", std::string cell_separator = "\t", bool header = true)
+      : line{{std::move(line_separator)}}, cell{{std::move(cell_separator)}}, header{header}
+    {
+    }
+
+    struct {
+      std::string separator;
+    } line;
+
+    struct {
+      std::string separator;
+    } cell;
+
+    bool header;
   };
 
   base_dataframe() = default;
