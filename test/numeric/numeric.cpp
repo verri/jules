@@ -25,9 +25,9 @@ TEST_CASE("Base numeric utilities", "[numeric]")
   }
   SECTION("Arithmetic")
   {
-    auto a = std::vector<long>{1, 2, 3, 4};
-    auto b = std::array<long, 4>{{1, 2, 3, 4}};
-    auto c = jules::vector<long>{1, 2, 3, 4};
+    const auto a = std::vector<long>{1, 2, 3, 4};
+    const auto b = std::array<long, 4>{{1, 2, 3, 4}};
+    const auto c = jules::vector<long>{1, 2, 3, 4};
 
     CHECK(jules::length(a.begin(), a.end()) == a.size());
     CHECK(jules::length(b) == b.size());
@@ -62,8 +62,11 @@ TEST_CASE("Base numeric utilities", "[numeric]")
   }
   SECTION("Logical")
   {
-    auto a = jules::vector<bool>{true, false, true};
-    auto b = jules::vector<bool>{true, true, true};
+    const auto a = jules::vector<bool>{true, false, true};
+    const auto b = jules::vector<bool>{true, true, true};
+
+    CHECK(jules::count(a.begin(), a.end()) == 2u);
+    CHECK(count(b) == 3u);
 
     CHECK(jules::any(a.begin(), a.end()));
     CHECK(any(!a));

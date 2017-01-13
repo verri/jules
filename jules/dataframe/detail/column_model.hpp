@@ -1,17 +1,17 @@
 // Copyright (c) 2016 Filipe Verri <filipeverri@gmail.com>
 
-#define JULES_DATAFRAME_DETAIL_STORAGE_H
-#ifndef JULES_DATAFRAME_DETAIL_STORAGE_H
+#ifndef JULES_DATAFRAME_DETAIL_COLUMN_MODEL_H
+#define JULES_DATAFRAME_DETAIL_COLUMN_MODEL_H
 
+#include <jules/base/async.hpp>
 #include <jules/core/type.hpp>
-#include <jules/util/async.hpp>
-#include <jules/util/type.hpp>
 
 #include <algorithm>
 #include <iterator>
 #include <memory>
 #include <type_traits>
 #include <typeindex>
+#include <typeinfo>
 #include <vector>
 
 namespace jules
@@ -20,7 +20,7 @@ namespace detail
 {
 template <typename T, typename Coercion> class column_model;
 
-template <typename Eraser, typename Coercion, size_t I>
+template <typename Eraser, typename Coercion, std::size_t I>
 class generate_virtual_coercions : public generate_virtual_coercions<Eraser, Coercion, I - 1>
 {
 private:
@@ -29,11 +29,11 @@ private:
   using base = generate_virtual_coercions<Eraser, Coercion, I - 1>;
 
 protected:
-  using base::coerce_to_;
-  using base::can_coerce_to_;
+  using base::coerce_;
+  using base::can_coerce_;
 
-  virtual column_interface_ptr coerce_to_(tag<type>) const = 0;
-  virtual bool can_coerce_to_(tag<type>) const = 0;
+  virtual column_interface_ptr coerce_(tag<type>) const = 0;
+  virtual bool can_coerce_(tag<type>) const = 0;
 
 public:
   ~generate_virtual_coercions() = default;
@@ -46,20 +46,20 @@ private:
   using type = typename Coercion::template type<0>;
 
 protected:
-  virtual column_interface_ptr coerce_to_(tag<type>) const = 0;
-  virtual bool can_coerce_to_(tag<type>) const = 0;
+  virtual column_interface_ptr coerce_(tag<type>) const = 0;
+  virtual bool can_coerce_(tag<type>) const = 0;
 
 public:
   ~generate_virtual_coercions() = default;
 };
 
 template <typename Coercion>
-class column_interface : public generate_virtual_coercions<column_interface<Coercion>, Coercion, Coercion::ntypes() - 1>
+class column_interface : public generate_virtual_coercions<column_interface<Coercion>, Coercion, Coercion::type_count() - 1>
 {
 private:
   using column_interface_ptr = std::unique_ptr<column_interface>;
   using coercion_rules = Coercion;
-  using base = generate_virtual_coercions<column_interface<Coercion>, Coercion, Coercion::ntypes() - 1>;
+  using base = generate_virtual_coercions<column_interface<Coercion>, Coercion, Coercion::type_count() - 1>;
 
 public:
   column_interface() = default;
@@ -75,8 +75,8 @@ public:
   virtual column_interface_ptr clone() const = 0;
   virtual std::size_t size() const = 0;
 
-  template <typename T> column_interface_ptr coerce_to() const { return this->coerce_to_(tag<T>{}); }
-  template <typename T> bool can_coerce_to() const { return this->can_coerce_to_(tag<T>{}); }
+  template <typename T> column_interface_ptr coerce() const { return this->coerce_(tag<T>{}); }
+  template <typename T> bool can_coerce() const { return this->can_coerce_(tag<T>{}); }
 
   virtual std::type_index elements_type() const = 0;
 
@@ -84,11 +84,11 @@ public:
   template <typename T> const auto& downcast() const { return dynamic_cast<const column_model<T, coercion_rules>&>(*this); }
 
 protected:
-  using base::coerce_to_;
-  using base::can_coerce_to_;
+  using base::coerce_;
+  using base::can_coerce_;
 
-  template <typename T>[[noreturn]] column_interface_ptr coerce_to_(T) const { throw std::bad_cast{}; }
-  template <typename T> bool can_coerce_to_(T) const { return false; }
+  template <typename T>[[noreturn]] column_interface_ptr coerce_(T) const { throw std::bad_cast{}; }
+  template <typename T> bool can_coerce_(T) const { return false; }
 };
 
 // Default coercion rules.  If it is impossible to convert from T to type, this class is
@@ -100,9 +100,9 @@ private:
   using column_interface_ptr = std::unique_ptr<column_interface<Coercion>>;
 
 protected:
-  template <typename Iter>[[noreturn]] column_interface_ptr coerce_to_(Iter, Iter, tag<type>) const { throw std::bad_cast{}; }
+  template <typename Iter>[[noreturn]] column_interface_ptr coerce_(Iter, Iter, tag<type>) const { throw std::bad_cast{}; }
 
-  constexpr bool can_coerce_to_(tag<type>) const { return false; }
+  constexpr bool can_coerce_(tag<type>) const { return false; }
 };
 
 // User-defined coercion rules.  If it is possible to convert from T to type using ONLY a
@@ -118,7 +118,7 @@ private:
   using column_interface_ptr = std::unique_ptr<column_interface<Coercion>>;
 
 protected:
-  template <typename Iter> column_interface_ptr coerce_to_(Iter begin, Iter end, tag<type>) const
+  template <typename Iter> column_interface_ptr coerce_(Iter begin, Iter end, tag<type>) const
   {
     auto result = new column_model<type, Coercion>;
     auto d = defer([&result] { delete result; });
@@ -130,7 +130,7 @@ protected:
     return column_interface_ptr{move_ptr(result)};
   }
 
-  constexpr bool can_coerce_to_(tag<type>) const { return true; }
+  constexpr bool can_coerce_(tag<type>) const { return true; }
 };
 
 // Automatic coercion rules.  If it is possible to convert from T to type using a
@@ -143,7 +143,7 @@ private:
   using column_interface_ptr = std::unique_ptr<column_interface<Coercion>>;
 
 protected:
-  template <typename Iter> column_interface_ptr coerce_to_(Iter begin, Iter end, tag<type>) const
+  template <typename Iter> column_interface_ptr coerce_(Iter begin, Iter end, tag<type>) const
   {
     auto result = new column_model<type, Coercion>;
     auto d = defer([&result] { delete result; });
@@ -154,7 +154,7 @@ protected:
     return column_interface_ptr{move_ptr(result)};
   }
 
-  constexpr bool can_coerce_to_(tag<type>) const { return true; }
+  constexpr bool can_coerce_(tag<type>) const { return true; }
 };
 
 template <typename T, typename Coercion, std::size_t I>
@@ -169,14 +169,14 @@ private:
   using specific = specific_concrete_coercion<T, typename Coercion::template type<I>, Coercion, I>;
 
 protected:
-  using base::coerce_to_;
-  using base::can_coerce_to_;
-  using column_interface<Coercion>::coerce_to_;
-  using column_interface<Coercion>::can_coerce_to_;
+  using base::coerce_;
+  using base::can_coerce_;
+  using column_interface<Coercion>::coerce_;
+  using column_interface<Coercion>::can_coerce_;
 
-  column_interface_ptr coerce_to_(tag<type> tag) const final { return specific::coerce_to_(this->begin(), this->end(), tag); }
+  column_interface_ptr coerce_(tag<type> tag) const final { return specific::coerce_(this->begin(), this->end(), tag); }
 
-  bool can_coerce_to_(tag<type> tag) const final { return specific::can_coerce_to_(tag); }
+  bool can_coerce_(tag<type> tag) const final { return specific::can_coerce_(tag); }
 
 public:
   using generate_concrete_coercions<T, Coercion, I - 1>::generate_concrete_coercions;
@@ -198,12 +198,12 @@ private:
   using specific = specific_concrete_coercion<T, typename Coercion::template type<0>, Coercion, 0>;
 
 protected:
-  using column_interface<Coercion>::coerce_to_;
-  using column_interface<Coercion>::can_coerce_to_;
+  using column_interface<Coercion>::coerce_;
+  using column_interface<Coercion>::can_coerce_;
 
-  column_interface_ptr coerce_to_(tag<type> tag) const final { return specific::coerce_to_(this->begin(), this->end(), tag); }
+  column_interface_ptr coerce_(tag<type> tag) const final { return specific::coerce_(this->begin(), this->end(), tag); }
 
-  bool can_coerce_to_(tag<type> tag) const final { return specific::can_coerce_to_(tag); }
+  bool can_coerce_(tag<type> tag) const final { return specific::can_coerce_(tag); }
 
 public:
   using std::vector<T>::vector;
@@ -214,12 +214,12 @@ public:
 };
 
 template <typename T, typename Coercion>
-class column_model : public generate_concrete_coercions<T, Coercion, Coercion::ntypes() - 1>
+class column_model : public generate_concrete_coercions<T, Coercion, Coercion::type_count() - 1>
 {
   static_assert(!std::is_reference<T>::value, "column_model type can not be a reference");
 
 public:
-  using generate_concrete_coercions<T, Coercion, Coercion::ntypes() - 1>::generate_concrete_coercions;
+  using generate_concrete_coercions<T, Coercion, Coercion::type_count() - 1>::generate_concrete_coercions;
 
   column_model() = default;
 
@@ -241,4 +241,4 @@ public:
 } // namespace detail
 } // namespace jules
 
-#endif // JULES_DATAFRAME_DETAIL_STORAGE_H
+#endif // JULES_DATAFRAME_DETAIL_COLUMN_MODEL_H

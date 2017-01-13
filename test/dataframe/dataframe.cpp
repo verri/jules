@@ -1,340 +1,329 @@
 #include "jules/dataframe/dataframe.hpp"
+#include "jules/array/all.hpp"
 
-#include <algorithm>
-#include <array>
 #include <catch.hpp>
-#include <sstream>
-#include <string>
-#include <typeinfo>
 
-TEST_CASE("null dataframe", "[dataframe]")
+#include <sstream>
+#include <vector>
+
+TEST_CASE("Null dataframe", "[dataframe]")
 {
   using jules::dataframe;
 
   dataframe df;
 
-  CHECK(df.is_empty());
-  CHECK(df.is_null());
+  CHECK(!df);
+  CHECK(df.row_count() == 0);
+  CHECK(df.column_count() == 0);
+}
+
+TEST_CASE("Null dataframe colbind", "[dataframe]")
+{
+  using jules::column;
+  using jules::dataframe;
+
+  const auto a = column{0, 0, 0};
+  const auto null = dataframe();
+
+  auto df1 = null;
+  auto df2 = null;
+
+  df1.bind(a).bind(column{0, 0, 0});
+  df2.bind({{"", a}, {"", {0, 0, 0}}});
+
+  CHECK_FALSE(null);
+  CHECK(df1);
+  CHECK(df2);
+
+  CHECK(df1.row_count() == 3u);
+  CHECK(df1.column_count() == 2u);
+
+  CHECK(df2.row_count() == df1.row_count());
+  CHECK(df2.column_count() == df1.column_count());
+}
+
+TEST_CASE("Dataframe colbind", "[dataframe]")
+{
+  using jules::column;
+  using jules::dataframe;
+  using jules::string;
+
+  auto c = column(0, 0);
+  auto a = column(0, 0);
+
+  auto null = dataframe();
+  auto df = dataframe();
+
+  df.bind({{"c", c}}).bind({{"a", a}, {"b", column(0, 0)}});
+
+  CHECK_FALSE(null);
   CHECK(df);
-  CHECK(df.rows_count() == 0);
-  CHECK(df.columns_count() == 0);
+
+  CHECK(null.row_count() == 0u);
+  CHECK(null.column_count() == 0u);
+
+  CHECK(df.row_count() == 0u);
+  CHECK(df.column_count() == 3u);
+
+  const auto df_names = df.names();
+  REQUIRE(df_names.size() == 3u);
+  CHECK(all(df_names == jules::as_vector("c", "a", "b")));
+
+  const auto d = column(0, 0);
+  auto some_df = dataframe{{"A", {1, 2, 3, 4}}, {"a", {"h", " ", "w", "0"}}};
+  CHECK_THROWS(some_df.bind(d));
 }
 
-TEST_CASE("null dataframe colbind", "[dataframe]")
-{
-  using jules::column;
-  using jules::dataframe;
-
-  column a(0, 0);
-  dataframe null;
-  dataframe df = null.colbind(a).colbind(column(0, 0));
-
-  CHECK_FALSE(null.is_null());
-  CHECK_FALSE(df.is_null());
-
-  CHECK(null.is_empty());
-  CHECK(df.is_empty());
-
-  CHECK(df.rows_count() == 0);
-  CHECK(df.columns_count() == 2);
-}
-
-TEST_CASE("dataframe colbind", "[dataframe]")
-{
-  using jules::column;
-  using jules::dataframe;
-
-  column c("c", 0, 0);
-  column a("a", 0, 0);
-  dataframe null;
-  dataframe df = null.colbind(c).colbind(a).colbind(column("b", 0, 0));
-
-  CHECK_FALSE(null.is_null());
-  CHECK_FALSE(df.is_null());
-
-  CHECK(null.is_empty());
-  CHECK(df.is_empty());
-
-  CHECK(df.rows_count() == 0);
-  CHECK(df.columns_count() == 3);
-
-  auto cols = df.columns_names();
-  auto nullcols = null.columns_names();
-  struct bla {
-    std::string unnamed[3];
-  };
-  struct foo {
-    int a;
-    int b;
-    int c;
-  };
-
-  foo f = {.a = 1, .b = 2, .c = 3};
-
-  std::array<std::string, 3> names{{"c", "a", "b"}};
-
-  REQUIRE(cols.size() == 3);
-  auto mm = std::mismatch(cols.begin(), cols.end(), names.begin());
-  CHECK(mm.first == cols.end());
-
-  REQUIRE(nullcols.size() == 3);
-  auto mm1 = std::mismatch(cols.begin(), cols.end(), nullcols.begin());
-  CHECK(mm1.first == cols.end());
-
-  column d("d", 0, 0);
-  dataframe some_df{{"A", {1, 2, 3, 4}}, {"a", {"h", " ", "w", "0"}}};
-  CHECK_THROWS(some_df.colbind(a));
-  CHECK_THROWS(some_df.colbind(d));
-}
-
-TEST_CASE("dataframe select by name", "[dataframe]")
+TEST_CASE("Dataframe select by name", "[dataframe]")
 {
   using jules::dataframe;
   using namespace std::literals::string_literals;
 
   dataframe df{{"int", {1, 2, 3, 4}}, {"str", {"h"s, " "s, "w"s, "0"s}}};
-  CHECK_THROWS(df.select(""));
-  CHECK_THROWS(df.select("h"));
-  CHECK(df.select("int").elements_type() == typeid(int));
-  CHECK(df.select("str").elements_type() == typeid(std::string));
-  CHECK(df.select("str").size() == 4);
+  CHECK_THROWS(df.at(""));
+  CHECK_THROWS(df.at("h"));
+  CHECK(df.at("int").column.elements_type() == typeid(int));
+  CHECK(df.at("str").column.elements_type() == typeid(jules::string));
+  CHECK(df.at("str").column.size() == 4);
 }
 
-TEST_CASE("accessing rows of the dataframe", "[datafrae]")
+TEST_CASE("Accessing rows of the dataframe", "[dataframe]")
 {
-  using jules::dataframe;
-  using namespace std::literals::string_literals;
-
-  auto df = dataframe{{0, 1, 2, 3}, {"0"s, "1"s, "2"s, "3"s}, {0.0, 1.0, 2.0, 3.0}};
-
-  CHECK_THROWS((df.rows<int, std::string>()));
-  CHECK_THROWS((df.rows<double, std::string, int>()));
-
-  auto rows = df.rows<int, std::string, double>();
-
-  for (auto i : jules::seq(0, df.rows_count()))
-    CHECK((rows[i] == std::tuple<int, std::string, double>(i, std::to_string(i), i)));
+  // TODO: row_view
 }
 
-TEST_CASE("invalid exception dataframe", "[dataframe]")
+TEST_CASE("Invalid dataframe exception", "[dataframe]")
 {
   using jules::dataframe;
 
-  auto create_invalid_dataframe = [] { return dataframe{{1, 2, 3, 4}, {1, 2}}; };
+  auto create_invalid_dataframe = [] { return dataframe{{"a", {1, 2, 3, 4}}, {"b", {1, 2}}}; };
   CHECK_THROWS(create_invalid_dataframe());
 }
 
-TEST_CASE("constructing a dataframe from a range of columns", "[dataframe]")
+TEST_CASE("Constructing a dataframe from a range of columns", "[dataframe]")
 {
   using jules::column;
   using jules::dataframe;
 
-  auto columns = std::vector<column>{
+  auto columns = std::vector<dataframe::named_column_type>{
     {"a", {1, 2, 3}}, {"b", {'a', 'b', 'c'}}, {"c", {1.0, 2.0, 3.0}},
   };
 
   auto df = dataframe(columns);
 
-  CHECK(df.select("a").elements_type() == columns[0].elements_type());
-  CHECK(df.select("b").elements_type() == columns[1].elements_type());
-  CHECK(df.select("c").elements_type() == columns[2].elements_type());
+  CHECK(df.row_count() == 3u);
+  CHECK(df.column_count() == 3u);
+
+  auto df2 = dataframe(columns.begin() + 1, columns.end());
+
+  CHECK(df2.row_count() == 3u);
+  CHECK(df2.column_count() == 2u);
+
+  namespace view = jules::range::view;
+
+  auto types = jules::as_vector(columns | view::transform([](const auto& elem) { return elem.column.elements_type(); }));
+  CHECK(all(df.column_types() == types));
+
+  auto names = jules::as_vector(columns | view::transform([](const auto& elem) { return elem.name; }));
+  CHECK(all(df.names() == names));
 }
 
-TEST_CASE("assigning a null dataframe", "[dataframe]")
+TEST_CASE("Implicit conversion from a column to a dataframe", "[dataframe]")
+{
+  using jules::column;
+  using jules::dataframe;
+  using jules::index_t;
+
+  const auto f = [](dataframe df, index_t size, std::type_index type) {
+    CHECK(df.row_count() == size);
+    CHECK(df.at(0u).column.elements_type() == type);
+  };
+
+  auto col = column{1, 2, 3, 4};
+  const auto size = col.size();
+  const auto type = col.elements_type();
+
+  f(col, size, type);
+  f(std::move(col), size, type);
+}
+
+TEST_CASE("Assigning a null dataframe", "[dataframe]")
 {
   using jules::dataframe;
 
   dataframe some_df{{"int", {1, 2, 3, 4}}, {"const char*", {"hello", " ", "world", "!"}}};
-
-  CHECK(!some_df.is_empty());
+  CHECK(some_df);
 
   some_df = {};
-  CHECK(some_df.is_empty());
+  CHECK(!some_df);
 }
 
-TEST_CASE("assigning itself", "[dataframe]")
+TEST_CASE("Assigning a dataframe to itself", "[dataframe]")
 {
   using jules::dataframe;
 
   dataframe some_df{{"int", {1, 2, 3, 4}}, {"const char*", {"hello", " ", "world", "!"}}};
-
   CHECK_NOTHROW(some_df = some_df);
 }
 
-TEST_CASE("reading an empty dataframe with header", "[dataframe]")
+TEST_CASE("Reading an empty dataframe with header", "[dataframe]")
 {
-  std::string input = "x\ty\tz\n";
-
-  std::stringstream stream(input);
+  std::stringstream stream("x\ty\tz\n");
 
   auto df = jules::dataframe::read(stream);
-  CHECK(df.rows_count() == 0);
-  CHECK(df.columns_count() == 3);
-  CHECK(df.is_empty());
+
+  CHECK(df.row_count() == 0u);
+  CHECK(df.column_count() == 3u);
+  CHECK(all(df.names() == jules::as_vector("x", "y", "z")));
 }
 
-TEST_CASE("reading an empty dataframe with line-break", "[dataframe]")
+TEST_CASE("Reading an empty dataframe with line-break", "[dataframe]")
 {
-  std::string input = "\n";
-
-  std::stringstream stream(input);
+  std::stringstream stream("\n");
 
   auto df = jules::dataframe::read(stream);
-  CHECK(df.rows_count() == 0);
-  CHECK(df.columns_count() == 0);
-  CHECK(df.is_empty());
+  CHECK_FALSE(df);
+  CHECK(df.row_count() == 0u);
+  CHECK(df.column_count() == 0u);
 }
 
-TEST_CASE("reading an empty dataframe from an empty string", "[dataframe]")
+TEST_CASE("Reading an empty dataframe from an empty string", "[dataframe]")
 {
-  std::string input = "";
-
-  std::stringstream stream(input);
+  std::stringstream stream("");
 
   auto df = jules::dataframe::read(stream);
-  CHECK(df.rows_count() == 0);
-  CHECK(df.columns_count() == 0);
-  CHECK(df.is_empty());
-  CHECK(df.is_null());
+  CHECK(df.row_count() == 0u);
+  CHECK(df.column_count() == 0u);
+  CHECK_FALSE(df);
 
   std::stringstream null_stream;
 
   auto df2 = jules::dataframe::read(null_stream);
-  CHECK(df2.rows_count() == 0);
-  CHECK(df2.columns_count() == 0);
-  CHECK(df2.is_empty());
-  CHECK(df.is_null());
+  CHECK(df2.row_count() == 0u);
+  CHECK(df2.column_count() == 0u);
+  CHECK_FALSE(df2);
 }
 
-TEST_CASE("reading a dataframe", "[dataframe]")
+TEST_CASE("Reading a dataframe", "[dataframe]")
 {
-  std::string input = "\t\t \n1 \t 2\t  3\n";
-
-  std::stringstream stream(input);
+  std::stringstream stream("\t\t \n1 \t 2\t  3\n");
 
   auto df = jules::dataframe::read(stream);
-  CHECK(df.rows_count() == 1);
-  CHECK(df.columns_count() == 3);
-  auto cols = df.columns_names();
-  CHECK(cols.size() == 3);
-  CHECK(cols[0] == "");
-  CHECK(cols[1] == "");
-  CHECK(cols[2] == " ");
+  CHECK(df.row_count() == 1u);
+  CHECK(df.column_count() == 3u);
+
+  auto cols = df.names();
+  CHECK(all(cols == jules::as_vector("", "", " ")));
 }
 
-TEST_CASE("reading matrix of integers", "[dataframe]")
+TEST_CASE("Reading matrix of integers", "[dataframe]")
 {
   struct my_integer_rules {
     using type = int;
-    static type coerce_from(const std::string& value) { return std::stoi(value); }
+    static auto coerce_from(const jules::string& value) -> type { return std::stoi(value); }
   };
 
   struct my_string_rules {
-    using type = std::string;
-    static type coerce_from(int value) { return std::to_string(value); }
+    using type = jules::string;
+    static auto coerce_from(int value) -> type { return std::to_string(value); }
   };
 
-  using my_coercion_rules = jules::coercion_rules<my_integer_rules, my_string_rules>;
+  using my_coercion_rules = jules::base_coercion_rules<my_integer_rules, my_string_rules>;
   using my_dataframe = jules::base_dataframe<my_coercion_rules>;
 
-  jules::dataframe_read_options opts;
+  auto opts = my_dataframe::read_options();
   opts.header = false;
 
   std::stringstream stream;
-  std::size_t N = 10;
-  for (std::size_t i = 0; i < N; ++i) {
-    for (std::size_t j = 0; j < N; ++j) {
+  constexpr auto N = 10u;
+  for (auto i = 0u; i < N; ++i) {
+    for (auto j = 0u; j < N; ++j) {
       stream << (i * N + j) << "\t";
     }
     stream << "\n";
   }
 
   auto df = my_dataframe::read(stream, opts);
-  REQUIRE(df.columns_count() == N);
-  REQUIRE(df.rows_count() == N);
-  my_dataframe idf;
+  REQUIRE(df.column_count() == N);
+  REQUIRE(df.row_count() == N);
 
-  // std::string -> double: Not OK
-  CHECK_FALSE(df.select(0).can_coerce_to<double>());
-  CHECK_THROWS(jules::as_column<double>(df.select(0)));
-  CHECK(df.select(0).can_coerce_to<int>());
+  // jules::string -> double: Not OK
+  CHECK_FALSE(df.at(0u).column.can_coerce<double>());
+  CHECK_THROWS(jules::to_column<double>(df.at(0).column));
+  CHECK(df.at(0).column.can_coerce<int>());
 
-  for (std::size_t i = 0; i < df.columns_count(); ++i) {
-    idf.colbind(jules::as_column<int>(df.select(i)));
-    REQUIRE(idf.select(idf.columns_count() - 1).elements_type() == typeid(int));
+  auto idf = my_dataframe();
+
+  for (auto i = 0u; i < df.column_count(); ++i) {
+    idf.bind(jules::to_column<int>(df.at(i).column));
+    REQUIRE(idf.at(idf.column_count() - 1).column.elements_type() == typeid(int));
   }
 
-  // coerce all columns
-  CHECK(jules::can_coerce_to<int>(df));
-  df.coerce_to<int>();
+  // TODO: coerce all columns
+  // df.coerce_to<int, ...>();
 
   // int -> double: Not OK
-  CHECK_FALSE(idf.select(0).can_coerce_to<double>());
-  CHECK_THROWS(jules::as_column<double>(idf.select(0)));
-  CHECK(idf.select(0).can_coerce_to<int>());
+  CHECK_FALSE(idf.at(0).column.can_coerce<double>());
+  CHECK_THROWS(jules::to_column<double>(idf.at(0).column));
+  CHECK(idf.at(0).column.can_coerce<int>());
 
-  // int -> std::string: OK
-  CHECK(idf.select(0).can_coerce_to<std::string>());
-  CHECK_NOTHROW(jules::as_column<std::string>(idf.select(0)));
+  // int -> string: OK
+  CHECK(idf.at(0).column.can_coerce<jules::string>());
+  CHECK_NOTHROW(jules::to_column<jules::string>(idf.at(0).column));
 
-  CHECK(idf.columns_count() == N);
-  CHECK(idf.rows_count() == N);
+  CHECK(idf.column_count() == N);
+  CHECK(idf.row_count() == N);
 }
 
-TEST_CASE("reading an inconsistent dataframe", "[dataframe]")
+TEST_CASE("Reading an inconsistent dataframe", "[dataframe]")
 {
-  std::string input = "\ty \t\n1 \t 2\t  3";
+  std::stringstream stream("\ty \t\n1 \t 2\t  3");
 
-  std::stringstream stream(input);
-
-  jules::dataframe df;
+  auto df = jules::dataframe();
   CHECK_THROWS(df = jules::dataframe::read(stream));
 
-  CHECK(df.rows_count() == 0);
-  CHECK(df.columns_count() == 0);
-  CHECK(df.is_null());
-  CHECK(df.is_empty());
-  CHECK_THROWS(df.select(0));
+  CHECK(df.row_count() == 0u);
+  CHECK(df.column_count() == 0u);
+  CHECK_FALSE(df);
+  CHECK_THROWS(df.at(0));
 }
 
-TEST_CASE("reading and writing a well-formed dataframe", "[dataframe]")
+TEST_CASE("Reading and writing a well-formed dataframe", "[dataframe]")
 {
   using jules::dataframe;
 
-  std::string data = "y\tx\tz\n" + std::to_string(0.0) + "\t" + std::to_string(1.0) + "\t" + std::to_string(2.0) + "\n" +
-                     std::to_string(3.0) + "\t" + std::to_string(4.0) + "\t" + std::to_string(5.0) + "\n";
+  const auto data = "y\tx\tz\n" + std::to_string(0.0) + "\t" + std::to_string(1.0) + "\t" + std::to_string(2.0) + "\n" +
+                    std::to_string(3.0) + "\t" + std::to_string(4.0) + "\t" + std::to_string(5.0) + "\n";
 
   std::stringstream is(data);
 
   auto df = jules::dataframe::read(is);
-  CHECK(df.rows_count() == 2);
-  CHECK(df.columns_count() == 3);
+  CHECK(df.row_count() == 2u);
+  CHECK(df.column_count() == 3u);
+  CHECK(df);
 
   std::stringstream os1;
   os1 << df;
   CHECK(data == os1.str());
 
   std::stringstream os2;
-  write(dataframe{{"y", {0, 3}}, {"x", {1, 4}}, {"z", {2, 5}}}, os2);
+
+  dataframe{{"y", {0, 3}}, {"x", {1, 4}}, {"z", {2, 5}}}.write(os2);
   CHECK(data == os2.str());
 
-  auto cols = df.columns_names();
-  std::array<std::string, 3> names{{"y", "x", "z"}};
-  // CHECK(cols == names);
+  const auto cols = df.names();
+  REQUIRE(cols.size() == 3u);
+  CHECK(all(cols == jules::as_vector("y", "x", "z")));
 
-  REQUIRE(cols.size() == 3);
-  auto mm = std::mismatch(cols.begin(), cols.end(), names.begin());
-  CHECK(mm.first == cols.end());
+  CHECK_THROWS(df.at(-1));
+  CHECK_THROWS(df.at(4));
 
-  CHECK_THROWS(df.select(-1));
-  CHECK_THROWS(df.select(4));
+  const auto& c1 = df.at(0);
+  CHECK(c1.name == "y");
 
-  auto c1 = df.select(0);
-  CHECK(c1.name() == "y");
+  const auto& c2 = df.at(1);
+  CHECK(c2.name == "x");
 
-  auto c2 = df.select(1);
-  CHECK(c2.name() == "x");
-
-  auto c3 = df.select(2);
-  CHECK(c3.name() == "z");
+  const auto& c3 = df.at(2);
+  CHECK(c3.name == "z");
 }
