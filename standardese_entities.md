@@ -33,6 +33,8 @@
 
   - [JULES\_ARRAY\_BLAS\_H](doc_array__blas.html#array/blas.hpp "JULES_ARRAY_BLAS_H")
 
+  - [JULES\_ARRAY\_CONTIGUOUS\_ARRAY\_H](doc_array__contiguous_array.html#array/contiguous_array.hpp "JULES_ARRAY_CONTIGUOUS_ARRAY_H")
+
   - [JULES\_ARRAY\_DETAIL\_ALLOCATOR\_H](doc_array__detail__allocator.html#array/detail/allocator.hpp "JULES_ARRAY_DETAIL_ALLOCATOR_H")
 
   - [JULES\_ARRAY\_DETAIL\_COMMON\_H](doc_array__detail__common.html#array/detail/common.hpp "JULES_ARRAY_DETAIL_COMMON_H")
@@ -71,25 +73,13 @@
 
   - [JULES\_CORE\_TYPE\_H](doc_core__type.html#core/type.hpp "JULES_CORE_TYPE_H")
 
-  - [JULES\_DATAFRAME\_COLUMN\_DECL\_H](doc_dataframe__column_decl.html#dataframe/column_decl.hpp "JULES_DATAFRAME_COLUMN_DECL_H")
-
   - [JULES\_DATAFRAME\_COLUMN\_H](doc_dataframe__column.html#dataframe/column.hpp "JULES_DATAFRAME_COLUMN_H")
-
-  - [JULES\_DATAFRAME\_COLUMN\_VIEW\_DECL\_H](doc_dataframe__column_view_decl.html#dataframe/column_view_decl.hpp "JULES_DATAFRAME_COLUMN_VIEW_DECL_H")
-
-  - [JULES\_DATAFRAME\_COLUMN\_VIEW\_H](doc_dataframe__column_view.html#dataframe/column_view.hpp "JULES_DATAFRAME_COLUMN_VIEW_H")
-
-  - [JULES\_DATAFRAME\_DATAFRAME\_DECL\_H](doc_dataframe__dataframe_decl.html#dataframe/dataframe_decl.hpp "JULES_DATAFRAME_DATAFRAME_DECL_H")
 
   - [JULES\_DATAFRAME\_DATAFRAME\_H](doc_dataframe__dataframe.html#dataframe/dataframe.hpp "JULES_DATAFRAME_DATAFRAME_H")
 
-  - [JULES\_DATAFRAME\_DETAIL\_STORAGE\_H](doc_dataframe__detail__column.html#dataframe/detail/column.hpp "JULES_DATAFRAME_DETAIL_STORAGE_H")
+  - [JULES\_DATAFRAME\_DETAIL\_COLUMN\_MODEL\_H](doc_dataframe__detail__column_model.html#dataframe/detail/column_model.hpp "JULES_DATAFRAME_DETAIL_COLUMN_MODEL_H")
 
-  - [JULES\_DATAFRAME\_IO\_H](doc_dataframe__io_decl.html#dataframe/io_decl.hpp "JULES_DATAFRAME_IO_H")
-
-  - [JULES\_DATAFRAME\_ROW\_VIEW\_DECL\_H](doc_dataframe__row_view_decl.html#dataframe/row_view_decl.hpp "JULES_DATAFRAME_ROW_VIEW_DECL_H")
-
-  - [JULES\_DATAFRAME\_ROW\_VIEW\_H](doc_dataframe__row_view.html#dataframe/row_view.hpp "JULES_DATAFRAME_ROW_VIEW_H")
+  - [JULES\_DATAFRAME\_NUMERIC\_H](doc_dataframe__numeric.html#dataframe/numeric.hpp "JULES_DATAFRAME_NUMERIC_H")
 
   - [JULES\_DEBUG\_LEVEL](doc_core__debug.html#core/debug.hpp "JULES_DEBUG_LEVEL")
 
@@ -118,6 +108,8 @@
       - [Array\<base\_array\<T, N\>\>](doc_array__detail__common.html#array/detail/common.hpp "jules::Array\<base_array\<T, N\>\>")
     
       - [Array\<binary\_expr\_array\<LhsIt, RhsIt, F, N\>\>](doc_array__detail__common.html#array/detail/common.hpp "jules::Array\<binary_expr_array\<LhsIt, RhsIt, F, N\>\>")
+    
+      - [Array\<contiguous\_array\<T, N\>\>](doc_array__detail__common.html#array/detail/common.hpp "jules::Array\<contiguous_array\<T, N\>\>")
     
       - [Array\<ind\_array\<T, N\>\>](doc_array__detail__common.html#array/detail/common.hpp "jules::Array\<ind_array\<T, N\>\>")
     
@@ -213,6 +205,10 @@
     
       - [base\_coercion\_rules](doc_core__type.html#jules::base_coercion_rules-Rules...- "jules::base_coercion_rules\<Rules...\>") - Utility class to combine coercion rules.
     
+      - [base\_column](doc_dataframe__column.html#dataframe/column.hpp "jules::base_column\<Coercion\>")
+    
+      - [base\_dataframe](doc_dataframe__dataframe.html#dataframe/dataframe.hpp "jules::base_dataframe\<Coercion\>")
+    
       - [base\_slice\<1\>](doc_array__slice.html#jules::base_slice-1- "jules::base_slice\<1\>") - 1D-Array specialization for slicing and dimensions representation.
     
       - [base\_slice](doc_array__slice.html#jules::base_slice-N- "jules::base_slice\<N\>") - Array slicing and dimensions representation.
@@ -224,6 +220,16 @@
       - [binary\_expr\_array](doc_array__binary_expr_array.html#array/binary_expr_array.hpp "jules::binary_expr_array\<LhsIt, RhsIt, Op, N\>")
     
       - [coercion\_rules](doc_core__type.html#jules::coercion_rules "jules::coercion_rules") - Default class with coercion rules for [numeric](doc_core__type.html#jules::numeric) and [string](doc_core__type.html#jules::string) classes.
+    
+      - [column](doc_dataframe__column.html#dataframe/column.hpp "jules::column")
+    
+      - [contiguous\_array](doc_array__contiguous_array.html#array/contiguous_array.hpp "jules::contiguous_array\<T, N\>")
+    
+      - [count(Iter, Sent)](doc_base__numeric.html#jules::count(Iter,Sent) "jules::count(Iter, Sent)") - Returns the number of true elements in a `Range` or in the sequence \[`first`, `last`).
+    
+      - [count(const Rng &)](doc_base__numeric.html#jules::count(Iter,Sent) "jules::count(const Rng &)") - Returns the number of true elements in a `Range` or in the sequence \[`first`, `last`).
+    
+      - [dataframe](doc_dataframe__dataframe.html#dataframe/dataframe.hpp "jules::dataframe")
     
       - [defer(F &&)](doc_base__async.html#base/async.hpp "jules::defer(F &&)")
     
@@ -943,6 +949,8 @@
     
       - [operator\<(const unary\_expr\_array\<It, Op, N\> &, const unary\_expr\_array\<A, B, N\> &)](doc_array__functional.html#array/functional.hpp "jules::operator\<(const unary_expr_array\<It, Op, N\> &, const unary_expr_array\<A, B, N\> &)")
     
+      - [operator\<\<(std::ostream &, const base\_dataframe\<Coercion\> &)](doc_dataframe__dataframe.html#dataframe/dataframe.hpp "jules::operator\<\<(std::ostream &, const base_dataframe\<Coercion\> &)")
+    
       - [operator\<=(U, const base\_array\<T, N\> &)](doc_array__functional.html#array/functional.hpp "jules::operator\<=(U, const base_array\<T, N\> &)")
     
       - [operator\<=(U, const binary\_expr\_array\<LhsIt, RhsIt, Op, N\> &)](doc_array__functional.html#array/functional.hpp "jules::operator\<=(U, const binary_expr_array\<LhsIt, RhsIt, Op, N\> &)")
@@ -1223,6 +1231,8 @@
     
       - [operator\>=(const unary\_expr\_array\<It, Op, N\> &, const unary\_expr\_array\<A, B, N\> &)](doc_array__functional.html#array/functional.hpp "jules::operator\>=(const unary_expr_array\<It, Op, N\> &, const unary_expr_array\<A, B, N\> &)")
     
+      - [operator\>\>(std::istream &, base\_dataframe\<Coercion\> &)](doc_dataframe__dataframe.html#dataframe/dataframe.hpp "jules::operator\>\>(std::istream &, base_dataframe\<Coercion\> &)")
+    
       - [operator^(U, const base\_array\<T, N\> &)](doc_array__functional.html#array/functional.hpp "jules::operator^(U, const base_array\<T, N\> &)")
     
       - [operator^(U, const binary\_expr\_array\<LhsIt, RhsIt, Op, N\> &)](doc_array__functional.html#array/functional.hpp "jules::operator^(U, const binary_expr_array\<LhsIt, RhsIt, Op, N\> &)")
@@ -1489,9 +1499,19 @@
     
       - [sum\_args(const T &, Args &&...)](doc_base__numeric.html#base/numeric.hpp "jules::sum_args(const T &, Args &&...)")
     
+      - [to\_column(base\_column\<C\> &&)](doc_dataframe__numeric.html#dataframe/numeric.hpp "jules::to_column(base_column\<C\> &&)")
+    
+      - [to\_column(const base\_column\<C\> &)](doc_dataframe__numeric.html#dataframe/numeric.hpp "jules::to_column(const base_column\<C\> &)")
+    
       - [to\_vector(A &&)](doc_array__numeric.html#array/numeric.hpp "jules::to_vector(A &&)")
     
       - [to\_vector(Rng &&)](doc_array__numeric.html#array/numeric.hpp "jules::to_vector(Rng &&)")
+    
+      - [to\_vector(const base\_column\<C\> &)](doc_dataframe__numeric.html#dataframe/numeric.hpp "jules::to_vector(const base_column\<C\> &)")
+    
+      - [to\_view(base\_column\<C\> &)](doc_dataframe__numeric.html#dataframe/numeric.hpp "jules::to_view(base_column\<C\> &)")
+    
+      - [to\_view(const base\_column\<C\> &)](doc_dataframe__numeric.html#dataframe/numeric.hpp "jules::to_view(const base_column\<C\> &)")
     
       - [uinteger](doc_core__type.html#jules::uinteger "jules::uinteger") - Standard unsigned type.
     
@@ -1515,7 +1535,13 @@
 
   - `jules::debug`
     
-      - [module](doc_core__debug.html#core/debug.hpp "jules::debug::module")
+      - [default\_module](doc_core__debug.html#core/debug.hpp "jules::debug::default_module")
+    
+      - [fatal\_module\_t](doc_core__debug.html#core/debug.hpp "jules::debug::fatal_module_t")
+    
+      - [throwing\_module](doc_core__debug.html#core/debug.hpp "jules::debug::throwing_module")
+    
+      - [throwing\_module\_t](doc_core__debug.html#core/debug.hpp "jules::debug::throwing_module_t")
 
   - `jules::debug::level` - Debug level for each kind of checking.
     
@@ -1536,6 +1562,10 @@
       - [cat(const T &, const std::array\<T, N\> &)](doc_array__detail__slicing.html#array/detail/slicing.hpp "jules::detail::cat(const T &, const std::array\<T, N\> &)")
     
       - [cat\_helper(const T &, const std::array\<T, N\> &, std::index\_sequence\<I...\>)](doc_array__detail__slicing.html#array/detail/slicing.hpp "jules::detail::cat_helper(const T &, const std::array\<T, N\> &, std::index_sequence\<I...\>)")
+    
+      - [column\_interface](doc_dataframe__detail__column_model.html#dataframe/detail/column_model.hpp "jules::detail::column_interface\<Coercion\>")
+    
+      - [column\_model](doc_dataframe__detail__column_model.html#dataframe/detail/column_model.hpp "jules::detail::column_model\<T, Coercion\>")
     
       - [default\_slicing(const base\_slice\<N\> &, Args &&...)](doc_array__detail__slicing.html#array/detail/slicing.hpp "jules::detail::default_slicing(const base_slice\<N\> &, Args &&...)")
     
@@ -1569,6 +1599,14 @@
     
       - [extents(const base\_slice\<N\> &)](doc_array__detail__slicing.html#array/detail/slicing.hpp "jules::detail::extents(const base_slice\<N\> &)")
     
+      - [generate\_concrete\_coercions\<T, Coercion, 0\>](doc_dataframe__detail__column_model.html#dataframe/detail/column_model.hpp "jules::detail::generate_concrete_coercions\<T, Coercion, 0\>")
+    
+      - [generate\_concrete\_coercions](doc_dataframe__detail__column_model.html#dataframe/detail/column_model.hpp "jules::detail::generate_concrete_coercions\<T, Coercion, I\>")
+    
+      - [generate\_virtual\_coercions\<Eraser, Coercion, 0\>](doc_dataframe__detail__column_model.html#dataframe/detail/column_model.hpp "jules::detail::generate_virtual_coercions\<Eraser, Coercion, 0\>")
+    
+      - [generate\_virtual\_coercions](doc_dataframe__detail__column_model.html#dataframe/detail/column_model.hpp "jules::detail::generate_virtual_coercions\<Eraser, Coercion, I\>")
+    
       - [index\_or\_slice()](doc_array__detail__common.html#array/detail/common.hpp "jules::detail::index_or_slice()")
     
       - [indirect\_request](doc_array__detail__common.html#array/detail/common.hpp "jules::detail::indirect_request\<Return, Args...\>")
@@ -1601,6 +1639,12 @@
     
       - [slicing\_size(const std::array\<index\_t, N\> &, index\_t, Args &&...)](doc_array__detail__slicing.html#array/detail/slicing.hpp "jules::detail::slicing_size(const std::array\<index_t, N\> &, index_t, Args &&...)")
     
+      - [specific\_concrete\_coercion](doc_dataframe__detail__column_model.html#dataframe/detail/column_model.hpp "jules::detail::specific_concrete_coercion\<T, U, Coercion, I, Enabler\>")
+    
+      - [specific\_concrete\_coercion\<T, U, Coercion, I, std::enable\_if\_t\<std::is\_convertible\<T, U\>::value\>\>](doc_dataframe__detail__column_model.html#dataframe/detail/column_model.hpp "jules::detail::specific_concrete_coercion\<T, U, Coercion, I, std::enable_if_t\<std::is_convertible\<T, U\>::value\>\>")
+    
+      - [specific\_concrete\_coercion\<T, U, Coercion, I, std::enable\_if\_t\<std::is\_same\<decltype(Coercion::template rule\<I\>::coerce\_from(std::declval\<T\>())), U\>::value&&\!std::is\_convertible\<T, U\>::value\>\>](doc_dataframe__detail__column_model.html#dataframe/detail/column_model.hpp "jules::detail::specific_concrete_coercion\<T, U, Coercion, I, std::enable_if_t\<std::is_same\<decltype(Coercion::template rule\<I\>::coerce_from(std::declval\<T\>())), U\>::value&&!std::is_convertible\<T, U\>::value\>\>")
+    
       - [stride(base\_slice\<N\> &, index\_t)](doc_array__detail__slicing.html#array/detail/slicing.hpp "jules::detail::stride(base_slice\<N\> &, index_t)")
     
       - [stride(const base\_slice\<N\> &, index\_t)](doc_array__detail__slicing.html#array/detail/slicing.hpp "jules::detail::stride(const base_slice\<N\> &, index_t)")
@@ -1608,6 +1652,8 @@
       - [strides(base\_slice\<N\> &)](doc_array__detail__slicing.html#array/detail/slicing.hpp "jules::detail::strides(base_slice\<N\> &)")
     
       - [strides(const base\_slice\<N\> &)](doc_array__detail__slicing.html#array/detail/slicing.hpp "jules::detail::strides(const base_slice\<N\> &)")
+    
+      - [tag](doc_core__type.html#core/type.hpp "jules::detail::tag\<T\>")
     
       - [trivial\_dispatch()](doc_core__type.html#core/type.hpp "jules::detail::trivial_dispatch()")
     

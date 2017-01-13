@@ -25,7 +25,13 @@ namespace jules
             constexpr auto extents_check = debug_assert::level<3u>{};
         }
         
-        struct module;
+        struct fatal_module_t;
+        
+        struct throwing_module_t;
+        
+        const auto default_module = fatal_module_t{};
+        
+        const auto throwing_module = throwing_module_t{};
     }
 }
 ```

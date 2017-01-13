@@ -9,6 +9,8 @@
 
   - [array/blas.hpp](doc_array__blas.html#array/blas.hpp "array/blas.hpp")
 
+  - [array/contiguous\_array.hpp](doc_array__contiguous_array.html#array/contiguous_array.hpp "array/contiguous_array.hpp")
+
   - [array/detail/allocator.hpp](doc_array__detail__allocator.html#array/detail/allocator.hpp "array/detail/allocator.hpp")
 
   - [array/detail/common.hpp](doc_array__detail__common.html#array/detail/common.hpp "array/detail/common.hpp")
@@ -49,20 +51,8 @@
 
   - [dataframe/column.hpp](doc_dataframe__column.html#dataframe/column.hpp "dataframe/column.hpp")
 
-  - [dataframe/column\_decl.hpp](doc_dataframe__column_decl.html#dataframe/column_decl.hpp "dataframe/column_decl.hpp")
-
-  - [dataframe/column\_view.hpp](doc_dataframe__column_view.html#dataframe/column_view.hpp "dataframe/column_view.hpp")
-
-  - [dataframe/column\_view\_decl.hpp](doc_dataframe__column_view_decl.html#dataframe/column_view_decl.hpp "dataframe/column_view_decl.hpp")
-
   - [dataframe/dataframe.hpp](doc_dataframe__dataframe.html#dataframe/dataframe.hpp "dataframe/dataframe.hpp")
 
-  - [dataframe/dataframe\_decl.hpp](doc_dataframe__dataframe_decl.html#dataframe/dataframe_decl.hpp "dataframe/dataframe_decl.hpp")
+  - [dataframe/detail/column\_model.hpp](doc_dataframe__detail__column_model.html#dataframe/detail/column_model.hpp "dataframe/detail/column_model.hpp")
 
-  - [dataframe/detail/column.hpp](doc_dataframe__detail__column.html#dataframe/detail/column.hpp "dataframe/detail/column.hpp")
-
-  - [dataframe/io\_decl.hpp](doc_dataframe__io_decl.html#dataframe/io_decl.hpp "dataframe/io_decl.hpp")
-
-  - [dataframe/row\_view.hpp](doc_dataframe__row_view.html#dataframe/row_view.hpp "dataframe/row_view.hpp")
-
-  - [dataframe/row\_view\_decl.hpp](doc_dataframe__row_view_decl.html#dataframe/row_view_decl.hpp "dataframe/row_view_decl.hpp")
+  - [dataframe/numeric.hpp](doc_dataframe__numeric.html#dataframe/numeric.hpp "dataframe/numeric.hpp")

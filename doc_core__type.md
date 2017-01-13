@@ -43,6 +43,9 @@ namespace jules
         
         template <typename T>
         auto trivial_dispatch();
+        
+        template <typename T>
+        struct tag;
     }
     
     template <typename T, std::size_t N>
@@ -131,7 +134,7 @@ Coercion rules for [numeric type](doc_core__type.html#jules::numeric).
 ``` cpp
 struct string_rule
 {
-    using type = std::string;
+    using type = string;
     
     static type coerce_from(const numeric& value);
 };

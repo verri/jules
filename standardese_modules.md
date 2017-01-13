@@ -61,6 +61,10 @@
     
       - [jules::any(const Rng &)](doc_base__numeric.html#jules::any(Iter,Sent) "jules::any(const Rng &)") - Checks whether any of the elements in a `Range` or in the sequence \[`first`, `last`) are true.
     
+      - [jules::count(Iter, Sent)](doc_base__numeric.html#jules::count(Iter,Sent) "jules::count(Iter, Sent)") - Returns the number of true elements in a `Range` or in the sequence \[`first`, `last`).
+    
+      - [jules::count(const Rng &)](doc_base__numeric.html#jules::count(Iter,Sent) "jules::count(const Rng &)") - Returns the number of true elements in a `Range` or in the sequence \[`first`, `last`).
+    
       - [jules::none(Iter, Sent)](doc_base__numeric.html#jules::none(Iter,Sent) "jules::none(Iter, Sent)") - Checks whether all elements in a `Range` or in the sequence \[`first`, `last`) are false.
     
       - [jules::none(const Rng &)](doc_base__numeric.html#jules::none(Iter,Sent) "jules::none(const Rng &)") - Checks whether all elements in a `Range` or in the sequence \[`first`, `last`) are false.

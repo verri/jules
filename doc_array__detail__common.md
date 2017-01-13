@@ -33,6 +33,9 @@ namespace jules
     struct Array<base_array<T, N>>;
     
     template <typename T, std::size_t N>
+    struct Array<contiguous_array<T, N>>;
+    
+    template <typename T, std::size_t N>
     struct Array<ref_array<T, N>>;
     
     template <typename T, std::size_t N>

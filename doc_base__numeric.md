@@ -39,6 +39,11 @@ namespace jules
     auto sum(const Rng& rng, T start = numeric_traits<T>::additive_identity());
     
     template <typename Iter, typename Sent, typename = meta::requires<range::Sentinel<Sent, Iter>>>
+    auto count(Iter first, Sent last);
+    template <typename Rng, typename = meta::requires<range::Range<Rng>>>
+    auto count(const Rng& rng);
+    
+    template <typename Iter, typename Sent, typename = meta::requires<range::Sentinel<Sent, Iter>>>
     auto all(Iter first, Sent last);
     template <typename Rng, typename = meta::requires<range::Range<Rng>>>
     auto all(const Rng& rng);
@@ -172,6 +177,18 @@ Returns either the summation of the elements in a `Range` or in the sequence \[`
 *Notes*: [jules::numeric\_traits\<T\>](doc_core__type.html#core/type.hpp) must implement `additive_identity`.
 
 *Notes*: If empty, returns [jules::numeric\_traits\<T\>::additive\_identity](doc_core__type.html#core/type.hpp).
+
+## Function template `jules::count` \[Logical\]<a id="jules::count(Iter,Sent)"></a>
+
+``` cpp
+(1)  template <typename Iter, typename Sent, typename = meta::requires<range::Sentinel<Sent, Iter>>>
+     auto count(Iter first, Sent last);
+
+(2)  template <typename Rng, typename = meta::requires<range::Range<Rng>>>
+     auto count(const Rng& rng);
+```
+
+Returns the number of true elements in a `Range` or in the sequence \[`first`, `last`).
 
 ## Function template `jules::all` \[Logical\]<a id="jules::all(Iter,Sent)"></a>
 
