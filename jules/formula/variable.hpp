@@ -14,6 +14,7 @@ public:
   using value_type = T;
 
   var(string name) : name_(name) {}
+  var(const char* name) : name_(name) {}
 
 private:
   string name_;
