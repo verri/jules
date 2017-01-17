@@ -36,7 +36,7 @@ protected:
   virtual bool can_coerce_(tag<type>) const = 0;
 
 public:
-  ~generate_virtual_coercions() = default;
+  virtual ~generate_virtual_coercions() = default;
 };
 
 template <typename Eraser, typename Coercion> class generate_virtual_coercions<Eraser, Coercion, 0>
@@ -50,7 +50,7 @@ protected:
   virtual bool can_coerce_(tag<type>) const = 0;
 
 public:
-  ~generate_virtual_coercions() = default;
+  virtual ~generate_virtual_coercions() = default;
 };
 
 template <typename Coercion>
@@ -67,7 +67,6 @@ public:
   column_interface(column_interface&&) noexcept = default;
 
   virtual ~column_interface() = default;
-  ;
 
   column_interface& operator=(const column_interface&) = delete;
   column_interface& operator=(column_interface&&) = delete;

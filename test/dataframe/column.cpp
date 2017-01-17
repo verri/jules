@@ -90,7 +90,7 @@ TEST_CASE("Column to_view vs as_vector", "[dataframe]")
   auto view2 = jules::to_view<int>(col);
   auto vector = jules::to_vector<int>(col);
 
-  for (int i : jules::slice(0, col.size())) {
+  for (auto i : jules::slice(0u, col.size())) {
     view1[i] = -1;
     CHECK(view2[i] == -1);
     CHECK(vector[i] == i);

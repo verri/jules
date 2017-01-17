@@ -28,19 +28,31 @@ template <> struct cblas<double> {
   static constexpr auto gemm = &cblas_dgemm;
 };
 
+template <typename T> static inline auto safe_int_cast(T value)
+{
+  DEBUG_ASSERT(value <= numeric_traits<int>::max(), debug::default_module, debug::level::invalid_argument,
+               "blas doesn't handle arrays this big");
+  return static_cast<int>(value);
+}
+
 template <typename T> auto product(const matrix<T>& lhs, const matrix<T>& rhs) -> matrix<T>
 {
   DEBUG_ASSERT(lhs.size() > 0 && rhs.size() > 0, debug::default_module, debug::level::invalid_argument, "empty matrix");
   DEBUG_ASSERT(lhs.column_count() == rhs.row_count(), debug::default_module, debug::level::invalid_argument, "invalid extents");
 
-  matrix<T> result(lhs.row_count(), rhs.column_count());
-  auto k = lhs.column_count(); // same as rhs.row_count()
+  auto result = matrix<T>(lhs.row_count(), rhs.column_count());
 
-  cblas<T>::gemm(CblasColMajor, CblasNoTrans, CblasNoTrans,         //
-                 result.row_count(), result.column_count(), k, 1.0, //
-                 lhs.data(), lhs.row_count(),                       //
-                 rhs.data(), rhs.row_count(),                       //
-                 0.0, result.data(), result.row_count());
+  const auto k = safe_int_cast(lhs.column_count()); // same as rhs.row_count()
+  const auto result_row_count = safe_int_cast(result.row_count());
+  const auto result_column_count = safe_int_cast(result.column_count());
+  const auto lhs_row_count = safe_int_cast(lhs.row_count());
+  const auto rhs_row_count = safe_int_cast(rhs.row_count());
+
+  cblas<T>::gemm(CblasColMajor, CblasNoTrans, CblasNoTrans,     //
+                 result_row_count, result_column_count, k, 1.0, //
+                 lhs.data(), lhs_row_count,                     //
+                 rhs.data(), rhs_row_count,                     //
+                 0.0, result.data(), result_row_count);
 
   return result;
 }
