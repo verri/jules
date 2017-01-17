@@ -151,7 +151,7 @@ void do_slice(base_slice<N>& result, const base_slice<1>& slice, Args&&... args)
   static_assert(N - D - 1 == sizeof...(args), "invalid number of arguments");
 
   CHECK_STRIDE(slice.stride);
-  CHECK_BOUNDS(slice.start + slice.extent * slice.stride, extent(result, D));
+  CHECK_BOUNDS(slice.start + slice.extent * slice.stride, extent(result, D) + 1u);
 
   result.start += stride(result, D) * slice.start;
   stride(result, D) = stride(result, D) * slice.stride;
@@ -240,7 +240,7 @@ void do_slice(std::array<index_t, N>& extents, std::vector<index_t>& indexes, co
   static_assert(I == sizeof...(args), "invalid number of arguments");
 
   CHECK_STRIDE(rng_base.stride);
-  CHECK_BOUNDS(rng_base.start + rng_base.extent * rng_base.stride, extent(slice, I));
+  CHECK_BOUNDS(rng_base.start + rng_base.extent * rng_base.stride, extent(slice, I) + 1u);
 
   auto rng = rng_base;
   if (rng.size() == 0)
