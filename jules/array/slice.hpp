@@ -87,13 +87,6 @@ public:
 
     constexpr auto operator*() const -> reference { return (*slice_)(indexes_); }
 
-    /// \notes You should not call this function.
-    auto operator-> () const -> pointer
-    {
-      DEBUG_ASSERT(false, debug::default_module, debug::level::invalid_state, "you should not call this function");
-      return nullptr;
-    }
-
   private:
     constexpr iterator(const base_slice* slice, extent_type indexes) : slice_{slice}, indexes_{indexes} {}
 
@@ -241,13 +234,6 @@ public:
     constexpr auto operator!=(const iterator& other) const { return !(*this == other); }
 
     constexpr auto operator*() const -> reference { return index_; }
-
-    /// \notes You should not call this function.
-    auto operator-> () const -> pointer
-    {
-      DEBUG_ASSERT(false, debug::default_module, debug::level::invalid_state, "you should not call this function");
-      return nullptr;
-    }
 
   private:
     constexpr iterator(index_t index, index_t stride) : index_{index}, stride_{stride} {}
