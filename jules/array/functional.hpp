@@ -16,6 +16,7 @@
   BINARY_OPERATIONS_LIST(TX__, X__, N__)
 
 #define BASE_NDARRAY(X__, N__) const base_array<X__, N__>&
+#define CONTIGUOUS_ARRAY(X__, N__) const contiguous_array<X__, N__>&
 #define REF_NDARRAY(X__, N__) const ref_array<X__, N__>&
 #define INDIRECT_NDARRAY(X__, N__) const ind_array<X__, N__>&
 #define BINARY_EXPR_NDARRAY(X__, Y__, Z__, N__) const binary_expr_array<X__, Y__, Z__, N__>&
@@ -44,6 +45,7 @@
 
 #define BINARY_APPLY_COMBINATIONS(TX__, X__, N__)                                                                                \
   BINARY_APPLY_OPERATION(TX__, X__, (typename U), (BASE_NDARRAY(U, N__)))                                                        \
+  BINARY_APPLY_OPERATION(TX__, X__, (typename U), (CONTIGUOUS_ARRAY(U, N__)))                                                    \
   BINARY_APPLY_OPERATION(TX__, X__, (typename U), (REF_NDARRAY(U, N__)))                                                         \
   BINARY_APPLY_OPERATION(TX__, X__, (typename U), (INDIRECT_NDARRAY(U, N__)))                                                    \
   BINARY_APPLY_OPERATION(TX__, X__, (typename A, typename B), (UNARY_EXPR_NDARRAY(A, B, N__)))                                   \
@@ -51,6 +53,7 @@
 
 #define BINARY_COMBINATIONS(TX__, X__, N__, OP__)                                                                                \
   BINARY_OPERATION(TX__, X__, (typename U), (BASE_NDARRAY(U, N__)), OP__)                                                        \
+  BINARY_OPERATION(TX__, X__, (typename U), (CONTIGUOUS_ARRAY(U, N__)), OP__)                                                    \
   BINARY_OPERATION(TX__, X__, (typename U), (REF_NDARRAY(U, N__)), OP__)                                                         \
   BINARY_OPERATION(TX__, X__, (typename U), (INDIRECT_NDARRAY(U, N__)), OP__)                                                    \
   BINARY_OPERATION(TX__, X__, (typename A, typename B), (UNARY_EXPR_NDARRAY(A, B, N__)), OP__)                                   \
@@ -118,6 +121,7 @@ namespace jules
 {
 
 OPERATIONS_LIST((typename T, std::size_t N), (const base_array<T, N>&), N);
+OPERATIONS_LIST((typename T, std::size_t N), (const contiguous_array<T, N>&), N);
 OPERATIONS_LIST((typename T, std::size_t N), (const ref_array<T, N>&), N);
 OPERATIONS_LIST((typename T, std::size_t N), (const ind_array<T, N>&), N);
 OPERATIONS_LIST((typename It, typename Op, std::size_t N), (const unary_expr_array<It, Op, N>&), N);
@@ -128,6 +132,7 @@ OPERATIONS_LIST((typename LhsIt, typename RhsIt, typename Op, std::size_t N), (c
 //=== Clean up ===/
 
 #undef BASE_NDARRAY
+#undef CONTIGUOUS_ARRAY
 #undef REF_NDARRAY
 #undef INDIRECT_NDARRAY
 #undef BINARY_EXPR_NDARRAY

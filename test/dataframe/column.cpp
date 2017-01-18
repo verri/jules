@@ -1,4 +1,5 @@
 #include "jules/dataframe/column.hpp"
+#include "jules/array/all.hpp"
 #include "jules/dataframe/dataframe.hpp"
 #include "jules/dataframe/numeric.hpp"
 
@@ -113,4 +114,39 @@ TEST_CASE("Column tutorial", "[dataframe]")
   CHECK_THROWS(empty_column.elements_type());
   CHECK_THROWS(empty_column.data<void*>());
   CHECK_THROWS(empty_column.coerce<jules::numeric>());
+
+  auto from_initializer_list = jules::column{1, 2, 3, 4};
+  CHECK(from_initializer_list.size() == 4u);
+  CHECK(from_initializer_list.elements_type() == typeid(int));
+
+  auto repeated_value = jules::column(0.0, 20u);
+  CHECK(repeated_value.size() == 20u);
+  CHECK(repeated_value.elements_type() == typeid(double));
+
+  auto x = jules::vector<long>{1l, 2l, 3l};
+
+  auto from_range = jules::column(x);
+  CHECK(from_range.size() == x.size());
+  CHECK(from_range.elements_type() == typeid(decltype(x)::value_type));
+  CHECK(all(jules::to_view<long>(from_range) == x));
+
+  auto from_iterators = jules::column(x.begin(), x.end());
+  CHECK(from_iterators.size() == x.size());
+  CHECK(from_iterators.elements_type() == typeid(decltype(x)::value_type));
+  CHECK(all(jules::to_view<long>(from_iterators) == x));
+
+  auto a = jules::column(0.0f, 5u);
+  auto b = a;
+  auto c = std::move(b);
+
+  CHECK(b.size() == 0u);
+  CHECK(c.size() == a.size());
+  CHECK(c.elements_type() == a.elements_type());
+
+  b = a;
+  c = std::move(a);
+
+  CHECK(a.size() == 0u);
+  CHECK(b.size() == c.size());
+  CHECK(b.elements_type() == c.elements_type());
 }
