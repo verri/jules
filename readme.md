@@ -1,4 +1,4 @@
-jules
+Jules
 =====
 
 [![Build Status](https://travis-ci.org/verri/jules.svg?branch=master)](https://travis-ci.org/verri/jules)
@@ -7,7 +7,7 @@ jules
 [![Github Releases](https://img.shields.io/github/release/verri/jules.svg)](https://github.com/verri/jules/releases)
 [![AUR](https://img.shields.io/aur/version/jules-git.svg)](https://aur.archlinux.org/packages/jules-git)
 
-`jules` is a statistical computing library that aims to provide R-like experience in modern C++.
+**Jules** is a statistical computing library that aims to provide R-like experience in modern C++.
 
 Dependencies
 ------------
@@ -23,11 +23,11 @@ Usage
 
 ### Installation
 
-`jules` is a header-only library. Download the [latest release](https://github.com/verri/jules/releases/latest)
+**Jules** is a header-only library. Download the [latest release](https://github.com/verri/jules/releases/latest)
 and extract it to `/path/to/release`. The zip file already contains all mandatory dependencies.
 
-For Arch Linux users, install the AUR package [jules-git](https://aur.archlinux.org/packages/jules-git) 
-via [yaourt](https://archlinux.fr/yaourt-en), 
+For Arch Linux users, install the AUR package [jules-git](https://aur.archlinux.org/packages/jules-git)
+via [yaourt](https://archlinux.fr/yaourt-en),
 [makepkg](https://wiki.archlinux.org/index.php/Arch_User_Repository#Build_and_install_the_package),
 or any other method of your preference.
 
@@ -35,7 +35,7 @@ If you intend to use BLAS optimized functions, make sure CBLAS is installed.
 
 ### Compilation
 
-Make sure to enable C++14 and to include the path where `jules` is installed. Arch Linux users do not need
+Make sure to enable C++14 and to include the path where **Jules** is installed. Arch Linux users do not need
 the `-isystem` option, since the library is already in the system path.
 
 ```sh

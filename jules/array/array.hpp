@@ -1,6 +1,7 @@
 // Copyright (c) 2016 Filipe Verri <filipeverri@gmail.com>
 
 #ifndef JULES_ARRAY_ARRAY_H
+/// \exclude
 #define JULES_ARRAY_ARRAY_H
 
 #include <jules/array/detail/allocator.hpp>
@@ -22,11 +23,14 @@ namespace jules
 /// N-Dimensional concrete array.
 ///
 /// Basic data-type to represent arrays with 2 or more dimensions.
-/// For more operations over this class, consult [jules::ref_array<T, N>]().
+/// (1-D array is specialized, see [jules::base_array<T, 1>]().)
 ///
-/// \module N-Dimensional Array
-/// \notes Using the aliasing [jules::matrix]() for 2D structures and [jules::ndarray]()
-/// for higher dimensions is recommended to keep portability between versions.
+/// Most of the operations are implemented in its base class,
+/// consult [jules::ref_array<T, N>]().
+///
+/// \module Array Types
+/// \notes It is recommended to use the alias [jules::matrix]() for 2-dimensional structures
+///   and [jules::ndarray]() for higher dimensions.
 /// \notes Elements are contiguously stored in column-major order.
 template <typename T, std::size_t N> class base_array : public ref_array<T, N>, private detail::array_allocator<T>
 {
@@ -35,120 +39,152 @@ template <typename T, std::size_t N> class base_array : public ref_array<T, N>, 
   template <typename, std::size_t> friend class base_array;
 
 public:
-  /// The type of the elements.
-  using value_type = T;
-
-  /// The order of dimensionality.
+  /// \group member_types Class Types and Constants
+  ///
+  /// (1) The order of dimensionality.
+  ///
+  /// (2) The type of the elements.
+  ///
+  /// (3) `RandomAccessIterator` over contiguous elements.
+  ///
+  /// (4) Constant `RandomAccessIterator` over contiguous elements.
+  ///
+  /// (5) Unsigned integer type that can store the dimensions of the array.
+  ///
+  /// (6) Signed integer type that can store differences between sizes.
   static constexpr auto order = N;
 
-  /// `RandomAccessIterator` over contiguous elements.
-  using iterator = T*;
+  /// \group member_types Class Types and Constants
+  using value_type = T;
 
-  /// Constant `RandomAccessIterator` over contiguous elements.
-  using const_iterator = const T*;
+  /// \group member_types Class Types and Constants
+  using iterator = value_type*;
 
-  /// Unsigned integer type that can store the dimensions of the array.
+  /// \group member_types
+  using const_iterator = const value_type*;
+
+  /// \group member_types
   using size_type = index_t;
 
-  /// Signed integer type that can store differences between sizes.
+  /// \group member_types
   using difference_type = distance_t;
 
+  /// \group destructor Destructor
   ~base_array() { clear(this->data(), this->size()); }
 
-  /// \group Constructors
+  /// \group constructors Constructors
   /// Constructs a new array from a variety of data sources.
   ///
-  /// 1) Default constructor. Constructs an empty array.
+  /// (1) Default constructor. Constructs an empty array.
   ///
-  /// 2) Explicit constructor with dimensions `dims`.  Elements are default initialized.
+  /// (2) Explicit constructor with dimensions `dims`.  Elements are default initialized.
   ///
-  /// 3) Constructs the array with copies of elements with value `value` and dimensions `dims`.
+  /// (3) Constructs the array with copies of elements with value `value` and dimensions `dims`.
   ///
-  /// 4) Constructs the array with dimensions `dims`.  Elements are initialized with
-  ///  elements from iterating `iter`.
+  /// (4) Constructs the array with dimensions `dims`.  Elements are initialized by iterating `iter`.
   ///
-  /// 5) Constructs the array from a `recursive_initialized_list`.
+  /// (5) Constructs the array from a `recursive_initialized_list`.
   ///
-  /// 6) Copy constructor.
+  /// (6) Copy constructor.
   ///
-  /// 7) Move constructor.
+  /// (7) Move constructor.
   ///
-  /// 8) Converting constructor.  Constructs a array from other array-like structures,
+  /// (8) Converting constructor.  Constructs a array from other array-like structures,
   ///   e.g. expression arrays or sliced arrays.
   ///
-  /// \notes (2-4) For constructors that receive the array dimensions, the number of arguments
-  ///   must be exactly the dimensionality [jules::base_array<T, N>::order]().
+  /// \requires `Iter` shall be `OutputIterator`
+  /// \requires `A` shall be `Array`
+  /// \requires `sizeof...(Dims)` shall be `order`
+  ///
   /// \notes (5) Dimensions are inferred from the list, so it must have the same number of
   ///   elements in each dimension.
-  base_array() : ref_array<T, N>{nullptr, {}} {}
+  base_array() : ref_array<value_type, order>{nullptr, {}} {}
 
-  /// \group Constructors
-  template <typename... Dims, typename = detail::n_indexes_enabler<N, Dims...>>
-  explicit base_array(Dims... dims) : ref_array<T, N>{this->allocate(prod_args(dims...)), {0u, {{index_t{dims}...}}}}
+  /// \group constructors
+  /// \tparam _
+  ///   \exclude
+  template <typename... Dims, typename _ = detail::n_indexes_enabler<order, Dims...>>
+  explicit base_array(Dims... dims) : ref_array<value_type, order>{this->allocate(prod_args(dims...)), {0u, {{index_t{dims}...}}}}
   {
-    this->create(detail::trivial_dispatch<T>(), this->data(), this->size());
+    this->create(detail::trivial_dispatch<value_type>(), this->data(), this->size());
   }
 
-  /// \group Constructors
-  template <typename... Dims, typename = detail::n_indexes_enabler<N, Dims...>>
-  base_array(const T& value, Dims... dims) : ref_array<T, N>{this->allocate(prod_args(dims...)), {0u, {{index_t{dims}...}}}}
+  /// \group constructors
+  /// \tparam _
+  ///   \exclude
+  template <typename... Dims, typename _ = detail::n_indexes_enabler<order, Dims...>>
+  base_array(const value_type& value, Dims... dims)
+    : ref_array<value_type, order>{this->allocate(prod_args(dims...)), {0u, {{index_t{dims}...}}}}
   {
-    this->create(detail::trivial_dispatch<T>(), this->data(), this->size(), value);
+    this->create(detail::trivial_dispatch<value_type>(), this->data(), this->size(), value);
   }
 
-  /// \group Constructors
+  /// \group constructors
+  /// \tparam R
+  ///   \exclude
+  /// \tparam _1
+  ///   \exclude
+  /// \tparam _2
+  ///   \exclude
   template <typename Iter, typename... Dims, typename R = range::iterator_value_t<Iter>,
-            typename = detail::n_indexes_enabler<N, Dims...>, typename = meta::requires<range::Iterator<Iter>>>
-  base_array(Iter iter, Dims... dims) : ref_array<T, N>{this->allocate(prod_args(dims...)), {0u, {{index_t{dims}...}}}}
+            typename _1 = detail::n_indexes_enabler<order, Dims...>, typename _2 = meta::requires<range::Iterator<Iter>>>
+  base_array(Iter iter, Dims... dims)
+    : ref_array<value_type, order>{this->allocate(prod_args(dims...)), {0u, {{index_t{dims}...}}}}
   {
-    static_assert(std::is_convertible<R, T>::value, "iterator values are not compatible");
-    this->create(detail::trivial_dispatch<T>(), this->data(), iter, this->size());
+    static_assert(std::is_convertible<R, value_type>::value, "iterator values are not compatible");
+    this->create(detail::trivial_dispatch<value_type>(), this->data(), iter, this->size());
   }
 
-  /// \group Constructors
-  base_array(recursive_initializer_list_t<T, N> values)
+  /// \group constructors
+  base_array(recursive_initializer_list_t<value_type, order> values)
   {
     this->descriptor_ = this->calculate_descriptor(values);
     this->data_ = this->allocate(this->descriptor_.size());
-    this->create(detail::trivial_dispatch<T>(), this->data(), values, this->descriptor_);
+    this->create(detail::trivial_dispatch<value_type>(), this->data(), values, this->descriptor_);
   }
 
-  /// \group Constructors
-  base_array(const base_array& source) : ref_array<T, N>{this->allocate(source.size()), source.descriptor_}
+  /// \group constructors
+  base_array(const base_array& source) : ref_array<value_type, order>{this->allocate(source.size()), source.descriptor_}
   {
-    this->create(detail::trivial_dispatch<T>(), this->data(), source.data(), this->size());
+    this->create(detail::trivial_dispatch<value_type>(), this->data(), source.data(), this->size());
   }
 
-  /// \group Constructors
-  base_array(base_array&& source) noexcept : ref_array<T, N>{move_ptr(source.data_), std::move(source.descriptor_)} {}
-
-  /// \group Constructors
-  template <typename A, typename = meta::requires<Array<A>>>
-  base_array(const A& source) : ref_array<T, N>{this->allocate(source.size()), {0u, source.extents()}}
+  /// \group constructors
+  base_array(base_array&& source) noexcept : ref_array<value_type, order>{move_ptr(source.data_), std::move(source.descriptor_)}
   {
-    static_assert(A::order == N, "array order mismatch");
-    static_assert(std::is_constructible<T, const typename A::value_type&>::value, "incompatible value types");
-    this->create(detail::trivial_dispatch<T>(), this->data(), source.begin(), this->size());
   }
 
-  /// \group Assignment
+  /// \group constructors
+  /// \tparam _
+  ///   \exclude
+  template <typename A, typename _ = meta::requires<Array<A>>>
+  base_array(const A& source) : ref_array<value_type, order>{this->allocate(source.size()), {0u, source.extents()}}
+  {
+    static_assert(A::order == order, "array order mismatch");
+    static_assert(std::is_constructible<value_type, const typename A::value_type&>::value, "incompatible value types");
+    this->create(detail::trivial_dispatch<value_type>(), this->data(), source.begin(), this->size());
+  }
+
+  /// \group assignment Assignment
   ///
-  /// 1) Copy assignment.
+  /// (1) Copy assignment.
   ///
-  /// 2) Move assignment.
+  /// (2) Move assignment.
   ///
-  /// 3) Assignment from array-like structures.
+  /// (3) Assignment from array-like structures.
+  ///
+  /// \requires `A` shall be `Array`
   auto operator=(const base_array& source) -> base_array&
   {
     DEBUG_ASSERT(this != &source, debug::default_module, debug::level::invalid_argument, "self assignment");
     clear(this->data(), this->size());
     this->data_ = this->allocate(source.size());
     this->descriptor_ = source.descriptor_;
-    this->create(detail::trivial_dispatch<T>(), this->data(), source.data(), source.size());
+    this->create(detail::trivial_dispatch<value_type>(), this->data(), source.data(), source.size());
     return *this;
   }
 
-  /// \group Assignment
+  /// \group assignment
   auto operator=(base_array&& source) noexcept -> base_array&
   {
     DEBUG_ASSERT(this != &source, debug::default_module, debug::level::invalid_argument, "self assignment");
@@ -158,18 +194,19 @@ public:
     return *this;
   }
 
-  /// \group Assignment
+  /// \group assignment
+  /// \synopsis_return base_array&
   template <typename A> auto operator=(const A& source) -> meta::requires_t<base_array&, Array<A>>
   {
-    static_assert(A::order == N, "array order mismatch");
-    static_assert(std::is_assignable<T&, typename A::value_type>::value, "incompatible assignment");
+    static_assert(A::order == order, "array order mismatch");
+    static_assert(std::is_assignable<value_type&, typename A::value_type>::value, "incompatible assignment");
 
     auto old_data = this->data();
     auto old_size = this->size();
 
     this->data_ = this->allocate(source.size());
     this->descriptor_ = {0, source.extents()};
-    this->create(detail::trivial_dispatch<T>(), this->data(), source.begin(), source.size());
+    this->create(detail::trivial_dispatch<value_type>(), this->data(), source.begin(), source.size());
 
     clear(old_data, old_size);
 
@@ -178,7 +215,7 @@ public:
 
   /// \group Fill
   /// Fills the array.
-  auto fill(const T& value)
+  auto fill(const value_type& value)
   {
     for (auto& elem : *this)
       elem = value;
@@ -188,8 +225,9 @@ public:
   template <typename... Args> auto fill(in_place_t, Args&&... args)
   {
     DEBUG_ASSERT(this->data(), debug::default_module, debug::level::invalid_state, "array is empty");
-    detail::array_allocator<T>::destroy(detail::trivial_dispatch<T>(), this->data(), this->size());
-    detail::array_allocator<T>::create(detail::trivial_dispatch<T>(), this->data(), this->size(), std::forward<Args>(args)...);
+    detail::array_allocator<value_type>::destroy(detail::trivial_dispatch<value_type>(), this->data(), this->size());
+    detail::array_allocator<value_type>::create(detail::trivial_dispatch<value_type>(), this->data(), this->size(),
+                                                std::forward<Args>(args)...);
   }
 
   /// \group Begin
@@ -197,7 +235,7 @@ public:
   auto begin() -> iterator { return this->data(); }
 
   /// \group End
-  /// Returns an iterator to the element following the last element of the container.
+  /// Returns an iterator to the element past the last element of the container.
   auto end() -> iterator { return this->data() + this->size(); }
 
   /// \group Begin
@@ -220,17 +258,19 @@ public:
   auto data() const -> const value_type* { return this->data_; }
 
 private:
-  static auto clear(T* data, index_t size)
+  /// \exclude
+  static auto clear(value_type* data, index_t size)
   {
     if (data) {
-      detail::array_allocator<T>::destroy(detail::trivial_dispatch<T>(), data, size);
-      detail::array_allocator<T>::deallocate(data, size);
+      detail::array_allocator<value_type>::destroy(detail::trivial_dispatch<value_type>(), data, size);
+      detail::array_allocator<value_type>::deallocate(data, size);
     }
   }
 
-  static auto calculate_descriptor(recursive_initializer_list_t<T, N> values) -> base_slice<N>
+  /// \exclude
+  static auto calculate_descriptor(recursive_initializer_list_t<value_type, order> values) -> base_slice<order>
   {
-    std::array<index_t, N> extents;
+    std::array<index_t, order> extents;
 
     calculate_descriptor_fill(extents, values, 0u);
     DEBUG_ASSERT(calculate_descriptor_check(extents, values, 0u), debug::default_module, debug::level::boundary_check,
@@ -239,16 +279,20 @@ private:
     return {0u, extents};
   }
 
-  template <typename List> static auto calculate_descriptor_fill(std::array<index_t, N>& extents, List values, index_t pos)
+  /// \exclude
+  template <typename List> static auto calculate_descriptor_fill(std::array<index_t, order>& extents, List values, index_t pos)
   {
     DEBUG_ASSERT(values.size() > 0, debug::default_module, debug::level::boundary_check, "invalid initializer");
     extents[pos] = values.size();
     calculate_descriptor_fill(extents, *values.begin(), pos + 1);
   }
 
-  static auto calculate_descriptor_fill(std::array<index_t, N>&, const T&, index_t) {}
+  /// \exclude
+  static auto calculate_descriptor_fill(std::array<index_t, order>&, const value_type&, index_t) {}
 
-  template <typename List> static auto calculate_descriptor_check(const std::array<index_t, N>& extents, List values, index_t pos)
+  /// \exclude
+  template <typename List>
+  static auto calculate_descriptor_check(const std::array<index_t, order>& extents, List values, index_t pos)
   {
     if (values.size() != extents[pos])
       return false;
@@ -260,136 +304,166 @@ private:
     return true;
   }
 
-  static constexpr auto calculate_descriptor_check(const std::array<index_t, N>&, const T&, index_t) { return true; }
+  /// \exclude
+  static constexpr auto calculate_descriptor_check(const std::array<index_t, order>&, const value_type&, index_t) { return true; }
 };
 
 /// 1-Dimensional concrete array.
 ///
 /// Basic data-type to represent arrays with 1 dimension.
-/// For more operations over this class, consult [jules::ref_array<T, 1>]().
+/// For more operations over this class, consult the base class [jules::ref_array<T, 1>]().
 ///
-/// \module N-Dimensional Array
-/// \notes Using the aliasing [jules::vector]() is recommended to keep portability between versions.
+/// \module Array Types
+/// \notes Using the aliasing [jules::vector]() is recommended.
 /// \notes Elements are contiguously stored.
 template <typename T> class base_array<T, 1> : public ref_array<T, 1>, private detail::array_allocator<T>
 {
   template <typename, std::size_t> friend class base_array;
 
 public:
-  /// The type of the elements.
+  /// \group member_types Class Types and Constants
+  ///
+  /// (1) The order of dimensionality.
+  ///
+  /// (2) The type of the elements.
+  ///
+  /// (3) `RandomAccessIterator` over contiguous elements.
+  ///
+  /// (4) Constant `RandomAccessIterator` over contiguous elements.
+  ///
+  /// (5) Unsigned integer type that can store the dimensions of the array.
+  ///
+  /// (6) Signed integer type that can store differences between sizes.
+  static constexpr auto order = 1ul;
+
+  /// \group member_types Class Types and Constants
   using value_type = T;
 
-  /// The order of dimensionality.
-  static constexpr auto order = 1;
+  /// \group member_types Class Types and Constants
+  using iterator = value_type*;
 
-  /// `RandomAccessIterator` over contiguous elements.
-  using iterator = T*;
+  /// \group member_types
+  using const_iterator = const value_type*;
 
-  /// Constant `RandomAccessIterator` over contiguous elements.
-  using const_iterator = const T*;
-
-  /// Unsigned integer type that can store the dimensions of the array.
+  /// \group member_types
   using size_type = index_t;
 
-  /// Signed integer type that can store differences between sizes.
+  /// \group member_types
   using difference_type = distance_t;
 
   ~base_array() { clear(this->data(), this->size()); }
 
-  /// \group Constructors
+  /// \group constructors Constructors
   /// Constructs a new vector from a variety of data sources.
   ///
-  /// 1) Default constructor. Constructs an empty vector.
+  /// (1) Default constructor. Constructs an empty vector.
   ///
-  /// 2) Explicit constructor with size `length`.  Elements are default initialized.
+  /// (2) Explicit constructor with size `length`.  Elements are default initialized.
   ///
-  /// 3) Constructs the vector with copies of elements with value `value` and length `length`.
+  /// (3) Constructs the vector with copies of elements with value `value` and length `length`.
   ///
-  /// 4) Constructs the container with the contents of the range [`first`, `last`).
+  /// (4) Constructs the container with the contents of the range [`first`, `last`).
   ///
-  /// 5) Constructs the vector from a `initialized_list`.
+  /// (5) Constructs the vector from a `initialized_list`.
   ///
-  /// 6) Constructs the vector from a range.
+  /// (6) Constructs the vector from a range.
   ///
-  /// 7) Copy constructor.
+  /// (7) Copy constructor.
   ///
-  /// 8) Move constructor.
+  /// (8) Move constructor.
   ///
-  /// 9) Converting constructor.  Constructs a vector from other vector-like structures,
+  /// (9) Converting constructor.  Constructs a vector from other vector-like structures,
   ///   e.g. expression arrays or sliced arrays.
-  base_array() : ref_array<T, 1>{nullptr, {}} {}
+  ///
+  /// \requires `Sent` shall be `Sentinel<Iter>`
+  /// \requires `Rng` shall be `Range` but not `Array`
+  /// \requires `A` shall be `Array`
+  base_array() : ref_array<value_type, 1>{nullptr, {}} {}
 
-  /// \group Constructors
-  explicit base_array(index_t length) : ref_array<T, 1>{this->allocate(length), {0u, length}}
+  /// \group constructors
+  explicit base_array(index_t length) : ref_array<value_type, 1>{this->allocate(length), {0u, length}}
   {
-    this->create(detail::trivial_dispatch<T>(), this->data(), this->size());
+    this->create(detail::trivial_dispatch<value_type>(), this->data(), this->size());
   }
 
-  /// \group Constructors
-  base_array(const T& value, index_t length) : ref_array<T, 1>{this->allocate(length), {0u, length}}
+  /// \group constructors
+  base_array(const value_type& value, index_t length) : ref_array<value_type, 1>{this->allocate(length), {0u, length}}
   {
-    this->create(detail::trivial_dispatch<T>(), this->data(), this->size(), value);
+    this->create(detail::trivial_dispatch<value_type>(), this->data(), this->size(), value);
   }
 
-  /// \group Constructors
+  /// \group constructors
+  /// \tparam U
+  ///   \exclude
+  /// \tparam _
+  ///   \exclude
   template <typename Iter, typename Sent, typename U = range::iterator_value_t<Iter>,
-            typename = meta::requires<range::Sentinel<Sent, Iter>>>
+            typename _ = meta::requires<range::Sentinel<Sent, Iter>>>
   base_array(Iter first, Sent last)
-    : ref_array<T, 1>{this->allocate(range::distance(first, last)), {0u, static_cast<index_t>(range::distance(first, last))}}
+    : ref_array<value_type, 1>{this->allocate(range::distance(first, last)),
+                               {0u, static_cast<index_t>(range::distance(first, last))}}
   {
-    static_assert(std::is_constructible<T, const U&>::value, "incompatible value types");
-    this->create(detail::trivial_dispatch<T>(), this->data(), first, this->size());
+    static_assert(std::is_constructible<value_type, const U&>::value, "incompatible value types");
+    this->create(detail::trivial_dispatch<value_type>(), this->data(), first, this->size());
   }
 
-  /// \group Constructors
-  base_array(std::initializer_list<T> values) : base_array(values.begin(), values.end()) {}
+  /// \group constructors
+  base_array(std::initializer_list<value_type> values) : base_array(values.begin(), values.end()) {}
 
-  /// \group Constructors
+  /// \group constructors
+  /// \tparam U
+  ///   \exclude
+  /// \tparam _
+  ///   \exclude
   template <typename Rng, typename U = range::range_value_t<std::decay_t<Rng>>,
-            typename = meta::requires<range::Range<std::decay_t<Rng>>, meta::negation<Array<std::decay_t<Rng>>>>>
+            typename _ = meta::requires<range::Range<std::decay_t<Rng>>, meta::negation<Array<std::decay_t<Rng>>>>>
   base_array(Rng&& rng)
-    : ref_array<T, 1>{this->allocate(range::size(std::forward<Rng>(rng))), {0u, range::size(std::forward<Rng>(rng))}}
+    : ref_array<value_type, 1>{this->allocate(range::size(std::forward<Rng>(rng))), {0u, range::size(std::forward<Rng>(rng))}}
   {
-    static_assert(std::is_constructible<T, const U&>::value, "incompatible value types");
-    this->create(detail::trivial_dispatch<T>(), this->data(), range::begin(std::forward<Rng>(rng)), this->size());
+    static_assert(std::is_constructible<value_type, const U&>::value, "incompatible value types");
+    this->create(detail::trivial_dispatch<value_type>(), this->data(), range::begin(std::forward<Rng>(rng)), this->size());
   }
 
-  /// \group Constructors
-  base_array(const base_array& source) : ref_array<T, 1>{this->allocate(source.size()), source.descriptor_}
+  /// \group constructors Constructors
+  base_array(const base_array& source) : ref_array<value_type, 1>{this->allocate(source.size()), source.descriptor_}
   {
-    this->create(detail::trivial_dispatch<T>(), this->data(), source.data(), this->size());
+    this->create(detail::trivial_dispatch<value_type>(), this->data(), source.data(), this->size());
   }
 
-  /// \group Constructors
-  base_array(base_array&& source) noexcept : ref_array<T, 1>{move_ptr(source.data_), std::move(source.descriptor_)} {}
+  /// \group constructors Constructors
+  base_array(base_array&& source) noexcept : ref_array<value_type, 1>{move_ptr(source.data_), std::move(source.descriptor_)} {}
 
-  /// \group Constructors
-  template <typename A, typename = meta::requires<Array<A>>>
-  base_array(const A& source) : ref_array<T, 1>{this->allocate(source.size()), {0u, source.extents()}}
+  /// \group constructors Constructors
+  /// \tparam _
+  ///   \exclude
+  template <typename A, typename _ = meta::requires<Array<A>>>
+  base_array(const A& source) : ref_array<value_type, 1>{this->allocate(source.size()), {0u, source.extents()}}
   {
     static_assert(A::order == 1, "array order mismatch");
-    static_assert(std::is_constructible<T, const typename A::value_type&>::value, "incompatible value types");
-    this->create(detail::trivial_dispatch<T>(), this->data(), source.begin(), this->size());
+    static_assert(std::is_constructible<value_type, const typename A::value_type&>::value, "incompatible value types");
+    this->create(detail::trivial_dispatch<value_type>(), this->data(), source.begin(), this->size());
   }
 
-  /// \group Assignment
+  /// \group assignment Assignment
   ///
-  /// 1) Copy assignment.
+  /// (1) Copy assignment.
   ///
-  /// 2) Move assignment.
+  /// (2) Move assignment.
   ///
-  /// 3) Assignment from array-like structures.
+  /// (3) Assignment from array-like structures.
+  ///
+  /// \requires `A` shall be `Array`
   auto operator=(const base_array& source) & -> base_array&
   {
     DEBUG_ASSERT(this != &source, debug::default_module, debug::level::invalid_argument, "self assignment");
     clear(this->data(), this->size());
     this->data_ = this->allocate(source.size());
     this->descriptor_ = source.descriptor_;
-    this->create(detail::trivial_dispatch<T>(), this->data(), source.data(), source.size());
+    this->create(detail::trivial_dispatch<value_type>(), this->data(), source.data(), source.size());
     return *this;
   }
 
-  /// \group Assignment
+  /// \group assignment
   auto operator=(base_array&& source) & noexcept -> base_array&
   {
     DEBUG_ASSERT(this != &source, debug::default_module, debug::level::invalid_argument, "self assignment");
@@ -399,18 +473,20 @@ public:
     return *this;
   }
 
-  /// \group Assignment
-  template <typename A, typename = meta::requires<Array<A>>> auto operator=(const A& source) & -> base_array&
+  /// \group assignment
+  /// \tparam _
+  ///   \exclude
+  template <typename A, typename _ = meta::requires<Array<A>>> auto operator=(const A& source) & -> base_array&
   {
     static_assert(A::order == 1, "array order mismatch");
-    static_assert(std::is_assignable<T&, typename A::value_type>::value, "incompatible assignment");
+    static_assert(std::is_assignable<value_type&, typename A::value_type>::value, "incompatible assignment");
 
     auto old_data = this->data();
     auto old_size = this->size();
 
     this->data_ = this->allocate(source.size());
     this->descriptor_ = {0u, source.extents()};
-    this->create(detail::trivial_dispatch<T>(), this->data(), source.begin(), source.size());
+    this->create(detail::trivial_dispatch<value_type>(), this->data(), source.begin(), source.size());
 
     clear(old_data, old_size);
 
@@ -419,7 +495,7 @@ public:
 
   /// \group Fill
   /// Fills the array.
-  auto fill(const T& value)
+  auto fill(const value_type& value)
   {
     for (auto& elem : *this)
       elem = value;
@@ -429,25 +505,33 @@ public:
   template <typename... Args> auto fill(in_place_t, Args&&... args)
   {
     DEBUG_ASSERT(this->data(), debug::default_module, debug::level::invalid_state, "array is empty");
-    detail::array_allocator<T>::destroy(detail::trivial_dispatch<T>(), this->data(), this->size());
-    detail::array_allocator<T>::create(detail::trivial_dispatch<T>(), this->data(), this->size(), std::forward<Args>(args)...);
+    detail::array_allocator<value_type>::destroy(detail::trivial_dispatch<value_type>(), this->data(), this->size());
+    detail::array_allocator<value_type>::create(detail::trivial_dispatch<value_type>(), this->data(), this->size(),
+                                                std::forward<Args>(args)...);
   }
 
-  auto operator()(std::vector<index_t>&& indexes) -> ind_array<T, 1> { return {this->data_, indexes.size(), std::move(indexes)}; }
-
-  auto operator()(std::vector<index_t>&& indexes) const -> ind_array<const T, 1>
+  /// \group Indexing
+  /// Optimized indirect indexing from temporary indexes.
+  auto operator()(std::vector<index_t>&& indexes) -> ind_array<value_type, 1>
   {
     return {this->data_, indexes.size(), std::move(indexes)};
   }
 
-  using ref_array<T, 1>::operator();
+  /// \group Indexing
+  auto operator()(std::vector<index_t>&& indexes) const -> ind_array<const value_type, 1>
+  {
+    return {this->data_, indexes.size(), std::move(indexes)};
+  }
+
+  /// \exclude
+  using ref_array<value_type, 1>::operator();
 
   /// \group Begin
   /// Returns an iterator to the first element of the array.
   auto begin() -> iterator { return this->data(); }
 
   /// \group End
-  /// Returns an iterator to the element following the last element of the container.
+  /// Returns an iterator to the element past the last element of the container.
   auto end() -> iterator { return this->data() + this->size(); }
 
   /// \group Begin
@@ -470,22 +554,28 @@ public:
   auto data() const -> const value_type* { return this->data_; }
 
 private:
-  static auto clear(T* data, index_t size)
+  /// \exclude
+  static auto clear(value_type* data, index_t size)
   {
     if (data) {
-      detail::array_allocator<T>::destroy(detail::trivial_dispatch<T>(), data, size);
-      detail::array_allocator<T>::deallocate(data, size);
+      detail::array_allocator<value_type>::destroy(detail::trivial_dispatch<value_type>(), data, size);
+      detail::array_allocator<value_type>::deallocate(data, size);
     }
   }
 };
 
-/// N-Dimensional array aliasing.  Data type defaults to [jules::numeric]().
+/// \group array_alias Array Aliasing
+/// (1) N-Dimensional array aliasing.
+///
+/// (2) Matrix aliasing.
+///
+/// (3) Vector aliasing.
 template <std::size_t N, typename T = jules::numeric> using ndarray = base_array<T, N>;
 
-/// Matrix aliasing.  Data type defaults to [jules::numeric]().
+/// \group array_alias
 template <typename T = jules::numeric> using matrix = base_array<T, 2>;
 
-/// Vector aliasing.  Data type defaults to [jules::numeric]().
+/// \group array_alias
 template <typename T = jules::numeric> using vector = base_array<T, 1>;
 
 } // namespace jules

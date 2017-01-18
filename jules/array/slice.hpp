@@ -26,7 +26,7 @@ namespace jules
 /// array in memory.
 ///
 /// \notes `base_slice` is `TriviallyCopyable` and `TriviallyMovable`.
-/// \module N-Dimensional Array
+/// \module Array Types
 template <std::size_t N> class base_slice
 {
   static_assert(N > 0, "Slice cannot have dimension 0.");
@@ -189,7 +189,7 @@ private:
 /// *TODO*: See the alias `jules::slice` for usage more information.
 ///
 /// \notes `base_slice` is `TriviallyCopyable` and `TriviallyMovable`.
-/// \module N-Dimensional Array
+/// \module Array Types
 template <> class base_slice<1>
 {
 public:

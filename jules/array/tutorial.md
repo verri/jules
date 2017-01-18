@@ -129,7 +129,7 @@ matrix[1u][1u] = vector[0u];
 
 Alternatively (and potentially faster), one can use the `operator()` notation.
 
-```
+```cpp
 matrix(2u, 2u) = vector(0u);
 // matrix == { {0.0, 0.0, 0.0}, {0.0, 1.0, 0.0}, {0.0, 0.0, 1.0} }
 ```

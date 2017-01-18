@@ -20,7 +20,7 @@ namespace jules
 /// This class is used internally by `jules` to represent a view of an concrete array with
 /// arbitrary positions in each dimension.
 ///
-/// \module N-Dimensional Array
+/// \module Array Types
 template <typename T, std::size_t N> class ind_array
 {
   static_assert(N > 0u, "invalid array dimension");
@@ -201,7 +201,7 @@ private:
 /// This class is used internally by `jules` to represent a view of an concrete array with
 /// arbitrary positions in each dimension.
 ///
-/// \module N-Dimensional Array
+/// \module Array Types
 template <typename T> class ind_array<T, 1>
 {
   template <typename, std::size_t> friend class ind_array;

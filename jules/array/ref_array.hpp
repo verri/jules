@@ -19,7 +19,7 @@ namespace jules
 ///
 /// This class is used internally by `jules` to represent a view of an concrete array.
 ///
-/// \module N-Dimensional Array
+/// \module Array Types
 template <typename T, std::size_t N> class ref_array
 {
   static_assert(N > 0u, "invalid array dimension");
@@ -148,7 +148,7 @@ protected:
 ///
 /// This class is used internally by `jules` to represent a view of an concrete array.
 ///
-/// \module N-Dimensional Array
+/// \module Array Types
 template <typename T> class ref_array<T, 1>
 {
   template <typename, std::size_t> friend class ref_array;
