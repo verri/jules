@@ -23,6 +23,9 @@ namespace jules
         struct cblas<double>;
         
         template <typename T>
+        auto safe_int_cast(T value);
+        
+        template <typename T>
         matrix<T> product(const matrix<T>& lhs, const matrix<T>& rhs);
     }
 }

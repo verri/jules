@@ -21,6 +21,9 @@ namespace jules
     contiguous_array<const T, 1> to_view(const base_column<C>& column);
     
     template <typename T, typename C>
+    auto to_view(const base_column<C>&& column) = delete;
+    
+    template <typename T, typename C>
     vector<T> to_vector(const base_column<C>& column);
 }
 ```

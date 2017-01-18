@@ -120,8 +120,6 @@ public:
     constexpr auto operator!=(const iterator& other) const;
     
     constexpr reference operator*() const;
-    
-    pointer operator->() const;
 };
 ```
 
@@ -144,14 +142,6 @@ constexpr auto operator!=(const iterator& other) const;
 ```
 
 *Notes*: It only checks if the slices are the same if `JULES_DEBUG_LEVEL` \>= `incompatible_comparison`.
-
-#### Operator `jules::base_slice::iterator::operator->`<a id="jules::base_slice-N-::iterator::operator--()const"></a>
-
-``` cpp
-pointer operator->() const;
-```
-
-*Notes*: You should not call this function.
 
 -----
 
@@ -298,24 +288,12 @@ public:
     constexpr auto operator!=(const iterator& other) const;
     
     constexpr reference operator*() const;
-    
-    pointer operator->() const;
 };
 ```
 
 **TODO**: No documentation, consult `jules::base_slice<N>::iterator`.
 
 *Notes*: For this specialization, the iterator does not depend on the parent slice.
-
-#### Operator `jules::base_slice<1>::iterator::operator->`<a id="jules::base_slice-1-::iterator::operator--()const"></a>
-
-``` cpp
-pointer operator->() const;
-```
-
-*Notes*: You should not call this function.
-
------
 
 ### Variable `jules::base_slice<1>::all`<a id="jules::base_slice-1-::all"></a>
 

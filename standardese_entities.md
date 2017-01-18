@@ -25,6 +25,8 @@
 
   - [CHECK\_STRIDE](doc_array__detail__slicing.html#array/detail/slicing.hpp "CHECK_STRIDE")
 
+  - [CONTIGUOUS\_ARRAY](doc_array__functional.html#array/functional.hpp "CONTIGUOUS_ARRAY")
+
   - [INDIRECT\_NDARRAY](doc_array__functional.html#array/functional.hpp "INDIRECT_NDARRAY")
 
   - [JULES\_ARRAY\_ARRAY\_H](doc_array__array.html#array/array.hpp "JULES_ARRAY_ARRAY_H")
@@ -83,6 +85,12 @@
 
   - [JULES\_DEBUG\_LEVEL](doc_core__debug.html#core/debug.hpp "JULES_DEBUG_LEVEL")
 
+  - [JULES\_DEFER](doc_base__async.html#base/async.hpp "JULES_DEFER")
+
+  - [JULES\_TOKEN\_CONCAT](doc_base__async.html#base/async.hpp "JULES_TOKEN_CONCAT")
+
+  - [JULES\_TOKEN\_PASTE](doc_base__async.html#base/async.hpp "JULES_TOKEN_PASTE")
+
   - [OPERATIONS\_LIST](doc_array__functional.html#array/functional.hpp "OPERATIONS_LIST")
 
   - [REF\_NDARRAY](doc_array__functional.html#array/functional.hpp "REF_NDARRAY")
@@ -139,6 +147,8 @@
     
       - [apply(const base\_array\<T, N\> &, const binary\_expr\_array\<A, B, C, N\> &, Operator &&)](doc_array__functional.html#array/functional.hpp "jules::apply(const base_array\<T, N\> &, const binary_expr_array\<A, B, C, N\> &, Operator &&)")
     
+      - [apply(const base\_array\<T, N\> &, const contiguous\_array\<U, N\> &, Operator &&)](doc_array__functional.html#array/functional.hpp "jules::apply(const base_array\<T, N\> &, const contiguous_array\<U, N\> &, Operator &&)")
+    
       - [apply(const base\_array\<T, N\> &, const ind\_array\<U, N\> &, Operator &&)](doc_array__functional.html#array/functional.hpp "jules::apply(const base_array\<T, N\> &, const ind_array\<U, N\> &, Operator &&)")
     
       - [apply(const base\_array\<T, N\> &, const ref\_array\<U, N\> &, Operator &&)](doc_array__functional.html#array/functional.hpp "jules::apply(const base_array\<T, N\> &, const ref_array\<U, N\> &, Operator &&)")
@@ -151,17 +161,35 @@
     
       - [apply(const binary\_expr\_array\<LhsIt, RhsIt, Op, N\> &, const binary\_expr\_array\<A, B, C, N\> &, Operator &&)](doc_array__functional.html#array/functional.hpp "jules::apply(const binary_expr_array\<LhsIt, RhsIt, Op, N\> &, const binary_expr_array\<A, B, C, N\> &, Operator &&)")
     
+      - [apply(const binary\_expr\_array\<LhsIt, RhsIt, Op, N\> &, const contiguous\_array\<U, N\> &, Operator &&)](doc_array__functional.html#array/functional.hpp "jules::apply(const binary_expr_array\<LhsIt, RhsIt, Op, N\> &, const contiguous_array\<U, N\> &, Operator &&)")
+    
       - [apply(const binary\_expr\_array\<LhsIt, RhsIt, Op, N\> &, const ind\_array\<U, N\> &, Operator &&)](doc_array__functional.html#array/functional.hpp "jules::apply(const binary_expr_array\<LhsIt, RhsIt, Op, N\> &, const ind_array\<U, N\> &, Operator &&)")
     
       - [apply(const binary\_expr\_array\<LhsIt, RhsIt, Op, N\> &, const ref\_array\<U, N\> &, Operator &&)](doc_array__functional.html#array/functional.hpp "jules::apply(const binary_expr_array\<LhsIt, RhsIt, Op, N\> &, const ref_array\<U, N\> &, Operator &&)")
     
       - [apply(const binary\_expr\_array\<LhsIt, RhsIt, Op, N\> &, const unary\_expr\_array\<A, B, N\> &, Operator &&)](doc_array__functional.html#array/functional.hpp "jules::apply(const binary_expr_array\<LhsIt, RhsIt, Op, N\> &, const unary_expr_array\<A, B, N\> &, Operator &&)")
     
+      - [apply(const contiguous\_array\<T, N\> &, Operator &&)](doc_array__functional.html#array/functional.hpp "jules::apply(const contiguous_array\<T, N\> &, Operator &&)")
+    
+      - [apply(const contiguous\_array\<T, N\> &, const base\_array\<U, N\> &, Operator &&)](doc_array__functional.html#array/functional.hpp "jules::apply(const contiguous_array\<T, N\> &, const base_array\<U, N\> &, Operator &&)")
+    
+      - [apply(const contiguous\_array\<T, N\> &, const binary\_expr\_array\<A, B, C, N\> &, Operator &&)](doc_array__functional.html#array/functional.hpp "jules::apply(const contiguous_array\<T, N\> &, const binary_expr_array\<A, B, C, N\> &, Operator &&)")
+    
+      - [apply(const contiguous\_array\<T, N\> &, const contiguous\_array\<U, N\> &, Operator &&)](doc_array__functional.html#array/functional.hpp "jules::apply(const contiguous_array\<T, N\> &, const contiguous_array\<U, N\> &, Operator &&)")
+    
+      - [apply(const contiguous\_array\<T, N\> &, const ind\_array\<U, N\> &, Operator &&)](doc_array__functional.html#array/functional.hpp "jules::apply(const contiguous_array\<T, N\> &, const ind_array\<U, N\> &, Operator &&)")
+    
+      - [apply(const contiguous\_array\<T, N\> &, const ref\_array\<U, N\> &, Operator &&)](doc_array__functional.html#array/functional.hpp "jules::apply(const contiguous_array\<T, N\> &, const ref_array\<U, N\> &, Operator &&)")
+    
+      - [apply(const contiguous\_array\<T, N\> &, const unary\_expr\_array\<A, B, N\> &, Operator &&)](doc_array__functional.html#array/functional.hpp "jules::apply(const contiguous_array\<T, N\> &, const unary_expr_array\<A, B, N\> &, Operator &&)")
+    
       - [apply(const ind\_array\<T, N\> &, Operator &&)](doc_array__functional.html#array/functional.hpp "jules::apply(const ind_array\<T, N\> &, Operator &&)")
     
       - [apply(const ind\_array\<T, N\> &, const base\_array\<U, N\> &, Operator &&)](doc_array__functional.html#array/functional.hpp "jules::apply(const ind_array\<T, N\> &, const base_array\<U, N\> &, Operator &&)")
     
       - [apply(const ind\_array\<T, N\> &, const binary\_expr\_array\<A, B, C, N\> &, Operator &&)](doc_array__functional.html#array/functional.hpp "jules::apply(const ind_array\<T, N\> &, const binary_expr_array\<A, B, C, N\> &, Operator &&)")
+    
+      - [apply(const ind\_array\<T, N\> &, const contiguous\_array\<U, N\> &, Operator &&)](doc_array__functional.html#array/functional.hpp "jules::apply(const ind_array\<T, N\> &, const contiguous_array\<U, N\> &, Operator &&)")
     
       - [apply(const ind\_array\<T, N\> &, const ind\_array\<U, N\> &, Operator &&)](doc_array__functional.html#array/functional.hpp "jules::apply(const ind_array\<T, N\> &, const ind_array\<U, N\> &, Operator &&)")
     
@@ -175,6 +203,8 @@
     
       - [apply(const ref\_array\<T, N\> &, const binary\_expr\_array\<A, B, C, N\> &, Operator &&)](doc_array__functional.html#array/functional.hpp "jules::apply(const ref_array\<T, N\> &, const binary_expr_array\<A, B, C, N\> &, Operator &&)")
     
+      - [apply(const ref\_array\<T, N\> &, const contiguous\_array\<U, N\> &, Operator &&)](doc_array__functional.html#array/functional.hpp "jules::apply(const ref_array\<T, N\> &, const contiguous_array\<U, N\> &, Operator &&)")
+    
       - [apply(const ref\_array\<T, N\> &, const ind\_array\<U, N\> &, Operator &&)](doc_array__functional.html#array/functional.hpp "jules::apply(const ref_array\<T, N\> &, const ind_array\<U, N\> &, Operator &&)")
     
       - [apply(const ref\_array\<T, N\> &, const ref\_array\<U, N\> &, Operator &&)](doc_array__functional.html#array/functional.hpp "jules::apply(const ref_array\<T, N\> &, const ref_array\<U, N\> &, Operator &&)")
@@ -186,6 +216,8 @@
       - [apply(const unary\_expr\_array\<It, Op, N\> &, const base\_array\<U, N\> &, Operator &&)](doc_array__functional.html#array/functional.hpp "jules::apply(const unary_expr_array\<It, Op, N\> &, const base_array\<U, N\> &, Operator &&)")
     
       - [apply(const unary\_expr\_array\<It, Op, N\> &, const binary\_expr\_array\<A, B, C, N\> &, Operator &&)](doc_array__functional.html#array/functional.hpp "jules::apply(const unary_expr_array\<It, Op, N\> &, const binary_expr_array\<A, B, C, N\> &, Operator &&)")
+    
+      - [apply(const unary\_expr\_array\<It, Op, N\> &, const contiguous\_array\<U, N\> &, Operator &&)](doc_array__functional.html#array/functional.hpp "jules::apply(const unary_expr_array\<It, Op, N\> &, const contiguous_array\<U, N\> &, Operator &&)")
     
       - [apply(const unary\_expr\_array\<It, Op, N\> &, const ind\_array\<U, N\> &, Operator &&)](doc_array__functional.html#array/functional.hpp "jules::apply(const unary_expr_array\<It, Op, N\> &, const ind_array\<U, N\> &, Operator &&)")
     
@@ -230,8 +262,6 @@
       - [count(const Rng &)](doc_base__numeric.html#jules::count(Iter,Sent) "jules::count(const Rng &)") - Returns the number of true elements in a `Range` or in the sequence \[`first`, `last`).
     
       - [dataframe](doc_dataframe__dataframe.html#dataframe/dataframe.hpp "jules::dataframe")
-    
-      - [defer(F &&)](doc_base__async.html#base/async.hpp "jules::defer(F &&)")
     
       - [discrete\_index\_sample(Rng &&)](doc_base__random.html#base/random.hpp "jules::discrete_index_sample(Rng &&)")
     
@@ -293,6 +323,8 @@
     
       - [operator\!(const binary\_expr\_array\<LhsIt, RhsIt, Op, N\> &)](doc_array__functional.html#array/functional.hpp "jules::operator!(const binary_expr_array\<LhsIt, RhsIt, Op, N\> &)")
     
+      - [operator\!(const contiguous\_array\<T, N\> &)](doc_array__functional.html#array/functional.hpp "jules::operator!(const contiguous_array\<T, N\> &)")
+    
       - [operator\!(const ind\_array\<T, N\> &)](doc_array__functional.html#array/functional.hpp "jules::operator!(const ind_array\<T, N\> &)")
     
       - [operator\!(const ref\_array\<T, N\> &)](doc_array__functional.html#array/functional.hpp "jules::operator!(const ref_array\<T, N\> &)")
@@ -302,6 +334,8 @@
       - [operator\!=(U, const base\_array\<T, N\> &)](doc_array__functional.html#array/functional.hpp "jules::operator!=(U, const base_array\<T, N\> &)")
     
       - [operator\!=(U, const binary\_expr\_array\<LhsIt, RhsIt, Op, N\> &)](doc_array__functional.html#array/functional.hpp "jules::operator!=(U, const binary_expr_array\<LhsIt, RhsIt, Op, N\> &)")
+    
+      - [operator\!=(U, const contiguous\_array\<T, N\> &)](doc_array__functional.html#array/functional.hpp "jules::operator!=(U, const contiguous_array\<T, N\> &)")
     
       - [operator\!=(U, const ind\_array\<T, N\> &)](doc_array__functional.html#array/functional.hpp "jules::operator!=(U, const ind_array\<T, N\> &)")
     
@@ -315,6 +349,8 @@
     
       - [operator\!=(const base\_array\<T, N\> &, const binary\_expr\_array\<A, B, C, N\> &)](doc_array__functional.html#array/functional.hpp "jules::operator!=(const base_array\<T, N\> &, const binary_expr_array\<A, B, C, N\> &)")
     
+      - [operator\!=(const base\_array\<T, N\> &, const contiguous\_array\<U, N\> &)](doc_array__functional.html#array/functional.hpp "jules::operator!=(const base_array\<T, N\> &, const contiguous_array\<U, N\> &)")
+    
       - [operator\!=(const base\_array\<T, N\> &, const ind\_array\<U, N\> &)](doc_array__functional.html#array/functional.hpp "jules::operator!=(const base_array\<T, N\> &, const ind_array\<U, N\> &)")
     
       - [operator\!=(const base\_array\<T, N\> &, const ref\_array\<U, N\> &)](doc_array__functional.html#array/functional.hpp "jules::operator!=(const base_array\<T, N\> &, const ref_array\<U, N\> &)")
@@ -327,17 +363,35 @@
     
       - [operator\!=(const binary\_expr\_array\<LhsIt, RhsIt, Op, N\> &, const binary\_expr\_array\<A, B, C, N\> &)](doc_array__functional.html#array/functional.hpp "jules::operator!=(const binary_expr_array\<LhsIt, RhsIt, Op, N\> &, const binary_expr_array\<A, B, C, N\> &)")
     
+      - [operator\!=(const binary\_expr\_array\<LhsIt, RhsIt, Op, N\> &, const contiguous\_array\<U, N\> &)](doc_array__functional.html#array/functional.hpp "jules::operator!=(const binary_expr_array\<LhsIt, RhsIt, Op, N\> &, const contiguous_array\<U, N\> &)")
+    
       - [operator\!=(const binary\_expr\_array\<LhsIt, RhsIt, Op, N\> &, const ind\_array\<U, N\> &)](doc_array__functional.html#array/functional.hpp "jules::operator!=(const binary_expr_array\<LhsIt, RhsIt, Op, N\> &, const ind_array\<U, N\> &)")
     
       - [operator\!=(const binary\_expr\_array\<LhsIt, RhsIt, Op, N\> &, const ref\_array\<U, N\> &)](doc_array__functional.html#array/functional.hpp "jules::operator!=(const binary_expr_array\<LhsIt, RhsIt, Op, N\> &, const ref_array\<U, N\> &)")
     
       - [operator\!=(const binary\_expr\_array\<LhsIt, RhsIt, Op, N\> &, const unary\_expr\_array\<A, B, N\> &)](doc_array__functional.html#array/functional.hpp "jules::operator!=(const binary_expr_array\<LhsIt, RhsIt, Op, N\> &, const unary_expr_array\<A, B, N\> &)")
     
+      - [operator\!=(const contiguous\_array\<T, N\> &, U)](doc_array__functional.html#array/functional.hpp "jules::operator!=(const contiguous_array\<T, N\> &, U)")
+    
+      - [operator\!=(const contiguous\_array\<T, N\> &, const base\_array\<U, N\> &)](doc_array__functional.html#array/functional.hpp "jules::operator!=(const contiguous_array\<T, N\> &, const base_array\<U, N\> &)")
+    
+      - [operator\!=(const contiguous\_array\<T, N\> &, const binary\_expr\_array\<A, B, C, N\> &)](doc_array__functional.html#array/functional.hpp "jules::operator!=(const contiguous_array\<T, N\> &, const binary_expr_array\<A, B, C, N\> &)")
+    
+      - [operator\!=(const contiguous\_array\<T, N\> &, const contiguous\_array\<U, N\> &)](doc_array__functional.html#array/functional.hpp "jules::operator!=(const contiguous_array\<T, N\> &, const contiguous_array\<U, N\> &)")
+    
+      - [operator\!=(const contiguous\_array\<T, N\> &, const ind\_array\<U, N\> &)](doc_array__functional.html#array/functional.hpp "jules::operator!=(const contiguous_array\<T, N\> &, const ind_array\<U, N\> &)")
+    
+      - [operator\!=(const contiguous\_array\<T, N\> &, const ref\_array\<U, N\> &)](doc_array__functional.html#array/functional.hpp "jules::operator!=(const contiguous_array\<T, N\> &, const ref_array\<U, N\> &)")
+    
+      - [operator\!=(const contiguous\_array\<T, N\> &, const unary\_expr\_array\<A, B, N\> &)](doc_array__functional.html#array/functional.hpp "jules::operator!=(const contiguous_array\<T, N\> &, const unary_expr_array\<A, B, N\> &)")
+    
       - [operator\!=(const ind\_array\<T, N\> &, U)](doc_array__functional.html#array/functional.hpp "jules::operator!=(const ind_array\<T, N\> &, U)")
     
       - [operator\!=(const ind\_array\<T, N\> &, const base\_array\<U, N\> &)](doc_array__functional.html#array/functional.hpp "jules::operator!=(const ind_array\<T, N\> &, const base_array\<U, N\> &)")
     
       - [operator\!=(const ind\_array\<T, N\> &, const binary\_expr\_array\<A, B, C, N\> &)](doc_array__functional.html#array/functional.hpp "jules::operator!=(const ind_array\<T, N\> &, const binary_expr_array\<A, B, C, N\> &)")
+    
+      - [operator\!=(const ind\_array\<T, N\> &, const contiguous\_array\<U, N\> &)](doc_array__functional.html#array/functional.hpp "jules::operator!=(const ind_array\<T, N\> &, const contiguous_array\<U, N\> &)")
     
       - [operator\!=(const ind\_array\<T, N\> &, const ind\_array\<U, N\> &)](doc_array__functional.html#array/functional.hpp "jules::operator!=(const ind_array\<T, N\> &, const ind_array\<U, N\> &)")
     
@@ -351,6 +405,8 @@
     
       - [operator\!=(const ref\_array\<T, N\> &, const binary\_expr\_array\<A, B, C, N\> &)](doc_array__functional.html#array/functional.hpp "jules::operator!=(const ref_array\<T, N\> &, const binary_expr_array\<A, B, C, N\> &)")
     
+      - [operator\!=(const ref\_array\<T, N\> &, const contiguous\_array\<U, N\> &)](doc_array__functional.html#array/functional.hpp "jules::operator!=(const ref_array\<T, N\> &, const contiguous_array\<U, N\> &)")
+    
       - [operator\!=(const ref\_array\<T, N\> &, const ind\_array\<U, N\> &)](doc_array__functional.html#array/functional.hpp "jules::operator!=(const ref_array\<T, N\> &, const ind_array\<U, N\> &)")
     
       - [operator\!=(const ref\_array\<T, N\> &, const ref\_array\<U, N\> &)](doc_array__functional.html#array/functional.hpp "jules::operator!=(const ref_array\<T, N\> &, const ref_array\<U, N\> &)")
@@ -363,6 +419,8 @@
     
       - [operator\!=(const unary\_expr\_array\<It, Op, N\> &, const binary\_expr\_array\<A, B, C, N\> &)](doc_array__functional.html#array/functional.hpp "jules::operator!=(const unary_expr_array\<It, Op, N\> &, const binary_expr_array\<A, B, C, N\> &)")
     
+      - [operator\!=(const unary\_expr\_array\<It, Op, N\> &, const contiguous\_array\<U, N\> &)](doc_array__functional.html#array/functional.hpp "jules::operator!=(const unary_expr_array\<It, Op, N\> &, const contiguous_array\<U, N\> &)")
+    
       - [operator\!=(const unary\_expr\_array\<It, Op, N\> &, const ind\_array\<U, N\> &)](doc_array__functional.html#array/functional.hpp "jules::operator!=(const unary_expr_array\<It, Op, N\> &, const ind_array\<U, N\> &)")
     
       - [operator\!=(const unary\_expr\_array\<It, Op, N\> &, const ref\_array\<U, N\> &)](doc_array__functional.html#array/functional.hpp "jules::operator!=(const unary_expr_array\<It, Op, N\> &, const ref_array\<U, N\> &)")
@@ -372,6 +430,8 @@
       - [operator%(U, const base\_array\<T, N\> &)](doc_array__functional.html#array/functional.hpp "jules::operator%(U, const base_array\<T, N\> &)")
     
       - [operator%(U, const binary\_expr\_array\<LhsIt, RhsIt, Op, N\> &)](doc_array__functional.html#array/functional.hpp "jules::operator%(U, const binary_expr_array\<LhsIt, RhsIt, Op, N\> &)")
+    
+      - [operator%(U, const contiguous\_array\<T, N\> &)](doc_array__functional.html#array/functional.hpp "jules::operator%(U, const contiguous_array\<T, N\> &)")
     
       - [operator%(U, const ind\_array\<T, N\> &)](doc_array__functional.html#array/functional.hpp "jules::operator%(U, const ind_array\<T, N\> &)")
     
@@ -385,6 +445,8 @@
     
       - [operator%(const base\_array\<T, N\> &, const binary\_expr\_array\<A, B, C, N\> &)](doc_array__functional.html#array/functional.hpp "jules::operator%(const base_array\<T, N\> &, const binary_expr_array\<A, B, C, N\> &)")
     
+      - [operator%(const base\_array\<T, N\> &, const contiguous\_array\<U, N\> &)](doc_array__functional.html#array/functional.hpp "jules::operator%(const base_array\<T, N\> &, const contiguous_array\<U, N\> &)")
+    
       - [operator%(const base\_array\<T, N\> &, const ind\_array\<U, N\> &)](doc_array__functional.html#array/functional.hpp "jules::operator%(const base_array\<T, N\> &, const ind_array\<U, N\> &)")
     
       - [operator%(const base\_array\<T, N\> &, const ref\_array\<U, N\> &)](doc_array__functional.html#array/functional.hpp "jules::operator%(const base_array\<T, N\> &, const ref_array\<U, N\> &)")
@@ -397,17 +459,35 @@
     
       - [operator%(const binary\_expr\_array\<LhsIt, RhsIt, Op, N\> &, const binary\_expr\_array\<A, B, C, N\> &)](doc_array__functional.html#array/functional.hpp "jules::operator%(const binary_expr_array\<LhsIt, RhsIt, Op, N\> &, const binary_expr_array\<A, B, C, N\> &)")
     
+      - [operator%(const binary\_expr\_array\<LhsIt, RhsIt, Op, N\> &, const contiguous\_array\<U, N\> &)](doc_array__functional.html#array/functional.hpp "jules::operator%(const binary_expr_array\<LhsIt, RhsIt, Op, N\> &, const contiguous_array\<U, N\> &)")
+    
       - [operator%(const binary\_expr\_array\<LhsIt, RhsIt, Op, N\> &, const ind\_array\<U, N\> &)](doc_array__functional.html#array/functional.hpp "jules::operator%(const binary_expr_array\<LhsIt, RhsIt, Op, N\> &, const ind_array\<U, N\> &)")
     
       - [operator%(const binary\_expr\_array\<LhsIt, RhsIt, Op, N\> &, const ref\_array\<U, N\> &)](doc_array__functional.html#array/functional.hpp "jules::operator%(const binary_expr_array\<LhsIt, RhsIt, Op, N\> &, const ref_array\<U, N\> &)")
     
       - [operator%(const binary\_expr\_array\<LhsIt, RhsIt, Op, N\> &, const unary\_expr\_array\<A, B, N\> &)](doc_array__functional.html#array/functional.hpp "jules::operator%(const binary_expr_array\<LhsIt, RhsIt, Op, N\> &, const unary_expr_array\<A, B, N\> &)")
     
+      - [operator%(const contiguous\_array\<T, N\> &, U)](doc_array__functional.html#array/functional.hpp "jules::operator%(const contiguous_array\<T, N\> &, U)")
+    
+      - [operator%(const contiguous\_array\<T, N\> &, const base\_array\<U, N\> &)](doc_array__functional.html#array/functional.hpp "jules::operator%(const contiguous_array\<T, N\> &, const base_array\<U, N\> &)")
+    
+      - [operator%(const contiguous\_array\<T, N\> &, const binary\_expr\_array\<A, B, C, N\> &)](doc_array__functional.html#array/functional.hpp "jules::operator%(const contiguous_array\<T, N\> &, const binary_expr_array\<A, B, C, N\> &)")
+    
+      - [operator%(const contiguous\_array\<T, N\> &, const contiguous\_array\<U, N\> &)](doc_array__functional.html#array/functional.hpp "jules::operator%(const contiguous_array\<T, N\> &, const contiguous_array\<U, N\> &)")
+    
+      - [operator%(const contiguous\_array\<T, N\> &, const ind\_array\<U, N\> &)](doc_array__functional.html#array/functional.hpp "jules::operator%(const contiguous_array\<T, N\> &, const ind_array\<U, N\> &)")
+    
+      - [operator%(const contiguous\_array\<T, N\> &, const ref\_array\<U, N\> &)](doc_array__functional.html#array/functional.hpp "jules::operator%(const contiguous_array\<T, N\> &, const ref_array\<U, N\> &)")
+    
+      - [operator%(const contiguous\_array\<T, N\> &, const unary\_expr\_array\<A, B, N\> &)](doc_array__functional.html#array/functional.hpp "jules::operator%(const contiguous_array\<T, N\> &, const unary_expr_array\<A, B, N\> &)")
+    
       - [operator%(const ind\_array\<T, N\> &, U)](doc_array__functional.html#array/functional.hpp "jules::operator%(const ind_array\<T, N\> &, U)")
     
       - [operator%(const ind\_array\<T, N\> &, const base\_array\<U, N\> &)](doc_array__functional.html#array/functional.hpp "jules::operator%(const ind_array\<T, N\> &, const base_array\<U, N\> &)")
     
       - [operator%(const ind\_array\<T, N\> &, const binary\_expr\_array\<A, B, C, N\> &)](doc_array__functional.html#array/functional.hpp "jules::operator%(const ind_array\<T, N\> &, const binary_expr_array\<A, B, C, N\> &)")
+    
+      - [operator%(const ind\_array\<T, N\> &, const contiguous\_array\<U, N\> &)](doc_array__functional.html#array/functional.hpp "jules::operator%(const ind_array\<T, N\> &, const contiguous_array\<U, N\> &)")
     
       - [operator%(const ind\_array\<T, N\> &, const ind\_array\<U, N\> &)](doc_array__functional.html#array/functional.hpp "jules::operator%(const ind_array\<T, N\> &, const ind_array\<U, N\> &)")
     
@@ -421,6 +501,8 @@
     
       - [operator%(const ref\_array\<T, N\> &, const binary\_expr\_array\<A, B, C, N\> &)](doc_array__functional.html#array/functional.hpp "jules::operator%(const ref_array\<T, N\> &, const binary_expr_array\<A, B, C, N\> &)")
     
+      - [operator%(const ref\_array\<T, N\> &, const contiguous\_array\<U, N\> &)](doc_array__functional.html#array/functional.hpp "jules::operator%(const ref_array\<T, N\> &, const contiguous_array\<U, N\> &)")
+    
       - [operator%(const ref\_array\<T, N\> &, const ind\_array\<U, N\> &)](doc_array__functional.html#array/functional.hpp "jules::operator%(const ref_array\<T, N\> &, const ind_array\<U, N\> &)")
     
       - [operator%(const ref\_array\<T, N\> &, const ref\_array\<U, N\> &)](doc_array__functional.html#array/functional.hpp "jules::operator%(const ref_array\<T, N\> &, const ref_array\<U, N\> &)")
@@ -433,6 +515,8 @@
     
       - [operator%(const unary\_expr\_array\<It, Op, N\> &, const binary\_expr\_array\<A, B, C, N\> &)](doc_array__functional.html#array/functional.hpp "jules::operator%(const unary_expr_array\<It, Op, N\> &, const binary_expr_array\<A, B, C, N\> &)")
     
+      - [operator%(const unary\_expr\_array\<It, Op, N\> &, const contiguous\_array\<U, N\> &)](doc_array__functional.html#array/functional.hpp "jules::operator%(const unary_expr_array\<It, Op, N\> &, const contiguous_array\<U, N\> &)")
+    
       - [operator%(const unary\_expr\_array\<It, Op, N\> &, const ind\_array\<U, N\> &)](doc_array__functional.html#array/functional.hpp "jules::operator%(const unary_expr_array\<It, Op, N\> &, const ind_array\<U, N\> &)")
     
       - [operator%(const unary\_expr\_array\<It, Op, N\> &, const ref\_array\<U, N\> &)](doc_array__functional.html#array/functional.hpp "jules::operator%(const unary_expr_array\<It, Op, N\> &, const ref_array\<U, N\> &)")
@@ -442,6 +526,8 @@
       - [operator&&(U, const base\_array\<T, N\> &)](doc_array__functional.html#array/functional.hpp "jules::operator&&(U, const base_array\<T, N\> &)")
     
       - [operator&&(U, const binary\_expr\_array\<LhsIt, RhsIt, Op, N\> &)](doc_array__functional.html#array/functional.hpp "jules::operator&&(U, const binary_expr_array\<LhsIt, RhsIt, Op, N\> &)")
+    
+      - [operator&&(U, const contiguous\_array\<T, N\> &)](doc_array__functional.html#array/functional.hpp "jules::operator&&(U, const contiguous_array\<T, N\> &)")
     
       - [operator&&(U, const ind\_array\<T, N\> &)](doc_array__functional.html#array/functional.hpp "jules::operator&&(U, const ind_array\<T, N\> &)")
     
@@ -455,6 +541,8 @@
     
       - [operator&&(const base\_array\<T, N\> &, const binary\_expr\_array\<A, B, C, N\> &)](doc_array__functional.html#array/functional.hpp "jules::operator&&(const base_array\<T, N\> &, const binary_expr_array\<A, B, C, N\> &)")
     
+      - [operator&&(const base\_array\<T, N\> &, const contiguous\_array\<U, N\> &)](doc_array__functional.html#array/functional.hpp "jules::operator&&(const base_array\<T, N\> &, const contiguous_array\<U, N\> &)")
+    
       - [operator&&(const base\_array\<T, N\> &, const ind\_array\<U, N\> &)](doc_array__functional.html#array/functional.hpp "jules::operator&&(const base_array\<T, N\> &, const ind_array\<U, N\> &)")
     
       - [operator&&(const base\_array\<T, N\> &, const ref\_array\<U, N\> &)](doc_array__functional.html#array/functional.hpp "jules::operator&&(const base_array\<T, N\> &, const ref_array\<U, N\> &)")
@@ -467,17 +555,35 @@
     
       - [operator&&(const binary\_expr\_array\<LhsIt, RhsIt, Op, N\> &, const binary\_expr\_array\<A, B, C, N\> &)](doc_array__functional.html#array/functional.hpp "jules::operator&&(const binary_expr_array\<LhsIt, RhsIt, Op, N\> &, const binary_expr_array\<A, B, C, N\> &)")
     
+      - [operator&&(const binary\_expr\_array\<LhsIt, RhsIt, Op, N\> &, const contiguous\_array\<U, N\> &)](doc_array__functional.html#array/functional.hpp "jules::operator&&(const binary_expr_array\<LhsIt, RhsIt, Op, N\> &, const contiguous_array\<U, N\> &)")
+    
       - [operator&&(const binary\_expr\_array\<LhsIt, RhsIt, Op, N\> &, const ind\_array\<U, N\> &)](doc_array__functional.html#array/functional.hpp "jules::operator&&(const binary_expr_array\<LhsIt, RhsIt, Op, N\> &, const ind_array\<U, N\> &)")
     
       - [operator&&(const binary\_expr\_array\<LhsIt, RhsIt, Op, N\> &, const ref\_array\<U, N\> &)](doc_array__functional.html#array/functional.hpp "jules::operator&&(const binary_expr_array\<LhsIt, RhsIt, Op, N\> &, const ref_array\<U, N\> &)")
     
       - [operator&&(const binary\_expr\_array\<LhsIt, RhsIt, Op, N\> &, const unary\_expr\_array\<A, B, N\> &)](doc_array__functional.html#array/functional.hpp "jules::operator&&(const binary_expr_array\<LhsIt, RhsIt, Op, N\> &, const unary_expr_array\<A, B, N\> &)")
     
+      - [operator&&(const contiguous\_array\<T, N\> &, U)](doc_array__functional.html#array/functional.hpp "jules::operator&&(const contiguous_array\<T, N\> &, U)")
+    
+      - [operator&&(const contiguous\_array\<T, N\> &, const base\_array\<U, N\> &)](doc_array__functional.html#array/functional.hpp "jules::operator&&(const contiguous_array\<T, N\> &, const base_array\<U, N\> &)")
+    
+      - [operator&&(const contiguous\_array\<T, N\> &, const binary\_expr\_array\<A, B, C, N\> &)](doc_array__functional.html#array/functional.hpp "jules::operator&&(const contiguous_array\<T, N\> &, const binary_expr_array\<A, B, C, N\> &)")
+    
+      - [operator&&(const contiguous\_array\<T, N\> &, const contiguous\_array\<U, N\> &)](doc_array__functional.html#array/functional.hpp "jules::operator&&(const contiguous_array\<T, N\> &, const contiguous_array\<U, N\> &)")
+    
+      - [operator&&(const contiguous\_array\<T, N\> &, const ind\_array\<U, N\> &)](doc_array__functional.html#array/functional.hpp "jules::operator&&(const contiguous_array\<T, N\> &, const ind_array\<U, N\> &)")
+    
+      - [operator&&(const contiguous\_array\<T, N\> &, const ref\_array\<U, N\> &)](doc_array__functional.html#array/functional.hpp "jules::operator&&(const contiguous_array\<T, N\> &, const ref_array\<U, N\> &)")
+    
+      - [operator&&(const contiguous\_array\<T, N\> &, const unary\_expr\_array\<A, B, N\> &)](doc_array__functional.html#array/functional.hpp "jules::operator&&(const contiguous_array\<T, N\> &, const unary_expr_array\<A, B, N\> &)")
+    
       - [operator&&(const ind\_array\<T, N\> &, U)](doc_array__functional.html#array/functional.hpp "jules::operator&&(const ind_array\<T, N\> &, U)")
     
       - [operator&&(const ind\_array\<T, N\> &, const base\_array\<U, N\> &)](doc_array__functional.html#array/functional.hpp "jules::operator&&(const ind_array\<T, N\> &, const base_array\<U, N\> &)")
     
       - [operator&&(const ind\_array\<T, N\> &, const binary\_expr\_array\<A, B, C, N\> &)](doc_array__functional.html#array/functional.hpp "jules::operator&&(const ind_array\<T, N\> &, const binary_expr_array\<A, B, C, N\> &)")
+    
+      - [operator&&(const ind\_array\<T, N\> &, const contiguous\_array\<U, N\> &)](doc_array__functional.html#array/functional.hpp "jules::operator&&(const ind_array\<T, N\> &, const contiguous_array\<U, N\> &)")
     
       - [operator&&(const ind\_array\<T, N\> &, const ind\_array\<U, N\> &)](doc_array__functional.html#array/functional.hpp "jules::operator&&(const ind_array\<T, N\> &, const ind_array\<U, N\> &)")
     
@@ -491,6 +597,8 @@
     
       - [operator&&(const ref\_array\<T, N\> &, const binary\_expr\_array\<A, B, C, N\> &)](doc_array__functional.html#array/functional.hpp "jules::operator&&(const ref_array\<T, N\> &, const binary_expr_array\<A, B, C, N\> &)")
     
+      - [operator&&(const ref\_array\<T, N\> &, const contiguous\_array\<U, N\> &)](doc_array__functional.html#array/functional.hpp "jules::operator&&(const ref_array\<T, N\> &, const contiguous_array\<U, N\> &)")
+    
       - [operator&&(const ref\_array\<T, N\> &, const ind\_array\<U, N\> &)](doc_array__functional.html#array/functional.hpp "jules::operator&&(const ref_array\<T, N\> &, const ind_array\<U, N\> &)")
     
       - [operator&&(const ref\_array\<T, N\> &, const ref\_array\<U, N\> &)](doc_array__functional.html#array/functional.hpp "jules::operator&&(const ref_array\<T, N\> &, const ref_array\<U, N\> &)")
@@ -503,6 +611,8 @@
     
       - [operator&&(const unary\_expr\_array\<It, Op, N\> &, const binary\_expr\_array\<A, B, C, N\> &)](doc_array__functional.html#array/functional.hpp "jules::operator&&(const unary_expr_array\<It, Op, N\> &, const binary_expr_array\<A, B, C, N\> &)")
     
+      - [operator&&(const unary\_expr\_array\<It, Op, N\> &, const contiguous\_array\<U, N\> &)](doc_array__functional.html#array/functional.hpp "jules::operator&&(const unary_expr_array\<It, Op, N\> &, const contiguous_array\<U, N\> &)")
+    
       - [operator&&(const unary\_expr\_array\<It, Op, N\> &, const ind\_array\<U, N\> &)](doc_array__functional.html#array/functional.hpp "jules::operator&&(const unary_expr_array\<It, Op, N\> &, const ind_array\<U, N\> &)")
     
       - [operator&&(const unary\_expr\_array\<It, Op, N\> &, const ref\_array\<U, N\> &)](doc_array__functional.html#array/functional.hpp "jules::operator&&(const unary_expr_array\<It, Op, N\> &, const ref_array\<U, N\> &)")
@@ -512,6 +622,8 @@
       - [operator&(U, const base\_array\<T, N\> &)](doc_array__functional.html#array/functional.hpp "jules::operator&(U, const base_array\<T, N\> &)")
     
       - [operator&(U, const binary\_expr\_array\<LhsIt, RhsIt, Op, N\> &)](doc_array__functional.html#array/functional.hpp "jules::operator&(U, const binary_expr_array\<LhsIt, RhsIt, Op, N\> &)")
+    
+      - [operator&(U, const contiguous\_array\<T, N\> &)](doc_array__functional.html#array/functional.hpp "jules::operator&(U, const contiguous_array\<T, N\> &)")
     
       - [operator&(U, const ind\_array\<T, N\> &)](doc_array__functional.html#array/functional.hpp "jules::operator&(U, const ind_array\<T, N\> &)")
     
@@ -525,6 +637,8 @@
     
       - [operator&(const base\_array\<T, N\> &, const binary\_expr\_array\<A, B, C, N\> &)](doc_array__functional.html#array/functional.hpp "jules::operator&(const base_array\<T, N\> &, const binary_expr_array\<A, B, C, N\> &)")
     
+      - [operator&(const base\_array\<T, N\> &, const contiguous\_array\<U, N\> &)](doc_array__functional.html#array/functional.hpp "jules::operator&(const base_array\<T, N\> &, const contiguous_array\<U, N\> &)")
+    
       - [operator&(const base\_array\<T, N\> &, const ind\_array\<U, N\> &)](doc_array__functional.html#array/functional.hpp "jules::operator&(const base_array\<T, N\> &, const ind_array\<U, N\> &)")
     
       - [operator&(const base\_array\<T, N\> &, const ref\_array\<U, N\> &)](doc_array__functional.html#array/functional.hpp "jules::operator&(const base_array\<T, N\> &, const ref_array\<U, N\> &)")
@@ -537,17 +651,35 @@
     
       - [operator&(const binary\_expr\_array\<LhsIt, RhsIt, Op, N\> &, const binary\_expr\_array\<A, B, C, N\> &)](doc_array__functional.html#array/functional.hpp "jules::operator&(const binary_expr_array\<LhsIt, RhsIt, Op, N\> &, const binary_expr_array\<A, B, C, N\> &)")
     
+      - [operator&(const binary\_expr\_array\<LhsIt, RhsIt, Op, N\> &, const contiguous\_array\<U, N\> &)](doc_array__functional.html#array/functional.hpp "jules::operator&(const binary_expr_array\<LhsIt, RhsIt, Op, N\> &, const contiguous_array\<U, N\> &)")
+    
       - [operator&(const binary\_expr\_array\<LhsIt, RhsIt, Op, N\> &, const ind\_array\<U, N\> &)](doc_array__functional.html#array/functional.hpp "jules::operator&(const binary_expr_array\<LhsIt, RhsIt, Op, N\> &, const ind_array\<U, N\> &)")
     
       - [operator&(const binary\_expr\_array\<LhsIt, RhsIt, Op, N\> &, const ref\_array\<U, N\> &)](doc_array__functional.html#array/functional.hpp "jules::operator&(const binary_expr_array\<LhsIt, RhsIt, Op, N\> &, const ref_array\<U, N\> &)")
     
       - [operator&(const binary\_expr\_array\<LhsIt, RhsIt, Op, N\> &, const unary\_expr\_array\<A, B, N\> &)](doc_array__functional.html#array/functional.hpp "jules::operator&(const binary_expr_array\<LhsIt, RhsIt, Op, N\> &, const unary_expr_array\<A, B, N\> &)")
     
+      - [operator&(const contiguous\_array\<T, N\> &, U)](doc_array__functional.html#array/functional.hpp "jules::operator&(const contiguous_array\<T, N\> &, U)")
+    
+      - [operator&(const contiguous\_array\<T, N\> &, const base\_array\<U, N\> &)](doc_array__functional.html#array/functional.hpp "jules::operator&(const contiguous_array\<T, N\> &, const base_array\<U, N\> &)")
+    
+      - [operator&(const contiguous\_array\<T, N\> &, const binary\_expr\_array\<A, B, C, N\> &)](doc_array__functional.html#array/functional.hpp "jules::operator&(const contiguous_array\<T, N\> &, const binary_expr_array\<A, B, C, N\> &)")
+    
+      - [operator&(const contiguous\_array\<T, N\> &, const contiguous\_array\<U, N\> &)](doc_array__functional.html#array/functional.hpp "jules::operator&(const contiguous_array\<T, N\> &, const contiguous_array\<U, N\> &)")
+    
+      - [operator&(const contiguous\_array\<T, N\> &, const ind\_array\<U, N\> &)](doc_array__functional.html#array/functional.hpp "jules::operator&(const contiguous_array\<T, N\> &, const ind_array\<U, N\> &)")
+    
+      - [operator&(const contiguous\_array\<T, N\> &, const ref\_array\<U, N\> &)](doc_array__functional.html#array/functional.hpp "jules::operator&(const contiguous_array\<T, N\> &, const ref_array\<U, N\> &)")
+    
+      - [operator&(const contiguous\_array\<T, N\> &, const unary\_expr\_array\<A, B, N\> &)](doc_array__functional.html#array/functional.hpp "jules::operator&(const contiguous_array\<T, N\> &, const unary_expr_array\<A, B, N\> &)")
+    
       - [operator&(const ind\_array\<T, N\> &, U)](doc_array__functional.html#array/functional.hpp "jules::operator&(const ind_array\<T, N\> &, U)")
     
       - [operator&(const ind\_array\<T, N\> &, const base\_array\<U, N\> &)](doc_array__functional.html#array/functional.hpp "jules::operator&(const ind_array\<T, N\> &, const base_array\<U, N\> &)")
     
       - [operator&(const ind\_array\<T, N\> &, const binary\_expr\_array\<A, B, C, N\> &)](doc_array__functional.html#array/functional.hpp "jules::operator&(const ind_array\<T, N\> &, const binary_expr_array\<A, B, C, N\> &)")
+    
+      - [operator&(const ind\_array\<T, N\> &, const contiguous\_array\<U, N\> &)](doc_array__functional.html#array/functional.hpp "jules::operator&(const ind_array\<T, N\> &, const contiguous_array\<U, N\> &)")
     
       - [operator&(const ind\_array\<T, N\> &, const ind\_array\<U, N\> &)](doc_array__functional.html#array/functional.hpp "jules::operator&(const ind_array\<T, N\> &, const ind_array\<U, N\> &)")
     
@@ -561,6 +693,8 @@
     
       - [operator&(const ref\_array\<T, N\> &, const binary\_expr\_array\<A, B, C, N\> &)](doc_array__functional.html#array/functional.hpp "jules::operator&(const ref_array\<T, N\> &, const binary_expr_array\<A, B, C, N\> &)")
     
+      - [operator&(const ref\_array\<T, N\> &, const contiguous\_array\<U, N\> &)](doc_array__functional.html#array/functional.hpp "jules::operator&(const ref_array\<T, N\> &, const contiguous_array\<U, N\> &)")
+    
       - [operator&(const ref\_array\<T, N\> &, const ind\_array\<U, N\> &)](doc_array__functional.html#array/functional.hpp "jules::operator&(const ref_array\<T, N\> &, const ind_array\<U, N\> &)")
     
       - [operator&(const ref\_array\<T, N\> &, const ref\_array\<U, N\> &)](doc_array__functional.html#array/functional.hpp "jules::operator&(const ref_array\<T, N\> &, const ref_array\<U, N\> &)")
@@ -573,6 +707,8 @@
     
       - [operator&(const unary\_expr\_array\<It, Op, N\> &, const binary\_expr\_array\<A, B, C, N\> &)](doc_array__functional.html#array/functional.hpp "jules::operator&(const unary_expr_array\<It, Op, N\> &, const binary_expr_array\<A, B, C, N\> &)")
     
+      - [operator&(const unary\_expr\_array\<It, Op, N\> &, const contiguous\_array\<U, N\> &)](doc_array__functional.html#array/functional.hpp "jules::operator&(const unary_expr_array\<It, Op, N\> &, const contiguous_array\<U, N\> &)")
+    
       - [operator&(const unary\_expr\_array\<It, Op, N\> &, const ind\_array\<U, N\> &)](doc_array__functional.html#array/functional.hpp "jules::operator&(const unary_expr_array\<It, Op, N\> &, const ind_array\<U, N\> &)")
     
       - [operator&(const unary\_expr\_array\<It, Op, N\> &, const ref\_array\<U, N\> &)](doc_array__functional.html#array/functional.hpp "jules::operator&(const unary_expr_array\<It, Op, N\> &, const ref_array\<U, N\> &)")
@@ -582,6 +718,8 @@
       - [operator\*(U, const base\_array\<T, N\> &)](doc_array__functional.html#array/functional.hpp "jules::operator*(U, const base_array\<T, N\> &)")
     
       - [operator\*(U, const binary\_expr\_array\<LhsIt, RhsIt, Op, N\> &)](doc_array__functional.html#array/functional.hpp "jules::operator*(U, const binary_expr_array\<LhsIt, RhsIt, Op, N\> &)")
+    
+      - [operator\*(U, const contiguous\_array\<T, N\> &)](doc_array__functional.html#array/functional.hpp "jules::operator*(U, const contiguous_array\<T, N\> &)")
     
       - [operator\*(U, const ind\_array\<T, N\> &)](doc_array__functional.html#array/functional.hpp "jules::operator*(U, const ind_array\<T, N\> &)")
     
@@ -595,6 +733,8 @@
     
       - [operator\*(const base\_array\<T, N\> &, const binary\_expr\_array\<A, B, C, N\> &)](doc_array__functional.html#array/functional.hpp "jules::operator*(const base_array\<T, N\> &, const binary_expr_array\<A, B, C, N\> &)")
     
+      - [operator\*(const base\_array\<T, N\> &, const contiguous\_array\<U, N\> &)](doc_array__functional.html#array/functional.hpp "jules::operator*(const base_array\<T, N\> &, const contiguous_array\<U, N\> &)")
+    
       - [operator\*(const base\_array\<T, N\> &, const ind\_array\<U, N\> &)](doc_array__functional.html#array/functional.hpp "jules::operator*(const base_array\<T, N\> &, const ind_array\<U, N\> &)")
     
       - [operator\*(const base\_array\<T, N\> &, const ref\_array\<U, N\> &)](doc_array__functional.html#array/functional.hpp "jules::operator*(const base_array\<T, N\> &, const ref_array\<U, N\> &)")
@@ -607,17 +747,35 @@
     
       - [operator\*(const binary\_expr\_array\<LhsIt, RhsIt, Op, N\> &, const binary\_expr\_array\<A, B, C, N\> &)](doc_array__functional.html#array/functional.hpp "jules::operator*(const binary_expr_array\<LhsIt, RhsIt, Op, N\> &, const binary_expr_array\<A, B, C, N\> &)")
     
+      - [operator\*(const binary\_expr\_array\<LhsIt, RhsIt, Op, N\> &, const contiguous\_array\<U, N\> &)](doc_array__functional.html#array/functional.hpp "jules::operator*(const binary_expr_array\<LhsIt, RhsIt, Op, N\> &, const contiguous_array\<U, N\> &)")
+    
       - [operator\*(const binary\_expr\_array\<LhsIt, RhsIt, Op, N\> &, const ind\_array\<U, N\> &)](doc_array__functional.html#array/functional.hpp "jules::operator*(const binary_expr_array\<LhsIt, RhsIt, Op, N\> &, const ind_array\<U, N\> &)")
     
       - [operator\*(const binary\_expr\_array\<LhsIt, RhsIt, Op, N\> &, const ref\_array\<U, N\> &)](doc_array__functional.html#array/functional.hpp "jules::operator*(const binary_expr_array\<LhsIt, RhsIt, Op, N\> &, const ref_array\<U, N\> &)")
     
       - [operator\*(const binary\_expr\_array\<LhsIt, RhsIt, Op, N\> &, const unary\_expr\_array\<A, B, N\> &)](doc_array__functional.html#array/functional.hpp "jules::operator*(const binary_expr_array\<LhsIt, RhsIt, Op, N\> &, const unary_expr_array\<A, B, N\> &)")
     
+      - [operator\*(const contiguous\_array\<T, N\> &, U)](doc_array__functional.html#array/functional.hpp "jules::operator*(const contiguous_array\<T, N\> &, U)")
+    
+      - [operator\*(const contiguous\_array\<T, N\> &, const base\_array\<U, N\> &)](doc_array__functional.html#array/functional.hpp "jules::operator*(const contiguous_array\<T, N\> &, const base_array\<U, N\> &)")
+    
+      - [operator\*(const contiguous\_array\<T, N\> &, const binary\_expr\_array\<A, B, C, N\> &)](doc_array__functional.html#array/functional.hpp "jules::operator*(const contiguous_array\<T, N\> &, const binary_expr_array\<A, B, C, N\> &)")
+    
+      - [operator\*(const contiguous\_array\<T, N\> &, const contiguous\_array\<U, N\> &)](doc_array__functional.html#array/functional.hpp "jules::operator*(const contiguous_array\<T, N\> &, const contiguous_array\<U, N\> &)")
+    
+      - [operator\*(const contiguous\_array\<T, N\> &, const ind\_array\<U, N\> &)](doc_array__functional.html#array/functional.hpp "jules::operator*(const contiguous_array\<T, N\> &, const ind_array\<U, N\> &)")
+    
+      - [operator\*(const contiguous\_array\<T, N\> &, const ref\_array\<U, N\> &)](doc_array__functional.html#array/functional.hpp "jules::operator*(const contiguous_array\<T, N\> &, const ref_array\<U, N\> &)")
+    
+      - [operator\*(const contiguous\_array\<T, N\> &, const unary\_expr\_array\<A, B, N\> &)](doc_array__functional.html#array/functional.hpp "jules::operator*(const contiguous_array\<T, N\> &, const unary_expr_array\<A, B, N\> &)")
+    
       - [operator\*(const ind\_array\<T, N\> &, U)](doc_array__functional.html#array/functional.hpp "jules::operator*(const ind_array\<T, N\> &, U)")
     
       - [operator\*(const ind\_array\<T, N\> &, const base\_array\<U, N\> &)](doc_array__functional.html#array/functional.hpp "jules::operator*(const ind_array\<T, N\> &, const base_array\<U, N\> &)")
     
       - [operator\*(const ind\_array\<T, N\> &, const binary\_expr\_array\<A, B, C, N\> &)](doc_array__functional.html#array/functional.hpp "jules::operator*(const ind_array\<T, N\> &, const binary_expr_array\<A, B, C, N\> &)")
+    
+      - [operator\*(const ind\_array\<T, N\> &, const contiguous\_array\<U, N\> &)](doc_array__functional.html#array/functional.hpp "jules::operator*(const ind_array\<T, N\> &, const contiguous_array\<U, N\> &)")
     
       - [operator\*(const ind\_array\<T, N\> &, const ind\_array\<U, N\> &)](doc_array__functional.html#array/functional.hpp "jules::operator*(const ind_array\<T, N\> &, const ind_array\<U, N\> &)")
     
@@ -631,6 +789,8 @@
     
       - [operator\*(const ref\_array\<T, N\> &, const binary\_expr\_array\<A, B, C, N\> &)](doc_array__functional.html#array/functional.hpp "jules::operator*(const ref_array\<T, N\> &, const binary_expr_array\<A, B, C, N\> &)")
     
+      - [operator\*(const ref\_array\<T, N\> &, const contiguous\_array\<U, N\> &)](doc_array__functional.html#array/functional.hpp "jules::operator*(const ref_array\<T, N\> &, const contiguous_array\<U, N\> &)")
+    
       - [operator\*(const ref\_array\<T, N\> &, const ind\_array\<U, N\> &)](doc_array__functional.html#array/functional.hpp "jules::operator*(const ref_array\<T, N\> &, const ind_array\<U, N\> &)")
     
       - [operator\*(const ref\_array\<T, N\> &, const ref\_array\<U, N\> &)](doc_array__functional.html#array/functional.hpp "jules::operator*(const ref_array\<T, N\> &, const ref_array\<U, N\> &)")
@@ -643,6 +803,8 @@
     
       - [operator\*(const unary\_expr\_array\<It, Op, N\> &, const binary\_expr\_array\<A, B, C, N\> &)](doc_array__functional.html#array/functional.hpp "jules::operator*(const unary_expr_array\<It, Op, N\> &, const binary_expr_array\<A, B, C, N\> &)")
     
+      - [operator\*(const unary\_expr\_array\<It, Op, N\> &, const contiguous\_array\<U, N\> &)](doc_array__functional.html#array/functional.hpp "jules::operator*(const unary_expr_array\<It, Op, N\> &, const contiguous_array\<U, N\> &)")
+    
       - [operator\*(const unary\_expr\_array\<It, Op, N\> &, const ind\_array\<U, N\> &)](doc_array__functional.html#array/functional.hpp "jules::operator*(const unary_expr_array\<It, Op, N\> &, const ind_array\<U, N\> &)")
     
       - [operator\*(const unary\_expr\_array\<It, Op, N\> &, const ref\_array\<U, N\> &)](doc_array__functional.html#array/functional.hpp "jules::operator*(const unary_expr_array\<It, Op, N\> &, const ref_array\<U, N\> &)")
@@ -652,6 +814,8 @@
       - [operator+(U, const base\_array\<T, N\> &)](doc_array__functional.html#array/functional.hpp "jules::operator+(U, const base_array\<T, N\> &)")
     
       - [operator+(U, const binary\_expr\_array\<LhsIt, RhsIt, Op, N\> &)](doc_array__functional.html#array/functional.hpp "jules::operator+(U, const binary_expr_array\<LhsIt, RhsIt, Op, N\> &)")
+    
+      - [operator+(U, const contiguous\_array\<T, N\> &)](doc_array__functional.html#array/functional.hpp "jules::operator+(U, const contiguous_array\<T, N\> &)")
     
       - [operator+(U, const ind\_array\<T, N\> &)](doc_array__functional.html#array/functional.hpp "jules::operator+(U, const ind_array\<T, N\> &)")
     
@@ -667,6 +831,8 @@
     
       - [operator+(const base\_array\<T, N\> &, const binary\_expr\_array\<A, B, C, N\> &)](doc_array__functional.html#array/functional.hpp "jules::operator+(const base_array\<T, N\> &, const binary_expr_array\<A, B, C, N\> &)")
     
+      - [operator+(const base\_array\<T, N\> &, const contiguous\_array\<U, N\> &)](doc_array__functional.html#array/functional.hpp "jules::operator+(const base_array\<T, N\> &, const contiguous_array\<U, N\> &)")
+    
       - [operator+(const base\_array\<T, N\> &, const ind\_array\<U, N\> &)](doc_array__functional.html#array/functional.hpp "jules::operator+(const base_array\<T, N\> &, const ind_array\<U, N\> &)")
     
       - [operator+(const base\_array\<T, N\> &, const ref\_array\<U, N\> &)](doc_array__functional.html#array/functional.hpp "jules::operator+(const base_array\<T, N\> &, const ref_array\<U, N\> &)")
@@ -681,11 +847,29 @@
     
       - [operator+(const binary\_expr\_array\<LhsIt, RhsIt, Op, N\> &, const binary\_expr\_array\<A, B, C, N\> &)](doc_array__functional.html#array/functional.hpp "jules::operator+(const binary_expr_array\<LhsIt, RhsIt, Op, N\> &, const binary_expr_array\<A, B, C, N\> &)")
     
+      - [operator+(const binary\_expr\_array\<LhsIt, RhsIt, Op, N\> &, const contiguous\_array\<U, N\> &)](doc_array__functional.html#array/functional.hpp "jules::operator+(const binary_expr_array\<LhsIt, RhsIt, Op, N\> &, const contiguous_array\<U, N\> &)")
+    
       - [operator+(const binary\_expr\_array\<LhsIt, RhsIt, Op, N\> &, const ind\_array\<U, N\> &)](doc_array__functional.html#array/functional.hpp "jules::operator+(const binary_expr_array\<LhsIt, RhsIt, Op, N\> &, const ind_array\<U, N\> &)")
     
       - [operator+(const binary\_expr\_array\<LhsIt, RhsIt, Op, N\> &, const ref\_array\<U, N\> &)](doc_array__functional.html#array/functional.hpp "jules::operator+(const binary_expr_array\<LhsIt, RhsIt, Op, N\> &, const ref_array\<U, N\> &)")
     
       - [operator+(const binary\_expr\_array\<LhsIt, RhsIt, Op, N\> &, const unary\_expr\_array\<A, B, N\> &)](doc_array__functional.html#array/functional.hpp "jules::operator+(const binary_expr_array\<LhsIt, RhsIt, Op, N\> &, const unary_expr_array\<A, B, N\> &)")
+    
+      - [operator+(const contiguous\_array\<T, N\> &)](doc_array__functional.html#array/functional.hpp "jules::operator+(const contiguous_array\<T, N\> &)")
+    
+      - [operator+(const contiguous\_array\<T, N\> &, U)](doc_array__functional.html#array/functional.hpp "jules::operator+(const contiguous_array\<T, N\> &, U)")
+    
+      - [operator+(const contiguous\_array\<T, N\> &, const base\_array\<U, N\> &)](doc_array__functional.html#array/functional.hpp "jules::operator+(const contiguous_array\<T, N\> &, const base_array\<U, N\> &)")
+    
+      - [operator+(const contiguous\_array\<T, N\> &, const binary\_expr\_array\<A, B, C, N\> &)](doc_array__functional.html#array/functional.hpp "jules::operator+(const contiguous_array\<T, N\> &, const binary_expr_array\<A, B, C, N\> &)")
+    
+      - [operator+(const contiguous\_array\<T, N\> &, const contiguous\_array\<U, N\> &)](doc_array__functional.html#array/functional.hpp "jules::operator+(const contiguous_array\<T, N\> &, const contiguous_array\<U, N\> &)")
+    
+      - [operator+(const contiguous\_array\<T, N\> &, const ind\_array\<U, N\> &)](doc_array__functional.html#array/functional.hpp "jules::operator+(const contiguous_array\<T, N\> &, const ind_array\<U, N\> &)")
+    
+      - [operator+(const contiguous\_array\<T, N\> &, const ref\_array\<U, N\> &)](doc_array__functional.html#array/functional.hpp "jules::operator+(const contiguous_array\<T, N\> &, const ref_array\<U, N\> &)")
+    
+      - [operator+(const contiguous\_array\<T, N\> &, const unary\_expr\_array\<A, B, N\> &)](doc_array__functional.html#array/functional.hpp "jules::operator+(const contiguous_array\<T, N\> &, const unary_expr_array\<A, B, N\> &)")
     
       - [operator+(const ind\_array\<T, N\> &)](doc_array__functional.html#array/functional.hpp "jules::operator+(const ind_array\<T, N\> &)")
     
@@ -694,6 +878,8 @@
       - [operator+(const ind\_array\<T, N\> &, const base\_array\<U, N\> &)](doc_array__functional.html#array/functional.hpp "jules::operator+(const ind_array\<T, N\> &, const base_array\<U, N\> &)")
     
       - [operator+(const ind\_array\<T, N\> &, const binary\_expr\_array\<A, B, C, N\> &)](doc_array__functional.html#array/functional.hpp "jules::operator+(const ind_array\<T, N\> &, const binary_expr_array\<A, B, C, N\> &)")
+    
+      - [operator+(const ind\_array\<T, N\> &, const contiguous\_array\<U, N\> &)](doc_array__functional.html#array/functional.hpp "jules::operator+(const ind_array\<T, N\> &, const contiguous_array\<U, N\> &)")
     
       - [operator+(const ind\_array\<T, N\> &, const ind\_array\<U, N\> &)](doc_array__functional.html#array/functional.hpp "jules::operator+(const ind_array\<T, N\> &, const ind_array\<U, N\> &)")
     
@@ -709,6 +895,8 @@
     
       - [operator+(const ref\_array\<T, N\> &, const binary\_expr\_array\<A, B, C, N\> &)](doc_array__functional.html#array/functional.hpp "jules::operator+(const ref_array\<T, N\> &, const binary_expr_array\<A, B, C, N\> &)")
     
+      - [operator+(const ref\_array\<T, N\> &, const contiguous\_array\<U, N\> &)](doc_array__functional.html#array/functional.hpp "jules::operator+(const ref_array\<T, N\> &, const contiguous_array\<U, N\> &)")
+    
       - [operator+(const ref\_array\<T, N\> &, const ind\_array\<U, N\> &)](doc_array__functional.html#array/functional.hpp "jules::operator+(const ref_array\<T, N\> &, const ind_array\<U, N\> &)")
     
       - [operator+(const ref\_array\<T, N\> &, const ref\_array\<U, N\> &)](doc_array__functional.html#array/functional.hpp "jules::operator+(const ref_array\<T, N\> &, const ref_array\<U, N\> &)")
@@ -723,6 +911,8 @@
     
       - [operator+(const unary\_expr\_array\<It, Op, N\> &, const binary\_expr\_array\<A, B, C, N\> &)](doc_array__functional.html#array/functional.hpp "jules::operator+(const unary_expr_array\<It, Op, N\> &, const binary_expr_array\<A, B, C, N\> &)")
     
+      - [operator+(const unary\_expr\_array\<It, Op, N\> &, const contiguous\_array\<U, N\> &)](doc_array__functional.html#array/functional.hpp "jules::operator+(const unary_expr_array\<It, Op, N\> &, const contiguous_array\<U, N\> &)")
+    
       - [operator+(const unary\_expr\_array\<It, Op, N\> &, const ind\_array\<U, N\> &)](doc_array__functional.html#array/functional.hpp "jules::operator+(const unary_expr_array\<It, Op, N\> &, const ind_array\<U, N\> &)")
     
       - [operator+(const unary\_expr\_array\<It, Op, N\> &, const ref\_array\<U, N\> &)](doc_array__functional.html#array/functional.hpp "jules::operator+(const unary_expr_array\<It, Op, N\> &, const ref_array\<U, N\> &)")
@@ -732,6 +922,8 @@
       - [operator-(U, const base\_array\<T, N\> &)](doc_array__functional.html#array/functional.hpp "jules::operator-(U, const base_array\<T, N\> &)")
     
       - [operator-(U, const binary\_expr\_array\<LhsIt, RhsIt, Op, N\> &)](doc_array__functional.html#array/functional.hpp "jules::operator-(U, const binary_expr_array\<LhsIt, RhsIt, Op, N\> &)")
+    
+      - [operator-(U, const contiguous\_array\<T, N\> &)](doc_array__functional.html#array/functional.hpp "jules::operator-(U, const contiguous_array\<T, N\> &)")
     
       - [operator-(U, const ind\_array\<T, N\> &)](doc_array__functional.html#array/functional.hpp "jules::operator-(U, const ind_array\<T, N\> &)")
     
@@ -747,6 +939,8 @@
     
       - [operator-(const base\_array\<T, N\> &, const binary\_expr\_array\<A, B, C, N\> &)](doc_array__functional.html#array/functional.hpp "jules::operator-(const base_array\<T, N\> &, const binary_expr_array\<A, B, C, N\> &)")
     
+      - [operator-(const base\_array\<T, N\> &, const contiguous\_array\<U, N\> &)](doc_array__functional.html#array/functional.hpp "jules::operator-(const base_array\<T, N\> &, const contiguous_array\<U, N\> &)")
+    
       - [operator-(const base\_array\<T, N\> &, const ind\_array\<U, N\> &)](doc_array__functional.html#array/functional.hpp "jules::operator-(const base_array\<T, N\> &, const ind_array\<U, N\> &)")
     
       - [operator-(const base\_array\<T, N\> &, const ref\_array\<U, N\> &)](doc_array__functional.html#array/functional.hpp "jules::operator-(const base_array\<T, N\> &, const ref_array\<U, N\> &)")
@@ -761,11 +955,29 @@
     
       - [operator-(const binary\_expr\_array\<LhsIt, RhsIt, Op, N\> &, const binary\_expr\_array\<A, B, C, N\> &)](doc_array__functional.html#array/functional.hpp "jules::operator-(const binary_expr_array\<LhsIt, RhsIt, Op, N\> &, const binary_expr_array\<A, B, C, N\> &)")
     
+      - [operator-(const binary\_expr\_array\<LhsIt, RhsIt, Op, N\> &, const contiguous\_array\<U, N\> &)](doc_array__functional.html#array/functional.hpp "jules::operator-(const binary_expr_array\<LhsIt, RhsIt, Op, N\> &, const contiguous_array\<U, N\> &)")
+    
       - [operator-(const binary\_expr\_array\<LhsIt, RhsIt, Op, N\> &, const ind\_array\<U, N\> &)](doc_array__functional.html#array/functional.hpp "jules::operator-(const binary_expr_array\<LhsIt, RhsIt, Op, N\> &, const ind_array\<U, N\> &)")
     
       - [operator-(const binary\_expr\_array\<LhsIt, RhsIt, Op, N\> &, const ref\_array\<U, N\> &)](doc_array__functional.html#array/functional.hpp "jules::operator-(const binary_expr_array\<LhsIt, RhsIt, Op, N\> &, const ref_array\<U, N\> &)")
     
       - [operator-(const binary\_expr\_array\<LhsIt, RhsIt, Op, N\> &, const unary\_expr\_array\<A, B, N\> &)](doc_array__functional.html#array/functional.hpp "jules::operator-(const binary_expr_array\<LhsIt, RhsIt, Op, N\> &, const unary_expr_array\<A, B, N\> &)")
+    
+      - [operator-(const contiguous\_array\<T, N\> &)](doc_array__functional.html#array/functional.hpp "jules::operator-(const contiguous_array\<T, N\> &)")
+    
+      - [operator-(const contiguous\_array\<T, N\> &, U)](doc_array__functional.html#array/functional.hpp "jules::operator-(const contiguous_array\<T, N\> &, U)")
+    
+      - [operator-(const contiguous\_array\<T, N\> &, const base\_array\<U, N\> &)](doc_array__functional.html#array/functional.hpp "jules::operator-(const contiguous_array\<T, N\> &, const base_array\<U, N\> &)")
+    
+      - [operator-(const contiguous\_array\<T, N\> &, const binary\_expr\_array\<A, B, C, N\> &)](doc_array__functional.html#array/functional.hpp "jules::operator-(const contiguous_array\<T, N\> &, const binary_expr_array\<A, B, C, N\> &)")
+    
+      - [operator-(const contiguous\_array\<T, N\> &, const contiguous\_array\<U, N\> &)](doc_array__functional.html#array/functional.hpp "jules::operator-(const contiguous_array\<T, N\> &, const contiguous_array\<U, N\> &)")
+    
+      - [operator-(const contiguous\_array\<T, N\> &, const ind\_array\<U, N\> &)](doc_array__functional.html#array/functional.hpp "jules::operator-(const contiguous_array\<T, N\> &, const ind_array\<U, N\> &)")
+    
+      - [operator-(const contiguous\_array\<T, N\> &, const ref\_array\<U, N\> &)](doc_array__functional.html#array/functional.hpp "jules::operator-(const contiguous_array\<T, N\> &, const ref_array\<U, N\> &)")
+    
+      - [operator-(const contiguous\_array\<T, N\> &, const unary\_expr\_array\<A, B, N\> &)](doc_array__functional.html#array/functional.hpp "jules::operator-(const contiguous_array\<T, N\> &, const unary_expr_array\<A, B, N\> &)")
     
       - [operator-(const ind\_array\<T, N\> &)](doc_array__functional.html#array/functional.hpp "jules::operator-(const ind_array\<T, N\> &)")
     
@@ -774,6 +986,8 @@
       - [operator-(const ind\_array\<T, N\> &, const base\_array\<U, N\> &)](doc_array__functional.html#array/functional.hpp "jules::operator-(const ind_array\<T, N\> &, const base_array\<U, N\> &)")
     
       - [operator-(const ind\_array\<T, N\> &, const binary\_expr\_array\<A, B, C, N\> &)](doc_array__functional.html#array/functional.hpp "jules::operator-(const ind_array\<T, N\> &, const binary_expr_array\<A, B, C, N\> &)")
+    
+      - [operator-(const ind\_array\<T, N\> &, const contiguous\_array\<U, N\> &)](doc_array__functional.html#array/functional.hpp "jules::operator-(const ind_array\<T, N\> &, const contiguous_array\<U, N\> &)")
     
       - [operator-(const ind\_array\<T, N\> &, const ind\_array\<U, N\> &)](doc_array__functional.html#array/functional.hpp "jules::operator-(const ind_array\<T, N\> &, const ind_array\<U, N\> &)")
     
@@ -789,6 +1003,8 @@
     
       - [operator-(const ref\_array\<T, N\> &, const binary\_expr\_array\<A, B, C, N\> &)](doc_array__functional.html#array/functional.hpp "jules::operator-(const ref_array\<T, N\> &, const binary_expr_array\<A, B, C, N\> &)")
     
+      - [operator-(const ref\_array\<T, N\> &, const contiguous\_array\<U, N\> &)](doc_array__functional.html#array/functional.hpp "jules::operator-(const ref_array\<T, N\> &, const contiguous_array\<U, N\> &)")
+    
       - [operator-(const ref\_array\<T, N\> &, const ind\_array\<U, N\> &)](doc_array__functional.html#array/functional.hpp "jules::operator-(const ref_array\<T, N\> &, const ind_array\<U, N\> &)")
     
       - [operator-(const ref\_array\<T, N\> &, const ref\_array\<U, N\> &)](doc_array__functional.html#array/functional.hpp "jules::operator-(const ref_array\<T, N\> &, const ref_array\<U, N\> &)")
@@ -803,6 +1019,8 @@
     
       - [operator-(const unary\_expr\_array\<It, Op, N\> &, const binary\_expr\_array\<A, B, C, N\> &)](doc_array__functional.html#array/functional.hpp "jules::operator-(const unary_expr_array\<It, Op, N\> &, const binary_expr_array\<A, B, C, N\> &)")
     
+      - [operator-(const unary\_expr\_array\<It, Op, N\> &, const contiguous\_array\<U, N\> &)](doc_array__functional.html#array/functional.hpp "jules::operator-(const unary_expr_array\<It, Op, N\> &, const contiguous_array\<U, N\> &)")
+    
       - [operator-(const unary\_expr\_array\<It, Op, N\> &, const ind\_array\<U, N\> &)](doc_array__functional.html#array/functional.hpp "jules::operator-(const unary_expr_array\<It, Op, N\> &, const ind_array\<U, N\> &)")
     
       - [operator-(const unary\_expr\_array\<It, Op, N\> &, const ref\_array\<U, N\> &)](doc_array__functional.html#array/functional.hpp "jules::operator-(const unary_expr_array\<It, Op, N\> &, const ref_array\<U, N\> &)")
@@ -812,6 +1030,8 @@
       - [operator/(U, const base\_array\<T, N\> &)](doc_array__functional.html#array/functional.hpp "jules::operator/(U, const base_array\<T, N\> &)")
     
       - [operator/(U, const binary\_expr\_array\<LhsIt, RhsIt, Op, N\> &)](doc_array__functional.html#array/functional.hpp "jules::operator/(U, const binary_expr_array\<LhsIt, RhsIt, Op, N\> &)")
+    
+      - [operator/(U, const contiguous\_array\<T, N\> &)](doc_array__functional.html#array/functional.hpp "jules::operator/(U, const contiguous_array\<T, N\> &)")
     
       - [operator/(U, const ind\_array\<T, N\> &)](doc_array__functional.html#array/functional.hpp "jules::operator/(U, const ind_array\<T, N\> &)")
     
@@ -825,6 +1045,8 @@
     
       - [operator/(const base\_array\<T, N\> &, const binary\_expr\_array\<A, B, C, N\> &)](doc_array__functional.html#array/functional.hpp "jules::operator/(const base_array\<T, N\> &, const binary_expr_array\<A, B, C, N\> &)")
     
+      - [operator/(const base\_array\<T, N\> &, const contiguous\_array\<U, N\> &)](doc_array__functional.html#array/functional.hpp "jules::operator/(const base_array\<T, N\> &, const contiguous_array\<U, N\> &)")
+    
       - [operator/(const base\_array\<T, N\> &, const ind\_array\<U, N\> &)](doc_array__functional.html#array/functional.hpp "jules::operator/(const base_array\<T, N\> &, const ind_array\<U, N\> &)")
     
       - [operator/(const base\_array\<T, N\> &, const ref\_array\<U, N\> &)](doc_array__functional.html#array/functional.hpp "jules::operator/(const base_array\<T, N\> &, const ref_array\<U, N\> &)")
@@ -837,17 +1059,35 @@
     
       - [operator/(const binary\_expr\_array\<LhsIt, RhsIt, Op, N\> &, const binary\_expr\_array\<A, B, C, N\> &)](doc_array__functional.html#array/functional.hpp "jules::operator/(const binary_expr_array\<LhsIt, RhsIt, Op, N\> &, const binary_expr_array\<A, B, C, N\> &)")
     
+      - [operator/(const binary\_expr\_array\<LhsIt, RhsIt, Op, N\> &, const contiguous\_array\<U, N\> &)](doc_array__functional.html#array/functional.hpp "jules::operator/(const binary_expr_array\<LhsIt, RhsIt, Op, N\> &, const contiguous_array\<U, N\> &)")
+    
       - [operator/(const binary\_expr\_array\<LhsIt, RhsIt, Op, N\> &, const ind\_array\<U, N\> &)](doc_array__functional.html#array/functional.hpp "jules::operator/(const binary_expr_array\<LhsIt, RhsIt, Op, N\> &, const ind_array\<U, N\> &)")
     
       - [operator/(const binary\_expr\_array\<LhsIt, RhsIt, Op, N\> &, const ref\_array\<U, N\> &)](doc_array__functional.html#array/functional.hpp "jules::operator/(const binary_expr_array\<LhsIt, RhsIt, Op, N\> &, const ref_array\<U, N\> &)")
     
       - [operator/(const binary\_expr\_array\<LhsIt, RhsIt, Op, N\> &, const unary\_expr\_array\<A, B, N\> &)](doc_array__functional.html#array/functional.hpp "jules::operator/(const binary_expr_array\<LhsIt, RhsIt, Op, N\> &, const unary_expr_array\<A, B, N\> &)")
     
+      - [operator/(const contiguous\_array\<T, N\> &, U)](doc_array__functional.html#array/functional.hpp "jules::operator/(const contiguous_array\<T, N\> &, U)")
+    
+      - [operator/(const contiguous\_array\<T, N\> &, const base\_array\<U, N\> &)](doc_array__functional.html#array/functional.hpp "jules::operator/(const contiguous_array\<T, N\> &, const base_array\<U, N\> &)")
+    
+      - [operator/(const contiguous\_array\<T, N\> &, const binary\_expr\_array\<A, B, C, N\> &)](doc_array__functional.html#array/functional.hpp "jules::operator/(const contiguous_array\<T, N\> &, const binary_expr_array\<A, B, C, N\> &)")
+    
+      - [operator/(const contiguous\_array\<T, N\> &, const contiguous\_array\<U, N\> &)](doc_array__functional.html#array/functional.hpp "jules::operator/(const contiguous_array\<T, N\> &, const contiguous_array\<U, N\> &)")
+    
+      - [operator/(const contiguous\_array\<T, N\> &, const ind\_array\<U, N\> &)](doc_array__functional.html#array/functional.hpp "jules::operator/(const contiguous_array\<T, N\> &, const ind_array\<U, N\> &)")
+    
+      - [operator/(const contiguous\_array\<T, N\> &, const ref\_array\<U, N\> &)](doc_array__functional.html#array/functional.hpp "jules::operator/(const contiguous_array\<T, N\> &, const ref_array\<U, N\> &)")
+    
+      - [operator/(const contiguous\_array\<T, N\> &, const unary\_expr\_array\<A, B, N\> &)](doc_array__functional.html#array/functional.hpp "jules::operator/(const contiguous_array\<T, N\> &, const unary_expr_array\<A, B, N\> &)")
+    
       - [operator/(const ind\_array\<T, N\> &, U)](doc_array__functional.html#array/functional.hpp "jules::operator/(const ind_array\<T, N\> &, U)")
     
       - [operator/(const ind\_array\<T, N\> &, const base\_array\<U, N\> &)](doc_array__functional.html#array/functional.hpp "jules::operator/(const ind_array\<T, N\> &, const base_array\<U, N\> &)")
     
       - [operator/(const ind\_array\<T, N\> &, const binary\_expr\_array\<A, B, C, N\> &)](doc_array__functional.html#array/functional.hpp "jules::operator/(const ind_array\<T, N\> &, const binary_expr_array\<A, B, C, N\> &)")
+    
+      - [operator/(const ind\_array\<T, N\> &, const contiguous\_array\<U, N\> &)](doc_array__functional.html#array/functional.hpp "jules::operator/(const ind_array\<T, N\> &, const contiguous_array\<U, N\> &)")
     
       - [operator/(const ind\_array\<T, N\> &, const ind\_array\<U, N\> &)](doc_array__functional.html#array/functional.hpp "jules::operator/(const ind_array\<T, N\> &, const ind_array\<U, N\> &)")
     
@@ -861,6 +1101,8 @@
     
       - [operator/(const ref\_array\<T, N\> &, const binary\_expr\_array\<A, B, C, N\> &)](doc_array__functional.html#array/functional.hpp "jules::operator/(const ref_array\<T, N\> &, const binary_expr_array\<A, B, C, N\> &)")
     
+      - [operator/(const ref\_array\<T, N\> &, const contiguous\_array\<U, N\> &)](doc_array__functional.html#array/functional.hpp "jules::operator/(const ref_array\<T, N\> &, const contiguous_array\<U, N\> &)")
+    
       - [operator/(const ref\_array\<T, N\> &, const ind\_array\<U, N\> &)](doc_array__functional.html#array/functional.hpp "jules::operator/(const ref_array\<T, N\> &, const ind_array\<U, N\> &)")
     
       - [operator/(const ref\_array\<T, N\> &, const ref\_array\<U, N\> &)](doc_array__functional.html#array/functional.hpp "jules::operator/(const ref_array\<T, N\> &, const ref_array\<U, N\> &)")
@@ -873,6 +1115,8 @@
     
       - [operator/(const unary\_expr\_array\<It, Op, N\> &, const binary\_expr\_array\<A, B, C, N\> &)](doc_array__functional.html#array/functional.hpp "jules::operator/(const unary_expr_array\<It, Op, N\> &, const binary_expr_array\<A, B, C, N\> &)")
     
+      - [operator/(const unary\_expr\_array\<It, Op, N\> &, const contiguous\_array\<U, N\> &)](doc_array__functional.html#array/functional.hpp "jules::operator/(const unary_expr_array\<It, Op, N\> &, const contiguous_array\<U, N\> &)")
+    
       - [operator/(const unary\_expr\_array\<It, Op, N\> &, const ind\_array\<U, N\> &)](doc_array__functional.html#array/functional.hpp "jules::operator/(const unary_expr_array\<It, Op, N\> &, const ind_array\<U, N\> &)")
     
       - [operator/(const unary\_expr\_array\<It, Op, N\> &, const ref\_array\<U, N\> &)](doc_array__functional.html#array/functional.hpp "jules::operator/(const unary_expr_array\<It, Op, N\> &, const ref_array\<U, N\> &)")
@@ -882,6 +1126,8 @@
       - [operator\<(U, const base\_array\<T, N\> &)](doc_array__functional.html#array/functional.hpp "jules::operator\<(U, const base_array\<T, N\> &)")
     
       - [operator\<(U, const binary\_expr\_array\<LhsIt, RhsIt, Op, N\> &)](doc_array__functional.html#array/functional.hpp "jules::operator\<(U, const binary_expr_array\<LhsIt, RhsIt, Op, N\> &)")
+    
+      - [operator\<(U, const contiguous\_array\<T, N\> &)](doc_array__functional.html#array/functional.hpp "jules::operator\<(U, const contiguous_array\<T, N\> &)")
     
       - [operator\<(U, const ind\_array\<T, N\> &)](doc_array__functional.html#array/functional.hpp "jules::operator\<(U, const ind_array\<T, N\> &)")
     
@@ -895,6 +1141,8 @@
     
       - [operator\<(const base\_array\<T, N\> &, const binary\_expr\_array\<A, B, C, N\> &)](doc_array__functional.html#array/functional.hpp "jules::operator\<(const base_array\<T, N\> &, const binary_expr_array\<A, B, C, N\> &)")
     
+      - [operator\<(const base\_array\<T, N\> &, const contiguous\_array\<U, N\> &)](doc_array__functional.html#array/functional.hpp "jules::operator\<(const base_array\<T, N\> &, const contiguous_array\<U, N\> &)")
+    
       - [operator\<(const base\_array\<T, N\> &, const ind\_array\<U, N\> &)](doc_array__functional.html#array/functional.hpp "jules::operator\<(const base_array\<T, N\> &, const ind_array\<U, N\> &)")
     
       - [operator\<(const base\_array\<T, N\> &, const ref\_array\<U, N\> &)](doc_array__functional.html#array/functional.hpp "jules::operator\<(const base_array\<T, N\> &, const ref_array\<U, N\> &)")
@@ -907,17 +1155,35 @@
     
       - [operator\<(const binary\_expr\_array\<LhsIt, RhsIt, Op, N\> &, const binary\_expr\_array\<A, B, C, N\> &)](doc_array__functional.html#array/functional.hpp "jules::operator\<(const binary_expr_array\<LhsIt, RhsIt, Op, N\> &, const binary_expr_array\<A, B, C, N\> &)")
     
+      - [operator\<(const binary\_expr\_array\<LhsIt, RhsIt, Op, N\> &, const contiguous\_array\<U, N\> &)](doc_array__functional.html#array/functional.hpp "jules::operator\<(const binary_expr_array\<LhsIt, RhsIt, Op, N\> &, const contiguous_array\<U, N\> &)")
+    
       - [operator\<(const binary\_expr\_array\<LhsIt, RhsIt, Op, N\> &, const ind\_array\<U, N\> &)](doc_array__functional.html#array/functional.hpp "jules::operator\<(const binary_expr_array\<LhsIt, RhsIt, Op, N\> &, const ind_array\<U, N\> &)")
     
       - [operator\<(const binary\_expr\_array\<LhsIt, RhsIt, Op, N\> &, const ref\_array\<U, N\> &)](doc_array__functional.html#array/functional.hpp "jules::operator\<(const binary_expr_array\<LhsIt, RhsIt, Op, N\> &, const ref_array\<U, N\> &)")
     
       - [operator\<(const binary\_expr\_array\<LhsIt, RhsIt, Op, N\> &, const unary\_expr\_array\<A, B, N\> &)](doc_array__functional.html#array/functional.hpp "jules::operator\<(const binary_expr_array\<LhsIt, RhsIt, Op, N\> &, const unary_expr_array\<A, B, N\> &)")
     
+      - [operator\<(const contiguous\_array\<T, N\> &, U)](doc_array__functional.html#array/functional.hpp "jules::operator\<(const contiguous_array\<T, N\> &, U)")
+    
+      - [operator\<(const contiguous\_array\<T, N\> &, const base\_array\<U, N\> &)](doc_array__functional.html#array/functional.hpp "jules::operator\<(const contiguous_array\<T, N\> &, const base_array\<U, N\> &)")
+    
+      - [operator\<(const contiguous\_array\<T, N\> &, const binary\_expr\_array\<A, B, C, N\> &)](doc_array__functional.html#array/functional.hpp "jules::operator\<(const contiguous_array\<T, N\> &, const binary_expr_array\<A, B, C, N\> &)")
+    
+      - [operator\<(const contiguous\_array\<T, N\> &, const contiguous\_array\<U, N\> &)](doc_array__functional.html#array/functional.hpp "jules::operator\<(const contiguous_array\<T, N\> &, const contiguous_array\<U, N\> &)")
+    
+      - [operator\<(const contiguous\_array\<T, N\> &, const ind\_array\<U, N\> &)](doc_array__functional.html#array/functional.hpp "jules::operator\<(const contiguous_array\<T, N\> &, const ind_array\<U, N\> &)")
+    
+      - [operator\<(const contiguous\_array\<T, N\> &, const ref\_array\<U, N\> &)](doc_array__functional.html#array/functional.hpp "jules::operator\<(const contiguous_array\<T, N\> &, const ref_array\<U, N\> &)")
+    
+      - [operator\<(const contiguous\_array\<T, N\> &, const unary\_expr\_array\<A, B, N\> &)](doc_array__functional.html#array/functional.hpp "jules::operator\<(const contiguous_array\<T, N\> &, const unary_expr_array\<A, B, N\> &)")
+    
       - [operator\<(const ind\_array\<T, N\> &, U)](doc_array__functional.html#array/functional.hpp "jules::operator\<(const ind_array\<T, N\> &, U)")
     
       - [operator\<(const ind\_array\<T, N\> &, const base\_array\<U, N\> &)](doc_array__functional.html#array/functional.hpp "jules::operator\<(const ind_array\<T, N\> &, const base_array\<U, N\> &)")
     
       - [operator\<(const ind\_array\<T, N\> &, const binary\_expr\_array\<A, B, C, N\> &)](doc_array__functional.html#array/functional.hpp "jules::operator\<(const ind_array\<T, N\> &, const binary_expr_array\<A, B, C, N\> &)")
+    
+      - [operator\<(const ind\_array\<T, N\> &, const contiguous\_array\<U, N\> &)](doc_array__functional.html#array/functional.hpp "jules::operator\<(const ind_array\<T, N\> &, const contiguous_array\<U, N\> &)")
     
       - [operator\<(const ind\_array\<T, N\> &, const ind\_array\<U, N\> &)](doc_array__functional.html#array/functional.hpp "jules::operator\<(const ind_array\<T, N\> &, const ind_array\<U, N\> &)")
     
@@ -931,6 +1197,8 @@
     
       - [operator\<(const ref\_array\<T, N\> &, const binary\_expr\_array\<A, B, C, N\> &)](doc_array__functional.html#array/functional.hpp "jules::operator\<(const ref_array\<T, N\> &, const binary_expr_array\<A, B, C, N\> &)")
     
+      - [operator\<(const ref\_array\<T, N\> &, const contiguous\_array\<U, N\> &)](doc_array__functional.html#array/functional.hpp "jules::operator\<(const ref_array\<T, N\> &, const contiguous_array\<U, N\> &)")
+    
       - [operator\<(const ref\_array\<T, N\> &, const ind\_array\<U, N\> &)](doc_array__functional.html#array/functional.hpp "jules::operator\<(const ref_array\<T, N\> &, const ind_array\<U, N\> &)")
     
       - [operator\<(const ref\_array\<T, N\> &, const ref\_array\<U, N\> &)](doc_array__functional.html#array/functional.hpp "jules::operator\<(const ref_array\<T, N\> &, const ref_array\<U, N\> &)")
@@ -942,6 +1210,8 @@
       - [operator\<(const unary\_expr\_array\<It, Op, N\> &, const base\_array\<U, N\> &)](doc_array__functional.html#array/functional.hpp "jules::operator\<(const unary_expr_array\<It, Op, N\> &, const base_array\<U, N\> &)")
     
       - [operator\<(const unary\_expr\_array\<It, Op, N\> &, const binary\_expr\_array\<A, B, C, N\> &)](doc_array__functional.html#array/functional.hpp "jules::operator\<(const unary_expr_array\<It, Op, N\> &, const binary_expr_array\<A, B, C, N\> &)")
+    
+      - [operator\<(const unary\_expr\_array\<It, Op, N\> &, const contiguous\_array\<U, N\> &)](doc_array__functional.html#array/functional.hpp "jules::operator\<(const unary_expr_array\<It, Op, N\> &, const contiguous_array\<U, N\> &)")
     
       - [operator\<(const unary\_expr\_array\<It, Op, N\> &, const ind\_array\<U, N\> &)](doc_array__functional.html#array/functional.hpp "jules::operator\<(const unary_expr_array\<It, Op, N\> &, const ind_array\<U, N\> &)")
     
@@ -955,6 +1225,8 @@
     
       - [operator\<=(U, const binary\_expr\_array\<LhsIt, RhsIt, Op, N\> &)](doc_array__functional.html#array/functional.hpp "jules::operator\<=(U, const binary_expr_array\<LhsIt, RhsIt, Op, N\> &)")
     
+      - [operator\<=(U, const contiguous\_array\<T, N\> &)](doc_array__functional.html#array/functional.hpp "jules::operator\<=(U, const contiguous_array\<T, N\> &)")
+    
       - [operator\<=(U, const ind\_array\<T, N\> &)](doc_array__functional.html#array/functional.hpp "jules::operator\<=(U, const ind_array\<T, N\> &)")
     
       - [operator\<=(U, const ref\_array\<T, N\> &)](doc_array__functional.html#array/functional.hpp "jules::operator\<=(U, const ref_array\<T, N\> &)")
@@ -966,6 +1238,8 @@
       - [operator\<=(const base\_array\<T, N\> &, const base\_array\<U, N\> &)](doc_array__functional.html#array/functional.hpp "jules::operator\<=(const base_array\<T, N\> &, const base_array\<U, N\> &)")
     
       - [operator\<=(const base\_array\<T, N\> &, const binary\_expr\_array\<A, B, C, N\> &)](doc_array__functional.html#array/functional.hpp "jules::operator\<=(const base_array\<T, N\> &, const binary_expr_array\<A, B, C, N\> &)")
+    
+      - [operator\<=(const base\_array\<T, N\> &, const contiguous\_array\<U, N\> &)](doc_array__functional.html#array/functional.hpp "jules::operator\<=(const base_array\<T, N\> &, const contiguous_array\<U, N\> &)")
     
       - [operator\<=(const base\_array\<T, N\> &, const ind\_array\<U, N\> &)](doc_array__functional.html#array/functional.hpp "jules::operator\<=(const base_array\<T, N\> &, const ind_array\<U, N\> &)")
     
@@ -979,17 +1253,35 @@
     
       - [operator\<=(const binary\_expr\_array\<LhsIt, RhsIt, Op, N\> &, const binary\_expr\_array\<A, B, C, N\> &)](doc_array__functional.html#array/functional.hpp "jules::operator\<=(const binary_expr_array\<LhsIt, RhsIt, Op, N\> &, const binary_expr_array\<A, B, C, N\> &)")
     
+      - [operator\<=(const binary\_expr\_array\<LhsIt, RhsIt, Op, N\> &, const contiguous\_array\<U, N\> &)](doc_array__functional.html#array/functional.hpp "jules::operator\<=(const binary_expr_array\<LhsIt, RhsIt, Op, N\> &, const contiguous_array\<U, N\> &)")
+    
       - [operator\<=(const binary\_expr\_array\<LhsIt, RhsIt, Op, N\> &, const ind\_array\<U, N\> &)](doc_array__functional.html#array/functional.hpp "jules::operator\<=(const binary_expr_array\<LhsIt, RhsIt, Op, N\> &, const ind_array\<U, N\> &)")
     
       - [operator\<=(const binary\_expr\_array\<LhsIt, RhsIt, Op, N\> &, const ref\_array\<U, N\> &)](doc_array__functional.html#array/functional.hpp "jules::operator\<=(const binary_expr_array\<LhsIt, RhsIt, Op, N\> &, const ref_array\<U, N\> &)")
     
       - [operator\<=(const binary\_expr\_array\<LhsIt, RhsIt, Op, N\> &, const unary\_expr\_array\<A, B, N\> &)](doc_array__functional.html#array/functional.hpp "jules::operator\<=(const binary_expr_array\<LhsIt, RhsIt, Op, N\> &, const unary_expr_array\<A, B, N\> &)")
     
+      - [operator\<=(const contiguous\_array\<T, N\> &, U)](doc_array__functional.html#array/functional.hpp "jules::operator\<=(const contiguous_array\<T, N\> &, U)")
+    
+      - [operator\<=(const contiguous\_array\<T, N\> &, const base\_array\<U, N\> &)](doc_array__functional.html#array/functional.hpp "jules::operator\<=(const contiguous_array\<T, N\> &, const base_array\<U, N\> &)")
+    
+      - [operator\<=(const contiguous\_array\<T, N\> &, const binary\_expr\_array\<A, B, C, N\> &)](doc_array__functional.html#array/functional.hpp "jules::operator\<=(const contiguous_array\<T, N\> &, const binary_expr_array\<A, B, C, N\> &)")
+    
+      - [operator\<=(const contiguous\_array\<T, N\> &, const contiguous\_array\<U, N\> &)](doc_array__functional.html#array/functional.hpp "jules::operator\<=(const contiguous_array\<T, N\> &, const contiguous_array\<U, N\> &)")
+    
+      - [operator\<=(const contiguous\_array\<T, N\> &, const ind\_array\<U, N\> &)](doc_array__functional.html#array/functional.hpp "jules::operator\<=(const contiguous_array\<T, N\> &, const ind_array\<U, N\> &)")
+    
+      - [operator\<=(const contiguous\_array\<T, N\> &, const ref\_array\<U, N\> &)](doc_array__functional.html#array/functional.hpp "jules::operator\<=(const contiguous_array\<T, N\> &, const ref_array\<U, N\> &)")
+    
+      - [operator\<=(const contiguous\_array\<T, N\> &, const unary\_expr\_array\<A, B, N\> &)](doc_array__functional.html#array/functional.hpp "jules::operator\<=(const contiguous_array\<T, N\> &, const unary_expr_array\<A, B, N\> &)")
+    
       - [operator\<=(const ind\_array\<T, N\> &, U)](doc_array__functional.html#array/functional.hpp "jules::operator\<=(const ind_array\<T, N\> &, U)")
     
       - [operator\<=(const ind\_array\<T, N\> &, const base\_array\<U, N\> &)](doc_array__functional.html#array/functional.hpp "jules::operator\<=(const ind_array\<T, N\> &, const base_array\<U, N\> &)")
     
       - [operator\<=(const ind\_array\<T, N\> &, const binary\_expr\_array\<A, B, C, N\> &)](doc_array__functional.html#array/functional.hpp "jules::operator\<=(const ind_array\<T, N\> &, const binary_expr_array\<A, B, C, N\> &)")
+    
+      - [operator\<=(const ind\_array\<T, N\> &, const contiguous\_array\<U, N\> &)](doc_array__functional.html#array/functional.hpp "jules::operator\<=(const ind_array\<T, N\> &, const contiguous_array\<U, N\> &)")
     
       - [operator\<=(const ind\_array\<T, N\> &, const ind\_array\<U, N\> &)](doc_array__functional.html#array/functional.hpp "jules::operator\<=(const ind_array\<T, N\> &, const ind_array\<U, N\> &)")
     
@@ -1003,6 +1295,8 @@
     
       - [operator\<=(const ref\_array\<T, N\> &, const binary\_expr\_array\<A, B, C, N\> &)](doc_array__functional.html#array/functional.hpp "jules::operator\<=(const ref_array\<T, N\> &, const binary_expr_array\<A, B, C, N\> &)")
     
+      - [operator\<=(const ref\_array\<T, N\> &, const contiguous\_array\<U, N\> &)](doc_array__functional.html#array/functional.hpp "jules::operator\<=(const ref_array\<T, N\> &, const contiguous_array\<U, N\> &)")
+    
       - [operator\<=(const ref\_array\<T, N\> &, const ind\_array\<U, N\> &)](doc_array__functional.html#array/functional.hpp "jules::operator\<=(const ref_array\<T, N\> &, const ind_array\<U, N\> &)")
     
       - [operator\<=(const ref\_array\<T, N\> &, const ref\_array\<U, N\> &)](doc_array__functional.html#array/functional.hpp "jules::operator\<=(const ref_array\<T, N\> &, const ref_array\<U, N\> &)")
@@ -1015,6 +1309,8 @@
     
       - [operator\<=(const unary\_expr\_array\<It, Op, N\> &, const binary\_expr\_array\<A, B, C, N\> &)](doc_array__functional.html#array/functional.hpp "jules::operator\<=(const unary_expr_array\<It, Op, N\> &, const binary_expr_array\<A, B, C, N\> &)")
     
+      - [operator\<=(const unary\_expr\_array\<It, Op, N\> &, const contiguous\_array\<U, N\> &)](doc_array__functional.html#array/functional.hpp "jules::operator\<=(const unary_expr_array\<It, Op, N\> &, const contiguous_array\<U, N\> &)")
+    
       - [operator\<=(const unary\_expr\_array\<It, Op, N\> &, const ind\_array\<U, N\> &)](doc_array__functional.html#array/functional.hpp "jules::operator\<=(const unary_expr_array\<It, Op, N\> &, const ind_array\<U, N\> &)")
     
       - [operator\<=(const unary\_expr\_array\<It, Op, N\> &, const ref\_array\<U, N\> &)](doc_array__functional.html#array/functional.hpp "jules::operator\<=(const unary_expr_array\<It, Op, N\> &, const ref_array\<U, N\> &)")
@@ -1024,6 +1320,8 @@
       - [operator==(U, const base\_array\<T, N\> &)](doc_array__functional.html#array/functional.hpp "jules::operator==(U, const base_array\<T, N\> &)")
     
       - [operator==(U, const binary\_expr\_array\<LhsIt, RhsIt, Op, N\> &)](doc_array__functional.html#array/functional.hpp "jules::operator==(U, const binary_expr_array\<LhsIt, RhsIt, Op, N\> &)")
+    
+      - [operator==(U, const contiguous\_array\<T, N\> &)](doc_array__functional.html#array/functional.hpp "jules::operator==(U, const contiguous_array\<T, N\> &)")
     
       - [operator==(U, const ind\_array\<T, N\> &)](doc_array__functional.html#array/functional.hpp "jules::operator==(U, const ind_array\<T, N\> &)")
     
@@ -1037,6 +1335,8 @@
     
       - [operator==(const base\_array\<T, N\> &, const binary\_expr\_array\<A, B, C, N\> &)](doc_array__functional.html#array/functional.hpp "jules::operator==(const base_array\<T, N\> &, const binary_expr_array\<A, B, C, N\> &)")
     
+      - [operator==(const base\_array\<T, N\> &, const contiguous\_array\<U, N\> &)](doc_array__functional.html#array/functional.hpp "jules::operator==(const base_array\<T, N\> &, const contiguous_array\<U, N\> &)")
+    
       - [operator==(const base\_array\<T, N\> &, const ind\_array\<U, N\> &)](doc_array__functional.html#array/functional.hpp "jules::operator==(const base_array\<T, N\> &, const ind_array\<U, N\> &)")
     
       - [operator==(const base\_array\<T, N\> &, const ref\_array\<U, N\> &)](doc_array__functional.html#array/functional.hpp "jules::operator==(const base_array\<T, N\> &, const ref_array\<U, N\> &)")
@@ -1049,17 +1349,35 @@
     
       - [operator==(const binary\_expr\_array\<LhsIt, RhsIt, Op, N\> &, const binary\_expr\_array\<A, B, C, N\> &)](doc_array__functional.html#array/functional.hpp "jules::operator==(const binary_expr_array\<LhsIt, RhsIt, Op, N\> &, const binary_expr_array\<A, B, C, N\> &)")
     
+      - [operator==(const binary\_expr\_array\<LhsIt, RhsIt, Op, N\> &, const contiguous\_array\<U, N\> &)](doc_array__functional.html#array/functional.hpp "jules::operator==(const binary_expr_array\<LhsIt, RhsIt, Op, N\> &, const contiguous_array\<U, N\> &)")
+    
       - [operator==(const binary\_expr\_array\<LhsIt, RhsIt, Op, N\> &, const ind\_array\<U, N\> &)](doc_array__functional.html#array/functional.hpp "jules::operator==(const binary_expr_array\<LhsIt, RhsIt, Op, N\> &, const ind_array\<U, N\> &)")
     
       - [operator==(const binary\_expr\_array\<LhsIt, RhsIt, Op, N\> &, const ref\_array\<U, N\> &)](doc_array__functional.html#array/functional.hpp "jules::operator==(const binary_expr_array\<LhsIt, RhsIt, Op, N\> &, const ref_array\<U, N\> &)")
     
       - [operator==(const binary\_expr\_array\<LhsIt, RhsIt, Op, N\> &, const unary\_expr\_array\<A, B, N\> &)](doc_array__functional.html#array/functional.hpp "jules::operator==(const binary_expr_array\<LhsIt, RhsIt, Op, N\> &, const unary_expr_array\<A, B, N\> &)")
     
+      - [operator==(const contiguous\_array\<T, N\> &, U)](doc_array__functional.html#array/functional.hpp "jules::operator==(const contiguous_array\<T, N\> &, U)")
+    
+      - [operator==(const contiguous\_array\<T, N\> &, const base\_array\<U, N\> &)](doc_array__functional.html#array/functional.hpp "jules::operator==(const contiguous_array\<T, N\> &, const base_array\<U, N\> &)")
+    
+      - [operator==(const contiguous\_array\<T, N\> &, const binary\_expr\_array\<A, B, C, N\> &)](doc_array__functional.html#array/functional.hpp "jules::operator==(const contiguous_array\<T, N\> &, const binary_expr_array\<A, B, C, N\> &)")
+    
+      - [operator==(const contiguous\_array\<T, N\> &, const contiguous\_array\<U, N\> &)](doc_array__functional.html#array/functional.hpp "jules::operator==(const contiguous_array\<T, N\> &, const contiguous_array\<U, N\> &)")
+    
+      - [operator==(const contiguous\_array\<T, N\> &, const ind\_array\<U, N\> &)](doc_array__functional.html#array/functional.hpp "jules::operator==(const contiguous_array\<T, N\> &, const ind_array\<U, N\> &)")
+    
+      - [operator==(const contiguous\_array\<T, N\> &, const ref\_array\<U, N\> &)](doc_array__functional.html#array/functional.hpp "jules::operator==(const contiguous_array\<T, N\> &, const ref_array\<U, N\> &)")
+    
+      - [operator==(const contiguous\_array\<T, N\> &, const unary\_expr\_array\<A, B, N\> &)](doc_array__functional.html#array/functional.hpp "jules::operator==(const contiguous_array\<T, N\> &, const unary_expr_array\<A, B, N\> &)")
+    
       - [operator==(const ind\_array\<T, N\> &, U)](doc_array__functional.html#array/functional.hpp "jules::operator==(const ind_array\<T, N\> &, U)")
     
       - [operator==(const ind\_array\<T, N\> &, const base\_array\<U, N\> &)](doc_array__functional.html#array/functional.hpp "jules::operator==(const ind_array\<T, N\> &, const base_array\<U, N\> &)")
     
       - [operator==(const ind\_array\<T, N\> &, const binary\_expr\_array\<A, B, C, N\> &)](doc_array__functional.html#array/functional.hpp "jules::operator==(const ind_array\<T, N\> &, const binary_expr_array\<A, B, C, N\> &)")
+    
+      - [operator==(const ind\_array\<T, N\> &, const contiguous\_array\<U, N\> &)](doc_array__functional.html#array/functional.hpp "jules::operator==(const ind_array\<T, N\> &, const contiguous_array\<U, N\> &)")
     
       - [operator==(const ind\_array\<T, N\> &, const ind\_array\<U, N\> &)](doc_array__functional.html#array/functional.hpp "jules::operator==(const ind_array\<T, N\> &, const ind_array\<U, N\> &)")
     
@@ -1073,6 +1391,8 @@
     
       - [operator==(const ref\_array\<T, N\> &, const binary\_expr\_array\<A, B, C, N\> &)](doc_array__functional.html#array/functional.hpp "jules::operator==(const ref_array\<T, N\> &, const binary_expr_array\<A, B, C, N\> &)")
     
+      - [operator==(const ref\_array\<T, N\> &, const contiguous\_array\<U, N\> &)](doc_array__functional.html#array/functional.hpp "jules::operator==(const ref_array\<T, N\> &, const contiguous_array\<U, N\> &)")
+    
       - [operator==(const ref\_array\<T, N\> &, const ind\_array\<U, N\> &)](doc_array__functional.html#array/functional.hpp "jules::operator==(const ref_array\<T, N\> &, const ind_array\<U, N\> &)")
     
       - [operator==(const ref\_array\<T, N\> &, const ref\_array\<U, N\> &)](doc_array__functional.html#array/functional.hpp "jules::operator==(const ref_array\<T, N\> &, const ref_array\<U, N\> &)")
@@ -1085,6 +1405,8 @@
     
       - [operator==(const unary\_expr\_array\<It, Op, N\> &, const binary\_expr\_array\<A, B, C, N\> &)](doc_array__functional.html#array/functional.hpp "jules::operator==(const unary_expr_array\<It, Op, N\> &, const binary_expr_array\<A, B, C, N\> &)")
     
+      - [operator==(const unary\_expr\_array\<It, Op, N\> &, const contiguous\_array\<U, N\> &)](doc_array__functional.html#array/functional.hpp "jules::operator==(const unary_expr_array\<It, Op, N\> &, const contiguous_array\<U, N\> &)")
+    
       - [operator==(const unary\_expr\_array\<It, Op, N\> &, const ind\_array\<U, N\> &)](doc_array__functional.html#array/functional.hpp "jules::operator==(const unary_expr_array\<It, Op, N\> &, const ind_array\<U, N\> &)")
     
       - [operator==(const unary\_expr\_array\<It, Op, N\> &, const ref\_array\<U, N\> &)](doc_array__functional.html#array/functional.hpp "jules::operator==(const unary_expr_array\<It, Op, N\> &, const ref_array\<U, N\> &)")
@@ -1094,6 +1416,8 @@
       - [operator\>(U, const base\_array\<T, N\> &)](doc_array__functional.html#array/functional.hpp "jules::operator\>(U, const base_array\<T, N\> &)")
     
       - [operator\>(U, const binary\_expr\_array\<LhsIt, RhsIt, Op, N\> &)](doc_array__functional.html#array/functional.hpp "jules::operator\>(U, const binary_expr_array\<LhsIt, RhsIt, Op, N\> &)")
+    
+      - [operator\>(U, const contiguous\_array\<T, N\> &)](doc_array__functional.html#array/functional.hpp "jules::operator\>(U, const contiguous_array\<T, N\> &)")
     
       - [operator\>(U, const ind\_array\<T, N\> &)](doc_array__functional.html#array/functional.hpp "jules::operator\>(U, const ind_array\<T, N\> &)")
     
@@ -1107,6 +1431,8 @@
     
       - [operator\>(const base\_array\<T, N\> &, const binary\_expr\_array\<A, B, C, N\> &)](doc_array__functional.html#array/functional.hpp "jules::operator\>(const base_array\<T, N\> &, const binary_expr_array\<A, B, C, N\> &)")
     
+      - [operator\>(const base\_array\<T, N\> &, const contiguous\_array\<U, N\> &)](doc_array__functional.html#array/functional.hpp "jules::operator\>(const base_array\<T, N\> &, const contiguous_array\<U, N\> &)")
+    
       - [operator\>(const base\_array\<T, N\> &, const ind\_array\<U, N\> &)](doc_array__functional.html#array/functional.hpp "jules::operator\>(const base_array\<T, N\> &, const ind_array\<U, N\> &)")
     
       - [operator\>(const base\_array\<T, N\> &, const ref\_array\<U, N\> &)](doc_array__functional.html#array/functional.hpp "jules::operator\>(const base_array\<T, N\> &, const ref_array\<U, N\> &)")
@@ -1119,17 +1445,35 @@
     
       - [operator\>(const binary\_expr\_array\<LhsIt, RhsIt, Op, N\> &, const binary\_expr\_array\<A, B, C, N\> &)](doc_array__functional.html#array/functional.hpp "jules::operator\>(const binary_expr_array\<LhsIt, RhsIt, Op, N\> &, const binary_expr_array\<A, B, C, N\> &)")
     
+      - [operator\>(const binary\_expr\_array\<LhsIt, RhsIt, Op, N\> &, const contiguous\_array\<U, N\> &)](doc_array__functional.html#array/functional.hpp "jules::operator\>(const binary_expr_array\<LhsIt, RhsIt, Op, N\> &, const contiguous_array\<U, N\> &)")
+    
       - [operator\>(const binary\_expr\_array\<LhsIt, RhsIt, Op, N\> &, const ind\_array\<U, N\> &)](doc_array__functional.html#array/functional.hpp "jules::operator\>(const binary_expr_array\<LhsIt, RhsIt, Op, N\> &, const ind_array\<U, N\> &)")
     
       - [operator\>(const binary\_expr\_array\<LhsIt, RhsIt, Op, N\> &, const ref\_array\<U, N\> &)](doc_array__functional.html#array/functional.hpp "jules::operator\>(const binary_expr_array\<LhsIt, RhsIt, Op, N\> &, const ref_array\<U, N\> &)")
     
       - [operator\>(const binary\_expr\_array\<LhsIt, RhsIt, Op, N\> &, const unary\_expr\_array\<A, B, N\> &)](doc_array__functional.html#array/functional.hpp "jules::operator\>(const binary_expr_array\<LhsIt, RhsIt, Op, N\> &, const unary_expr_array\<A, B, N\> &)")
     
+      - [operator\>(const contiguous\_array\<T, N\> &, U)](doc_array__functional.html#array/functional.hpp "jules::operator\>(const contiguous_array\<T, N\> &, U)")
+    
+      - [operator\>(const contiguous\_array\<T, N\> &, const base\_array\<U, N\> &)](doc_array__functional.html#array/functional.hpp "jules::operator\>(const contiguous_array\<T, N\> &, const base_array\<U, N\> &)")
+    
+      - [operator\>(const contiguous\_array\<T, N\> &, const binary\_expr\_array\<A, B, C, N\> &)](doc_array__functional.html#array/functional.hpp "jules::operator\>(const contiguous_array\<T, N\> &, const binary_expr_array\<A, B, C, N\> &)")
+    
+      - [operator\>(const contiguous\_array\<T, N\> &, const contiguous\_array\<U, N\> &)](doc_array__functional.html#array/functional.hpp "jules::operator\>(const contiguous_array\<T, N\> &, const contiguous_array\<U, N\> &)")
+    
+      - [operator\>(const contiguous\_array\<T, N\> &, const ind\_array\<U, N\> &)](doc_array__functional.html#array/functional.hpp "jules::operator\>(const contiguous_array\<T, N\> &, const ind_array\<U, N\> &)")
+    
+      - [operator\>(const contiguous\_array\<T, N\> &, const ref\_array\<U, N\> &)](doc_array__functional.html#array/functional.hpp "jules::operator\>(const contiguous_array\<T, N\> &, const ref_array\<U, N\> &)")
+    
+      - [operator\>(const contiguous\_array\<T, N\> &, const unary\_expr\_array\<A, B, N\> &)](doc_array__functional.html#array/functional.hpp "jules::operator\>(const contiguous_array\<T, N\> &, const unary_expr_array\<A, B, N\> &)")
+    
       - [operator\>(const ind\_array\<T, N\> &, U)](doc_array__functional.html#array/functional.hpp "jules::operator\>(const ind_array\<T, N\> &, U)")
     
       - [operator\>(const ind\_array\<T, N\> &, const base\_array\<U, N\> &)](doc_array__functional.html#array/functional.hpp "jules::operator\>(const ind_array\<T, N\> &, const base_array\<U, N\> &)")
     
       - [operator\>(const ind\_array\<T, N\> &, const binary\_expr\_array\<A, B, C, N\> &)](doc_array__functional.html#array/functional.hpp "jules::operator\>(const ind_array\<T, N\> &, const binary_expr_array\<A, B, C, N\> &)")
+    
+      - [operator\>(const ind\_array\<T, N\> &, const contiguous\_array\<U, N\> &)](doc_array__functional.html#array/functional.hpp "jules::operator\>(const ind_array\<T, N\> &, const contiguous_array\<U, N\> &)")
     
       - [operator\>(const ind\_array\<T, N\> &, const ind\_array\<U, N\> &)](doc_array__functional.html#array/functional.hpp "jules::operator\>(const ind_array\<T, N\> &, const ind_array\<U, N\> &)")
     
@@ -1143,6 +1487,8 @@
     
       - [operator\>(const ref\_array\<T, N\> &, const binary\_expr\_array\<A, B, C, N\> &)](doc_array__functional.html#array/functional.hpp "jules::operator\>(const ref_array\<T, N\> &, const binary_expr_array\<A, B, C, N\> &)")
     
+      - [operator\>(const ref\_array\<T, N\> &, const contiguous\_array\<U, N\> &)](doc_array__functional.html#array/functional.hpp "jules::operator\>(const ref_array\<T, N\> &, const contiguous_array\<U, N\> &)")
+    
       - [operator\>(const ref\_array\<T, N\> &, const ind\_array\<U, N\> &)](doc_array__functional.html#array/functional.hpp "jules::operator\>(const ref_array\<T, N\> &, const ind_array\<U, N\> &)")
     
       - [operator\>(const ref\_array\<T, N\> &, const ref\_array\<U, N\> &)](doc_array__functional.html#array/functional.hpp "jules::operator\>(const ref_array\<T, N\> &, const ref_array\<U, N\> &)")
@@ -1155,6 +1501,8 @@
     
       - [operator\>(const unary\_expr\_array\<It, Op, N\> &, const binary\_expr\_array\<A, B, C, N\> &)](doc_array__functional.html#array/functional.hpp "jules::operator\>(const unary_expr_array\<It, Op, N\> &, const binary_expr_array\<A, B, C, N\> &)")
     
+      - [operator\>(const unary\_expr\_array\<It, Op, N\> &, const contiguous\_array\<U, N\> &)](doc_array__functional.html#array/functional.hpp "jules::operator\>(const unary_expr_array\<It, Op, N\> &, const contiguous_array\<U, N\> &)")
+    
       - [operator\>(const unary\_expr\_array\<It, Op, N\> &, const ind\_array\<U, N\> &)](doc_array__functional.html#array/functional.hpp "jules::operator\>(const unary_expr_array\<It, Op, N\> &, const ind_array\<U, N\> &)")
     
       - [operator\>(const unary\_expr\_array\<It, Op, N\> &, const ref\_array\<U, N\> &)](doc_array__functional.html#array/functional.hpp "jules::operator\>(const unary_expr_array\<It, Op, N\> &, const ref_array\<U, N\> &)")
@@ -1164,6 +1512,8 @@
       - [operator\>=(U, const base\_array\<T, N\> &)](doc_array__functional.html#array/functional.hpp "jules::operator\>=(U, const base_array\<T, N\> &)")
     
       - [operator\>=(U, const binary\_expr\_array\<LhsIt, RhsIt, Op, N\> &)](doc_array__functional.html#array/functional.hpp "jules::operator\>=(U, const binary_expr_array\<LhsIt, RhsIt, Op, N\> &)")
+    
+      - [operator\>=(U, const contiguous\_array\<T, N\> &)](doc_array__functional.html#array/functional.hpp "jules::operator\>=(U, const contiguous_array\<T, N\> &)")
     
       - [operator\>=(U, const ind\_array\<T, N\> &)](doc_array__functional.html#array/functional.hpp "jules::operator\>=(U, const ind_array\<T, N\> &)")
     
@@ -1177,6 +1527,8 @@
     
       - [operator\>=(const base\_array\<T, N\> &, const binary\_expr\_array\<A, B, C, N\> &)](doc_array__functional.html#array/functional.hpp "jules::operator\>=(const base_array\<T, N\> &, const binary_expr_array\<A, B, C, N\> &)")
     
+      - [operator\>=(const base\_array\<T, N\> &, const contiguous\_array\<U, N\> &)](doc_array__functional.html#array/functional.hpp "jules::operator\>=(const base_array\<T, N\> &, const contiguous_array\<U, N\> &)")
+    
       - [operator\>=(const base\_array\<T, N\> &, const ind\_array\<U, N\> &)](doc_array__functional.html#array/functional.hpp "jules::operator\>=(const base_array\<T, N\> &, const ind_array\<U, N\> &)")
     
       - [operator\>=(const base\_array\<T, N\> &, const ref\_array\<U, N\> &)](doc_array__functional.html#array/functional.hpp "jules::operator\>=(const base_array\<T, N\> &, const ref_array\<U, N\> &)")
@@ -1189,17 +1541,35 @@
     
       - [operator\>=(const binary\_expr\_array\<LhsIt, RhsIt, Op, N\> &, const binary\_expr\_array\<A, B, C, N\> &)](doc_array__functional.html#array/functional.hpp "jules::operator\>=(const binary_expr_array\<LhsIt, RhsIt, Op, N\> &, const binary_expr_array\<A, B, C, N\> &)")
     
+      - [operator\>=(const binary\_expr\_array\<LhsIt, RhsIt, Op, N\> &, const contiguous\_array\<U, N\> &)](doc_array__functional.html#array/functional.hpp "jules::operator\>=(const binary_expr_array\<LhsIt, RhsIt, Op, N\> &, const contiguous_array\<U, N\> &)")
+    
       - [operator\>=(const binary\_expr\_array\<LhsIt, RhsIt, Op, N\> &, const ind\_array\<U, N\> &)](doc_array__functional.html#array/functional.hpp "jules::operator\>=(const binary_expr_array\<LhsIt, RhsIt, Op, N\> &, const ind_array\<U, N\> &)")
     
       - [operator\>=(const binary\_expr\_array\<LhsIt, RhsIt, Op, N\> &, const ref\_array\<U, N\> &)](doc_array__functional.html#array/functional.hpp "jules::operator\>=(const binary_expr_array\<LhsIt, RhsIt, Op, N\> &, const ref_array\<U, N\> &)")
     
       - [operator\>=(const binary\_expr\_array\<LhsIt, RhsIt, Op, N\> &, const unary\_expr\_array\<A, B, N\> &)](doc_array__functional.html#array/functional.hpp "jules::operator\>=(const binary_expr_array\<LhsIt, RhsIt, Op, N\> &, const unary_expr_array\<A, B, N\> &)")
     
+      - [operator\>=(const contiguous\_array\<T, N\> &, U)](doc_array__functional.html#array/functional.hpp "jules::operator\>=(const contiguous_array\<T, N\> &, U)")
+    
+      - [operator\>=(const contiguous\_array\<T, N\> &, const base\_array\<U, N\> &)](doc_array__functional.html#array/functional.hpp "jules::operator\>=(const contiguous_array\<T, N\> &, const base_array\<U, N\> &)")
+    
+      - [operator\>=(const contiguous\_array\<T, N\> &, const binary\_expr\_array\<A, B, C, N\> &)](doc_array__functional.html#array/functional.hpp "jules::operator\>=(const contiguous_array\<T, N\> &, const binary_expr_array\<A, B, C, N\> &)")
+    
+      - [operator\>=(const contiguous\_array\<T, N\> &, const contiguous\_array\<U, N\> &)](doc_array__functional.html#array/functional.hpp "jules::operator\>=(const contiguous_array\<T, N\> &, const contiguous_array\<U, N\> &)")
+    
+      - [operator\>=(const contiguous\_array\<T, N\> &, const ind\_array\<U, N\> &)](doc_array__functional.html#array/functional.hpp "jules::operator\>=(const contiguous_array\<T, N\> &, const ind_array\<U, N\> &)")
+    
+      - [operator\>=(const contiguous\_array\<T, N\> &, const ref\_array\<U, N\> &)](doc_array__functional.html#array/functional.hpp "jules::operator\>=(const contiguous_array\<T, N\> &, const ref_array\<U, N\> &)")
+    
+      - [operator\>=(const contiguous\_array\<T, N\> &, const unary\_expr\_array\<A, B, N\> &)](doc_array__functional.html#array/functional.hpp "jules::operator\>=(const contiguous_array\<T, N\> &, const unary_expr_array\<A, B, N\> &)")
+    
       - [operator\>=(const ind\_array\<T, N\> &, U)](doc_array__functional.html#array/functional.hpp "jules::operator\>=(const ind_array\<T, N\> &, U)")
     
       - [operator\>=(const ind\_array\<T, N\> &, const base\_array\<U, N\> &)](doc_array__functional.html#array/functional.hpp "jules::operator\>=(const ind_array\<T, N\> &, const base_array\<U, N\> &)")
     
       - [operator\>=(const ind\_array\<T, N\> &, const binary\_expr\_array\<A, B, C, N\> &)](doc_array__functional.html#array/functional.hpp "jules::operator\>=(const ind_array\<T, N\> &, const binary_expr_array\<A, B, C, N\> &)")
+    
+      - [operator\>=(const ind\_array\<T, N\> &, const contiguous\_array\<U, N\> &)](doc_array__functional.html#array/functional.hpp "jules::operator\>=(const ind_array\<T, N\> &, const contiguous_array\<U, N\> &)")
     
       - [operator\>=(const ind\_array\<T, N\> &, const ind\_array\<U, N\> &)](doc_array__functional.html#array/functional.hpp "jules::operator\>=(const ind_array\<T, N\> &, const ind_array\<U, N\> &)")
     
@@ -1213,6 +1583,8 @@
     
       - [operator\>=(const ref\_array\<T, N\> &, const binary\_expr\_array\<A, B, C, N\> &)](doc_array__functional.html#array/functional.hpp "jules::operator\>=(const ref_array\<T, N\> &, const binary_expr_array\<A, B, C, N\> &)")
     
+      - [operator\>=(const ref\_array\<T, N\> &, const contiguous\_array\<U, N\> &)](doc_array__functional.html#array/functional.hpp "jules::operator\>=(const ref_array\<T, N\> &, const contiguous_array\<U, N\> &)")
+    
       - [operator\>=(const ref\_array\<T, N\> &, const ind\_array\<U, N\> &)](doc_array__functional.html#array/functional.hpp "jules::operator\>=(const ref_array\<T, N\> &, const ind_array\<U, N\> &)")
     
       - [operator\>=(const ref\_array\<T, N\> &, const ref\_array\<U, N\> &)](doc_array__functional.html#array/functional.hpp "jules::operator\>=(const ref_array\<T, N\> &, const ref_array\<U, N\> &)")
@@ -1224,6 +1596,8 @@
       - [operator\>=(const unary\_expr\_array\<It, Op, N\> &, const base\_array\<U, N\> &)](doc_array__functional.html#array/functional.hpp "jules::operator\>=(const unary_expr_array\<It, Op, N\> &, const base_array\<U, N\> &)")
     
       - [operator\>=(const unary\_expr\_array\<It, Op, N\> &, const binary\_expr\_array\<A, B, C, N\> &)](doc_array__functional.html#array/functional.hpp "jules::operator\>=(const unary_expr_array\<It, Op, N\> &, const binary_expr_array\<A, B, C, N\> &)")
+    
+      - [operator\>=(const unary\_expr\_array\<It, Op, N\> &, const contiguous\_array\<U, N\> &)](doc_array__functional.html#array/functional.hpp "jules::operator\>=(const unary_expr_array\<It, Op, N\> &, const contiguous_array\<U, N\> &)")
     
       - [operator\>=(const unary\_expr\_array\<It, Op, N\> &, const ind\_array\<U, N\> &)](doc_array__functional.html#array/functional.hpp "jules::operator\>=(const unary_expr_array\<It, Op, N\> &, const ind_array\<U, N\> &)")
     
@@ -1237,6 +1611,8 @@
     
       - [operator^(U, const binary\_expr\_array\<LhsIt, RhsIt, Op, N\> &)](doc_array__functional.html#array/functional.hpp "jules::operator^(U, const binary_expr_array\<LhsIt, RhsIt, Op, N\> &)")
     
+      - [operator^(U, const contiguous\_array\<T, N\> &)](doc_array__functional.html#array/functional.hpp "jules::operator^(U, const contiguous_array\<T, N\> &)")
+    
       - [operator^(U, const ind\_array\<T, N\> &)](doc_array__functional.html#array/functional.hpp "jules::operator^(U, const ind_array\<T, N\> &)")
     
       - [operator^(U, const ref\_array\<T, N\> &)](doc_array__functional.html#array/functional.hpp "jules::operator^(U, const ref_array\<T, N\> &)")
@@ -1248,6 +1624,8 @@
       - [operator^(const base\_array\<T, N\> &, const base\_array\<U, N\> &)](doc_array__functional.html#array/functional.hpp "jules::operator^(const base_array\<T, N\> &, const base_array\<U, N\> &)")
     
       - [operator^(const base\_array\<T, N\> &, const binary\_expr\_array\<A, B, C, N\> &)](doc_array__functional.html#array/functional.hpp "jules::operator^(const base_array\<T, N\> &, const binary_expr_array\<A, B, C, N\> &)")
+    
+      - [operator^(const base\_array\<T, N\> &, const contiguous\_array\<U, N\> &)](doc_array__functional.html#array/functional.hpp "jules::operator^(const base_array\<T, N\> &, const contiguous_array\<U, N\> &)")
     
       - [operator^(const base\_array\<T, N\> &, const ind\_array\<U, N\> &)](doc_array__functional.html#array/functional.hpp "jules::operator^(const base_array\<T, N\> &, const ind_array\<U, N\> &)")
     
@@ -1261,17 +1639,35 @@
     
       - [operator^(const binary\_expr\_array\<LhsIt, RhsIt, Op, N\> &, const binary\_expr\_array\<A, B, C, N\> &)](doc_array__functional.html#array/functional.hpp "jules::operator^(const binary_expr_array\<LhsIt, RhsIt, Op, N\> &, const binary_expr_array\<A, B, C, N\> &)")
     
+      - [operator^(const binary\_expr\_array\<LhsIt, RhsIt, Op, N\> &, const contiguous\_array\<U, N\> &)](doc_array__functional.html#array/functional.hpp "jules::operator^(const binary_expr_array\<LhsIt, RhsIt, Op, N\> &, const contiguous_array\<U, N\> &)")
+    
       - [operator^(const binary\_expr\_array\<LhsIt, RhsIt, Op, N\> &, const ind\_array\<U, N\> &)](doc_array__functional.html#array/functional.hpp "jules::operator^(const binary_expr_array\<LhsIt, RhsIt, Op, N\> &, const ind_array\<U, N\> &)")
     
       - [operator^(const binary\_expr\_array\<LhsIt, RhsIt, Op, N\> &, const ref\_array\<U, N\> &)](doc_array__functional.html#array/functional.hpp "jules::operator^(const binary_expr_array\<LhsIt, RhsIt, Op, N\> &, const ref_array\<U, N\> &)")
     
       - [operator^(const binary\_expr\_array\<LhsIt, RhsIt, Op, N\> &, const unary\_expr\_array\<A, B, N\> &)](doc_array__functional.html#array/functional.hpp "jules::operator^(const binary_expr_array\<LhsIt, RhsIt, Op, N\> &, const unary_expr_array\<A, B, N\> &)")
     
+      - [operator^(const contiguous\_array\<T, N\> &, U)](doc_array__functional.html#array/functional.hpp "jules::operator^(const contiguous_array\<T, N\> &, U)")
+    
+      - [operator^(const contiguous\_array\<T, N\> &, const base\_array\<U, N\> &)](doc_array__functional.html#array/functional.hpp "jules::operator^(const contiguous_array\<T, N\> &, const base_array\<U, N\> &)")
+    
+      - [operator^(const contiguous\_array\<T, N\> &, const binary\_expr\_array\<A, B, C, N\> &)](doc_array__functional.html#array/functional.hpp "jules::operator^(const contiguous_array\<T, N\> &, const binary_expr_array\<A, B, C, N\> &)")
+    
+      - [operator^(const contiguous\_array\<T, N\> &, const contiguous\_array\<U, N\> &)](doc_array__functional.html#array/functional.hpp "jules::operator^(const contiguous_array\<T, N\> &, const contiguous_array\<U, N\> &)")
+    
+      - [operator^(const contiguous\_array\<T, N\> &, const ind\_array\<U, N\> &)](doc_array__functional.html#array/functional.hpp "jules::operator^(const contiguous_array\<T, N\> &, const ind_array\<U, N\> &)")
+    
+      - [operator^(const contiguous\_array\<T, N\> &, const ref\_array\<U, N\> &)](doc_array__functional.html#array/functional.hpp "jules::operator^(const contiguous_array\<T, N\> &, const ref_array\<U, N\> &)")
+    
+      - [operator^(const contiguous\_array\<T, N\> &, const unary\_expr\_array\<A, B, N\> &)](doc_array__functional.html#array/functional.hpp "jules::operator^(const contiguous_array\<T, N\> &, const unary_expr_array\<A, B, N\> &)")
+    
       - [operator^(const ind\_array\<T, N\> &, U)](doc_array__functional.html#array/functional.hpp "jules::operator^(const ind_array\<T, N\> &, U)")
     
       - [operator^(const ind\_array\<T, N\> &, const base\_array\<U, N\> &)](doc_array__functional.html#array/functional.hpp "jules::operator^(const ind_array\<T, N\> &, const base_array\<U, N\> &)")
     
       - [operator^(const ind\_array\<T, N\> &, const binary\_expr\_array\<A, B, C, N\> &)](doc_array__functional.html#array/functional.hpp "jules::operator^(const ind_array\<T, N\> &, const binary_expr_array\<A, B, C, N\> &)")
+    
+      - [operator^(const ind\_array\<T, N\> &, const contiguous\_array\<U, N\> &)](doc_array__functional.html#array/functional.hpp "jules::operator^(const ind_array\<T, N\> &, const contiguous_array\<U, N\> &)")
     
       - [operator^(const ind\_array\<T, N\> &, const ind\_array\<U, N\> &)](doc_array__functional.html#array/functional.hpp "jules::operator^(const ind_array\<T, N\> &, const ind_array\<U, N\> &)")
     
@@ -1285,6 +1681,8 @@
     
       - [operator^(const ref\_array\<T, N\> &, const binary\_expr\_array\<A, B, C, N\> &)](doc_array__functional.html#array/functional.hpp "jules::operator^(const ref_array\<T, N\> &, const binary_expr_array\<A, B, C, N\> &)")
     
+      - [operator^(const ref\_array\<T, N\> &, const contiguous\_array\<U, N\> &)](doc_array__functional.html#array/functional.hpp "jules::operator^(const ref_array\<T, N\> &, const contiguous_array\<U, N\> &)")
+    
       - [operator^(const ref\_array\<T, N\> &, const ind\_array\<U, N\> &)](doc_array__functional.html#array/functional.hpp "jules::operator^(const ref_array\<T, N\> &, const ind_array\<U, N\> &)")
     
       - [operator^(const ref\_array\<T, N\> &, const ref\_array\<U, N\> &)](doc_array__functional.html#array/functional.hpp "jules::operator^(const ref_array\<T, N\> &, const ref_array\<U, N\> &)")
@@ -1297,6 +1695,8 @@
     
       - [operator^(const unary\_expr\_array\<It, Op, N\> &, const binary\_expr\_array\<A, B, C, N\> &)](doc_array__functional.html#array/functional.hpp "jules::operator^(const unary_expr_array\<It, Op, N\> &, const binary_expr_array\<A, B, C, N\> &)")
     
+      - [operator^(const unary\_expr\_array\<It, Op, N\> &, const contiguous\_array\<U, N\> &)](doc_array__functional.html#array/functional.hpp "jules::operator^(const unary_expr_array\<It, Op, N\> &, const contiguous_array\<U, N\> &)")
+    
       - [operator^(const unary\_expr\_array\<It, Op, N\> &, const ind\_array\<U, N\> &)](doc_array__functional.html#array/functional.hpp "jules::operator^(const unary_expr_array\<It, Op, N\> &, const ind_array\<U, N\> &)")
     
       - [operator^(const unary\_expr\_array\<It, Op, N\> &, const ref\_array\<U, N\> &)](doc_array__functional.html#array/functional.hpp "jules::operator^(const unary_expr_array\<It, Op, N\> &, const ref_array\<U, N\> &)")
@@ -1306,6 +1706,8 @@
       - [operator|(U, const base\_array\<T, N\> &)](doc_array__functional.html#array/functional.hpp "jules::operator|(U, const base_array\<T, N\> &)")
     
       - [operator|(U, const binary\_expr\_array\<LhsIt, RhsIt, Op, N\> &)](doc_array__functional.html#array/functional.hpp "jules::operator|(U, const binary_expr_array\<LhsIt, RhsIt, Op, N\> &)")
+    
+      - [operator|(U, const contiguous\_array\<T, N\> &)](doc_array__functional.html#array/functional.hpp "jules::operator|(U, const contiguous_array\<T, N\> &)")
     
       - [operator|(U, const ind\_array\<T, N\> &)](doc_array__functional.html#array/functional.hpp "jules::operator|(U, const ind_array\<T, N\> &)")
     
@@ -1319,6 +1721,8 @@
     
       - [operator|(const base\_array\<T, N\> &, const binary\_expr\_array\<A, B, C, N\> &)](doc_array__functional.html#array/functional.hpp "jules::operator|(const base_array\<T, N\> &, const binary_expr_array\<A, B, C, N\> &)")
     
+      - [operator|(const base\_array\<T, N\> &, const contiguous\_array\<U, N\> &)](doc_array__functional.html#array/functional.hpp "jules::operator|(const base_array\<T, N\> &, const contiguous_array\<U, N\> &)")
+    
       - [operator|(const base\_array\<T, N\> &, const ind\_array\<U, N\> &)](doc_array__functional.html#array/functional.hpp "jules::operator|(const base_array\<T, N\> &, const ind_array\<U, N\> &)")
     
       - [operator|(const base\_array\<T, N\> &, const ref\_array\<U, N\> &)](doc_array__functional.html#array/functional.hpp "jules::operator|(const base_array\<T, N\> &, const ref_array\<U, N\> &)")
@@ -1331,17 +1735,35 @@
     
       - [operator|(const binary\_expr\_array\<LhsIt, RhsIt, Op, N\> &, const binary\_expr\_array\<A, B, C, N\> &)](doc_array__functional.html#array/functional.hpp "jules::operator|(const binary_expr_array\<LhsIt, RhsIt, Op, N\> &, const binary_expr_array\<A, B, C, N\> &)")
     
+      - [operator|(const binary\_expr\_array\<LhsIt, RhsIt, Op, N\> &, const contiguous\_array\<U, N\> &)](doc_array__functional.html#array/functional.hpp "jules::operator|(const binary_expr_array\<LhsIt, RhsIt, Op, N\> &, const contiguous_array\<U, N\> &)")
+    
       - [operator|(const binary\_expr\_array\<LhsIt, RhsIt, Op, N\> &, const ind\_array\<U, N\> &)](doc_array__functional.html#array/functional.hpp "jules::operator|(const binary_expr_array\<LhsIt, RhsIt, Op, N\> &, const ind_array\<U, N\> &)")
     
       - [operator|(const binary\_expr\_array\<LhsIt, RhsIt, Op, N\> &, const ref\_array\<U, N\> &)](doc_array__functional.html#array/functional.hpp "jules::operator|(const binary_expr_array\<LhsIt, RhsIt, Op, N\> &, const ref_array\<U, N\> &)")
     
       - [operator|(const binary\_expr\_array\<LhsIt, RhsIt, Op, N\> &, const unary\_expr\_array\<A, B, N\> &)](doc_array__functional.html#array/functional.hpp "jules::operator|(const binary_expr_array\<LhsIt, RhsIt, Op, N\> &, const unary_expr_array\<A, B, N\> &)")
     
+      - [operator|(const contiguous\_array\<T, N\> &, U)](doc_array__functional.html#array/functional.hpp "jules::operator|(const contiguous_array\<T, N\> &, U)")
+    
+      - [operator|(const contiguous\_array\<T, N\> &, const base\_array\<U, N\> &)](doc_array__functional.html#array/functional.hpp "jules::operator|(const contiguous_array\<T, N\> &, const base_array\<U, N\> &)")
+    
+      - [operator|(const contiguous\_array\<T, N\> &, const binary\_expr\_array\<A, B, C, N\> &)](doc_array__functional.html#array/functional.hpp "jules::operator|(const contiguous_array\<T, N\> &, const binary_expr_array\<A, B, C, N\> &)")
+    
+      - [operator|(const contiguous\_array\<T, N\> &, const contiguous\_array\<U, N\> &)](doc_array__functional.html#array/functional.hpp "jules::operator|(const contiguous_array\<T, N\> &, const contiguous_array\<U, N\> &)")
+    
+      - [operator|(const contiguous\_array\<T, N\> &, const ind\_array\<U, N\> &)](doc_array__functional.html#array/functional.hpp "jules::operator|(const contiguous_array\<T, N\> &, const ind_array\<U, N\> &)")
+    
+      - [operator|(const contiguous\_array\<T, N\> &, const ref\_array\<U, N\> &)](doc_array__functional.html#array/functional.hpp "jules::operator|(const contiguous_array\<T, N\> &, const ref_array\<U, N\> &)")
+    
+      - [operator|(const contiguous\_array\<T, N\> &, const unary\_expr\_array\<A, B, N\> &)](doc_array__functional.html#array/functional.hpp "jules::operator|(const contiguous_array\<T, N\> &, const unary_expr_array\<A, B, N\> &)")
+    
       - [operator|(const ind\_array\<T, N\> &, U)](doc_array__functional.html#array/functional.hpp "jules::operator|(const ind_array\<T, N\> &, U)")
     
       - [operator|(const ind\_array\<T, N\> &, const base\_array\<U, N\> &)](doc_array__functional.html#array/functional.hpp "jules::operator|(const ind_array\<T, N\> &, const base_array\<U, N\> &)")
     
       - [operator|(const ind\_array\<T, N\> &, const binary\_expr\_array\<A, B, C, N\> &)](doc_array__functional.html#array/functional.hpp "jules::operator|(const ind_array\<T, N\> &, const binary_expr_array\<A, B, C, N\> &)")
+    
+      - [operator|(const ind\_array\<T, N\> &, const contiguous\_array\<U, N\> &)](doc_array__functional.html#array/functional.hpp "jules::operator|(const ind_array\<T, N\> &, const contiguous_array\<U, N\> &)")
     
       - [operator|(const ind\_array\<T, N\> &, const ind\_array\<U, N\> &)](doc_array__functional.html#array/functional.hpp "jules::operator|(const ind_array\<T, N\> &, const ind_array\<U, N\> &)")
     
@@ -1355,6 +1777,8 @@
     
       - [operator|(const ref\_array\<T, N\> &, const binary\_expr\_array\<A, B, C, N\> &)](doc_array__functional.html#array/functional.hpp "jules::operator|(const ref_array\<T, N\> &, const binary_expr_array\<A, B, C, N\> &)")
     
+      - [operator|(const ref\_array\<T, N\> &, const contiguous\_array\<U, N\> &)](doc_array__functional.html#array/functional.hpp "jules::operator|(const ref_array\<T, N\> &, const contiguous_array\<U, N\> &)")
+    
       - [operator|(const ref\_array\<T, N\> &, const ind\_array\<U, N\> &)](doc_array__functional.html#array/functional.hpp "jules::operator|(const ref_array\<T, N\> &, const ind_array\<U, N\> &)")
     
       - [operator|(const ref\_array\<T, N\> &, const ref\_array\<U, N\> &)](doc_array__functional.html#array/functional.hpp "jules::operator|(const ref_array\<T, N\> &, const ref_array\<U, N\> &)")
@@ -1367,6 +1791,8 @@
     
       - [operator|(const unary\_expr\_array\<It, Op, N\> &, const binary\_expr\_array\<A, B, C, N\> &)](doc_array__functional.html#array/functional.hpp "jules::operator|(const unary_expr_array\<It, Op, N\> &, const binary_expr_array\<A, B, C, N\> &)")
     
+      - [operator|(const unary\_expr\_array\<It, Op, N\> &, const contiguous\_array\<U, N\> &)](doc_array__functional.html#array/functional.hpp "jules::operator|(const unary_expr_array\<It, Op, N\> &, const contiguous_array\<U, N\> &)")
+    
       - [operator|(const unary\_expr\_array\<It, Op, N\> &, const ind\_array\<U, N\> &)](doc_array__functional.html#array/functional.hpp "jules::operator|(const unary_expr_array\<It, Op, N\> &, const ind_array\<U, N\> &)")
     
       - [operator|(const unary\_expr\_array\<It, Op, N\> &, const ref\_array\<U, N\> &)](doc_array__functional.html#array/functional.hpp "jules::operator|(const unary_expr_array\<It, Op, N\> &, const ref_array\<U, N\> &)")
@@ -1376,6 +1802,8 @@
       - [operator||(U, const base\_array\<T, N\> &)](doc_array__functional.html#array/functional.hpp "jules::operator||(U, const base_array\<T, N\> &)")
     
       - [operator||(U, const binary\_expr\_array\<LhsIt, RhsIt, Op, N\> &)](doc_array__functional.html#array/functional.hpp "jules::operator||(U, const binary_expr_array\<LhsIt, RhsIt, Op, N\> &)")
+    
+      - [operator||(U, const contiguous\_array\<T, N\> &)](doc_array__functional.html#array/functional.hpp "jules::operator||(U, const contiguous_array\<T, N\> &)")
     
       - [operator||(U, const ind\_array\<T, N\> &)](doc_array__functional.html#array/functional.hpp "jules::operator||(U, const ind_array\<T, N\> &)")
     
@@ -1389,6 +1817,8 @@
     
       - [operator||(const base\_array\<T, N\> &, const binary\_expr\_array\<A, B, C, N\> &)](doc_array__functional.html#array/functional.hpp "jules::operator||(const base_array\<T, N\> &, const binary_expr_array\<A, B, C, N\> &)")
     
+      - [operator||(const base\_array\<T, N\> &, const contiguous\_array\<U, N\> &)](doc_array__functional.html#array/functional.hpp "jules::operator||(const base_array\<T, N\> &, const contiguous_array\<U, N\> &)")
+    
       - [operator||(const base\_array\<T, N\> &, const ind\_array\<U, N\> &)](doc_array__functional.html#array/functional.hpp "jules::operator||(const base_array\<T, N\> &, const ind_array\<U, N\> &)")
     
       - [operator||(const base\_array\<T, N\> &, const ref\_array\<U, N\> &)](doc_array__functional.html#array/functional.hpp "jules::operator||(const base_array\<T, N\> &, const ref_array\<U, N\> &)")
@@ -1401,17 +1831,35 @@
     
       - [operator||(const binary\_expr\_array\<LhsIt, RhsIt, Op, N\> &, const binary\_expr\_array\<A, B, C, N\> &)](doc_array__functional.html#array/functional.hpp "jules::operator||(const binary_expr_array\<LhsIt, RhsIt, Op, N\> &, const binary_expr_array\<A, B, C, N\> &)")
     
+      - [operator||(const binary\_expr\_array\<LhsIt, RhsIt, Op, N\> &, const contiguous\_array\<U, N\> &)](doc_array__functional.html#array/functional.hpp "jules::operator||(const binary_expr_array\<LhsIt, RhsIt, Op, N\> &, const contiguous_array\<U, N\> &)")
+    
       - [operator||(const binary\_expr\_array\<LhsIt, RhsIt, Op, N\> &, const ind\_array\<U, N\> &)](doc_array__functional.html#array/functional.hpp "jules::operator||(const binary_expr_array\<LhsIt, RhsIt, Op, N\> &, const ind_array\<U, N\> &)")
     
       - [operator||(const binary\_expr\_array\<LhsIt, RhsIt, Op, N\> &, const ref\_array\<U, N\> &)](doc_array__functional.html#array/functional.hpp "jules::operator||(const binary_expr_array\<LhsIt, RhsIt, Op, N\> &, const ref_array\<U, N\> &)")
     
       - [operator||(const binary\_expr\_array\<LhsIt, RhsIt, Op, N\> &, const unary\_expr\_array\<A, B, N\> &)](doc_array__functional.html#array/functional.hpp "jules::operator||(const binary_expr_array\<LhsIt, RhsIt, Op, N\> &, const unary_expr_array\<A, B, N\> &)")
     
+      - [operator||(const contiguous\_array\<T, N\> &, U)](doc_array__functional.html#array/functional.hpp "jules::operator||(const contiguous_array\<T, N\> &, U)")
+    
+      - [operator||(const contiguous\_array\<T, N\> &, const base\_array\<U, N\> &)](doc_array__functional.html#array/functional.hpp "jules::operator||(const contiguous_array\<T, N\> &, const base_array\<U, N\> &)")
+    
+      - [operator||(const contiguous\_array\<T, N\> &, const binary\_expr\_array\<A, B, C, N\> &)](doc_array__functional.html#array/functional.hpp "jules::operator||(const contiguous_array\<T, N\> &, const binary_expr_array\<A, B, C, N\> &)")
+    
+      - [operator||(const contiguous\_array\<T, N\> &, const contiguous\_array\<U, N\> &)](doc_array__functional.html#array/functional.hpp "jules::operator||(const contiguous_array\<T, N\> &, const contiguous_array\<U, N\> &)")
+    
+      - [operator||(const contiguous\_array\<T, N\> &, const ind\_array\<U, N\> &)](doc_array__functional.html#array/functional.hpp "jules::operator||(const contiguous_array\<T, N\> &, const ind_array\<U, N\> &)")
+    
+      - [operator||(const contiguous\_array\<T, N\> &, const ref\_array\<U, N\> &)](doc_array__functional.html#array/functional.hpp "jules::operator||(const contiguous_array\<T, N\> &, const ref_array\<U, N\> &)")
+    
+      - [operator||(const contiguous\_array\<T, N\> &, const unary\_expr\_array\<A, B, N\> &)](doc_array__functional.html#array/functional.hpp "jules::operator||(const contiguous_array\<T, N\> &, const unary_expr_array\<A, B, N\> &)")
+    
       - [operator||(const ind\_array\<T, N\> &, U)](doc_array__functional.html#array/functional.hpp "jules::operator||(const ind_array\<T, N\> &, U)")
     
       - [operator||(const ind\_array\<T, N\> &, const base\_array\<U, N\> &)](doc_array__functional.html#array/functional.hpp "jules::operator||(const ind_array\<T, N\> &, const base_array\<U, N\> &)")
     
       - [operator||(const ind\_array\<T, N\> &, const binary\_expr\_array\<A, B, C, N\> &)](doc_array__functional.html#array/functional.hpp "jules::operator||(const ind_array\<T, N\> &, const binary_expr_array\<A, B, C, N\> &)")
+    
+      - [operator||(const ind\_array\<T, N\> &, const contiguous\_array\<U, N\> &)](doc_array__functional.html#array/functional.hpp "jules::operator||(const ind_array\<T, N\> &, const contiguous_array\<U, N\> &)")
     
       - [operator||(const ind\_array\<T, N\> &, const ind\_array\<U, N\> &)](doc_array__functional.html#array/functional.hpp "jules::operator||(const ind_array\<T, N\> &, const ind_array\<U, N\> &)")
     
@@ -1425,6 +1873,8 @@
     
       - [operator||(const ref\_array\<T, N\> &, const binary\_expr\_array\<A, B, C, N\> &)](doc_array__functional.html#array/functional.hpp "jules::operator||(const ref_array\<T, N\> &, const binary_expr_array\<A, B, C, N\> &)")
     
+      - [operator||(const ref\_array\<T, N\> &, const contiguous\_array\<U, N\> &)](doc_array__functional.html#array/functional.hpp "jules::operator||(const ref_array\<T, N\> &, const contiguous_array\<U, N\> &)")
+    
       - [operator||(const ref\_array\<T, N\> &, const ind\_array\<U, N\> &)](doc_array__functional.html#array/functional.hpp "jules::operator||(const ref_array\<T, N\> &, const ind_array\<U, N\> &)")
     
       - [operator||(const ref\_array\<T, N\> &, const ref\_array\<U, N\> &)](doc_array__functional.html#array/functional.hpp "jules::operator||(const ref_array\<T, N\> &, const ref_array\<U, N\> &)")
@@ -1437,6 +1887,8 @@
     
       - [operator||(const unary\_expr\_array\<It, Op, N\> &, const binary\_expr\_array\<A, B, C, N\> &)](doc_array__functional.html#array/functional.hpp "jules::operator||(const unary_expr_array\<It, Op, N\> &, const binary_expr_array\<A, B, C, N\> &)")
     
+      - [operator||(const unary\_expr\_array\<It, Op, N\> &, const contiguous\_array\<U, N\> &)](doc_array__functional.html#array/functional.hpp "jules::operator||(const unary_expr_array\<It, Op, N\> &, const contiguous_array\<U, N\> &)")
+    
       - [operator||(const unary\_expr\_array\<It, Op, N\> &, const ind\_array\<U, N\> &)](doc_array__functional.html#array/functional.hpp "jules::operator||(const unary_expr_array\<It, Op, N\> &, const ind_array\<U, N\> &)")
     
       - [operator||(const unary\_expr\_array\<It, Op, N\> &, const ref\_array\<U, N\> &)](doc_array__functional.html#array/functional.hpp "jules::operator||(const unary_expr_array\<It, Op, N\> &, const ref_array\<U, N\> &)")
@@ -1446,6 +1898,8 @@
       - [operator~(const base\_array\<T, N\> &)](doc_array__functional.html#array/functional.hpp "jules::operator~(const base_array\<T, N\> &)")
     
       - [operator~(const binary\_expr\_array\<LhsIt, RhsIt, Op, N\> &)](doc_array__functional.html#array/functional.hpp "jules::operator~(const binary_expr_array\<LhsIt, RhsIt, Op, N\> &)")
+    
+      - [operator~(const contiguous\_array\<T, N\> &)](doc_array__functional.html#array/functional.hpp "jules::operator~(const contiguous_array\<T, N\> &)")
     
       - [operator~(const ind\_array\<T, N\> &)](doc_array__functional.html#array/functional.hpp "jules::operator~(const ind_array\<T, N\> &)")
     
@@ -1511,6 +1965,8 @@
     
       - [to\_view(base\_column\<C\> &)](doc_dataframe__numeric.html#dataframe/numeric.hpp "jules::to_view(base_column\<C\> &)")
     
+      - [to\_view(const base\_column\<C\> &&)](doc_dataframe__numeric.html#dataframe/numeric.hpp "jules::to_view(const base_column\<C\> &&)")
+    
       - [to\_view(const base\_column\<C\> &)](doc_dataframe__numeric.html#dataframe/numeric.hpp "jules::to_view(const base_column\<C\> &)")
     
       - [uinteger](doc_core__type.html#jules::uinteger "jules::uinteger") - Standard unsigned type.
@@ -1532,6 +1988,8 @@
       - [invalid](doc_array__blas.html#array/blas.hpp "jules::blas::invalid\<T\>")
     
       - [product(const matrix\<T\> &, const matrix\<T\> &)](doc_array__blas.html#array/blas.hpp "jules::blas::product(const matrix\<T\> &, const matrix\<T\> &)")
+    
+      - [safe\_int\_cast(T)](doc_array__blas.html#array/blas.hpp "jules::blas::safe_int_cast(T)")
 
   - `jules::debug`
     
@@ -1568,8 +2026,6 @@
       - [column\_model](doc_dataframe__detail__column_model.html#dataframe/detail/column_model.hpp "jules::detail::column_model\<T, Coercion\>")
     
       - [default\_slicing(const base\_slice\<N\> &, Args &&...)](doc_array__detail__slicing.html#array/detail/slicing.hpp "jules::detail::default_slicing(const base_slice\<N\> &, Args &&...)")
-    
-      - [defer\_helper](doc_base__async.html#base/async.hpp "jules::detail::defer_helper\<F\>")
     
       - [do\_slice(base\_slice\<N\> &)](doc_array__detail__slicing.html#array/detail/slicing.hpp "jules::detail::do_slice(base_slice\<N\> &)")
     

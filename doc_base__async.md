@@ -6,20 +6,15 @@
 ``` cpp
 #define JULES_BASE_ASYNC_H
 
+#define JULES_TOKEN_CONCAT(X, Y)
+
+#define JULES_TOKEN_PASTE(X, Y)
+
+#define JULES_DEFER(...)
+
 namespace jules
 {
-    namespace detail
-    {
-        template <typename F>
-        struct defer_helper;
-    }
-    
-    template <typename F>
-    auto defer(F&& f);
-    
     template <typename T>
-    T* move_ptr(T*& pointer);
+    auto move_ptr(T*& pointer);
 }
 ```
-
------
