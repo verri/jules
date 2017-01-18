@@ -120,7 +120,7 @@ protected:
   template <typename Iter> column_interface_ptr coerce_(Iter begin, Iter end, tag<type>) const
   {
     auto result = new column_model<type, Coercion>;
-    auto d = defer([&result] { delete result; });
+    JULES_DEFER(delete result);
 
     result->reserve(end - begin);
     std::transform(begin, end, std::back_inserter(*result),
@@ -145,7 +145,7 @@ protected:
   template <typename Iter> column_interface_ptr coerce_(Iter begin, Iter end, tag<type>) const
   {
     auto result = new column_model<type, Coercion>;
-    auto d = defer([&result] { delete result; });
+    JULES_DEFER(delete result);
 
     result->reserve(end - begin);
     std::transform(begin, end, std::back_inserter(*result), [](const T& value) -> type { return value; });
