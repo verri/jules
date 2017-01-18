@@ -56,6 +56,13 @@ TEST_CASE("Column constructor using initializer list", "[dataframe]")
   static_assert(std::is_same<decltype(make_value(v)), numeric>::value, "");
 }
 
+template <typename T> using _to_view = decltype(jules::to_view<int>(std::declval<T>()));
+static_assert(jules::meta::compiles<jules::column&, _to_view>::value, "");
+static_assert(jules::meta::compiles<const jules::column&, _to_view>::value, "");
+static_assert(!jules::meta::compiles<jules::column, _to_view>::value, "");
+static_assert(!jules::meta::compiles<jules::column&&, _to_view>::value, "");
+static_assert(!jules::meta::compiles<const jules::column&&, _to_view>::value, "");
+
 TEST_CASE("Column constructor inference", "[dataframe]")
 {
   using jules::column;
@@ -81,7 +88,6 @@ TEST_CASE("Temporary columns", "[dataframe]")
 
   auto c = jules::to_column<numeric>(df.at(0u).column);
   auto view = jules::to_view<numeric>(c);
-  // auto impossible_view = jules::to_view<numeric>(jules::to_column<numeric>(df.at(0u).column));
 
   for (auto i = 0u; i < df.row_count(); ++i)
     CHECK(view[i] == i + 1);
