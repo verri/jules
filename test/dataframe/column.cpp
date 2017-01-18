@@ -100,3 +100,17 @@ TEST_CASE("Column to_view vs as_vector", "[dataframe]")
     CHECK(vector[i] == i);
   }
 }
+
+TEST_CASE("Column tutorial", "[dataframe]")
+{
+  auto empty_column = jules::column();
+
+  CHECK(empty_column.size() == 0u);
+  CHECK(empty_column.length() == 0u);
+  CHECK(empty_column.extents() == 0u);
+  CHECK_FALSE(empty_column.can_coerce<jules::numeric>());
+
+  CHECK_THROWS(empty_column.elements_type());
+  CHECK_THROWS(empty_column.data<void*>());
+  CHECK_THROWS(empty_column.coerce<jules::numeric>());
+}

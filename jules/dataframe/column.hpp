@@ -3,6 +3,7 @@
 #ifndef JULES_DATAFRAME_COLUMN_H
 #define JULES_DATAFRAME_COLUMN_H
 
+#include <jules/core/debug.hpp>
 #include <jules/core/meta.hpp>
 #include <jules/core/range.hpp>
 #include <jules/core/type.hpp>
@@ -47,7 +48,7 @@ public:
 
   auto operator=(const base_column& source) -> base_column&
   {
-    model_ = std::move(source.model_->clone());
+    model_ = source.model_ ? source.model_->clone() : nullptr;
     return *this;
   }
 
@@ -55,13 +56,19 @@ public:
 
   template <typename T> auto coerce() & -> base_column&
   {
+    DEBUG_ASSERT(model_ != nullptr, debug::default_module, debug::level::invalid_state, "column has no data");
     model_ = model_->template coerce<T>();
     return *this;
   }
 
-  template <typename T> auto can_coerce() const { return model_->template can_coerce<T>(); }
+  template <typename T> auto can_coerce() const { return model_ ? model_->template can_coerce<T>() : false; }
 
-  auto elements_type() const { return model_->elements_type(); }
+  auto elements_type() const
+  {
+    DEBUG_ASSERT(model_ != nullptr, debug::default_module, debug::level::invalid_state,
+                 "column has no type because it has no data");
+    return model_->elements_type();
+  }
 
   auto size() const { return model_ ? model_->size() : 0u; }
   auto extents() const { return size(); }
@@ -69,14 +76,16 @@ public:
 
   template <typename T> auto data()
   {
-    if (elements_type() != typeid(T))
-      this->coerce<T>();
+    DEBUG_ASSERT(model_ != nullptr, debug::default_module, debug::level::invalid_state, "column has no data");
+    DEBUG_ASSERT(elements_type() == typeid(T), debug::default_module, debug::level::invalid_state, "invalid data type");
     auto& model = this->model_->template downcast<T>();
     return model.data();
   }
 
   template <typename T> auto data() const
   {
+    DEBUG_ASSERT(model_ != nullptr, debug::default_module, debug::level::invalid_state, "column has no data");
+    DEBUG_ASSERT(elements_type() == typeid(T), debug::default_module, debug::level::invalid_state, "invalid data type");
     const auto& model = this->model_->template downcast<T>();
     return model.data();
   }
