@@ -31,6 +31,8 @@ template <typename T, typename C> auto to_view(const base_column<C>& column) -> 
   return {column.template data<T>(), column.size()};
 }
 
+template <typename T, typename C> auto to_view(const base_column<C>&& column) = delete;
+
 template <typename T, typename C> auto to_vector(const base_column<C>& column) -> vector<T>
 {
   auto size = column.size();

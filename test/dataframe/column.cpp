@@ -1,4 +1,5 @@
 #include "jules/dataframe/column.hpp"
+#include "jules/dataframe/dataframe.hpp"
 #include "jules/dataframe/numeric.hpp"
 
 #include <catch.hpp>
@@ -68,19 +69,22 @@ TEST_CASE("Column constructor inference", "[dataframe]")
   check_column({"1.0"s, "2.0"s, "3.0"s, "1.0"s}, typeid(string));
 }
 
-// TEST_CASE("Temporary columns", "[dataframe]")
-// {
-//   jules::column col{{1, 2, 3, 4, 5}};
-//   jules::dataframe df;
-//
-//   df.colbind(col);
-//   auto c = jules::as_column<numeric>(df.select(0));
-//   auto view = jules::to_view<numeric>(c);
-//   // auto impossible_view = jules::to_view<numeric>(jules::as_column<numeric>(df.select(0)));
-//
-//   for (std::size_t i = 0; i < df.rows_count(); ++i)
-//     CHECK(view[i] == i + 1);
-// }
+TEST_CASE("Temporary columns", "[dataframe]")
+{
+  using jules::numeric;
+
+  auto col = jules::column{1, 2, 3, 4, 5};
+  auto df = jules::dataframe{};
+
+  df.bind(col);
+
+  auto c = jules::to_column<numeric>(df.at(0u).column);
+  auto view = jules::to_view<numeric>(c);
+  // auto impossible_view = jules::to_view<numeric>(jules::to_column<numeric>(df.at(0u).column));
+
+  for (auto i = 0u; i < df.row_count(); ++i)
+    CHECK(view[i] == i + 1);
+}
 
 TEST_CASE("Column to_view vs as_vector", "[dataframe]")
 {
