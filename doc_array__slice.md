@@ -18,7 +18,7 @@ namespace jules
 }
 ```
 
-## Class template `jules::base_slice` \[N-Dimensional Array\]<a id="jules::base_slice-N-"></a>
+## Class template `jules::base_slice` \[Array Types\]<a id="jules::base_slice-N-"></a>
 
 ``` cpp
 template <std::size_t N>
@@ -190,7 +190,7 @@ Returns the memory position of the index.
 
 -----
 
-## Class template `jules::base_slice<1>` \[N-Dimensional Array\]<a id="jules::base_slice-1-"></a>
+## Class template `jules::base_slice<1>` \[Array Types\]<a id="jules::base_slice-1-"></a>
 
 ``` cpp
 template <>

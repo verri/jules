@@ -16,7 +16,7 @@ namespace jules
 }
 ```
 
-## Class template `jules::ind_array` \[N-Dimensional Array\]<a id="jules::ind_array-T,N-"></a>
+## Class template `jules::ind_array` \[Array Types\]<a id="jules::ind_array-T,N-"></a>
 
 ``` cpp
 template <typename T, std::size_t N>
@@ -144,7 +144,7 @@ Implicitly convertable to hold const values.
 
 -----
 
-## Class template `jules::ind_array<T, 1>` \[N-Dimensional Array\]<a id="jules::ind_array-T,1-"></a>
+## Class template `jules::ind_array<T, 1>` \[Array Types\]<a id="jules::ind_array-T,1-"></a>
 
 ``` cpp
 template <typename T>

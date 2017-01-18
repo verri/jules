@@ -27,6 +27,24 @@
     
       - [jules::sum(const Rng &, T)](doc_base__numeric.html#jules::sum(Iter,Sent,T) "jules::sum(const Rng &, T)") - Returns either the summation of the elements in a `Range` or in the sequence \[`first`, `last`).
 
+  - ## Array Types
+    
+      - [jules::base\_array\<T, 1\>](doc_array__array.html#jules::base_array-T,1- "jules::base_array\<T, 1\>") - 1-Dimensional concrete array.
+    
+      - [jules::base\_array](doc_array__array.html#jules::base_array-T,N- "jules::base_array\<T, N\>") - N-Dimensional concrete array.
+    
+      - [jules::base\_slice\<1\>](doc_array__slice.html#jules::base_slice-1- "jules::base_slice\<1\>") - 1D-Array specialization for slicing and dimensions representation.
+    
+      - [jules::base\_slice](doc_array__slice.html#jules::base_slice-N- "jules::base_slice\<N\>") - Array slicing and dimensions representation.
+    
+      - [jules::ind\_array\<T, 1\>](doc_array__ind_array.html#jules::ind_array-T,1- "jules::ind_array\<T, 1\>") - 1-D Indirect array specialization.
+    
+      - [jules::ind\_array](doc_array__ind_array.html#jules::ind_array-T,N- "jules::ind_array\<T, N\>") - Array indirect reference.
+    
+      - [jules::ref\_array\<T, 1\>](doc_array__ref_array.html#jules::ref_array-T,1- "jules::ref_array\<T, 1\>") - 1-D Array reference specialization.
+    
+      - [jules::ref\_array](doc_array__ref_array.html#jules::ref_array-T,N- "jules::ref_array\<T, N\>") - Array reference.
+
   - ## Basic Types
     
       - [jules::distance\_t](doc_core__type.html#jules::distance_t "jules::distance_t") - Standard distance type.
@@ -68,21 +86,3 @@
       - [jules::none(Iter, Sent)](doc_base__numeric.html#jules::none(Iter,Sent) "jules::none(Iter, Sent)") - Checks whether all elements in a `Range` or in the sequence \[`first`, `last`) are false.
     
       - [jules::none(const Rng &)](doc_base__numeric.html#jules::none(Iter,Sent) "jules::none(const Rng &)") - Checks whether all elements in a `Range` or in the sequence \[`first`, `last`) are false.
-
-  - ## N-Dimensional Array
-    
-      - [jules::base\_array\<T, 1\>](doc_array__array.html#jules::base_array-T,1- "jules::base_array\<T, 1\>") - 1-Dimensional concrete array.
-    
-      - [jules::base\_array](doc_array__array.html#jules::base_array-T,N- "jules::base_array\<T, N\>") - N-Dimensional concrete array.
-    
-      - [jules::base\_slice\<1\>](doc_array__slice.html#jules::base_slice-1- "jules::base_slice\<1\>") - 1D-Array specialization for slicing and dimensions representation.
-    
-      - [jules::base\_slice](doc_array__slice.html#jules::base_slice-N- "jules::base_slice\<N\>") - Array slicing and dimensions representation.
-    
-      - [jules::ind\_array\<T, 1\>](doc_array__ind_array.html#jules::ind_array-T,1- "jules::ind_array\<T, 1\>") - 1-D Indirect array specialization.
-    
-      - [jules::ind\_array](doc_array__ind_array.html#jules::ind_array-T,N- "jules::ind_array\<T, N\>") - Array indirect reference.
-    
-      - [jules::ref\_array\<T, 1\>](doc_array__ref_array.html#jules::ref_array-T,1- "jules::ref_array\<T, 1\>") - 1-D Array reference specialization.
-    
-      - [jules::ref\_array](doc_array__ref_array.html#jules::ref_array-T,N- "jules::ref_array\<T, N\>") - Array reference.

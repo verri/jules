@@ -29,8 +29,6 @@
 
   - [INDIRECT\_NDARRAY](doc_array__functional.html#array/functional.hpp "INDIRECT_NDARRAY")
 
-  - [JULES\_ARRAY\_ARRAY\_H](doc_array__array.html#array/array.hpp "JULES_ARRAY_ARRAY_H")
-
   - [JULES\_ARRAY\_BINARY\_EXPR\_ARRAY\_H](doc_array__binary_expr_array.html#array/binary_expr_array.hpp "JULES_ARRAY_BINARY_EXPR_ARRAY_H")
 
   - [JULES\_ARRAY\_BLAS\_H](doc_array__blas.html#array/blas.hpp "JULES_ARRAY_BLAS_H")
@@ -291,7 +289,7 @@
     
       - [make\_expr\_array(LhsIt, LhsIt, RhsIt, RhsIt, F &&, typename base\_slice\<M\>::extent\_type)](doc_array__detail__common.html#array/detail/common.hpp "jules::make_expr_array(LhsIt, LhsIt, RhsIt, RhsIt, F &&, typename base_slice\<M\>::extent_type)")
     
-      - [matrix](doc_array__array.html#jules::matrix-T- "jules::matrix\<T\>") - Matrix aliasing.  Data type defaults to [jules::numeric](doc_core__type.html#jules::numeric).
+      - [matrix](doc_array__array.html#jules::ndarray-N,T- "jules::matrix\<T\>") - (1) N-Dimensional array aliasing.
     
       - [max(Iter, Sent, T)](doc_base__numeric.html#jules::max(Iter,Sent,T) "jules::max(Iter, Sent, T)") - Returns either the maximum element in a `Range` or in the sequence \[`first`, `last`).
     
@@ -303,7 +301,7 @@
     
       - [move\_ptr(T \*&)](doc_base__async.html#base/async.hpp "jules::move_ptr(T *&)")
     
-      - [ndarray](doc_array__array.html#jules::ndarray-N,T- "jules::ndarray\<N, T\>") - N-Dimensional array aliasing.  Data type defaults to [jules::numeric](doc_core__type.html#jules::numeric).
+      - [ndarray](doc_array__array.html#jules::ndarray-N,T- "jules::ndarray\<N, T\>") - (1) N-Dimensional array aliasing.
     
       - [none(Iter, Sent)](doc_base__numeric.html#jules::none(Iter,Sent) "jules::none(Iter, Sent)") - Checks whether all elements in a `Range` or in the sequence \[`first`, `last`) are false.
     
@@ -1953,9 +1951,9 @@
     
       - [sum\_args(const T &, Args &&...)](doc_base__numeric.html#base/numeric.hpp "jules::sum_args(const T &, Args &&...)")
     
-      - [to\_column(base\_column\<C\> &&)](doc_dataframe__numeric.html#dataframe/numeric.hpp "jules::to_column(base_column\<C\> &&)")
+      - [to\_column(base\_column\<C\> &&)](doc_dataframe__column.html#dataframe/column.hpp "jules::to_column(base_column\<C\> &&)")
     
-      - [to\_column(const base\_column\<C\> &)](doc_dataframe__numeric.html#dataframe/numeric.hpp "jules::to_column(const base_column\<C\> &)")
+      - [to\_column(const base\_column\<C\> &)](doc_dataframe__column.html#dataframe/column.hpp "jules::to_column(const base_column\<C\> &)")
     
       - [to\_vector(A &&)](doc_array__numeric.html#array/numeric.hpp "jules::to_vector(A &&)")
     
@@ -1975,7 +1973,7 @@
     
       - [uniform\_index\_sample(index\_t)](doc_base__random.html#base/random.hpp "jules::uniform_index_sample(index_t)")
     
-      - [vector](doc_array__array.html#jules::vector-T- "jules::vector\<T\>") - Vector aliasing.  Data type defaults to [jules::numeric](doc_core__type.html#jules::numeric).
+      - [vector](doc_array__array.html#jules::ndarray-N,T- "jules::vector\<T\>") - (1) N-Dimensional array aliasing.
 
   - `jules::blas`
     

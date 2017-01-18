@@ -1,11 +1,12 @@
 ---
+title: Home
 layout: default
 ---
 
-jules
+Jules
 =====
 
-jules is a statistical computing library that aims to provide R-like experience in modern C++.
+A statistical computing library that aims to provide R-like experience in modern C++.
 
 Dependencies
 ------------
@@ -34,6 +35,9 @@ Contributing
 ------------
 
 [Source code](https://github.com/verri/jules) hosted at [GitHub](https://github.com).
+
+[Feature requests](https://github.com/verri/jules/issues) are welcome!
+
 
 Acknowledgements
 ----------------
