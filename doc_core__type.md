@@ -29,25 +29,6 @@ namespace jules
     
     using coercion_rules = base_coercion_rules<numeric_rule, string_rule>;
     
-    namespace detail
-    {
-        struct trivial_tag;
-        
-        struct non_trivial_tag;
-        
-        template <typename T, typename = void>
-        struct trivial_dispatch_helper;
-        
-        template <typename T>
-        struct trivial_dispatch_helper<T, std::enable_if_t<std::is_trivial<T>::value>>;
-        
-        template <typename T>
-        auto trivial_dispatch();
-        
-        template <typename T>
-        struct tag;
-    }
-    
     template <typename T, std::size_t N>
     struct recursive_initializer_list;
     

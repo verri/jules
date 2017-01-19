@@ -8,24 +8,6 @@
 
 namespace jules
 {
-    namespace detail
-    {
-        template <std::size_t N, typename ... Types>
-        using n_indexes_enabler = std::enable_if_t<N==sizeof...(Types)&&all_args(std::is_convertible<Types, uint>::value...)>;
-        
-        template <typename T>
-        constexpr auto index_or_slice();
-        
-        template <typename Return, typename ... Args>
-        using element_request = std::enable_if_t<all_args(std::is_convertible<Args, uint>::value...), Return>;
-        
-        template <typename Return, typename ... Args>
-        using slice_request = std::enable_if_t<all_args(index_or_slice<Args>()...)&&!all_args(std::is_convertible<Args, uint>::value...), Return>;
-        
-        template <typename Return, typename ... Args>
-        using indirect_request = std::enable_if_t<!all_args(index_or_slice<Args>()...), Return>;
-    }
-    
     template <typename T>
     struct Array;
     
@@ -54,5 +36,3 @@ namespace jules
     binary_expr_array<LhsIt, RhsIt, std::decay_t<F>, M> make_expr_array(LhsIt lhs_first, LhsIt lhs_last, RhsIt rhs_first, RhsIt rhs_last, F&& f, typename base_slice<M>::extent_type extent);
 }
 ```
-
------

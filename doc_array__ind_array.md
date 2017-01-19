@@ -59,22 +59,22 @@ public:
     ind_array<const T, N-1> operator[](index_t i) const;
     
     template <typename ... Args>
-    detail::indirect_request<ind_array<T, N>, Args...> operator()(Args&&... args);
+    /*unspecified*/ operator()(Args&&... args);
     
     template <typename ... Args>
-    detail::slice_request<ind_array<T, N>, Args...> operator()(Args&&... args);
+    /*unspecified*/ operator()(Args&&... args);
     
     template <typename ... Args>
-    detail::element_request<T&, Args...> operator()(Args&&... args);
+    /*unspecified*/ operator()(Args&&... args);
     
     template <typename ... Args>
-    detail::indirect_request<ind_array<const T, N>, Args...> operator()(Args&&... args) const;
+    /*unspecified*/ operator()(Args&&... args) const;
     
     template <typename ... Args>
-    detail::slice_request<ind_array<const T, N>, Args...> operator()(Args&&... args) const;
+    /*unspecified*/ operator()(Args&&... args) const;
     
     template <typename ... Args>
-    detail::element_request<const T&, Args...> operator()(Args&&... args) const;
+    /*unspecified*/ operator()(Args&&... args) const;
     
     iterator begin();
     

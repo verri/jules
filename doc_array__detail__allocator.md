@@ -8,12 +8,5 @@
 
 namespace jules
 {
-    namespace detail
-    {
-        template <typename T>
-        struct array_allocator;
-    }
 }
 ```
-
------
