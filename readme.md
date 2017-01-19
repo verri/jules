@@ -35,11 +35,12 @@ If you intend to use BLAS optimized functions, make sure CBLAS is installed.
 
 ### Compilation
 
-Make sure to enable C++14 and to include the path where **Jules** is installed. Arch Linux users do not need
-the `-isystem` option, since the library is already in the system path.
+Enable C++14 and include the path where **Jules** is installed. Arch Linux
+users do not need the `-isystem` option, since the library is already in the
+system path.
 
 ```sh
-CXXFLAGS=-std=c++14 -isystem/path/to/release/include
+CXXFLAGS="-std=c++14 -isystem/path/to/release/include"
 ```
 
 If using BLAS, make sure to link it.

@@ -1,6 +1,7 @@
 // Copyright (c) 2016 Filipe Verri <filipeverri@gmail.com>
 
 #ifndef JULES_ARRAY_REF_ARRAY_H
+/// \exclude
 #define JULES_ARRAY_REF_ARRAY_H
 
 #include <jules/array/detail/common.hpp>
@@ -17,9 +18,10 @@ namespace jules
 
 /// Array reference.
 ///
-/// This class is used internally by `jules` to represent a view of an concrete array.
+/// This class represents a view of an concrete array.
 ///
 /// \module Array Types
+/// \notes This class is not meant to be used in user code.
 template <typename T, std::size_t N> class ref_array
 {
   static_assert(N > 0u, "invalid array dimension");
@@ -27,14 +29,35 @@ template <typename T, std::size_t N> class ref_array
   template <typename, std::size_t> friend class ref_array;
 
 public:
-  using value_type = T;
+  /// \group member_types Class Types and Constants
+  ///
+  /// (1) The order of dimensionality.
+  ///
+  /// (2) The type of the elements.
+  ///
+  /// (3) `ForwardIterator` over the elements.
+  ///
+  /// (4) Constant `ForwardIterator` over the elements.
+  ///
+  /// (5) Unsigned integer type that can store the dimensions of the array.
+  ///
+  /// (6) Signed integer type that can store differences between sizes.
   static constexpr auto order = N;
 
-  using size_type = index_t;
-  using difference_type = distance_t;
+  /// \group member_types
+  using value_type = T;
 
+  /// \group member_types
   using iterator = detail::iterator_from_indexes<T, typename base_slice<N>::iterator>;
+
+  /// \group member_types
   using const_iterator = detail::iterator_from_indexes<const T, typename base_slice<N>::iterator>;
+
+  /// \group member_types
+  using size_type = index_t;
+
+  /// \group member_types
+  using difference_type = distance_t;
 
   /// *TODO*: Explain why the user should probably not call these functions.
   /// In C++17, we can provide a helper that generates a view with more security.
@@ -131,37 +154,65 @@ public:
   auto cbegin() const -> const_iterator { return {data_, descriptor_.begin()}; }
   auto cend() const -> const_iterator { return {data_, descriptor_.end()}; }
 
-  auto descriptor() const { return descriptor_; }
-  auto data() const { return data_; }
-  auto extents() const { return descriptor_.extents; }
-  auto size() const { return descriptor_.size(); }
+  auto descriptor() const -> base_slice<order> { return descriptor_; }
+  auto data() const -> value_type* { return data_; }
 
-  auto row_count() const { return extents()[0]; }
-  auto column_count() const { return extents()[1]; }
+  /// \exclude return
+  auto extents() const { return descriptor_.extents; }
+
+  auto size() const -> index_t { return descriptor_.size(); }
+
+  auto row_count() const -> index_t { return extents()[0]; }
+  auto column_count() const -> index_t { return extents()[1]; }
 
 protected:
-  T* data_;
-  base_slice<N> descriptor_;
+  /// \exclude
+  value_type* data_;
+
+  /// \exclude
+  base_slice<order> descriptor_;
 };
 
 /// 1-D Array reference specialization.
 ///
-/// This class is used internally by `jules` to represent a view of an concrete array.
+/// This class represents a view of a concrete array.
 ///
 /// \module Array Types
+/// \notes This class is not meant to be used in user code.
 template <typename T> class ref_array<T, 1>
 {
   template <typename, std::size_t> friend class ref_array;
 
 public:
+  /// \group member_types Class Types and Constants
+  ///
+  /// (1) The order of dimensionality.
+  ///
+  /// (2) The type of the elements.
+  ///
+  /// (3) `ForwardIterator` over the elements.
+  ///
+  /// (4) Constant `ForwardIterator` over the elements.
+  ///
+  /// (5) Unsigned integer type that can store the dimensions of the array.
+  ///
+  /// (6) Signed integer type that can store differences between sizes.
+  static constexpr auto order = std::size_t{1u};
+
+  /// \group member_types Class Types and Constants
   using value_type = T;
-  static constexpr auto order = 1;
 
-  using size_type = index_t;
-  using difference_type = distance_t;
-
+  /// \group member_types Class Types and Constants
   using iterator = detail::iterator_from_indexes<T, typename base_slice<1>::iterator>;
+
+  /// \group member_types Class Types and Constants
   using const_iterator = detail::iterator_from_indexes<const T, typename base_slice<1>::iterator>;
+
+  /// \group member_types Class Types and Constants
+  using size_type = index_t;
+
+  /// \group member_types Class Types and Constants
+  using difference_type = distance_t;
 
   /// *TODO*: Explain why the user should probably not call this function.
   /// In C++17, we can provide a helper that generates a view with more security.
@@ -292,14 +343,20 @@ public:
   auto cbegin() const -> const_iterator { return {data_, descriptor_.begin()}; }
   auto cend() const -> const_iterator { return {data_, descriptor_.end()}; }
 
-  auto descriptor() const { return descriptor_; }
-  auto data() const { return data_; }
-  auto extents() const { return descriptor_.extent; }
-  auto size() const { return descriptor_.size(); }
-  auto length() const { return size(); }
+  auto descriptor() const -> base_slice<1> { return descriptor_; }
+  auto data() const -> value_type* { return data_; }
+
+  auto extents() const -> index_t { return descriptor_.extent; }
+
+  auto size() const -> index_t { return descriptor_.size(); }
+
+  auto length() const -> index_t { return size(); }
 
 protected:
+  /// \exclude
   T* data_;
+
+  /// \exclude
   base_slice<1> descriptor_;
 };
 

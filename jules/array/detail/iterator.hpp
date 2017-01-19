@@ -1,6 +1,7 @@
 // Copyright (c) 2016 Filipe Verri <filipeverri@gmail.com>
 
 #ifndef JULES_ARRAY_DETAIL_ITERATOR_H
+/// \exclude
 #define JULES_ARRAY_DETAIL_ITERATOR_H
 
 #include <jules/array/detail/common.hpp>
@@ -10,8 +11,10 @@
 
 namespace jules
 {
+/// \exclude
 namespace detail
 {
+/// \exclude
 template <typename T, typename It> class iterator_from_indexes
 {
 public:

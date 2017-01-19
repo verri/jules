@@ -215,14 +215,14 @@ public:
 
   /// \group Fill
   /// Fills the array.
-  auto fill(const value_type& value)
+  auto fill(const value_type& value) -> void
   {
     for (auto& elem : *this)
       elem = value;
   }
 
   /// \group Fill
-  template <typename... Args> auto fill(in_place_t, Args&&... args)
+  template <typename... Args> auto fill(in_place_t, Args&&... args) -> void
   {
     DEBUG_ASSERT(this->data(), debug::default_module, debug::level::invalid_state, "array is empty");
     detail::array_allocator<value_type>::destroy(detail::trivial_dispatch<value_type>(), this->data(), this->size());
@@ -334,7 +334,7 @@ public:
   /// (5) Unsigned integer type that can store the dimensions of the array.
   ///
   /// (6) Signed integer type that can store differences between sizes.
-  static constexpr auto order = 1ul;
+  static constexpr auto order = std::size_t{1u};
 
   /// \group member_types Class Types and Constants
   using value_type = T;
@@ -495,14 +495,14 @@ public:
 
   /// \group Fill
   /// Fills the array.
-  auto fill(const value_type& value)
+  auto fill(const value_type& value) -> void
   {
     for (auto& elem : *this)
       elem = value;
   }
 
   /// \group Fill
-  template <typename... Args> auto fill(in_place_t, Args&&... args)
+  template <typename... Args> auto fill(in_place_t, Args&&... args) -> void
   {
     DEBUG_ASSERT(this->data(), debug::default_module, debug::level::invalid_state, "array is empty");
     detail::array_allocator<value_type>::destroy(detail::trivial_dispatch<value_type>(), this->data(), this->size());
