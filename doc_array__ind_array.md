@@ -33,9 +33,9 @@ public:
     
     using difference_type = distance_t;
     
-    using iterator = detail::iterator_from_indexes<T, typename vector_type::const_iterator>;
+    using iterator = /*unspecified*/;
     
-    using const_iterator = detail::iterator_from_indexes<const T, typename vector_type::const_iterator>;
+    using const_iterator = /*unspecified*/;
     
     ind_array() = default;
     
@@ -161,9 +161,9 @@ public:
     
     using difference_type = distance_t;
     
-    using iterator = detail::iterator_from_indexes<T, typename vector_type::iterator>;
+    using iterator = /*unspecified*/;
     
-    using const_iterator = detail::iterator_from_indexes<const T, typename vector_type::const_iterator>;
+    using const_iterator = /*unspecified*/;
     
     ind_array() = default;
     

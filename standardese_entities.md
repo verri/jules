@@ -39,8 +39,6 @@
 
   - [JULES\_ARRAY\_DETAIL\_COMMON\_H](doc_array__detail__common.html#array/detail/common.hpp "JULES_ARRAY_DETAIL_COMMON_H")
 
-  - [JULES\_ARRAY\_DETAIL\_ITERATOR\_H](doc_array__detail__iterator.html#array/detail/iterator.hpp "JULES_ARRAY_DETAIL_ITERATOR_H")
-
   - [JULES\_ARRAY\_DETAIL\_SLICING\_H](doc_array__detail__slicing.html#array/detail/slicing.hpp "JULES_ARRAY_DETAIL_SLICING_H")
 
   - [JULES\_ARRAY\_FUNCTIONAL\_H](doc_array__functional.html#array/functional.hpp "JULES_ARRAY_FUNCTIONAL_H")
@@ -50,8 +48,6 @@
   - [JULES\_ARRAY\_IO\_H](doc_array__io.html#array/io.hpp "JULES_ARRAY_IO_H")
 
   - [JULES\_ARRAY\_NUMERIC\_H](doc_array__numeric.html#array/numeric.hpp "JULES_ARRAY_NUMERIC_H")
-
-  - [JULES\_ARRAY\_REF\_ARRAY\_H](doc_array__ref_array.html#array/ref_array.hpp "JULES_ARRAY_REF_ARRAY_H")
 
   - [JULES\_ARRAY\_SLICE\_H](doc_array__slice.html#array/slice.hpp "JULES_ARRAY_SLICE_H")
 
@@ -2068,8 +2064,6 @@
       - [indirect\_slicing(const base\_slice\<N\> &, Args &&...)](doc_array__detail__slicing.html#array/detail/slicing.hpp "jules::detail::indirect_slicing(const base_slice\<N\> &, Args &&...)")
     
       - [indirect\_slicing\_impl(const base\_slice\<N\> &, Tuple &&, std::index\_sequence\<I...\>)](doc_array__detail__slicing.html#array/detail/slicing.hpp "jules::detail::indirect_slicing_impl(const base_slice\<N\> &, Tuple &&, std::index_sequence\<I...\>)")
-    
-      - [iterator\_from\_indexes](doc_array__detail__iterator.html#array/detail/iterator.hpp "jules::detail::iterator_from_indexes\<T, It\>")
     
       - [n\_indexes\_enabler](doc_array__detail__common.html#array/detail/common.hpp "jules::detail::n_indexes_enabler\<N, Types...\>")
     

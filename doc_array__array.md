@@ -61,9 +61,9 @@ public:
     template <typename A>
     base_array& operator=(const A& source);
     
-    auto fill(const value_type& value);
+    void fill(const value_type& value);
     template <typename ... Args>
-    auto fill(in_place_t, Args&&... args);
+    void fill(in_place_t, Args&&... args);
     
     iterator begin();
     const_iterator begin() const;
@@ -194,10 +194,10 @@ Constructs a new array from a variety of data sources.
 ### Function `jules::base_array::fill`<a id="jules::base_array-T,N-::fill(constvalue_type&)"></a>
 
 ``` cpp
-(1)  auto fill(const value_type& value);
+(1)  void fill(const value_type& value);
 
 (2)  template <typename ... Args>
-     auto fill(in_place_t, Args&&... args);
+     void fill(in_place_t, Args&&... args);
 ```
 
 Fills the array.
@@ -247,7 +247,7 @@ class base_array<T, 1>
 {
 public:
     //=== Class Types and Constants ===//
-    static constexpr auto order = 1ul;
+    static constexpr auto order = std::size_t{1u};
     using value_type = T;
     using iterator = value_type*;
     using const_iterator = const value_type*;
@@ -276,9 +276,9 @@ public:
     template <typename A>
     base_array& operator=(const A& source) &;
     
-    auto fill(const value_type& value);
+    void fill(const value_type& value);
     template <typename ... Args>
-    auto fill(in_place_t, Args&&... args);
+    void fill(in_place_t, Args&&... args);
     
     ind_array<value_type, 1> operator()(std::vector<index_t>&& indexes);
     ind_array<const value_type, 1> operator()(std::vector<index_t>&& indexes) const;
@@ -307,7 +307,7 @@ Basic data-type to represent arrays with 1 dimension. For more operations over t
 ### Class Types and Constants<a id="jules::base_array-T,1-::order"></a>
 
 ``` cpp
-(1)  static constexpr auto order = 1ul;
+(1)  static constexpr auto order = std::size_t{1u};
 
 (2)  using value_type = T;
 
@@ -405,10 +405,10 @@ Constructs a new vector from a variety of data sources.
 ### Function `jules::base_array<T, 1>::fill`<a id="jules::base_array-T,1-::fill(constvalue_type&)"></a>
 
 ``` cpp
-(1)  auto fill(const value_type& value);
+(1)  void fill(const value_type& value);
 
 (2)  template <typename ... Args>
-     auto fill(in_place_t, Args&&... args);
+     void fill(in_place_t, Args&&... args);
 ```
 
 Fills the array.

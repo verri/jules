@@ -4,8 +4,6 @@
 # Header file `array/ref_array.hpp`<a id="array/ref_array.hpp"></a>
 
 ``` cpp
-#define JULES_ARRAY_REF_ARRAY_H
-
 namespace jules
 {
     template <typename T, std::size_t N>
@@ -23,17 +21,13 @@ template <typename T, std::size_t N>
 class ref_array
 {
 public:
-    using value_type = T;
-    
+    //=== Class Types and Constants ===//
     static constexpr auto order = N;
-    
-    using size_type = index_t;
-    
-    using difference_type = distance_t;
-    
+    using value_type = T;
     using iterator = detail::iterator_from_indexes<T, typename base_slice<N>::iterator>;
-    
     using const_iterator = detail::iterator_from_indexes<const T, typename base_slice<N>::iterator>;
+    using size_type = index_t;
+    using difference_type = distance_t;
     
     ref_array() = default;
     
@@ -84,28 +78,53 @@ public:
     
     const_iterator cend() const;
     
-    auto descriptor() const;
+    base_slice<order> descriptor() const;
     
-    auto data() const;
+    value_type* data() const;
     
-    auto extents() const;
+    /*unspecified*/ extents() const;
     
-    auto size() const;
+    index_t size() const;
     
-    auto row_count() const;
+    index_t row_count() const;
     
-    auto column_count() const;
-    
-protected:
-    T* data_;
-    
-    base_slice<N> descriptor_;
+    index_t column_count() const;
 };
 ```
 
 Array reference.
 
-This class is used internally by `jules` to represent a view of an concrete array.
+This class represents a view of an concrete array.
+
+*Notes*: This class is not meant to be used in user code.
+
+### Class Types and Constants<a id="jules::ref_array-T,N-::order"></a>
+
+``` cpp
+(1)  static constexpr auto order = N;
+
+(2)  using value_type = T;
+
+(3)  using iterator = detail::iterator_from_indexes<T, typename base_slice<N>::iterator>;
+
+(4)  using const_iterator = detail::iterator_from_indexes<const T, typename base_slice<N>::iterator>;
+
+(5)  using size_type = index_t;
+
+(6)  using difference_type = distance_t;
+```
+
+(1) The order of dimensionality.
+
+(2) The type of the elements.
+
+(3) `ForwardIterator` over the elements.
+
+(4) Constant `ForwardIterator` over the elements.
+
+(5) Unsigned integer type that can store the dimensions of the array.
+
+(6) Signed integer type that can store differences between sizes.
 
 ### Default constructor `jules::ref_array::ref_array`<a id="jules::ref_array-T,N-::ref_array()"></a>
 
@@ -152,17 +171,13 @@ template <typename T>
 class ref_array<T, 1>
 {
 public:
+    //=== Class Types and Constants ===//
+    static constexpr auto order = std::size_t{1u};
     using value_type = T;
-    
-    static constexpr auto order = 1;
-    
-    using size_type = index_t;
-    
-    using difference_type = distance_t;
-    
     using iterator = detail::iterator_from_indexes<T, typename base_slice<1>::iterator>;
-    
     using const_iterator = detail::iterator_from_indexes<const T, typename base_slice<1>::iterator>;
+    using size_type = index_t;
+    using difference_type = distance_t;
     
     ref_array() = default;
     
@@ -220,26 +235,51 @@ public:
     
     const_iterator cend() const;
     
-    auto descriptor() const;
+    base_slice<1> descriptor() const;
     
-    auto data() const;
+    value_type* data() const;
     
-    auto extents() const;
+    index_t extents() const;
     
-    auto size() const;
+    index_t size() const;
     
-    auto length() const;
-    
-protected:
-    T* data_;
-    
-    base_slice<1> descriptor_;
+    index_t length() const;
 };
 ```
 
 1-D Array reference specialization.
 
-This class is used internally by `jules` to represent a view of an concrete array.
+This class represents a view of a concrete array.
+
+*Notes*: This class is not meant to be used in user code.
+
+### Class Types and Constants<a id="jules::ref_array-T,1-::order"></a>
+
+``` cpp
+(1)  static constexpr auto order = std::size_t{1u};
+
+(2)  using value_type = T;
+
+(3)  using iterator = detail::iterator_from_indexes<T, typename base_slice<1>::iterator>;
+
+(4)  using const_iterator = detail::iterator_from_indexes<const T, typename base_slice<1>::iterator>;
+
+(5)  using size_type = index_t;
+
+(6)  using difference_type = distance_t;
+```
+
+(1) The order of dimensionality.
+
+(2) The type of the elements.
+
+(3) `ForwardIterator` over the elements.
+
+(4) Constant `ForwardIterator` over the elements.
+
+(5) Unsigned integer type that can store the dimensions of the array.
+
+(6) Signed integer type that can store differences between sizes.
 
 ### Default constructor `jules::ref_array<T, 1>::ref_array`<a id="jules::ref_array-T,1-::ref_array()"></a>
 
