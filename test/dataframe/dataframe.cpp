@@ -235,7 +235,7 @@ TEST_CASE("Reading matrix of integers", "[dataframe]")
   opts.header = false;
 
   std::stringstream stream;
-  constexpr auto N = 10u;
+  constexpr auto N = 3u;
   for (auto i = 0u; i < N; ++i) {
     for (auto j = 0u; j < N; ++j) {
       stream << (i * N + j) << "\t";
@@ -273,6 +273,10 @@ TEST_CASE("Reading matrix of integers", "[dataframe]")
 
   CHECK(idf.column_count() == N);
   CHECK(idf.row_count() == N);
+
+  // Converting to matrix
+  auto imatrix = jules::to_matrix<int>(idf);
+  CHECK(all(imatrix == jules::matrix<int>{{0, 1, 2}, {3, 4, 5}, {6, 7, 8}}));
 }
 
 TEST_CASE("Reading an inconsistent dataframe", "[dataframe]")
