@@ -312,7 +312,7 @@ TEST_CASE("Reading and writing a well-formed dataframe", "[dataframe]")
 
   std::stringstream os2;
 
-  dataframe{{"y", {0, 3}}, {"x", {1, 4}}, {"z", {2, 5}}}.write(os2);
+  dataframe{{"y", {0.0, 3.0}}, {"x", {1.0, 4.0}}, {"z", {2.0, 5.0}}}.write(os2);
   CHECK(data == os2.str());
 
   const auto cols = df.names();

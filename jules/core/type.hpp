@@ -5,6 +5,7 @@
 
 #include <initializer_list>
 #include <limits>
+#include <stdexcept>
 #include <string>
 #include <utility>
 
@@ -24,7 +25,7 @@ using string = std::string;
 
 /// Standard unsigned type.
 /// \module Basic Types
-using uinteger = std::uint32_t;
+using uinteger = unsigned;
 
 /// Standard index type.
 /// \module Basic Types
@@ -32,7 +33,7 @@ using index_t = std::size_t;
 
 /// Standard signed type.
 /// \module Basic Types
-using integer = std::int64_t;
+using integer = int;
 
 /// Standard distance type.
 /// \module Basic Types
@@ -42,7 +43,14 @@ using distance_t = std::ptrdiff_t;
 /// \module Coercion Rules
 struct numeric_rule {
   using type = numeric;
+
   static auto coerce_from(const string& value) -> type { return std::stod(value); }
+
+  template <typename T, typename = std::enable_if_t<std::is_convertible<const T&, type>::value>>
+  static auto coerce_from(const T& value) -> type
+  {
+    return type{value};
+  }
 };
 
 /// Coercion rules for [string type](standardese://jules::string/).
@@ -50,6 +58,81 @@ struct numeric_rule {
 struct string_rule {
   using type = string;
   static auto coerce_from(const numeric& value) -> type { return std::to_string(static_cast<double>(value)); }
+  static auto coerce_from(const index_t& value) -> type { return std::to_string(value); }
+  static auto coerce_from(const integer& value) -> type { return std::to_string(value); }
+  static auto coerce_from(const uinteger& value) -> type { return std::to_string(value); }
+  static auto coerce_from(const type& value) -> type { return value; }
+  // TODO: Some automatic rules like the others.
+};
+
+/// Coercion rules for [index type](standardese://jules::index_t/).
+/// \module Coercion Rules
+struct index_rule {
+  using type = index_t;
+
+  static auto coerce_from(const numeric& value) -> type
+  {
+    if (value < 0)
+      throw std::invalid_argument{"index from negative numeric value"};
+    return static_cast<type>(value);
+  }
+
+  static auto coerce_from(const string& value) -> type { return std::stoul(value); }
+
+  static auto coerce_from(const integer& value) -> type
+  {
+    if (value < 0)
+      throw std::invalid_argument{"index from negative value"};
+    return static_cast<type>(value);
+  }
+
+  template <typename T, typename = std::enable_if_t<std::is_convertible<const T&, type>::value>>
+  static auto coerce_from(const T& value) -> type
+  {
+    return type{value};
+  }
+};
+
+/// Coercion rules for [integer type](standardese://jules::integer/).
+/// \module Coercion Rules
+struct integer_rule {
+  using type = integer;
+
+  static auto coerce_from(const string& value) -> type { return std::stoi(value); }
+
+  template <typename T, typename = std::enable_if_t<std::is_convertible<const T&, type>::value>>
+  static auto coerce_from(const T& value) -> type
+  {
+    return type{value};
+  }
+};
+
+/// Coercion rules for [unsigned type](standardese://jules::uinteger/).
+/// \module Coercion Rules
+struct unsigned_rule {
+  using type = uinteger;
+
+  static auto coerce_from(const numeric& value) -> type
+  {
+    if (value < 0)
+      throw std::invalid_argument{"index from negative numeric value"};
+    return static_cast<type>(value);
+  }
+
+  static auto coerce_from(const string& value) -> type { return static_cast<type>(std::stoul(value)); }
+
+  static auto coerce_from(const integer& value) -> type
+  {
+    if (value < 0)
+      throw std::invalid_argument{"index from negative value"};
+    return static_cast<type>(value);
+  }
+
+  template <typename T, typename = std::enable_if_t<std::is_convertible<const T&, type>::value>>
+  static auto coerce_from(const T& value) -> type
+  {
+    return type{value};
+  }
 };
 
 /// Utility class to combine coercion rules.
@@ -77,7 +160,7 @@ public:
 /// Default class with coercion rules for [numeric](standardese://jules::numeric/) and
 /// [string](standardese://jules::string/) classes.
 /// \module Coercion Rules
-using coercion_rules = base_coercion_rules<numeric_rule, string_rule>;
+using coercion_rules = base_coercion_rules<numeric_rule, string_rule, index_rule, integer_rule, unsigned_rule>;
 
 namespace detail
 {

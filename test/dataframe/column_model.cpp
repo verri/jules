@@ -13,31 +13,30 @@ TEST_CASE("Column model", "[dataframe]")
   using column_interface_ptr = std::unique_ptr<column_interface<coercion_rules>>;
 
   column_interface_ptr icolumn{new column_model<int, coercion_rules>};
-  // Learns the coercions: int -(explicit)-> double
-  //                       int -(implicit)-> double -(explicit)-> string
-  column_interface_ptr dcolumn{new column_model<double, coercion_rules>};
-  // Learns the coercions: double -(implicit)-> double
-  //                       double -(explicit)-> string
+  column_interface_ptr dcolumn{new column_model<numeric, coercion_rules>};
 
   CHECK(icolumn->elements_type() == typeid(int));
-  CHECK(dcolumn->elements_type() == typeid(double));
+  CHECK(dcolumn->elements_type() == typeid(numeric));
   CHECK(dcolumn->elements_type() != typeid(int));
-  CHECK(icolumn->elements_type() != typeid(double));
+  CHECK(icolumn->elements_type() != typeid(numeric));
+  CHECK(icolumn->elements_type() != typeid(index_t));
 
-  CHECK(!icolumn->can_coerce<int>());
-  CHECK(icolumn->can_coerce<double>());
-  CHECK(!icolumn->can_coerce<unsigned int>());
+  CHECK(icolumn->can_coerce<int>());
+  CHECK(icolumn->can_coerce<numeric>());
+  CHECK(icolumn->can_coerce<unsigned int>());
   CHECK(icolumn->can_coerce<string>());
+  CHECK(icolumn->can_coerce<index_t>());
 
-  CHECK(!dcolumn->can_coerce<int>());
-  CHECK(dcolumn->can_coerce<double>());
+  CHECK(dcolumn->can_coerce<int>());
+  CHECK(dcolumn->can_coerce<numeric>());
+  CHECK(dcolumn->can_coerce<index_t>());
   CHECK(dcolumn->can_coerce<string>());
 
   auto& ivec = icolumn->downcast<int>();
   ivec.resize(10);
   std::iota(ivec.begin(), ivec.end(), 0);
 
-  auto& dvec = dcolumn->downcast<double>();
+  auto& dvec = dcolumn->downcast<numeric>();
   std::transform(ivec.begin(), ivec.end(), std::back_inserter(dvec), [](int x) { return 3.1415 * x; });
 
   std::vector<string> expected{"0.000000",  "3.141500",  "6.283000",  "9.424500",  "12.566000",
@@ -50,8 +49,8 @@ TEST_CASE("Column model", "[dataframe]")
   CHECK(check.first == svec.end());
   CHECK(check.second == expected.end());
 
-  auto back_to_dcolumn = scolumn->coerce<double>();
-  auto& back_to_dvec = back_to_dcolumn->downcast<double>();
+  auto back_to_dcolumn = scolumn->coerce<numeric>();
+  auto& back_to_dvec = back_to_dcolumn->downcast<numeric>();
 
   auto check_back = std::mismatch(dvec.begin(), dvec.end(), back_to_dvec.begin(), [](auto x, auto y) { return x == Approx(y); });
   CHECK(check_back.first == dvec.end());
