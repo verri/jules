@@ -76,20 +76,22 @@ public:
   /// Constructs a new array from a variety of data sources.
   ///
   /// (1) Default constructor. Constructs an empty array.
+  //
+  /// (2) Explicit construction with dimensions `dims`. Elements are **uninitialized**.
   ///
-  /// (2) Explicit constructor with dimensions `dims`.  Elements are default initialized.
+  /// (3) Explicit constructor with dimensions `dims`.  Elements are default-initialized.
   ///
-  /// (3) Constructs the array with copies of elements with value `value` and dimensions `dims`.
+  /// (4) Constructs the array with copies of elements with value `value` and dimensions `dims`.
   ///
-  /// (4) Constructs the array with dimensions `dims`.  Elements are initialized by iterating `iter`.
+  /// (5) Constructs the array with dimensions `dims`.  Elements are initialized by iterating `iter`.
   ///
-  /// (5) Constructs the array from a `recursive_initialized_list`.
+  /// (6) Constructs the array from a `recursive_initialized_list`.
   ///
-  /// (6) Copy constructor.
+  /// (7) Copy constructor.
   ///
-  /// (7) Move constructor.
+  /// (8) Move constructor.
   ///
-  /// (8) Converting constructor.  Constructs a array from other array-like structures,
+  /// (9) Converting constructor.  Constructs a array from other array-like structures,
   ///   e.g. expression arrays or sliced arrays.
   ///
   /// \requires `Iter` shall be `OutputIterator`
@@ -104,7 +106,16 @@ public:
   /// \tparam _
   ///   \exclude
   template <typename... Dims, typename _ = detail::n_indexes_enabler<order, Dims...>>
-  explicit base_array(Dims... dims) : ref_array<value_type, order>{this->allocate(prod_args(dims...)), {0u, {{index_t{dims}...}}}}
+  explicit base_array(uninitialized_t, Dims... dims)
+    : ref_array<value_type, order>{this->allocate(prod_args(dims...)), {0u, {{index_t{dims}...}}}}
+  {
+  }
+
+  /// \group constructors
+  /// \tparam _
+  ///   \exclude
+  template <typename... Dims, typename _ = detail::n_indexes_enabler<order, Dims...>>
+  explicit base_array(Dims... dims) : base_array(uninitialized, dims...)
   {
     this->create(detail::trivial_dispatch<value_type>(), this->data(), this->size());
   }
@@ -113,8 +124,7 @@ public:
   /// \tparam _
   ///   \exclude
   template <typename... Dims, typename _ = detail::n_indexes_enabler<order, Dims...>>
-  base_array(const value_type& value, Dims... dims)
-    : ref_array<value_type, order>{this->allocate(prod_args(dims...)), {0u, {{index_t{dims}...}}}}
+  base_array(const value_type& value, Dims... dims) : base_array(uninitialized, dims...)
   {
     this->create(detail::trivial_dispatch<value_type>(), this->data(), this->size(), value);
   }
@@ -128,8 +138,7 @@ public:
   ///   \exclude
   template <typename Iter, typename... Dims, typename R = range::iterator_value_t<Iter>,
             typename _1 = detail::n_indexes_enabler<order, Dims...>, typename _2 = meta::requires<range::Iterator<Iter>>>
-  base_array(Iter iter, Dims... dims)
-    : ref_array<value_type, order>{this->allocate(prod_args(dims...)), {0u, {{index_t{dims}...}}}}
+  base_array(Iter iter, Dims... dims) : base_array(uninitialized, dims...)
   {
     static_assert(std::is_convertible<R, value_type>::value, "iterator values are not compatible");
     this->create(detail::trivial_dispatch<value_type>(), this->data(), iter, this->size());
@@ -358,21 +367,23 @@ public:
   ///
   /// (1) Default constructor. Constructs an empty vector.
   ///
-  /// (2) Explicit constructor with size `length`.  Elements are default initialized.
+  /// (2) Explicit construction with size `length`. Elements are **uninitialized**.
   ///
-  /// (3) Constructs the vector with copies of elements with value `value` and length `length`.
+  /// (3) Explicit constructor with size `length`.  Elements are default initialized.
   ///
-  /// (4) Constructs the container with the contents of the range [`first`, `last`).
+  /// (4) Constructs the vector with copies of elements with value `value` and length `length`.
   ///
-  /// (5) Constructs the vector from a `initialized_list`.
+  /// (5) Constructs the container with the contents of the range [`first`, `last`).
   ///
-  /// (6) Constructs the vector from a range.
+  /// (6) Constructs the vector from a `initialized_list`.
   ///
-  /// (7) Copy constructor.
+  /// (7) Constructs the vector from a range.
   ///
-  /// (8) Move constructor.
+  /// (8) Copy constructor.
   ///
-  /// (9) Converting constructor.  Constructs a vector from other vector-like structures,
+  /// (9) Move constructor.
+  ///
+  /// (10) Converting constructor.  Constructs a vector from other vector-like structures,
   ///   e.g. expression arrays or sliced arrays.
   ///
   /// \requires `Sent` shall be `Sentinel<Iter>`
@@ -381,13 +392,16 @@ public:
   base_array() : ref_array<value_type, 1>{nullptr, {}} {}
 
   /// \group constructors
-  explicit base_array(index_t length) : ref_array<value_type, 1>{this->allocate(length), {0u, length}}
+  explicit base_array(uninitialized_t, index_t length) : ref_array<value_type, 1>{this->allocate(length), {0u, length}} {}
+
+  /// \group constructors
+  explicit base_array(index_t length) : base_array(uninitialized, length)
   {
     this->create(detail::trivial_dispatch<value_type>(), this->data(), this->size());
   }
 
   /// \group constructors
-  base_array(const value_type& value, index_t length) : ref_array<value_type, 1>{this->allocate(length), {0u, length}}
+  base_array(const value_type& value, index_t length) : base_array(uninitialized, length)
   {
     this->create(detail::trivial_dispatch<value_type>(), this->data(), this->size(), value);
   }
@@ -417,8 +431,7 @@ public:
   ///   \exclude
   template <typename Rng, typename U = range::range_value_t<std::decay_t<Rng>>,
             typename _ = meta::requires<range::Range<std::decay_t<Rng>>, meta::negation<Array<std::decay_t<Rng>>>>>
-  base_array(Rng&& rng)
-    : ref_array<value_type, 1>{this->allocate(range::size(std::forward<Rng>(rng))), {0u, range::size(std::forward<Rng>(rng))}}
+  base_array(Rng&& rng) : base_array(uninitialized, range::size(std::forward<Rng>(rng)))
   {
     static_assert(std::is_constructible<value_type, const U&>::value, "incompatible value types");
     this->create(detail::trivial_dispatch<value_type>(), this->data(), range::begin(std::forward<Rng>(rng)), this->size());

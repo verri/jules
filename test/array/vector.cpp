@@ -15,6 +15,12 @@ TEST_CASE("Vector tutorial", "[array]")
     CHECK(empty.begin() == empty.end());
     CHECK(empty.cbegin() == empty.cend());
 
+    // Uninitialized vs initialized
+    auto uninit = jules::vector<>(jules::uninitialized, 10u);
+    auto init = jules::vector<>(10u);
+
+    CHECK(all(init == jules::numeric{}));
+
     // Constructors with size and optional default value.
     auto all_same1 = jules::vector<long>(3l, 10u);
     auto all_same2 = jules::vector<long>(10u);

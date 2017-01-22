@@ -15,6 +15,12 @@ TEST_CASE("Matrix tutorial", "[array]")
     CHECK(empty.begin() == empty.end());
     CHECK(empty.cbegin() == empty.cend());
 
+    // Uninitialized vs initialized
+    auto uninit = jules::matrix<>(jules::uninitialized, 3u, 3u);
+    auto init = jules::matrix<>(3u, 3u);
+
+    CHECK(all(init == jules::numeric{}));
+
     // Constructors with size and optional default value.
     auto all_same1 = jules::matrix<long>(3l, 4u, 4u);
     auto all_same2 = jules::matrix<long>(4u, 4u);
