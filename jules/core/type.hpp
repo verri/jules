@@ -127,7 +127,15 @@ struct in_place_t {
   constexpr explicit in_place_t() = default;
 };
 
-static constexpr in_place_t in_place{};
+static constexpr auto in_place = in_place_t{};
+
+// Non-initialized construction tag
+
+struct uninitialized_t {
+  constexpr explicit uninitialized_t() = default;
+};
+
+static constexpr auto uninitialized = uninitialized_t{};
 
 // Arithmetic rules
 
