@@ -27,10 +27,10 @@ template <typename T>
 struct StringConvertible<T, std::enable_if_t<meta::compiles<T, detail::to_string_expr>::value>> : std::true_type {
 };
 
-template <typename T, typename = void> struct Signed : std::false_type {};
+template <typename T, typename = void> struct Signed : std::false_type {
+};
 
-template <typename T>
-struct Signed<T, std::enable_if_t<std::numeric_limits<T>::is_signed>> : std::true_type {
+template <typename T> struct Signed<T, std::enable_if_t<std::numeric_limits<T>::is_signed>> : std::true_type {
 };
 
 /// Standard numeric type.
@@ -88,7 +88,8 @@ struct string_rule {
     return std::to_string(value);
   }
 
-  template <typename U, typename = meta::fallback<StringConvertible<const U&>>, typename = std::enable_if_t<std::is_convertible<const U&, type>::value>>
+  template <typename U, typename = meta::fallback<StringConvertible<const U&>>,
+            typename = std::enable_if_t<std::is_convertible<const U&, type>::value>>
   static auto coerce_from(const U& value) -> type
   {
     return value;
@@ -97,7 +98,7 @@ struct string_rule {
 
 /// Coercion rules for [index type](standardese://jules::index_t/).
 /// \module Coercion Rules
-struct index_rule  {
+struct index_rule {
   using type = index_t;
 
   static auto coerce_from(const string& value) -> type { return std::stoul(value); }
@@ -109,7 +110,8 @@ struct index_rule  {
     return value;
   }
 
-  template <typename U, typename = meta::fallback<Signed<U>>, typename = std::enable_if_t<std::is_convertible<const U&, type>::value>>
+  template <typename U, typename = meta::fallback<Signed<U>>,
+            typename = std::enable_if_t<std::is_convertible<const U&, type>::value>>
   static auto coerce_from(const U& value) -> type
   {
     return value;
@@ -126,7 +128,7 @@ struct integer_rule : default_rule<integer> {
 
 /// Coercion rules for [unsigned type](standardese://jules::uinteger/).
 /// \module Coercion Rules
-struct uinteger_rule  {
+struct uinteger_rule {
   using type = uinteger;
 
   static auto coerce_from(const string& value) -> type
@@ -144,7 +146,8 @@ struct uinteger_rule  {
     return value;
   }
 
-  template <typename U, typename = meta::fallback<Signed<U>>, typename = std::enable_if_t<std::is_convertible<const U&, type>::value>>
+  template <typename U, typename = meta::fallback<Signed<U>>,
+            typename = std::enable_if_t<std::is_convertible<const U&, type>::value>>
   static auto coerce_from(const U& value) -> type
   {
     return value;
@@ -180,24 +183,6 @@ using coercion_rules = base_coercion_rules<numeric_rule, string_rule, index_rule
 
 namespace detail
 {
-
-// Trivial/Non-trivial dispatch
-
-struct trivial_tag {
-};
-
-struct non_trivial_tag {
-};
-
-template <typename T, typename = void> struct trivial_dispatch_helper {
-  using type = non_trivial_tag;
-};
-
-template <typename T> struct trivial_dispatch_helper<T, std::enable_if_t<std::is_trivial<T>::value>> {
-  using type = trivial_tag;
-};
-
-template <typename T> auto trivial_dispatch() { return typename trivial_dispatch_helper<T>::type{}; }
 
 // Tag type utility
 

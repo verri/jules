@@ -79,7 +79,7 @@ public:
   //
   /// (2) Explicit construction with dimensions `dims`. Elements are **uninitialized**.
   ///
-  /// (3) Explicit constructor with dimensions `dims`.  Elements are default-initialized.
+  /// (3) Explicit constructor with dimensions `dims`.  Elements are value-initialized.
   ///
   /// (4) Constructs the array with copies of elements with value `value` and dimensions `dims`.
   ///
@@ -117,7 +117,7 @@ public:
   template <typename... Dims, typename _ = detail::n_indexes_enabler<order, Dims...>>
   explicit base_array(Dims... dims) : base_array(uninitialized, dims...)
   {
-    this->create(detail::trivial_dispatch<value_type>(), this->data(), this->size());
+    this->create(this->data(), this->size());
   }
 
   /// \group constructors
@@ -126,7 +126,7 @@ public:
   template <typename... Dims, typename _ = detail::n_indexes_enabler<order, Dims...>>
   base_array(const value_type& value, Dims... dims) : base_array(uninitialized, dims...)
   {
-    this->create(detail::trivial_dispatch<value_type>(), this->data(), this->size(), value);
+    this->create(this->data(), this->size(), value);
   }
 
   /// \group constructors
@@ -141,7 +141,7 @@ public:
   base_array(Iter iter, Dims... dims) : base_array(uninitialized, dims...)
   {
     static_assert(std::is_convertible<R, value_type>::value, "iterator values are not compatible");
-    this->create(detail::trivial_dispatch<value_type>(), this->data(), iter, this->size());
+    this->create(this->data(), iter, this->size());
   }
 
   /// \group constructors
@@ -149,13 +149,13 @@ public:
   {
     this->descriptor_ = this->calculate_descriptor(values);
     this->data_ = this->allocate(this->descriptor_.size());
-    this->create(detail::trivial_dispatch<value_type>(), this->data(), values, this->descriptor_);
+    this->create(this->data(), values, this->descriptor_);
   }
 
   /// \group constructors
   base_array(const base_array& source) : ref_array<value_type, order>{this->allocate(source.size()), source.descriptor_}
   {
-    this->create(detail::trivial_dispatch<value_type>(), this->data(), source.data(), this->size());
+    this->create(this->data(), source.data(), this->size());
   }
 
   /// \group constructors
@@ -171,7 +171,7 @@ public:
   {
     static_assert(A::order == order, "array order mismatch");
     static_assert(std::is_constructible<value_type, const typename A::value_type&>::value, "incompatible value types");
-    this->create(detail::trivial_dispatch<value_type>(), this->data(), source.begin(), this->size());
+    this->create(this->data(), source.begin(), this->size());
   }
 
   /// \group assignment Assignment
@@ -189,7 +189,7 @@ public:
     clear(this->data(), this->size());
     this->data_ = this->allocate(source.size());
     this->descriptor_ = source.descriptor_;
-    this->create(detail::trivial_dispatch<value_type>(), this->data(), source.data(), source.size());
+    this->create(this->data(), source.data(), source.size());
     return *this;
   }
 
@@ -215,7 +215,7 @@ public:
 
     this->data_ = this->allocate(source.size());
     this->descriptor_ = {0, source.extents()};
-    this->create(detail::trivial_dispatch<value_type>(), this->data(), source.begin(), source.size());
+    this->create(this->data(), source.begin(), source.size());
 
     clear(old_data, old_size);
 
@@ -234,9 +234,8 @@ public:
   template <typename... Args> auto fill(in_place_t, Args&&... args) -> void
   {
     DEBUG_ASSERT(this->data(), debug::default_module, debug::level::invalid_state, "array is empty");
-    detail::array_allocator<value_type>::destroy(detail::trivial_dispatch<value_type>(), this->data(), this->size());
-    detail::array_allocator<value_type>::create(detail::trivial_dispatch<value_type>(), this->data(), this->size(),
-                                                std::forward<Args>(args)...);
+    this->destroy(this->data(), this->size());
+    this->create(this->data(), this->size(), std::forward<Args>(args)...);
   }
 
   /// \group Begin
@@ -271,8 +270,8 @@ private:
   static auto clear(value_type* data, index_t size)
   {
     if (data) {
-      detail::array_allocator<value_type>::destroy(detail::trivial_dispatch<value_type>(), data, size);
-      detail::array_allocator<value_type>::deallocate(data, size);
+      base_array::destroy(data, size);
+      base_array::deallocate(data, size);
     }
   }
 
@@ -369,7 +368,7 @@ public:
   ///
   /// (2) Explicit construction with size `length`. Elements are **uninitialized**.
   ///
-  /// (3) Explicit constructor with size `length`.  Elements are default initialized.
+  /// (3) Explicit constructor with size `length`.  Elements are value-initialized.
   ///
   /// (4) Constructs the vector with copies of elements with value `value` and length `length`.
   ///
@@ -395,15 +394,12 @@ public:
   explicit base_array(uninitialized_t, index_t length) : ref_array<value_type, 1>{this->allocate(length), {0u, length}} {}
 
   /// \group constructors
-  explicit base_array(index_t length) : base_array(uninitialized, length)
-  {
-    this->create(detail::trivial_dispatch<value_type>(), this->data(), this->size());
-  }
+  explicit base_array(index_t length) : base_array(uninitialized, length) { this->create(this->data(), this->size()); }
 
   /// \group constructors
   base_array(const value_type& value, index_t length) : base_array(uninitialized, length)
   {
-    this->create(detail::trivial_dispatch<value_type>(), this->data(), this->size(), value);
+    this->create(this->data(), this->size(), value);
   }
 
   /// \group constructors
@@ -418,7 +414,7 @@ public:
                                {0u, static_cast<index_t>(range::distance(first, last))}}
   {
     static_assert(std::is_constructible<value_type, const U&>::value, "incompatible value types");
-    this->create(detail::trivial_dispatch<value_type>(), this->data(), first, this->size());
+    this->create(this->data(), first, this->size());
   }
 
   /// \group constructors
@@ -434,13 +430,13 @@ public:
   base_array(Rng&& rng) : base_array(uninitialized, range::size(std::forward<Rng>(rng)))
   {
     static_assert(std::is_constructible<value_type, const U&>::value, "incompatible value types");
-    this->create(detail::trivial_dispatch<value_type>(), this->data(), range::begin(std::forward<Rng>(rng)), this->size());
+    this->create(this->data(), range::begin(std::forward<Rng>(rng)), this->size());
   }
 
   /// \group constructors Constructors
   base_array(const base_array& source) : ref_array<value_type, 1>{this->allocate(source.size()), source.descriptor_}
   {
-    this->create(detail::trivial_dispatch<value_type>(), this->data(), source.data(), this->size());
+    this->create(this->data(), source.data(), this->size());
   }
 
   /// \group constructors Constructors
@@ -454,7 +450,7 @@ public:
   {
     static_assert(A::order == 1, "array order mismatch");
     static_assert(std::is_constructible<value_type, const typename A::value_type&>::value, "incompatible value types");
-    this->create(detail::trivial_dispatch<value_type>(), this->data(), source.begin(), this->size());
+    this->create(this->data(), source.begin(), this->size());
   }
 
   /// \group assignment Assignment
@@ -472,7 +468,7 @@ public:
     clear(this->data(), this->size());
     this->data_ = this->allocate(source.size());
     this->descriptor_ = source.descriptor_;
-    this->create(detail::trivial_dispatch<value_type>(), this->data(), source.data(), source.size());
+    this->create(this->data(), source.data(), source.size());
     return *this;
   }
 
@@ -499,7 +495,7 @@ public:
 
     this->data_ = this->allocate(source.size());
     this->descriptor_ = {0u, source.extents()};
-    this->create(detail::trivial_dispatch<value_type>(), this->data(), source.begin(), source.size());
+    this->create(this->data(), source.begin(), source.size());
 
     clear(old_data, old_size);
 
@@ -518,9 +514,8 @@ public:
   template <typename... Args> auto fill(in_place_t, Args&&... args) -> void
   {
     DEBUG_ASSERT(this->data(), debug::default_module, debug::level::invalid_state, "array is empty");
-    detail::array_allocator<value_type>::destroy(detail::trivial_dispatch<value_type>(), this->data(), this->size());
-    detail::array_allocator<value_type>::create(detail::trivial_dispatch<value_type>(), this->data(), this->size(),
-                                                std::forward<Args>(args)...);
+    this->destroy(this->data(), this->size());
+    this->create(this->data(), this->size(), std::forward<Args>(args)...);
   }
 
   /// \group Indexing
@@ -571,8 +566,8 @@ private:
   static auto clear(value_type* data, index_t size)
   {
     if (data) {
-      detail::array_allocator<value_type>::destroy(detail::trivial_dispatch<value_type>(), data, size);
-      detail::array_allocator<value_type>::deallocate(data, size);
+      base_array::destroy(data, size);
+      base_array::deallocate(data, size);
     }
   }
 };
