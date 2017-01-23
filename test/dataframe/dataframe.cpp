@@ -218,13 +218,15 @@ TEST_CASE("Reading a dataframe", "[dataframe]")
 
 TEST_CASE("Reading matrix of integers", "[dataframe]")
 {
-  struct my_integer_rules {
-    using type = int;
+  struct my_integer_rules : jules::default_rule<int> {
+    using jules::default_rule<int>::type;
+    using jules::default_rule<int>::coerce_from;
     static auto coerce_from(const jules::string& value) -> type { return std::stoi(value); }
   };
 
-  struct my_string_rules {
-    using type = jules::string;
+  struct my_string_rules : jules::default_rule<std::string> {
+    using jules::default_rule<std::string>::type;
+    using jules::default_rule<std::string>::coerce_from;
     static auto coerce_from(int value) -> type { return std::to_string(value); }
   };
 

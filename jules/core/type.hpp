@@ -22,8 +22,15 @@ template <typename T> using to_string_expr = decltype(std::to_string(std::declva
 template <typename T, typename = void> struct StringConvertible : std::false_type {
 };
 
+// TODO: Maybe move it to core/concepts.hpp
 template <typename T>
 struct StringConvertible<T, std::enable_if_t<meta::compiles<T, detail::to_string_expr>::value>> : std::true_type {
+};
+
+template <typename T, typename = void> struct Signed : std::false_type {};
+
+template <typename T>
+struct Signed<T, std::enable_if_t<std::numeric_limits<T>::is_signed>> : std::true_type {
 };
 
 /// Standard numeric type.
@@ -53,21 +60,6 @@ using integer = int;
 /// \module Basic Types
 using distance_t = std::ptrdiff_t;
 
-// Arithmetic rules
-
-template <typename T> struct numeric_traits : std::numeric_limits<T> {
-  static constexpr auto additive_identity() { return static_cast<T>(0); }
-  static constexpr auto multiplicative_identity() { return static_cast<T>(1); }
-  static constexpr auto unbounded_min()
-  {
-    return std::numeric_limits<T>::has_infinity ? -std::numeric_limits<T>::infinity() : std::numeric_limits<T>::min();
-  }
-  static constexpr auto unbounded_max()
-  {
-    return std::numeric_limits<T>::has_infinity ? std::numeric_limits<T>::infinity() : std::numeric_limits<T>::max();
-  }
-};
-
 template <typename T> struct default_rule {
   using type = T;
 
@@ -88,28 +80,40 @@ struct numeric_rule : default_rule<numeric> {
 
 /// Coercion rules for [string type](standardese://jules::string/).
 /// \module Coercion Rules
-struct string_rule : default_rule<string> {
-  using default_rule<string>::type;
+struct string_rule {
+  using type = string;
 
   template <typename U, typename = meta::requires<StringConvertible<const U&>>> static auto coerce_from(const U& value) -> type
   {
     return std::to_string(value);
   }
+
+  template <typename U, typename = meta::fallback<StringConvertible<const U&>>, typename = std::enable_if_t<std::is_convertible<const U&, type>::value>>
+  static auto coerce_from(const U& value) -> type
+  {
+    return value;
+  }
 };
 
 /// Coercion rules for [index type](standardese://jules::index_t/).
 /// \module Coercion Rules
-struct index_rule : default_rule<index_t> {
-  using default_rule<index_t>::type;
+struct index_rule  {
+  using type = index_t;
 
-  template <typename U, typename = std::enable_if_t<numeric_traits<U>::is_signed>> static auto coerce_from(const U& value) -> type
+  static auto coerce_from(const string& value) -> type { return std::stoul(value); }
+
+  template <typename U, typename = meta::requires<Signed<U>>> static auto coerce_from(const U& value) -> type
   {
     if (value < 0)
       throw std::invalid_argument{"index cannot be initialized by a negative value"};
     return value;
   }
 
-  static auto coerce_from(const string& value) -> type { return std::stoul(value); }
+  template <typename U, typename = meta::fallback<Signed<U>>, typename = std::enable_if_t<std::is_convertible<const U&, type>::value>>
+  static auto coerce_from(const U& value) -> type
+  {
+    return value;
+  }
 };
 
 /// Coercion rules for [integer type](standardese://jules::integer/).
@@ -122,22 +126,28 @@ struct integer_rule : default_rule<integer> {
 
 /// Coercion rules for [unsigned type](standardese://jules::uinteger/).
 /// \module Coercion Rules
-struct uinteger_rule : default_rule<uinteger> {
-  using default_rule<uinteger>::type;
+struct uinteger_rule  {
+  using type = uinteger;
 
-  template <typename U, typename = std::enable_if_t<numeric_traits<U>::is_signed>> static auto coerce_from(const U& value) -> type
+  static auto coerce_from(const string& value) -> type
+  {
+    auto result = std::stoul(value);
+    if (result > std::numeric_limits<uinteger>::max())
+      throw std::invalid_argument{"value too big to initialize an unsigned value"};
+    return result;
+  }
+
+  template <typename U, typename = meta::requires<Signed<U>>> static auto coerce_from(const U& value) -> type
   {
     if (value < 0)
       throw std::invalid_argument{"unsigned cannot be initialized by a negative value"};
     return value;
   }
 
-  static auto coerce_from(const string& value) -> type
+  template <typename U, typename = meta::fallback<Signed<U>>, typename = std::enable_if_t<std::is_convertible<const U&, type>::value>>
+  static auto coerce_from(const U& value) -> type
   {
-    auto result = std::stoul(value);
-    if (result > numeric_traits<uinteger>::max())
-      throw std::invalid_argument{"value too big to initialize an unsigned value"};
-    return result;
+    return value;
   }
 };
 
@@ -225,6 +235,21 @@ struct uninitialized_t {
 };
 
 static constexpr auto uninitialized = uninitialized_t{};
+
+// Arithmetic rules
+
+template <typename T> struct numeric_traits : std::numeric_limits<T> {
+  static constexpr auto additive_identity() { return static_cast<T>(0); }
+  static constexpr auto multiplicative_identity() { return static_cast<T>(1); }
+  static constexpr auto unbounded_min()
+  {
+    return std::numeric_limits<T>::has_infinity ? -std::numeric_limits<T>::infinity() : std::numeric_limits<T>::min();
+  }
+  static constexpr auto unbounded_max()
+  {
+    return std::numeric_limits<T>::has_infinity ? std::numeric_limits<T>::infinity() : std::numeric_limits<T>::max();
+  }
+};
 
 } // namespace jules
 
