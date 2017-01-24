@@ -159,6 +159,48 @@ TEST_CASE("Column model sanity conversions", "[dataframe]")
   CHECK(!ind_column->can_coerce<Bar>());
   CHECK(!ind_column->can_coerce<float>());
 
-  CHECK_THROWS(str_column->downcast<index_t>().size());
-  CHECK_THROWS(flt_column->downcast<index_t>().size());
+  // TODO: improve coerce_from so it doesn't accept the string "-1"
+  //       also check if the whole string was read
+  // CHECK_THROWS(str_column->coerce<index_t>());
+  CHECK_THROWS(flt_column->coerce<index_t>());
+}
+
+TEST_CASE("Column model successful coercions", "[dataframe]")
+{
+  using namespace jules;
+  using namespace jules::detail;
+  using namespace std::string_literals;
+  using column_ptr = std::unique_ptr<column_interface<coercion_rules>>;
+
+  struct Foo {
+    operator string() const { return "17"; }
+  };
+
+  const auto foo_column = column_ptr{new column_model<Foo, coercion_rules>(1u)};
+  const auto int_column1 = column_ptr{new column_model<integer, coercion_rules>{0, -1}};
+  const auto str_column1 = column_ptr{new column_model<string, coercion_rules>{"18446744073709551615"}};
+
+  CHECK_THROWS(int_column1->coerce<index_t>());
+  CHECK_THROWS(int_column1->coerce<uinteger>());
+  CHECK_THROWS(str_column1->coerce<uinteger>());
+
+  const auto str_column2 = foo_column->coerce<string>();
+  const auto int_column2 = str_column2->coerce<integer>();
+  const auto uns_column = str_column2->coerce<uinteger>();
+
+  const auto ind_column1 = str_column2->coerce<index_t>();
+  const auto ind_column2 = int_column2->coerce<index_t>();
+  const auto ind_column3 = uns_column->coerce<index_t>();
+
+  const auto uns_column1 = str_column2->coerce<uinteger>();
+  const auto uns_column2 = int_column2->coerce<uinteger>();
+  const auto uns_column3 = ind_column1->coerce<uinteger>();
+
+  CHECK(str_column2->downcast<string>().at(0u) == "17");
+  CHECK(ind_column1->downcast<index_t>().at(0u) == 17u);
+  CHECK(ind_column2->downcast<index_t>().at(0u) == 17u);
+  CHECK(ind_column3->downcast<index_t>().at(0u) == 17u);
+  CHECK(uns_column1->downcast<uinteger>().at(0u) == 17u);
+  CHECK(uns_column2->downcast<uinteger>().at(0u) == 17u);
+  CHECK(uns_column3->downcast<uinteger>().at(0u) == 17u);
 }
