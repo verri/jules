@@ -24,12 +24,39 @@ template <typename T> struct array_allocator {
   static T* allocate(index_t size) { return reinterpret_cast<T*>(new storage_type[size]); }
   static void deallocate(T* data, index_t) { delete[] reinterpret_cast<storage_type*>(data); }
 
-  template <typename... Args> static void create(detail::trivial_tag, T* data, index_t size, Args&&... args)
+  template <typename... Args>
+  static void create(T* data, index_t size, Args&&... args) noexcept(std::is_nothrow_constructible<T, Args...>::value)
   {
-    create(detail::non_trivial_tag{}, data, size, std::forward<Args>(args)...);
+    create(may_throw<std::is_nothrow_constructible<T, Args...>::value>{}, data, size, std::forward<Args>(args)...);
   }
 
-  template <typename... Args> static void create(detail::non_trivial_tag, T* data, index_t size, Args&&... args)
+  template <typename It, typename = meta::requires<range::Iterator<It>>> static void create(T* to, It from, index_t size)
+  {
+    std::uninitialized_copy_n(from, size, to);
+  }
+
+  template <std::size_t N> static void create(T* to, recursive_initializer_list_t<T, N> values, base_slice<N> descriptor)
+  {
+    create_impl(to, values, descriptor);
+  }
+
+  static void destroy(T* data, index_t size) noexcept
+  {
+    for (auto i = index_t{0u}; i < size; ++i)
+      data[i].~T();
+  }
+
+private:
+  template <bool> struct may_throw {
+  };
+
+  template <typename... Args> static void create(may_throw<false>, T* data, index_t size, Args&&... args) noexcept
+  {
+    for (auto i = index_t{0u}; i < size; ++i)
+      ::new (static_cast<void*>(data + i)) T(std::forward<Args>(args)...);
+  }
+
+  template <typename... Args> static void create(may_throw<true>, T* data, index_t size, Args&&... args)
   {
     auto current = index_t{0u};
     try {
@@ -42,41 +69,6 @@ template <typename T> struct array_allocator {
     }
   }
 
-  template <typename It, typename = meta::requires<range::Iterator<It>>>
-  static void create(detail::trivial_tag, T* to, It from, index_t size)
-  {
-    std::uninitialized_copy_n(from, size, to);
-  }
-
-  static void create(detail::trivial_tag, T* to, const T* from, index_t size) { std::memcpy(to, from, size * sizeof(T)); }
-
-  template <std::size_t N>
-  static void create(detail::trivial_tag, T* to, recursive_initializer_list_t<T, N> values, base_slice<N> descriptor)
-  {
-    create(detail::non_trivial_tag{}, to, values, descriptor);
-  }
-
-  template <std::size_t N>
-  static void create(detail::non_trivial_tag, T* to, recursive_initializer_list_t<T, N> values, base_slice<N> descriptor)
-  {
-    create_impl(to, values, descriptor);
-  }
-
-  template <typename It, typename = meta::requires<range::Iterator<It>>>
-  static void create(detail::non_trivial_tag, T* to, It from, index_t size)
-  {
-    std::uninitialized_copy_n(from, size, to);
-  }
-
-  static void destroy(detail::trivial_tag, T*, index_t) {}
-
-  static void destroy(detail::non_trivial_tag, T* data, index_t size)
-  {
-    for (auto i = index_t{0u}; i < size; ++i) // use jules::seq (verify other files)
-      data[i].~T();
-  }
-
-private:
   template <std::size_t N, typename List, typename... Args>
   static void create_impl(T* to, List values, base_slice<N> descriptor, Args... indexes)
   {

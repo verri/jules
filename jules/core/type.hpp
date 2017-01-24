@@ -3,13 +3,35 @@
 #ifndef JULES_CORE_TYPE_H
 #define JULES_CORE_TYPE_H
 
+#include <jules/core/meta.hpp>
+
 #include <initializer_list>
 #include <limits>
+#include <stdexcept>
 #include <string>
 #include <utility>
 
 namespace jules
 {
+
+namespace detail
+{
+template <typename T> using to_string_expr = decltype(std::to_string(std::declval<T>()));
+}
+
+template <typename T, typename = void> struct StringConvertible : std::false_type {
+};
+
+// TODO: Maybe move it to core/concepts.hpp
+template <typename T>
+struct StringConvertible<T, std::enable_if_t<meta::compiles<T, detail::to_string_expr>::value>> : std::true_type {
+};
+
+template <typename T, typename = void> struct Signed : std::false_type {
+};
+
+template <typename T> struct Signed<T, std::enable_if_t<std::numeric_limits<T>::is_signed>> : std::true_type {
+};
 
 /// Standard numeric type.
 /// \module Basic Types
@@ -24,7 +46,7 @@ using string = std::string;
 
 /// Standard unsigned type.
 /// \module Basic Types
-using uinteger = std::uint32_t;
+using uinteger = unsigned;
 
 /// Standard index type.
 /// \module Basic Types
@@ -32,16 +54,27 @@ using index_t = std::size_t;
 
 /// Standard signed type.
 /// \module Basic Types
-using integer = std::int64_t;
+using integer = int;
 
 /// Standard distance type.
 /// \module Basic Types
 using distance_t = std::ptrdiff_t;
 
+template <typename T> struct default_rule {
+  using type = T;
+
+  template <typename U, typename = std::enable_if_t<std::is_convertible<const U&, type>::value>>
+  static auto coerce_from(const U& value) -> type
+  {
+    return value;
+  }
+};
+
 /// Coercion rules for [numeric type](standardese://jules::numeric/).
 /// \module Coercion Rules
-struct numeric_rule {
-  using type = numeric;
+struct numeric_rule : default_rule<numeric> {
+  using default_rule<numeric>::type;
+  using default_rule<numeric>::coerce_from;
   static auto coerce_from(const string& value) -> type { return std::stod(value); }
 };
 
@@ -49,7 +82,76 @@ struct numeric_rule {
 /// \module Coercion Rules
 struct string_rule {
   using type = string;
-  static auto coerce_from(const numeric& value) -> type { return std::to_string(static_cast<double>(value)); }
+
+  template <typename U, typename = meta::requires<StringConvertible<const U&>>> static auto coerce_from(const U& value) -> type
+  {
+    return std::to_string(value);
+  }
+
+  template <typename U, typename = meta::fallback<StringConvertible<const U&>>,
+            typename = std::enable_if_t<std::is_convertible<const U&, type>::value>>
+  static auto coerce_from(const U& value) -> type
+  {
+    return value;
+  }
+};
+
+/// Coercion rules for [index type](standardese://jules::index_t/).
+/// \module Coercion Rules
+struct index_rule {
+  using type = index_t;
+
+  static auto coerce_from(const string& value) -> type { return std::stoul(value); }
+
+  template <typename U, typename = meta::requires<Signed<U>>> static auto coerce_from(const U& value) -> type
+  {
+    if (value < 0)
+      throw std::invalid_argument{"index cannot be initialized by a negative value"};
+    return value;
+  }
+
+  template <typename U, typename = meta::fallback<Signed<U>>,
+            typename = std::enable_if_t<std::is_convertible<const U&, type>::value>>
+  static auto coerce_from(const U& value) -> type
+  {
+    return value;
+  }
+};
+
+/// Coercion rules for [integer type](standardese://jules::integer/).
+/// \module Coercion Rules
+struct integer_rule : default_rule<integer> {
+  using default_rule<integer>::type;
+  using default_rule<integer>::coerce_from;
+  static auto coerce_from(const string& value) -> type { return std::stoi(value); }
+};
+
+/// Coercion rules for [unsigned type](standardese://jules::uinteger/).
+/// \module Coercion Rules
+struct uinteger_rule {
+  using type = uinteger;
+
+  static auto coerce_from(const string& value) -> type
+  {
+    auto result = std::stoul(value);
+    if (result > std::numeric_limits<uinteger>::max())
+      throw std::invalid_argument{"value too big to initialize an unsigned value"};
+    return result;
+  }
+
+  template <typename U, typename = meta::requires<Signed<U>>> static auto coerce_from(const U& value) -> type
+  {
+    if (value < 0)
+      throw std::invalid_argument{"unsigned cannot be initialized by a negative value"};
+    return value;
+  }
+
+  template <typename U, typename = meta::fallback<Signed<U>>,
+            typename = std::enable_if_t<std::is_convertible<const U&, type>::value>>
+  static auto coerce_from(const U& value) -> type
+  {
+    return value;
+  }
 };
 
 /// Utility class to combine coercion rules.
@@ -77,28 +179,10 @@ public:
 /// Default class with coercion rules for [numeric](standardese://jules::numeric/) and
 /// [string](standardese://jules::string/) classes.
 /// \module Coercion Rules
-using coercion_rules = base_coercion_rules<numeric_rule, string_rule>;
+using coercion_rules = base_coercion_rules<numeric_rule, string_rule, index_rule, integer_rule, uinteger_rule>;
 
 namespace detail
 {
-
-// Trivial/Non-trivial dispatch
-
-struct trivial_tag {
-};
-
-struct non_trivial_tag {
-};
-
-template <typename T, typename = void> struct trivial_dispatch_helper {
-  using type = non_trivial_tag;
-};
-
-template <typename T> struct trivial_dispatch_helper<T, std::enable_if_t<std::is_trivial<T>::value>> {
-  using type = trivial_tag;
-};
-
-template <typename T> auto trivial_dispatch() { return typename trivial_dispatch_helper<T>::type{}; }
 
 // Tag type utility
 
@@ -127,7 +211,15 @@ struct in_place_t {
   constexpr explicit in_place_t() = default;
 };
 
-static constexpr in_place_t in_place{};
+static constexpr auto in_place = in_place_t{};
+
+// Non-initialized construction tag
+
+struct uninitialized_t {
+  constexpr explicit uninitialized_t() = default;
+};
+
+static constexpr auto uninitialized = uninitialized_t{};
 
 // Arithmetic rules
 

@@ -109,8 +109,7 @@ protected:
 template <typename T, typename U, typename Coercion, std::size_t I>
 class specific_concrete_coercion<
   T, U, Coercion, I,
-  std::enable_if_t<std::is_same<decltype(Coercion::template rule<I>::coerce_from(std::declval<T>())), U>::value &&
-                   !std::is_convertible<T, U>::value>>
+  std::enable_if_t<std::is_same<decltype(Coercion::template rule<I>::coerce_from(std::declval<T>())), U>::value>>
 {
 private:
   using type = typename Coercion::template type<I>;
@@ -125,30 +124,6 @@ protected:
     result->reserve(end - begin);
     std::transform(begin, end, std::back_inserter(*result),
                    [](const T& value) { return Coercion::template rule<I>::coerce_from(value); });
-
-    return column_interface_ptr{move_ptr(result)};
-  }
-
-  constexpr bool can_coerce_(tag<type>) const { return true; }
-};
-
-// Automatic coercion rules.  If it is possible to convert from T to type using a
-// implicit method, this class is instantiated.
-template <typename T, typename U, typename Coercion, std::size_t I>
-class specific_concrete_coercion<T, U, Coercion, I, std::enable_if_t<std::is_convertible<T, U>::value>>
-{
-private:
-  using type = typename Coercion::template type<I>;
-  using column_interface_ptr = std::unique_ptr<column_interface<Coercion>>;
-
-protected:
-  template <typename Iter> column_interface_ptr coerce_(Iter begin, Iter end, tag<type>) const
-  {
-    auto result = new column_model<type, Coercion>;
-    JULES_DEFER(delete result);
-
-    result->reserve(end - begin);
-    std::transform(begin, end, std::back_inserter(*result), [](const T& value) -> type { return value; });
 
     return column_interface_ptr{move_ptr(result)};
   }

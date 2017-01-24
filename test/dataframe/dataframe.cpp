@@ -218,13 +218,15 @@ TEST_CASE("Reading a dataframe", "[dataframe]")
 
 TEST_CASE("Reading matrix of integers", "[dataframe]")
 {
-  struct my_integer_rules {
-    using type = int;
+  struct my_integer_rules : jules::default_rule<int> {
+    using jules::default_rule<int>::type;
+    using jules::default_rule<int>::coerce_from;
     static auto coerce_from(const jules::string& value) -> type { return std::stoi(value); }
   };
 
-  struct my_string_rules {
-    using type = jules::string;
+  struct my_string_rules : jules::default_rule<std::string> {
+    using jules::default_rule<std::string>::type;
+    using jules::default_rule<std::string>::coerce_from;
     static auto coerce_from(int value) -> type { return std::to_string(value); }
   };
 
@@ -235,7 +237,7 @@ TEST_CASE("Reading matrix of integers", "[dataframe]")
   opts.header = false;
 
   std::stringstream stream;
-  constexpr auto N = 10u;
+  constexpr auto N = 3u;
   for (auto i = 0u; i < N; ++i) {
     for (auto j = 0u; j < N; ++j) {
       stream << (i * N + j) << "\t";
@@ -273,6 +275,10 @@ TEST_CASE("Reading matrix of integers", "[dataframe]")
 
   CHECK(idf.column_count() == N);
   CHECK(idf.row_count() == N);
+
+  // Converting to matrix
+  auto imatrix = jules::to_matrix<int>(idf);
+  CHECK(all(imatrix == jules::matrix<int>{{0, 1, 2}, {3, 4, 5}, {6, 7, 8}}));
 }
 
 TEST_CASE("Reading an inconsistent dataframe", "[dataframe]")
@@ -308,7 +314,7 @@ TEST_CASE("Reading and writing a well-formed dataframe", "[dataframe]")
 
   std::stringstream os2;
 
-  dataframe{{"y", {0, 3}}, {"x", {1, 4}}, {"z", {2, 5}}}.write(os2);
+  dataframe{{"y", {0.0, 3.0}}, {"x", {1.0, 4.0}}, {"z", {2.0, 5.0}}}.write(os2);
   CHECK(data == os2.str());
 
   const auto cols = df.names();
