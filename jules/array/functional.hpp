@@ -120,12 +120,12 @@
 namespace jules
 {
 
-OPERATIONS_LIST((typename T, std::size_t N), (const base_array<T, N>&), N);
-OPERATIONS_LIST((typename T, std::size_t N), (const contiguous_array<T, N>&), N);
-OPERATIONS_LIST((typename T, std::size_t N), (const ref_array<T, N>&), N);
-OPERATIONS_LIST((typename T, std::size_t N), (const ind_array<T, N>&), N);
-OPERATIONS_LIST((typename It, typename Op, std::size_t N), (const unary_expr_array<It, Op, N>&), N);
-OPERATIONS_LIST((typename LhsIt, typename RhsIt, typename Op, std::size_t N), (const binary_expr_array<LhsIt, RhsIt, Op, N>&), N);
+OPERATIONS_LIST((typename T, std::size_t N), (const base_array<T, N>&), N)
+OPERATIONS_LIST((typename T, std::size_t N), (const contiguous_array<T, N>&), N)
+OPERATIONS_LIST((typename T, std::size_t N), (const ref_array<T, N>&), N)
+OPERATIONS_LIST((typename T, std::size_t N), (const ind_array<T, N>&), N)
+OPERATIONS_LIST((typename It, typename Op, std::size_t N), (const unary_expr_array<It, Op, N>&), N)
+OPERATIONS_LIST((typename LhsIt, typename RhsIt, typename Op, std::size_t N), (const binary_expr_array<LhsIt, RhsIt, Op, N>&), N)
 
 } // namespace jules
 
