@@ -218,6 +218,10 @@ TEST_CASE("Reading a dataframe", "[dataframe]")
 
 TEST_CASE("Reading matrix of integers", "[dataframe]")
 {
+  struct Foo {
+    operator int() const { return 0; }
+  };
+
   struct my_integer_rules : jules::default_rule<int> {
     using jules::default_rule<int>::type;
     using jules::default_rule<int>::coerce_from;
@@ -228,6 +232,11 @@ TEST_CASE("Reading matrix of integers", "[dataframe]")
     using jules::default_rule<std::string>::type;
     using jules::default_rule<std::string>::coerce_from;
     static auto coerce_from(int value) -> type { return std::to_string(value); }
+  };
+
+  struct my_foo_rules : jules::default_rule<Foo> {
+    using jules::default_rule<Foo>::type;
+    using jules::default_rule<Foo>::coerce_from;
   };
 
   using my_coercion_rules = jules::base_coercion_rules<my_integer_rules, my_string_rules>;
@@ -276,9 +285,14 @@ TEST_CASE("Reading matrix of integers", "[dataframe]")
   CHECK(idf.column_count() == N);
   CHECK(idf.row_count() == N);
 
+  CHECK_THROWS(jules::to_column<Foo>(idf.at(0).column));
+
   // Converting to matrix
-  auto imatrix = jules::to_matrix<int>(idf);
+  const auto imatrix = jules::to_matrix<int>(idf);
   CHECK(all(imatrix == jules::matrix<int>{{0, 1, 2}, {3, 4, 5}, {6, 7, 8}}));
+
+  const auto smatrix = jules::to_matrix<jules::string>(idf);
+  CHECK(all(smatrix == jules::matrix<jules::string>{{"0", "1", "2"}, {"3", "4", "5"}, {"6", "7", "8"}}));
 }
 
 TEST_CASE("Reading an inconsistent dataframe", "[dataframe]")

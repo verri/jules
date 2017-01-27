@@ -42,6 +42,11 @@ public:
   {
   }
 
+  base_column(const base_column& source, index_t first, index_t size)
+    : model_{std::move(source.model_->partial_clone(first, size))}
+  {
+  }
+
   base_column(const base_column& source) : model_{std::move(source.model_->clone())} {}
 
   base_column(base_column&& source) noexcept = default;

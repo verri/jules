@@ -69,7 +69,7 @@ public:
   virtual ~column_interface() = default;
 
   auto operator=(const column_interface&) -> column_interface& = delete;
-  auto operator=(column_interface&&) -> column_interface& = delete;
+  auto operator=(column_interface &&) -> column_interface& = delete;
 
   virtual auto clone() const -> column_interface_ptr = 0;
   virtual auto partial_clone(index_t first, index_t size) const -> column_interface_ptr = 0;
@@ -103,7 +103,10 @@ private:
   using column_interface_ptr = std::unique_ptr<column_interface<Coercion>>;
 
 protected:
-  template <typename Iter>[[noreturn]] auto coerce_(Iter, Iter, tag<type>) const -> column_interface_ptr { throw std::bad_cast{}; }
+  template <typename Iter>[[noreturn]] auto coerce_(Iter, Iter, tag<type>) const -> column_interface_ptr
+  {
+    throw std::bad_cast{};
+  }
 
   constexpr auto can_coerce_(tag<type>) const -> bool { return false; }
 };
@@ -205,7 +208,7 @@ public:
   column_model(column_model&&) noexcept = default;
 
   auto operator=(const column_model&) -> column_model& = delete;
-  auto operator=(column_model&&) -> column_model& = delete;
+  auto operator=(column_model &&) -> column_model& = delete;
 
   auto elements_type() const -> std::type_index final { return typeid(T); }
 
@@ -223,7 +226,7 @@ public:
 
   auto resize(index_t size) -> void final { std::vector<T>::resize(size); }
 
-  auto shrink_to_fit() -> void final { std::vector<T>::shrink_to_fit();  }
+  auto shrink_to_fit() -> void final { std::vector<T>::shrink_to_fit(); }
 
   auto size() const -> index_t final { return std::vector<T>::size(); }
 };

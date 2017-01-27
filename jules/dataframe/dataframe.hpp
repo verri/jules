@@ -9,6 +9,7 @@
 #include <jules/core/meta.hpp>
 #include <jules/core/range.hpp>
 #include <jules/core/type.hpp>
+#include <jules/dataframe/action.hpp>
 #include <jules/dataframe/column.hpp>
 #include <jules/dataframe/numeric.hpp>
 
@@ -292,6 +293,12 @@ public:
     namespace view = ::jules::range::view;
     return to_vector<string>(elements_ | view::transform([](const auto& element) { return element.name; }));
   }
+
+  auto begin() const { return cbegin(); }
+  auto end() const { return cend(); }
+
+  auto cbegin() const { return elements_.cbegin(); }
+  auto cend() const { return elements_.cend(); }
 
 private:
   index_t row_count_ = 0u;

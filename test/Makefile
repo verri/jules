@@ -3,6 +3,7 @@ SUFFIXES += .d
 SRC = array/slice.cpp array/ref_array.cpp array/ind_array.cpp array/array.cpp \
 			array/vector.cpp array/matrix.cpp array/blas.cpp \
 			dataframe/column_model.cpp dataframe/column.cpp dataframe/dataframe.cpp \
+			dataframe/action.cpp \
 			range/range.cpp random/random.cpp \
 			numeric/numeric.cpp \
 			debug/debug.cpp
