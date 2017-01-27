@@ -32,8 +32,8 @@ protected:
   using base::coerce_;
   using base::can_coerce_;
 
-  virtual column_interface_ptr coerce_(tag<type>) const = 0;
-  virtual bool can_coerce_(tag<type>) const = 0;
+  virtual auto coerce_(tag<type>) const -> column_interface_ptr = 0;
+  virtual auto can_coerce_(tag<type>) const -> bool = 0;
 
 public:
   virtual ~generate_virtual_coercions() = default;
@@ -46,8 +46,8 @@ private:
   using type = typename Coercion::template type<0>;
 
 protected:
-  virtual column_interface_ptr coerce_(tag<type>) const = 0;
-  virtual bool can_coerce_(tag<type>) const = 0;
+  virtual auto coerce_(tag<type>) const -> column_interface_ptr = 0;
+  virtual auto can_coerce_(tag<type>) const -> bool = 0;
 
 public:
   virtual ~generate_virtual_coercions() = default;
@@ -68,30 +68,34 @@ public:
 
   virtual ~column_interface() = default;
 
-  column_interface& operator=(const column_interface&) = delete;
-  column_interface& operator=(column_interface&&) = delete;
+  auto operator=(const column_interface&) -> column_interface& = delete;
+  auto operator=(column_interface&&) -> column_interface& = delete;
 
-  virtual column_interface_ptr clone() const = 0;
-  virtual std::size_t size() const = 0;
+  virtual auto clone() const -> column_interface_ptr = 0;
+  virtual auto partial_clone(index_t first, index_t size) const -> column_interface_ptr = 0;
 
-  template <typename T> column_interface_ptr coerce() const { return this->coerce_(tag<T>{}); }
-  template <typename T> bool can_coerce() const { return this->can_coerce_(tag<T>{}); }
+  virtual auto resize(index_t size) -> void = 0;
+  virtual auto shrink_to_fit() -> void = 0;
+  virtual auto size() const -> index_t = 0;
 
-  virtual std::type_index elements_type() const = 0;
+  template <typename T> auto coerce() const -> column_interface_ptr { return this->coerce_(tag<T>{}); }
+  template <typename T> auto can_coerce() const -> bool { return this->can_coerce_(tag<T>{}); }
 
-  template <typename T> auto& downcast() { return dynamic_cast<column_model<T, coercion_rules>&>(*this); }
-  template <typename T> const auto& downcast() const { return dynamic_cast<const column_model<T, coercion_rules>&>(*this); }
+  virtual auto elements_type() const -> std::type_index = 0;
+
+  template <typename T> decltype(auto) downcast() { return dynamic_cast<column_model<T, coercion_rules>&>(*this); }
+  template <typename T> decltype(auto) downcast() const { return dynamic_cast<const column_model<T, coercion_rules>&>(*this); }
 
 protected:
   using base::coerce_;
   using base::can_coerce_;
 
-  template <typename T>[[noreturn]] column_interface_ptr coerce_(T) const { throw std::bad_cast{}; }
-  template <typename T> bool can_coerce_(T) const { return false; }
+  template <typename T>[[noreturn]] auto coerce_(T) const -> column_interface_ptr { throw std::bad_cast{}; }
+  template <typename T> auto can_coerce_(T) const -> bool { return false; }
 };
 
-// Default coercion rules.  If it is impossible to convert from T to type, this class is
-// instantiated.
+// No known coercion rule.
+// If it is impossible to convert from T to type using a user-defined method, this class is instantiated.
 template <typename T, typename U, typename Coercion, std::size_t I, typename Enabler = void> class specific_concrete_coercion
 {
 private:
@@ -99,13 +103,13 @@ private:
   using column_interface_ptr = std::unique_ptr<column_interface<Coercion>>;
 
 protected:
-  template <typename Iter>[[noreturn]] column_interface_ptr coerce_(Iter, Iter, tag<type>) const { throw std::bad_cast{}; }
+  template <typename Iter>[[noreturn]] auto coerce_(Iter, Iter, tag<type>) const -> column_interface_ptr { throw std::bad_cast{}; }
 
-  constexpr bool can_coerce_(tag<type>) const { return false; }
+  constexpr auto can_coerce_(tag<type>) const -> bool { return false; }
 };
 
-// User-defined coercion rules.  If it is possible to convert from T to type using ONLY a
-// user-defined method, this class is instantiated.
+// User-defined coercion rules.
+// If it is possible to convert from T to type using a user-defined method, this class is instantiated.
 template <typename T, typename U, typename Coercion, std::size_t I>
 class specific_concrete_coercion<
   T, U, Coercion, I,
@@ -116,7 +120,7 @@ private:
   using column_interface_ptr = std::unique_ptr<column_interface<Coercion>>;
 
 protected:
-  template <typename Iter> column_interface_ptr coerce_(Iter begin, Iter end, tag<type>) const
+  template <typename Iter> auto coerce_(Iter begin, Iter end, tag<type>) const -> column_interface_ptr
   {
     auto result = new column_model<type, Coercion>;
     JULES_DEFER(delete result);
@@ -128,7 +132,7 @@ protected:
     return column_interface_ptr{move_ptr(result)};
   }
 
-  constexpr bool can_coerce_(tag<type>) const { return true; }
+  constexpr auto can_coerce_(tag<type>) const -> bool { return true; }
 };
 
 template <typename T, typename Coercion, std::size_t I>
@@ -148,9 +152,9 @@ protected:
   using column_interface<Coercion>::coerce_;
   using column_interface<Coercion>::can_coerce_;
 
-  column_interface_ptr coerce_(tag<type> tag) const final { return specific::coerce_(this->begin(), this->end(), tag); }
+  auto coerce_(tag<type> tag) const -> column_interface_ptr final { return specific::coerce_(this->begin(), this->end(), tag); }
 
-  bool can_coerce_(tag<type> tag) const final { return specific::can_coerce_(tag); }
+  auto can_coerce_(tag<type> tag) const -> bool final { return specific::can_coerce_(tag); }
 
 public:
   using generate_concrete_coercions<T, Coercion, I - 1>::generate_concrete_coercions;
@@ -175,9 +179,9 @@ protected:
   using column_interface<Coercion>::coerce_;
   using column_interface<Coercion>::can_coerce_;
 
-  column_interface_ptr coerce_(tag<type> tag) const final { return specific::coerce_(this->begin(), this->end(), tag); }
+  auto coerce_(tag<type> tag) const -> column_interface_ptr final { return specific::coerce_(this->begin(), this->end(), tag); }
 
-  bool can_coerce_(tag<type> tag) const final { return specific::can_coerce_(tag); }
+  auto can_coerce_(tag<type> tag) const -> bool final { return specific::can_coerce_(tag); }
 
 public:
   using std::vector<T>::vector;
@@ -200,16 +204,28 @@ public:
   column_model(const column_model&) = default;
   column_model(column_model&&) noexcept = default;
 
-  column_model& operator=(const column_model&) = delete;
-  column_model& operator=(column_model&&) = delete;
+  auto operator=(const column_model&) -> column_model& = delete;
+  auto operator=(column_model&&) -> column_model& = delete;
 
-  std::type_index elements_type() const final { return typeid(T); }
-  std::unique_ptr<column_interface<Coercion>> clone() const final
+  auto elements_type() const -> std::type_index final { return typeid(T); }
+
+  auto clone() const -> std::unique_ptr<column_interface<Coercion>> final
   {
     return std::unique_ptr<column_interface<Coercion>>{new column_model{*this}};
   }
 
-  std::size_t size() const final { return std::vector<T>::size(); }
+  auto partial_clone(index_t first, index_t size) const -> std::unique_ptr<column_interface<Coercion>> final
+  {
+    if (first >= this->size() || first + size > this->size())
+      throw std::out_of_range{"invalid partial clone extents"};
+    return std::unique_ptr<column_interface<Coercion>>{new column_model{this->begin() + first, this->begin() + first + size}};
+  }
+
+  auto resize(index_t size) -> void final { std::vector<T>::resize(size); }
+
+  auto shrink_to_fit() -> void final { std::vector<T>::shrink_to_fit();  }
+
+  auto size() const -> index_t final { return std::vector<T>::size(); }
 };
 
 } // namespace detail

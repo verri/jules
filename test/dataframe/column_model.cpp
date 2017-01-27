@@ -169,7 +169,6 @@ TEST_CASE("Column model successful coercions", "[dataframe]")
 {
   using namespace jules;
   using namespace jules::detail;
-  using namespace std::string_literals;
   using column_ptr = std::unique_ptr<column_interface<coercion_rules>>;
 
   struct Foo {
@@ -203,4 +202,32 @@ TEST_CASE("Column model successful coercions", "[dataframe]")
   CHECK(uns_column1->downcast<uinteger>().at(0u) == 17u);
   CHECK(uns_column2->downcast<uinteger>().at(0u) == 17u);
   CHECK(uns_column3->downcast<uinteger>().at(0u) == 17u);
+}
+
+TEST_CASE("Column model partial clone and resize", "[dataframe]")
+{
+  using namespace jules;
+  using namespace jules::detail;
+  using column_ptr = std::unique_ptr<column_interface<coercion_rules>>;
+
+  auto column = column_ptr{new column_model<integer, coercion_rules>{0, 1, 2, 3, 4, 5}};
+
+  CHECK(column->size() == 6u);
+  CHECK(column->clone()->size() == 6u);
+
+  CHECK_THROWS(column->partial_clone(0u, 7u));
+  CHECK_THROWS(column->partial_clone(4u, 3u));
+
+  const auto partial = column->partial_clone(2u, 4u);
+
+  CHECK(partial->size() == 4u);
+
+  const auto& ipartial = partial->downcast<int>();
+
+  CHECK(ipartial[0u] == 2);
+  CHECK(ipartial[3u] == 5);
+
+  column->resize(2u);
+  column->shrink_to_fit();
+  CHECK(column->size() == 2u);
 }
