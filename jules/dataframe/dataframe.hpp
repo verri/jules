@@ -22,15 +22,23 @@
 namespace jules
 {
 
-template <typename Coercion> class base_dataframe
-{
-public:
+template <typename Coercion> struct base_dataframe_data {
   using column_type = base_column<Coercion>;
 
   struct named_column_type {
     string name;
     column_type column;
   };
+
+  std::vector<named_column_type> elements;
+  std::unordered_map<string, index_t> indexes;
+};
+
+template <typename Coercion> class base_dataframe : private base_dataframe_data<Coercion>
+{
+public:
+  using column_type = typename base_dataframe_data<Coercion>::column_type;
+  using named_column_type = typename base_dataframe_data<Coercion>::named_column_type;
 
   struct read_options {
     read_options(std::regex line_regex = std::regex{R"(\n)"}, std::regex cell_regex = std::regex{R"(\t)"}, bool header = true)
@@ -103,32 +111,36 @@ public:
             typename = meta::requires<range::Sentinel<Sent, Iter>>>
   base_dataframe(Iter first, Sent last, index_t size_hint)
   {
-    elements_.reserve(size_hint);
+    this->elements.reserve(size_hint);
 
-    elements_.push_back(*first);
-    row_count_ = elements_.back().column.size();
+    this->elements.push_back(*first);
+    row_count_ = this->elements.back().column.size();
 
     auto ok = std::all_of(++first, last, [this](auto&& column) {
-      elements_.push_back(std::forward<decltype(column)>(column));
-      return elements_.back().column.size() == row_count_;
+      this->elements.push_back(std::forward<decltype(column)>(column));
+      return this->elements.back().column.size() == row_count_;
     });
 
     DEBUG_ASSERT(ok, debug::throwing_module, debug::level::invalid_argument, "columns size mismatch");
 
     auto i = index_t{0u};
-    for (auto& element : elements_) {
+    for (auto& element : this->elements) {
       auto& name = element.name;
       if (!name.empty()) {
-        DEBUG_ASSERT(indexes_.find(name) == indexes_.end(), debug::throwing_module, debug::level::invalid_argument,
+        DEBUG_ASSERT(this->indexes.find(name) == this->indexes.end(), debug::throwing_module, debug::level::invalid_argument,
                      "repeated column name");
-        indexes_[name] = i++;
+        this->indexes[name] = i++;
       }
     }
   }
 
-  base_dataframe(named_column_type elem) : row_count_{elem.column.size()} { elements_.push_back(std::move(elem)); }
+  base_dataframe(named_column_type elem) : row_count_{elem.column.size()}
+  {
+    this->indexes[elem.name] = 0u;
+    this->elements.emplace_back(std::move(elem));
+  }
 
-  base_dataframe(column_type column) : row_count_{column.size()}, elements_{{"", std::move(column)}} {}
+  base_dataframe(column_type column) : row_count_{column.size()} { this->elements.push_back({"", std::move(column)}); }
 
   base_dataframe(const base_dataframe& source) = default;
   base_dataframe(base_dataframe&& source) noexcept = default;
@@ -212,7 +224,7 @@ public:
     coerced.reserve(column_count());
     data.reserve(column_count());
 
-    const auto columns = elements_ | view::transform([](auto&& elem) -> const column_type& { return elem.column; });
+    const auto columns = this->elements | view::transform([](auto&& elem) -> const column_type& { return elem.column; });
 
     for (const auto& col : columns) {
       if (col.elements_type() == typeid(string)) {
@@ -224,9 +236,9 @@ public:
     }
 
     if (opt.header) {
-      os << elements_[0].name;
+      os << this->elements[0].name;
       for (auto j = index_t{1u}; j < column_count(); ++j)
-        os << opt.cell.separator << elements_[j].name;
+        os << opt.cell.separator << this->elements[j].name;
       os << opt.line.separator;
     }
 
@@ -240,12 +252,15 @@ public:
     return os;
   }
 
+  static auto load(std::istream& os) -> base_dataframe;
+  auto save(std::ostream& os) const -> void;
+
   // other options are `bind_left`, `bind_right`, `bind_up`, `bind_down`, or something similar.
   auto bind(base_dataframe other) -> base_dataframe&
   {
     for (const auto& name : other.names())
-      DEBUG_ASSERT(name.empty() || indexes_.find(name) == indexes_.end(), debug::throwing_module, debug::level::invalid_argument,
-                   "repeated column name");
+      DEBUG_ASSERT(name.empty() || this->indexes.find(name) == this->indexes.end(), debug::throwing_module,
+                   debug::level::invalid_argument, "repeated column name");
 
     if (*this)
       DEBUG_ASSERT(row_count() == other.row_count(), debug::throwing_module, debug::level::invalid_argument,
@@ -253,10 +268,10 @@ public:
     else
       row_count_ = other.row_count();
 
-    for (auto& elem : other.elements_) {
+    for (auto& elem : other.elements) {
       if (!elem.name.empty())
-        indexes_[elem.name] = elements_.size();
-      elements_.push_back(std::move(elem));
+        this->indexes[elem.name] = this->elements.size();
+      this->elements.push_back(std::move(elem));
     }
 
     return *this;
@@ -265,45 +280,45 @@ public:
   // `select` will be part of dplyr-like operations.
   auto at(index_t pos) const -> const named_column_type&
   {
-    DEBUG_ASSERT(pos < elements_.size(), debug::throwing_module, debug::level::boundary_check, "invalid column index");
-    return elements_[pos];
+    DEBUG_ASSERT(pos < this->elements.size(), debug::throwing_module, debug::level::boundary_check, "invalid column index");
+    return this->elements[pos];
   }
 
   auto at(const string& name) const -> const named_column_type&
   {
-    auto it = indexes_.find(name);
-    DEBUG_ASSERT(it != indexes_.end(), debug::throwing_module, debug::level::invalid_argument, "column does not exist");
-    return elements_[it->second];
+    auto it = this->indexes.find(name);
+    DEBUG_ASSERT(it != this->indexes.end(), debug::throwing_module, debug::level::invalid_argument, "column does not exist");
+    return this->elements[it->second];
   }
 
   operator bool() const { return column_count() > 0u; }
 
   auto row_count() const { return row_count_; }
-  auto column_count() const { return elements_.size(); }
+  auto column_count() const { return this->elements.size(); }
 
   auto column_types() const -> vector<std::type_index>
   {
     namespace view = ::jules::range::view;
-    return to_vector<std::type_index>(elements_ |
+    return to_vector<std::type_index>(this->elements |
                                       view::transform([](const auto& element) { return element.column.elements_type(); }));
   }
 
   auto names() const -> vector<string>
   {
     namespace view = ::jules::range::view;
-    return to_vector<string>(elements_ | view::transform([](const auto& element) { return element.name; }));
+    return to_vector<string>(this->elements | view::transform([](const auto& element) { return element.name; }));
   }
 
   auto begin() const { return cbegin(); }
   auto end() const { return cend(); }
 
-  auto cbegin() const { return elements_.cbegin(); }
-  auto cend() const { return elements_.cend(); }
+  auto cbegin() const { return this->elements.cbegin(); }
+  auto cend() const { return this->elements.cend(); }
+
+  auto move_data() && -> base_dataframe_data<Coercion> { return {std::move(static_cast<base_dataframe_data<Coercion>&>(*this))}; }
 
 private:
   index_t row_count_ = 0u;
-  std::vector<named_column_type> elements_;
-  std::unordered_map<string, index_t> indexes_;
 };
 
 using dataframe = base_dataframe<coercion_rules>;
