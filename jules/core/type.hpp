@@ -3,6 +3,7 @@
 #ifndef JULES_CORE_TYPE_H
 #define JULES_CORE_TYPE_H
 
+#include <jules/core/debug.hpp>
 #include <jules/core/meta.hpp>
 
 #include <initializer_list>
@@ -105,8 +106,8 @@ struct index_rule {
 
   template <typename U, typename = meta::requires<Signed<U>>> static auto coerce_from(const U& value) -> type
   {
-    if (value < 0)
-      throw std::invalid_argument{"index cannot be initialized by a negative value"};
+    DEBUG_ASSERT(value >= 0, debug::throwing_module, debug::level::invalid_argument,
+                 "index cannot be initialized by a negative value");
     return value;
   }
 
@@ -134,15 +135,15 @@ struct uinteger_rule {
   static auto coerce_from(const string& value) -> type
   {
     auto result = std::stoul(value);
-    if (result > std::numeric_limits<uinteger>::max())
-      throw std::invalid_argument{"value too big to initialize an unsigned value"};
+    DEBUG_ASSERT(result <= std::numeric_limits<uinteger>::max(), debug::throwing_module, debug::level::invalid_argument,
+                 "value too big to initialize an unsigned value");
     return result;
   }
 
   template <typename U, typename = meta::requires<Signed<U>>> static auto coerce_from(const U& value) -> type
   {
-    if (value < 0)
-      throw std::invalid_argument{"unsigned cannot be initialized by a negative value"};
+    DEBUG_ASSERT(value >= 0, debug::throwing_module, debug::level::invalid_argument,
+                 "unsigned cannot be initialized by a negative value");
     return value;
   }
 

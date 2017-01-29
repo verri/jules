@@ -4,6 +4,7 @@
 #define JULES_DATAFRAME_DETAIL_COLUMN_MODEL_H
 
 #include <jules/base/async.hpp>
+#include <jules/core/debug.hpp>
 #include <jules/core/type.hpp>
 
 #include <algorithm>
@@ -219,8 +220,8 @@ public:
 
   auto partial_clone(index_t first, index_t size) const -> std::unique_ptr<column_interface<Coercion>> final
   {
-    if (first >= this->size() || first + size > this->size())
-      throw std::out_of_range{"invalid partial clone extents"};
+    DEBUG_ASSERT(first < this->size() && first + size <= this->size(), debug::throwing_module, debug::level::invalid_argument,
+                 "invalid partial clone extents");
     return std::unique_ptr<column_interface<Coercion>>{new column_model{this->begin() + first, this->begin() + first + size}};
   }
 

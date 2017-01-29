@@ -3,6 +3,7 @@
 #ifndef JULES_DATAFRAME_ACTIONS_HPP
 #define JULES_DATAFRAME_ACTIONS_HPP
 
+#include <jules/core/debug.hpp>
 #include <jules/core/range.hpp>
 #include <jules/core/type.hpp>
 #include <jules/dataframe/detail/common.hpp>
@@ -41,8 +42,7 @@ static inline auto head(index_t n)
 {
   // TODO: composed lambdas to accept temporary dataframe
   return make_dataframe_action([n](const auto& df) {
-    if (n > df.row_count())
-      throw std::out_of_range{"not enough rows"};
+    DEBUG_ASSERT(n <= df.row_count(), debug::throwing_module, debug::level::extents_check, "not enough rows");
 
     namespace view = ::jules::range::view;
     return decltype(df)(view::all(df) | view::transform([n](const auto& named_column) {
