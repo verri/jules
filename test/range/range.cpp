@@ -12,7 +12,7 @@ TEST_CASE("Basic range::view usage", "[range]")
   using vector = jules::vector<>;
   using jules::as_vector;
 
-  static_assert(std::is_same<range_value_t<vector>, typename std::iterator_traits<vector::iterator>::value_type>::value, "");
+  static_assert(std::is_same<range_value_type_t<vector>, typename std::iterator_traits<vector::iterator>::value_type>::value, "");
 
   auto ints_vector = as_vector(view::ints(0) | view::take(10u));
   REQUIRE(ints_vector.size() == 10u);

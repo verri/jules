@@ -427,10 +427,14 @@ public:
   ///   \exclude
   template <typename Rng, typename U = range::range_value_t<std::decay_t<Rng>>,
             typename _ = meta::requires<range::Range<std::decay_t<Rng>>, meta::negation<Array<std::decay_t<Rng>>>>>
-  base_array(Rng&& rng) : base_array(uninitialized, range::size(std::forward<Rng>(rng)))
+  base_array(Rng&& rng) : base_array(uninitialized, range::size(rng))
   {
     static_assert(std::is_constructible<value_type, const U&>::value, "incompatible value types");
-    this->create(this->data(), range::begin(std::forward<Rng>(rng)), this->size());
+    // TODO: C++17
+    // if contexpr (std::is_rvalue_v<Rng>)
+    //   this->create(this->data(), range::make_move_iterator(range::begin(rng)), this->size());
+    // else
+    this->create(this->data(), range::begin(rng), this->size());
   }
 
   /// \group constructors Constructors
