@@ -43,11 +43,11 @@ static inline auto uniform_index_sample(index_t end)
   return sample(dist);
 }
 
-template <typename Rng, typename U = range::range_value_t<std::decay_t<Rng>>, typename = meta::requires<range::Range<Rng>>>
-auto discrete_index_sample(Rng&& rng)
+template <typename Rng, typename U = range::range_value_t<Rng>, typename = meta::requires<range::Range<Rng>>>
+auto discrete_index_sample(const Rng& rng)
 {
   static_assert(std::is_convertible<U, double>::value, "weights must be convertible to double");
-  auto dist = std::discrete_distribution<index_t>(range::begin(std::forward<Rng>(rng)), range::end(std::forward<Rng>(rng)));
+  auto dist = std::discrete_distribution<index_t>(range::begin(rng), range::end(rng));
   return sample(dist);
 }
 
