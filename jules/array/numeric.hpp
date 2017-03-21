@@ -63,12 +63,6 @@ template <typename... Args, typename = std::enable_if_t<(sizeof...(Args) > 1)>> 
   return vector<R>(std::make_move_iterator(std::begin(values)), std::make_move_iterator(std::end(values)));
 }
 
-template <typename A, typename T = typename A::value_type, typename = meta::requires<Array<A>>>
-auto normal_pdf(const A& array, T mu, T sigma)
-{
-  return apply(array, [ mu = std::move(mu), sigma = std::move(sigma) ](const auto& x) { return normal_pdf(x, mu, sigma); });
-}
-
 } // namespace jules
 
 #endif // JULES_ARRAY_NUMERIC_H

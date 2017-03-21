@@ -15,8 +15,6 @@
 namespace jules
 {
 
-template <class T> constexpr auto pi = T(3.1415926535897932385);
-
 /// \exclude
 namespace detail
 {
@@ -290,14 +288,6 @@ constexpr auto any_args() { return false; }
 template <typename... Args> constexpr auto any_args(bool arg, Args&&... args)
 {
   return arg || any_args(std::forward<Args>(args)...);
-}
-
-template <typename T> constexpr auto square(const T& value) { return value * value; }
-
-template <typename T> auto normal_pdf(const T& x, const T& mu, const T& sigma)
-{
-  auto sigma2 = 2 * square(sigma);
-  return std::exp(-square(x - mu)) / std::sqrt(sigma2 * pi<T>);
 }
 
 } // namespace jules
