@@ -183,6 +183,27 @@ template <typename Rng, typename = meta::requires<range::Range<Rng>>> auto count
   return ::jules::count(range::begin(rng), range::end(rng));
 }
 
+/// \group Which
+///
+/// Returns a vector with the indexes of the true elements in a `Range` or in the sequence [`first`, `last`).
+///
+/// \module Logical
+template <typename Iter, typename Sent, typename = meta::requires<range::Sentinel<Sent, Iter>>> auto which(Iter first, Sent last)
+{
+  std::vector<index_t> indexes;
+  auto it = first;
+  for (auto index = 0ul; it != last; ++index)
+    if (*it++)
+      indexes.push_back(index);
+  return indexes;
+}
+
+/// \group Which
+template <typename Rng, typename = meta::requires<range::Range<Rng>>> auto which(const Rng& rng)
+{
+  return ::jules::which(range::begin(rng), range::end(rng));
+}
+
 /// \group All
 ///
 /// Checks whether all elements in a `Range` or in the sequence [`first`, `last`) are true.

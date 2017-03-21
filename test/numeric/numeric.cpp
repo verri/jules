@@ -77,5 +77,16 @@ TEST_CASE("Base numeric utilities", "[numeric]")
 
     CHECK(!jules::none(a.begin(), a.end()));
     CHECK(none(!b));
+
+    const auto aix = which(a);
+    const auto bix = jules::which(b.begin(), b.end());
+    const auto cix = which(!b);
+
+    CHECK(aix.size() == count(a));
+    CHECK(bix.size() == count(b));
+    CHECK(cix.size() == 0u);
+
+    CHECK(all(jules::as_vector(aix) == jules::as_vector(0u, 2u)));
+    CHECK(all(jules::as_vector(bix) == jules::as_vector(0u, 1u, 2u)));
   }
 }

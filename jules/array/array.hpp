@@ -16,6 +16,8 @@
 
 /// TODO: XXΧ: There are no strong guarantees if an exceptions occurs. It possibly will
 /// cause a memory leak.
+/// TODO: Everytime a Range is given, the size must be known a priori.  A better error
+/// message is needed.
 
 namespace jules
 {
