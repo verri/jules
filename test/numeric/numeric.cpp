@@ -37,6 +37,10 @@ TEST_CASE("Base numeric utilities", "[numeric]")
     CHECK(jules::sum(b) == 10);
     CHECK(sum(c) == 10);
 
+    CHECK(jules::mean(a.begin(), a.end()) == 10 / 4);
+    CHECK(jules::mean(b) == 10 / 4);
+    CHECK(mean(c) == 10 / 4);
+
     CHECK(jules::prod(a.begin(), a.end()) == 24);
     CHECK(jules::prod(b) == 24);
     CHECK(prod(c) == 24);
@@ -67,6 +71,9 @@ TEST_CASE("Base numeric utilities", "[numeric]")
 
     CHECK(jules::count(a.begin(), a.end()) == 2u);
     CHECK(count(b) == 3u);
+
+    CHECK(jules::freq(a.begin(), a.end()) == Approx(2.0 / 3.0));
+    CHECK(freq(b) == Approx(1.0));
 
     CHECK(jules::any(a.begin(), a.end()));
     CHECK(any(!a));

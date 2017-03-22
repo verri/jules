@@ -161,6 +161,26 @@ auto sum(const Rng& rng, T start = numeric_traits<T>::additive_identity())
   return ::jules::sum(range::begin(rng), range::end(rng), std::move(start));
 }
 
+/// \group Mean
+///
+/// Returns either the mean of the elements in a `Range` or in the sequence [`first`, `last`).
+///
+/// \module Arithmetic
+/// \notes [jules::numeric_traits<T>]() must implement `additive_identity`.
+template <typename Iter, typename Sent, typename T = range::iterator_value_t<Iter>,
+          typename = meta::requires<range::Sentinel<Sent, Iter>>>
+auto mean(Iter first, Sent last, T start = numeric_traits<T>::additive_identity())
+{
+  return ::jules::sum(first, last, std::move(start)) / ::jules::length(first, last);
+}
+
+/// \group Mean
+template <typename Rng, typename T = range::range_value_t<Rng>, typename = meta::requires<range::Range<Rng>>>
+auto mean(const Rng& rng, T start = numeric_traits<T>::additive_identity())
+{
+  return ::jules::sum(rng, std::move(start)) / ::jules::length(rng);
+}
+
 /// \group Count
 ///
 /// Returns the number of true elements in a `Range` or in the sequence [`first`, `last`).
@@ -179,6 +199,22 @@ template <typename Iter, typename Sent, typename = meta::requires<range::Sentine
 template <typename Rng, typename = meta::requires<range::Range<Rng>>> auto count(const Rng& rng)
 {
   return ::jules::count(range::begin(rng), range::end(rng));
+}
+
+/// \group Freq
+///
+/// Returns the frequency of true elements in a `Range` or in the sequence [`first`, `last`).
+///
+/// \module Logical
+template <typename Iter, typename Sent, typename = meta::requires<range::Sentinel<Sent, Iter>>> auto freq(Iter first, Sent last)
+{
+  return static_cast<numeric>(::jules::count(first, last)) / ::jules::length(first, last);
+}
+
+/// \group Freq
+template <typename Rng, typename = meta::requires<range::Range<Rng>>> auto freq(const Rng& rng)
+{
+  return static_cast<numeric>(::jules::count(rng)) / ::jules::length(rng);
 }
 
 /// \group Which
