@@ -3,6 +3,7 @@
 #ifndef JULES_BASE_NUMERIC_H
 #define JULES_BASE_NUMERIC_H
 
+#include <jules/base/math.hpp>
 #include <jules/core/meta.hpp>
 #include <jules/core/range.hpp>
 
@@ -69,7 +70,7 @@ template <typename Rng, typename = meta::requires<range::Range<Rng>>> auto lengt
 
 /// \group Max
 ///
-/// Returns either the maximum element in a `Range` or in the sequence [`first`, `last`).
+/// Returns the maximum element either in a `Range` or in the sequence [`first`, `last`).
 ///
 /// \module Arithmetic
 /// \notes [jules::numeric_traits<T>]() must implement `unbounded_min`.
@@ -93,7 +94,7 @@ auto max(const Rng& rng, T start = numeric_traits<T>::unbounded_min())
 
 /// \group Min
 ///
-/// Returns either the minimum element in a `Range` or in the sequence [`first`, `last`).
+/// Returns the minimum element either in a `Range` or in the sequence [`first`, `last`).
 ///
 /// \module Arithmetic
 /// \notes [jules::numeric_traits<T>]() must implement `unbounded_max`.
@@ -117,7 +118,7 @@ auto min(const Rng& rng, T start = numeric_traits<T>::unbounded_max())
 
 /// \group Prod
 ///
-/// Returns either the product of the elements in a `Range` or in the sequence [`first`, `last`).
+/// Returns the product of the elements either in a `Range` or in the sequence [`first`, `last`).
 ///
 /// \module Arithmetic
 /// \notes [jules::numeric_traits<T>]() must implement `multiplicative_identity`.
@@ -140,7 +141,7 @@ auto prod(const Rng& rng, T start = numeric_traits<T>::multiplicative_identity()
 
 /// \group Sum
 ///
-/// Returns either the summation of the elements in a `Range` or in the sequence [`first`, `last`).
+/// Returns the summation of the elements either in a `Range` or in the sequence [`first`, `last`).
 ///
 /// \module Arithmetic
 /// \notes [jules::numeric_traits<T>]() must implement `additive_identity`.
@@ -163,7 +164,7 @@ auto sum(const Rng& rng, T start = numeric_traits<T>::additive_identity())
 
 /// \group Mean
 ///
-/// Returns either the mean of the elements in a `Range` or in the sequence [`first`, `last`).
+/// Returns the mean of the elements either in a `Range` or in the sequence [`first`, `last`).
 ///
 /// \module Arithmetic
 /// \notes [jules::numeric_traits<T>]() must implement `additive_identity`.
@@ -179,6 +180,53 @@ template <typename Rng, typename T = range::range_value_t<Rng>, typename = meta:
 auto mean(const Rng& rng, T start = numeric_traits<T>::additive_identity())
 {
   return ::jules::sum(rng, std::move(start)) / ::jules::length(rng);
+}
+
+/// \group Var
+///
+/// Returns the *corrected* sample variance of the elements either in a `Range` or in the
+/// sequence [`first`, `last`).
+///
+/// \module Arithmetic
+/// \notes [jules::numeric_traits<T>]() must implement `additive_identity`.
+template <typename Iter, typename Sent, typename T = range::iterator_value_t<Iter>,
+          typename = meta::requires<range::Sentinel<Sent, Iter>>>
+auto var(Iter first, Sent last, T start = numeric_traits<T>::additive_identity())
+{
+  const auto N = ::jules::length(first, last);
+  const auto mu = ::jules::mean(first, last, start);
+  auto result = std::move(start);
+  for (auto it = first; it != last; ++it)
+    result += square(*it - mu);
+  return result / (N - 1);
+}
+
+/// \group Var
+template <typename Rng, typename T = range::range_value_t<Rng>, typename = meta::requires<range::Range<Rng>>>
+auto var(const Rng& rng, T start = numeric_traits<T>::additive_identity())
+{
+  return ::jules::var(range::begin(rng), range::end(rng), std::move(start));
+}
+
+/// \group Sd
+///
+/// Returns the *corrected* sample standard deviation of the elements either in a `Range`
+/// or in the sequence [`first`, `last`).
+///
+/// \module Arithmetic
+/// \notes [jules::numeric_traits<T>]() must implement `additive_identity`.
+template <typename Iter, typename Sent, typename T = range::iterator_value_t<Iter>,
+          typename = meta::requires<range::Sentinel<Sent, Iter>>>
+auto sd(Iter first, Sent last, T start = numeric_traits<T>::additive_identity())
+{
+  return std::sqrt(::jules::var(first, last, std::move(start)));
+}
+
+/// \group Sd
+template <typename Rng, typename T = range::range_value_t<Rng>, typename = meta::requires<range::Range<Rng>>>
+auto sd(const Rng& rng, T start = numeric_traits<T>::additive_identity())
+{
+  return std::sqrt(::jules::var(rng, std::move(start)));
 }
 
 /// \group Count

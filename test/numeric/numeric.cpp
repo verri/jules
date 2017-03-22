@@ -41,6 +41,14 @@ TEST_CASE("Base numeric utilities", "[numeric]")
     CHECK(jules::mean(b) == 10 / 4);
     CHECK(mean(c) == 10 / 4);
 
+    CHECK(jules::var(a.begin(), a.end()) == 6 / 3);
+    CHECK(jules::var(b) == 6 / 3);
+    CHECK(var(c) == 6 / 3);
+
+    CHECK(jules::sd(a.begin(), a.end()) == Approx(std::sqrt(6 / 3)));
+    CHECK(jules::sd(b) == Approx(std::sqrt(6 / 3)));
+    CHECK(sd(c) == Approx(std::sqrt(6 / 3)));
+
     CHECK(jules::prod(a.begin(), a.end()) == 24);
     CHECK(jules::prod(b) == 24);
     CHECK(prod(c) == 24);
