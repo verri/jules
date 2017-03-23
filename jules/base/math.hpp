@@ -15,7 +15,7 @@ template <typename T> constexpr auto square(const T& value) { return value * val
 template <typename T> auto normal_pdf(const T& x, const T& mu, const T& sigma)
 {
   auto sigma2 = 2 * square(sigma);
-  return std::exp(-square(x - mu)) / std::sqrt(sigma2 * pi<T>);
+  return std::exp(-square(x - mu) / sigma2) / std::sqrt(sigma2 * pi<T>);
 }
 
 } // namespace jules
