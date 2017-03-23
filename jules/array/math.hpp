@@ -22,6 +22,16 @@ template <typename A, typename = meta::requires<Array<A>>> auto abs(const A& arr
   return apply(array, [](const auto& v) { return std::abs(v); });
 }
 
+template <typename A, typename = meta::requires<Array<A>>> auto sqrt(const A& array)
+{
+  return apply(array, [](const auto& v) { return std::sqrt(v); });
+}
+
+template <typename A, typename = meta::requires<Array<A>>> auto log(const A& array)
+{
+  return apply(array, [](const auto& v) { return std::log(v); });
+}
+
 } // namespace jules
 
 #endif // JULES_ARRAY_MATH_H
