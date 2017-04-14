@@ -5,6 +5,7 @@
 
 #include <jules/array/array.hpp>
 #include <jules/array/binary_expr_array.hpp>
+#include <jules/array/contiguous_array.hpp>
 #include <jules/array/functional.hpp>
 #include <jules/array/ind_array.hpp>
 #include <jules/array/io.hpp>
