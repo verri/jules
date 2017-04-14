@@ -6,7 +6,8 @@ SRC = array/slice.cpp array/ref_array.cpp array/ind_array.cpp array/array.cpp \
 			dataframe/action.cpp \
 			range/range.cpp random/random.cpp \
 			numeric/numeric.cpp \
-			debug/debug.cpp
+			debug/debug.cpp \
+			const_vector/const_vector.cpp
 
 OBJ := $(SRC:.cpp=.o) test_suite.o
 DEP := $(SRC:.cpp=.d) test_suite.d
