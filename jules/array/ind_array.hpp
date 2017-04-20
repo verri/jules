@@ -6,6 +6,7 @@
 #include <jules/array/detail/iterator.hpp>
 #include <jules/array/detail/slicing.hpp>
 #include <jules/array/slice.hpp>
+#include <jules/base/const_vector.hpp>
 #include <jules/core/debug.hpp>
 #include <jules/core/meta.hpp>
 #include <jules/core/type.hpp>
@@ -28,7 +29,7 @@ template <typename T, std::size_t N> class ind_array
   template <typename, std::size_t> friend class ind_array;
 
 public:
-  using vector_type = std::vector<index_t>;
+  using vector_type = const_vector<index_t>;
   using value_type = T;
 
   static constexpr auto order = N;
@@ -116,7 +117,7 @@ public:
   template <typename... Args> auto operator()(Args&&... args) -> detail::slice_request<ind_array<T, N>, Args...>
   {
     auto slice = detail::default_slicing(descriptor_, std::forward<Args>(args)...);
-    auto indexes = vector_type();
+    auto indexes = std::vector<index_t>();
 
     indexes.reserve(slice.size());
     for (auto j : slice)
@@ -144,7 +145,7 @@ public:
   template <typename... Args> auto operator()(Args&&... args) const -> detail::slice_request<ind_array<const T, N>, Args...>
   {
     auto slice = detail::default_slicing(descriptor_, std::forward<Args>(args)...);
-    auto indexes = vector_type();
+    auto indexes = std::vector<index_t>();
 
     indexes.reserve(slice.size());
     for (auto j : slice)
@@ -181,7 +182,7 @@ private:
   auto row(index_t i) const
   {
     auto extents = std::array<index_t, N - 1>();
-    auto indexes = vector_type();
+    auto indexes = std::vector<index_t>();
     indexes.reserve(size() / row_count());
 
     std::copy(std::begin(extents()) + 1, std::end(extents()), std::begin(extents));
@@ -207,14 +208,14 @@ template <typename T> class ind_array<T, 1>
   template <typename, std::size_t> friend class ind_array;
 
 public:
-  using vector_type = std::vector<index_t>;
+  using vector_type = const_vector<index_t>;
   using value_type = T;
   static constexpr auto order = 1;
 
   using size_type = index_t;
   using difference_type = distance_t;
 
-  using iterator = detail::iterator_from_indexes<T, typename vector_type::iterator>;
+  using iterator = detail::iterator_from_indexes<T, typename vector_type::const_iterator>;
   using const_iterator = detail::iterator_from_indexes<const T, typename vector_type::const_iterator>;
 
   /// *TODO*: Explain why the user should probably not call this function.
@@ -298,9 +299,9 @@ public:
     return {data_, slicing.first.extent, std::move(indexes)};
   }
 
-  auto operator()(std::vector<index_t>&& indexes) -> ind_array<T, 1>
+  auto operator()(std::vector<index_t> indexes) -> ind_array<T, 1>
   {
-    map_indexes(indexes);
+    inplace_map_indexes(indexes);
     return {this->data_, indexes.size(), std::move(indexes)};
   }
 
@@ -323,9 +324,9 @@ public:
     return {data_, slicing.first.extent, std::move(indexes)};
   }
 
-  auto operator()(std::vector<index_t>&& indexes) const -> ind_array<const T, 1>
+  auto operator()(std::vector<index_t> indexes) const -> ind_array<const T, 1>
   {
-    map_indexes(indexes);
+    inplace_map_indexes(indexes);
     return {this->data_, indexes.size(), std::move(indexes)};
   }
 
@@ -356,14 +357,14 @@ public:
 private:
   template <typename Range> auto map_indexes(const Range& rng) const
   {
-    auto indexes = vector_type();
+    auto indexes = std::vector<index_t>();
     indexes.reserve(rng.size());
     for (index_t j : rng)
       indexes.push_back(indexes_[j]);
     return indexes;
   }
 
-  auto map_indexes(std::vector<index_t>& indexes) const
+  auto inplace_map_indexes(std::vector<index_t>& indexes) const
   {
     for (auto& index : indexes)
       index = indexes_[index];

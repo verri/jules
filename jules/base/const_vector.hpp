@@ -56,9 +56,11 @@ public:
   ///
   /// (2) explicitly by forwarding one parameter to the underlying standard vector.
   ///
-  /// (3) from a initializer list.
+  /// (3) from a standard vector.
   ///
-  /// (4-5) from another vector.
+  /// (4) from a initializer list.
+  ///
+  /// (5-6) from another vector.
   template <typename... Args, typename = std::enable_if_t<(sizeof...(Args) > 1)>>
   const_vector(Args&&... args) : data_{std::make_shared<storage_t>(std::forward<Args>(args)...)}
   {
@@ -66,6 +68,9 @@ public:
 
   /// \group constructors Constructors
   template <typename Arg> explicit const_vector(Arg&& arg) : data_{std::make_shared<storage_t>(std::forward<Arg>(arg))} {}
+
+  /// \group constructors Constructors
+  const_vector(storage_t source) : data_{std::make_shared<storage_t>(std::move(source))} {}
 
   /// \group constructors Constructors
   const_vector(std::initializer_list<value_type> init, const allocator_type& alloc = {})
