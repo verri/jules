@@ -8,6 +8,7 @@
 #include <jules/array/detail/common.hpp>
 #include <jules/array/ref_array.hpp>
 #include <jules/base/async.hpp>
+#include <jules/base/const_vector.hpp>
 #include <jules/base/numeric.hpp>
 #include <jules/core/meta.hpp>
 #include <jules/core/type.hpp>
@@ -526,13 +527,13 @@ public:
 
   /// \group Indexing
   /// Optimized indirect indexing from temporary indexes.
-  auto operator()(std::vector<index_t>&& indexes) -> ind_array<value_type, 1>
+  auto operator()(const_vector<index_t> indexes) -> ind_array<value_type, 1>
   {
     return {this->data_, indexes.size(), std::move(indexes)};
   }
 
   /// \group Indexing
-  auto operator()(std::vector<index_t>&& indexes) const -> ind_array<const value_type, 1>
+  auto operator()(const_vector<index_t> indexes) const -> ind_array<const value_type, 1>
   {
     return {this->data_, indexes.size(), std::move(indexes)};
   }
