@@ -57,10 +57,10 @@ public:
   /// (6) Signed integer type that can store differences between sizes.
   static constexpr auto order = N;
 
-  /// \group member_types Class Types and Constants
+  /// \group member_types
   using value_type = T;
 
-  /// \group member_types Class Types and Constants
+  /// \group member_types
   using iterator = value_type*;
 
   /// \group member_types
