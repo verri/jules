@@ -6,28 +6,29 @@
 TEST_CASE("Constructing constant vectors", "[const_vector]")
 {
   using jules::as_vector;
+  using jules::index_t;
 
-  auto vec = std::vector<int>(5ul);
+  auto vec = std::vector<index_t>(5ul);
 
   // Initializer list
-  auto a = jules::const_vector<int>{1, 2, 3, 4, 5};
+  auto a = jules::const_vector<index_t>{1u, 2u, 3u, 4u, 5u};
 
   // From a vector
-  auto b = jules::const_vector<int>(vec);
+  auto b = jules::const_vector<index_t>(vec);
 
   // With one argument (the size)
-  auto c = jules::const_vector<int>(5ul);
+  auto c = jules::const_vector<index_t>(5ul);
 
   // With more than one argument
-  auto d = jules::const_vector<int>(5ul, 6);
+  auto d = jules::const_vector<index_t>(5ul, 6);
 
   CHECK(a.size() == 5u);
   CHECK(b.size() == 5u);
   CHECK(c.size() == 5u);
   CHECK(d.size() == 5u);
 
-  CHECK(all(as_vector(a) == as_vector(1, 2, 3, 4, 5)));
-  CHECK(all(as_vector(b) == as_vector(0, 0, 0, 0, 0)));
-  CHECK(all(as_vector(c) == as_vector(0, 0, 0, 0, 0)));
-  CHECK(all(as_vector(d) == as_vector(6, 6, 6, 6, 6)));
+  CHECK(a == jules::seq(1u, 5u));
+  CHECK(all(as_vector(b) == as_vector(0u, 0u, 0u, 0u, 0u)));
+  CHECK(all(as_vector(c) == 0u));
+  CHECK(all(as_vector(d) == 6u));
 }
