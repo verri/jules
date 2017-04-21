@@ -59,26 +59,35 @@ public:
     }
   };
 
-  static const auto& Current() { return Instance().current; }
-  static const auto& Total() { return Instance().total; }
-  static const auto& Peak() { return Instance().peak; }
-
   static void Summary(std::ostream& os = std::cerr)
   {
-    os << "Still using: " << Current() << std::endl
-       << "Peak usage:  " << Peak() << std::endl
-       << "Requested:   " << Total() << std::endl;
+    const auto& mem = Instance();
 
-    os << "Blocks:" << std::endl;
-    for (auto&& block : Instance().blocks)
+    os << "  Total usage:  " << mem.total_usage << std::endl << "  Still using:  " << mem.still_using << std::endl;
+
+    if (mem.recent_usage.count > 0u)
+      os << "  Recent usage: " << mem.recent_usage << std::endl;
+
+    if (mem.recently_allocated.size() > 0u)
+      os << "  Recently allocated blocks:" << std::endl;
+    for (auto&& block : mem.recently_allocated)
       os << "\t" << block.first << ": " << (block.second * ToMB) << " MB" << std::endl;
 
-    os << "Freed blocks:" << std::endl;
-    for (auto&& block : Instance().freed)
+    if (mem.recently_freed.size() > 0u)
+      os << "  Recently freed blocks:" << std::endl;
+    for (auto&& block : mem.recently_freed)
       os << "\t" << block.first << ": " << (block.second * ToMB) << " MB" << std::endl;
   }
 
-  static void Reset() { Finalize(); }
+  static void Reset()
+  {
+    auto& mem = Instance();
+
+    mem.recently_allocated.clear();
+    mem.recently_freed.clear();
+
+    mem.recent_usage = {};
+  }
 
   static void Finalize()
   {
@@ -90,24 +99,24 @@ public:
   {
     auto& mem = Instance();
 
-    mem.blocks[ptr] = size;
+    mem.all_blocks[ptr] = size;
+    mem.recently_allocated[ptr] = size;
 
-    mem.current.inc(size);
-    mem.total.inc(size);
-
-    if (mem.peak < mem.current)
-      mem.peak = mem.current;
+    mem.total_usage.inc(size);
+    mem.recent_usage.inc(size);
+    mem.still_using.inc(size);
   }
 
   static void UnTrack(void* ptr)
   {
     auto& mem = Instance();
 
-    auto it = mem.blocks.find(ptr);
-    if (it != mem.blocks.end()) {
-      mem.current.dec(it->second);
-      mem.freed.push_back(*it);
-      mem.blocks.erase(it);
+    auto it = mem.all_blocks.find(ptr);
+    if (it != mem.all_blocks.end()) {
+      mem.still_using.dec(it->second);
+
+      mem.recently_freed.push_back(*it);
+      mem.all_blocks.erase(it);
     }
   }
 
@@ -127,11 +136,13 @@ private:
 
   static Memory* instance;
 
-  Alloc total, peak, current;
+  Alloc total_usage, recent_usage, still_using;
+
   std::unordered_map<void*, std::size_t, std::hash<void*>, std::equal_to<void*>,
-                     SafeAllocator<std::pair<void* const, std::size_t>>>
-    blocks;
-  std::vector<std::pair<void* const, std::size_t>, SafeAllocator<std::pair<void* const, std::size_t>>> freed;
+                     SafeAllocator<std::pair<void*const, std::size_t>>>
+    all_blocks, recently_allocated;
+
+  std::vector<std::pair<void* const, std::size_t>, SafeAllocator<std::pair<void* const, std::size_t>>> recently_freed;
 };
 
 Memory* Memory::instance = nullptr;
