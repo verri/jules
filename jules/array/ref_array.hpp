@@ -8,6 +8,7 @@
 #include <jules/array/detail/iterator.hpp>
 #include <jules/array/detail/slicing.hpp>
 #include <jules/array/slice.hpp>
+#include <jules/base/const_vector.hpp>
 #include <jules/core/debug.hpp>
 #include <jules/core/meta.hpp>
 #include <jules/core/range.hpp>
@@ -296,7 +297,7 @@ public:
     return {data_, slicing.first[0], std::move(slicing.second)};
   }
 
-  auto operator()(std::vector<index_t>&& indexes) -> ind_array<T, 1>
+  auto operator()(typename const_vector<index_t>::container_type indexes) -> ind_array<T, 1>
   {
     for (auto& index : indexes)
       index = this->descriptor()(index);
@@ -319,7 +320,7 @@ public:
     return {data_, slicing.first[0], std::move(slicing.second)};
   }
 
-  auto operator()(std::vector<index_t>&& indexes) const -> ind_array<const T, 1>
+  auto operator()(typename const_vector<index_t>::container_type indexes) const -> ind_array<const T, 1>
   {
     for (auto& index : indexes)
       index = this->descriptor()(index);

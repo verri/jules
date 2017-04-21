@@ -3,6 +3,7 @@
 #ifndef JULES_BASE_NUMERIC_H
 #define JULES_BASE_NUMERIC_H
 
+#include <jules/base/const_vector.hpp>
 #include <jules/base/math.hpp>
 #include <jules/core/meta.hpp>
 #include <jules/core/range.hpp>
@@ -267,17 +268,18 @@ template <typename Rng, typename = meta::requires<range::Range<Rng>>> auto freq(
 
 /// \group Which
 ///
-/// Returns a vector with the indexes of the true elements in a `Range` or in the sequence [`first`, `last`).
+/// Returns a const_vector with the indexes of the true elements in a `Range` or in the sequence [`first`, `last`).
 ///
 /// \module Logical
-template <typename Iter, typename Sent, typename = meta::requires<range::Sentinel<Sent, Iter>>> auto which(Iter first, Sent last)
+template <typename Iter, typename Sent, typename = meta::requires<range::Sentinel<Sent, Iter>>>
+auto which(Iter first, Sent last) -> const_vector<index_t>
 {
-  std::vector<index_t> indexes;
+  auto indexes = std::vector<index_t>();
   auto it = first;
   for (auto index = 0ul; it != last; ++index)
     if (*it++)
       indexes.push_back(index);
-  return indexes;
+  return {std::move(indexes)};
 }
 
 /// \group Which

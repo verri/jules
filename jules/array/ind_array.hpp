@@ -139,7 +139,7 @@ public:
     auto slicing = detail::indirect_slicing(descriptor_, std::forward<Args>(args)...);
     for (auto& v : slicing.second)
       v = indexes_[v];
-    return {data_, slicing.first.extents, std::move(slicing.second)};
+    return {data_, slicing.first, std::move(slicing.second)};
   }
 
   template <typename... Args> auto operator()(Args&&... args) const -> detail::slice_request<ind_array<const T, N>, Args...>
@@ -296,7 +296,7 @@ public:
 
     auto slicing = detail::indirect_slicing(descriptor_, rng);
     auto indexes = map_indexes(slicing.second);
-    return {data_, slicing.first.extent, std::move(indexes)};
+    return {data_, slicing.first[0], std::move(indexes)};
   }
 
   auto operator()(typename vector_type::container_type indexes) -> ind_array<T, 1>
@@ -321,7 +321,7 @@ public:
 
     auto slicing = detail::indirect_slicing(descriptor_, rng);
     auto indexes = map_indexes(slicing.second);
-    return {data_, slicing.first.extent, std::move(indexes)};
+    return {data_, slicing.first[0], std::move(indexes)};
   }
 
   auto operator()(typename vector_type::container_type indexes) const -> ind_array<const T, 1>
