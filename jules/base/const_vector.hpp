@@ -23,9 +23,10 @@ namespace jules
 /// \notes Unused memory is always freed.
 template <typename T, typename Allocator = typename std::vector<T>::allocator_type> class const_vector
 {
-  using storage_t = std::vector<T, Allocator>;
-
 public:
+  /// \group member_types Class Types
+  using container_type = std::vector<T, Allocator>;
+
   /// \group member_types Class Types
   using value_type = T;
 
@@ -33,19 +34,19 @@ public:
   using allocator_type = Allocator;
 
   /// \group member_types Class Types
-  using size_type = typename storage_t::size_type;
+  using size_type = typename container_type::size_type;
 
   /// \group member_types Class Types
-  using difference_type = typename storage_t::difference_type;
+  using difference_type = typename container_type::difference_type;
 
   /// \group member_types Class Types
-  using const_reference = typename storage_t::const_reference;
+  using const_reference = typename container_type::const_reference;
 
   /// \group member_types Class Types
-  using const_iterator = typename storage_t::const_iterator;
+  using const_iterator = typename container_type::const_iterator;
 
   /// \group member_types Class Types
-  using const_reverse_iterator = typename storage_t::const_reverse_iterator;
+  using const_reverse_iterator = typename container_type::const_reverse_iterator;
 
   ~const_vector() = default;
 
@@ -62,19 +63,19 @@ public:
   ///
   /// (5-6) from another vector.
   template <typename... Args, typename = std::enable_if_t<(sizeof...(Args) > 1)>>
-  const_vector(Args&&... args) : data_{std::make_shared<storage_t>(std::forward<Args>(args)...)}
+  const_vector(Args&&... args) : data_{std::make_shared<container_type>(std::forward<Args>(args)...)}
   {
   }
 
   /// \group constructors Constructors
-  template <typename Arg> explicit const_vector(Arg&& arg) : data_{std::make_shared<storage_t>(std::forward<Arg>(arg))} {}
+  template <typename Arg> explicit const_vector(Arg&& arg) : data_{std::make_shared<container_type>(std::forward<Arg>(arg))} {}
 
   /// \group constructors Constructors
-  const_vector(storage_t source) : data_{std::make_shared<storage_t>(std::move(source))} {}
+  const_vector(container_type source) : data_{std::make_shared<container_type>(std::move(source))} {}
 
   /// \group constructors Constructors
   const_vector(std::initializer_list<value_type> init, const allocator_type& alloc = {})
-    : data_{std::make_shared<storage_t>(init, alloc)}
+    : data_{std::make_shared<container_type>(init, alloc)}
   {
   }
 
@@ -82,7 +83,7 @@ public:
   const_vector(const const_vector& source) = default;
 
   /// \group constructors Constructors
-  const_vector(const_vector&& source) = default;
+  const_vector(const_vector&& source) noexcept = default;
 
   /// \group assignment Assignment
   ///
@@ -92,7 +93,7 @@ public:
   auto operator=(const const_vector& source) -> const_vector& = default;
 
   /// \group assignment Assignment
-  auto operator=(const_vector&& source) -> const_vector& = default;
+  auto operator=(const_vector&& source) noexcept -> const_vector& = default;
 
   /// TODO: assign and get_allocator
 
@@ -166,7 +167,7 @@ public:
   auto size() const -> size_type { return data_->size(); }
 
 private:
-  std::shared_ptr<storage_t> data_;
+  std::shared_ptr<container_type> data_;
 };
 }
 

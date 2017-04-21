@@ -117,7 +117,7 @@ public:
   template <typename... Args> auto operator()(Args&&... args) -> detail::slice_request<ind_array<T, N>, Args...>
   {
     auto slice = detail::default_slicing(descriptor_, std::forward<Args>(args)...);
-    auto indexes = std::vector<index_t>();
+    auto indexes = typename vector_type::container_type();
 
     indexes.reserve(slice.size());
     for (auto j : slice)
@@ -145,7 +145,7 @@ public:
   template <typename... Args> auto operator()(Args&&... args) const -> detail::slice_request<ind_array<const T, N>, Args...>
   {
     auto slice = detail::default_slicing(descriptor_, std::forward<Args>(args)...);
-    auto indexes = std::vector<index_t>();
+    auto indexes = typename vector_type::container_type();
 
     indexes.reserve(slice.size());
     for (auto j : slice)
@@ -182,7 +182,7 @@ private:
   auto row(index_t i) const
   {
     auto extents = std::array<index_t, N - 1>();
-    auto indexes = std::vector<index_t>();
+    auto indexes = typename vector_type::container_type();
     indexes.reserve(size() / row_count());
 
     std::copy(std::begin(extents()) + 1, std::end(extents()), std::begin(extents));
@@ -299,7 +299,7 @@ public:
     return {data_, slicing.first.extent, std::move(indexes)};
   }
 
-  auto operator()(std::vector<index_t> indexes) -> ind_array<T, 1>
+  auto operator()(typename vector_type::container_type indexes) -> ind_array<T, 1>
   {
     inplace_map_indexes(indexes);
     return {this->data_, indexes.size(), std::move(indexes)};
@@ -324,7 +324,7 @@ public:
     return {data_, slicing.first.extent, std::move(indexes)};
   }
 
-  auto operator()(std::vector<index_t> indexes) const -> ind_array<const T, 1>
+  auto operator()(typename vector_type::container_type indexes) const -> ind_array<const T, 1>
   {
     inplace_map_indexes(indexes);
     return {this->data_, indexes.size(), std::move(indexes)};
@@ -357,14 +357,14 @@ public:
 private:
   template <typename Range> auto map_indexes(const Range& rng) const
   {
-    auto indexes = std::vector<index_t>();
+    auto indexes = typename vector_type::container_type();
     indexes.reserve(rng.size());
     for (index_t j : rng)
       indexes.push_back(indexes_[j]);
     return indexes;
   }
 
-  auto inplace_map_indexes(std::vector<index_t>& indexes) const
+  auto inplace_map_indexes(typename vector_type::container_type& indexes) const
   {
     for (auto& index : indexes)
       index = indexes_[index];
