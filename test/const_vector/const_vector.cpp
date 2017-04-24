@@ -40,3 +40,23 @@ TEST_CASE("Constructing constant vectors", "[const_vector]")
   CHECK(all(as_vector(c) == 0u));
   CHECK(all(as_vector(d) == 6u));
 }
+
+TEST_CASE("Assigning constant vectors", "[const_vector]")
+{
+  using jules::const_vector;
+  using jules::index_t;
+  using jules::seq;
+
+  auto a = seq(1u, 5u);
+  auto b = const_vector<index_t>();
+  auto c = const_vector<index_t>();
+
+  b = a;
+  c = [d = a]()->const_vector<index_t> { return std::move(d); }
+  ();
+  a = std::vector<index_t>{1u, 2u, 3u, 4u, 5u};
+
+  CHECK(a == seq(1u, 5u));
+  CHECK(a == b);
+  CHECK(a == c);
+}
