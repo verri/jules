@@ -53,15 +53,20 @@ public:
   /// \group constructors Constructors
   /// Constructs a constant vector:
   ///
-  /// (1) by forwarding the parameters to the underlying standard vector.
+  /// (1) with no elements.
   ///
-  /// (2) explicitly by forwarding one parameter to the underlying standard vector.
+  /// (2) by forwarding the parameters to the underlying standard vector.
   ///
-  /// (3) from a standard vector.
+  /// (3) explicitly by forwarding one parameter to the underlying standard vector.
   ///
-  /// (4) from a initializer list.
+  /// (4) from a standard vector.
   ///
-  /// (5-6) from another vector.
+  /// (5) from a initializer list.
+  ///
+  /// (6-7) from another vector.
+  const_vector() : data_{std::make_shared<container_type>()} {}
+
+  /// \group constructors
   template <typename... Args, typename = std::enable_if_t<(sizeof...(Args) > 1)>>
   const_vector(Args&&... args) : data_{std::make_shared<container_type>(std::forward<Args>(args)...)}
   {

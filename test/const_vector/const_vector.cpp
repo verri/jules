@@ -3,6 +3,14 @@
 
 #include <catch.hpp>
 
+TEST_CASE("Empty constant vector", "[const_vector]")
+{
+  auto vec = jules::const_vector<int>();
+
+  CHECK(vec.size() == 0u);
+  CHECK_THROWS(vec.at(0u));
+}
+
 TEST_CASE("Constructing constant vectors", "[const_vector]")
 {
   using jules::as_vector;
