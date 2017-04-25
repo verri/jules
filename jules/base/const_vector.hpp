@@ -97,7 +97,7 @@ public:
   /// (2) Move assignment.
   auto operator=(const const_vector& source) -> const_vector& = default;
 
-  /// \group assignment Assignment
+  /// \group assignment
   auto operator=(const_vector&& source) noexcept -> const_vector& = default;
 
   /// TODO: assign and get_allocator
