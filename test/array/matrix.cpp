@@ -199,10 +199,9 @@ TEST_CASE("Matrix tutorial", "[array]")
     CHECK(x.extents()[0] == 5u);
     CHECK(x.extents()[1] == 20u);
 
-    // TODO: with C++17
-    // auto [nrow, ncol] = x.dimensions();
-    // CHECK(nrow == 10u);
-    // CHECK(ncol == 10u);
+    auto[nrow, ncol] = x.extents();
+    CHECK(nrow == 5u);
+    CHECK(ncol == 20u);
   }
 
   SECTION("Submatrix assignment")

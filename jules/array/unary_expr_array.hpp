@@ -77,8 +77,8 @@ public:
   }
 
   // TODO: XXX: with C++17 theses constructors can be deleted.
-  unary_expr_array(const unary_expr_array& source) = default;
-  unary_expr_array(unary_expr_array&& source) noexcept = default;
+  unary_expr_array(const unary_expr_array& source) = delete;
+  unary_expr_array(unary_expr_array&& source) noexcept = delete;
 
   auto operator=(const unary_expr_array& source) -> unary_expr_array& = delete;
   auto operator=(unary_expr_array&& source) noexcept -> unary_expr_array& = delete;

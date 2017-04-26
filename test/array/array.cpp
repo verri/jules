@@ -46,11 +46,11 @@ TEST_CASE("Basic array functionalities", "[array]")
   }
 
   REQUIRE(matrix1.extents() == matrix2.extents());
-  auto&& expr0 = jules::make_expr_array<2>(matrix1.begin(), matrix1.end(), matrix2.begin(), matrix2.end(),
-                                           [](const int& a, const int& b) { return a + b; }, matrix1.extents());
+  auto expr0 = jules::make_expr_array<2>(matrix1.begin(), matrix1.end(), matrix2.begin(), matrix2.end(),
+                                         [](const int& a, const int& b) { return a + b; }, matrix1.extents());
 
-  auto&& expr1 = jules::apply(matrix1, matrix2, [](int a, int b) { return a + b; });
-  auto&& expr2 = matrix1 + matrix2;
+  auto expr1 = jules::apply(matrix1, matrix2, [](int a, int b) { return a + b; });
+  auto expr2 = matrix1 + matrix2;
 
   CHECK(expr1.extents() == expr2.extents());
   {

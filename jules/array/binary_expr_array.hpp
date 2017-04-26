@@ -80,9 +80,8 @@ public:
   {
   }
 
-  // TODO: XXX: with guaranteed copy elision these constructors can be deleted.
-  binary_expr_array(const binary_expr_array& source) = default;
-  binary_expr_array(binary_expr_array&& source) noexcept = default;
+  binary_expr_array(const binary_expr_array& source) = delete;
+  binary_expr_array(binary_expr_array&& source) noexcept = delete;
 
   auto operator=(const binary_expr_array& source) -> binary_expr_array& = delete;
   auto operator=(binary_expr_array&& source) noexcept -> binary_expr_array& = delete;

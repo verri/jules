@@ -62,10 +62,7 @@ public:
 
   /// *TODO*: Explain why the user should probably not call these functions.
   /// In C++17, we can provide a helper that generates a view with more security.
-  ref_array() = default;
   ref_array(T* data, base_slice<N> descriptor) : data_{data}, descriptor_{descriptor} {}
-  ref_array(const ref_array& source) = default;
-  ref_array(ref_array&& source) noexcept = default;
 
   ~ref_array() = default;
 
@@ -167,6 +164,10 @@ public:
   auto column_count() const -> index_t { return extents()[1]; }
 
 protected:
+  ref_array() = default;
+  ref_array(const ref_array& source) = default;
+  ref_array(ref_array&& source) noexcept = default;
+
   /// \exclude
   value_type* data_;
 
@@ -217,10 +218,7 @@ public:
 
   /// *TODO*: Explain why the user should probably not call this function.
   /// In C++17, we can provide a helper that generates a view with more security.
-  ref_array() = default;
   ref_array(T* data, base_slice<1> descriptor) : data_{data}, descriptor_{descriptor} {}
-  ref_array(const ref_array& source) = default;
-  ref_array(ref_array&& source) noexcept = default;
 
   ~ref_array() = default;
 
@@ -354,6 +352,10 @@ public:
   auto length() const -> index_t { return size(); }
 
 protected:
+  ref_array() = default;
+  ref_array(const ref_array& source) = default;
+  ref_array(ref_array&& source) noexcept = default;
+
   /// \exclude
   T* data_;
 

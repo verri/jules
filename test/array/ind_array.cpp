@@ -15,16 +15,14 @@ TEST_CASE("Basic indirect array functionalities", "[array]")
   auto indexes = std::vector<index_t>(10u);
   std::iota(indexes.begin(), indexes.end(), 0u);
 
-  // TODO: XXX: cannot use AAA-style in C++14 because RVO is not guaranteed.
-  ind_array<numeric, 1> vector(values.data(), 10u, indexes);
+  auto vector = ind_array<numeric, 1>(values.data(), 10u, indexes);
   REQUIRE(values.data() == vector.data());
 
   vector = 2.0;
   for (auto value : values)
     CHECK(static_cast<double>(value) == 2.0);
 
-  // TODO: XXX: cannot use AAA-style in C++14 because RVO is not guaranteed.
-  ind_array<numeric, 2> matrix(values.data(), {{2ul, 5ul}}, indexes);
+  auto matrix = ind_array<numeric, 2>(values.data(), {{2ul, 5ul}}, indexes);
   REQUIRE(values.data() == matrix.data());
 
   matrix = 2.0;
