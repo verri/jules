@@ -348,33 +348,19 @@ template <typename Rng, typename = meta::requires<range::Range<Rng>>> auto any(c
   return any(ranges::begin(rng), ranges::end(rng));
 }
 
-constexpr auto prod_args() -> detail::forward_arithmetic { return {}; }
-
-template <typename T, typename... Args> constexpr auto prod_args(const T& arg, Args&&... args)
+template <typename... Args> constexpr decltype(auto) prod_args(Args&&... args)
 {
-  return arg * prod_args(std::forward<Args>(args)...);
+  return (std::forward<Args>(args) * ... * detail::forward_arithmetic{});
 }
 
-constexpr auto sum_args() -> detail::forward_arithmetic { return {}; }
-
-template <typename T, typename... Args> constexpr auto sum_args(const T& arg, Args&&... args)
+template <typename... Args> constexpr decltype(auto) sum_args(Args&&... args)
 {
-  return arg * sum_args(std::forward<Args>(args)...);
+  return (std::forward<Args>(args) + ... + detail::forward_arithmetic{});
 }
 
-constexpr auto all_args() { return true; }
+template <typename... Args> constexpr decltype(auto) all_args(Args&&... args) { return (std::forward<Args>(args) && ...); }
 
-template <typename... Args> constexpr auto all_args(bool arg, Args&&... args)
-{
-  return arg && all_args(std::forward<Args>(args)...);
-}
-
-constexpr auto any_args() { return false; }
-
-template <typename... Args> constexpr auto any_args(bool arg, Args&&... args)
-{
-  return arg || any_args(std::forward<Args>(args)...);
-}
+template <typename... Args> constexpr decltype(auto) any_args(Args&&... args) { return (std::forward<Args>(args) || ...); }
 
 } // namespace jules
 
