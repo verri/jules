@@ -114,31 +114,31 @@ public:
   /// \group Indexing
   auto operator[](index_t i) const -> ref_array<const T, N - 1> { return static_cast<ref_array<const T, N>>(*this)[i]; }
 
-  auto operator()() -> ref_array<T, N>& { return *this; }
-  auto operator()() const -> ref_array<const T, N> { return *this; }
+  [[deprecated]] auto operator()() -> ref_array<T, N>& { return *this; }
+  [[deprecated]] auto operator()() const -> ref_array<const T, N> { return *this; }
 
-  template <typename... Args> auto operator()(Args&&... args) -> detail::indirect_request<ind_array<T, N>, Args...>
+  template <typename... Args>[[deprecated]] auto operator()(Args&&... args) -> detail::indirect_request<ind_array<T, N>, Args...>
   {
     static_assert(sizeof...(args) == N, "invalid number of arguments");
     auto slicing = detail::indirect_slicing(descriptor_, std::forward<Args>(args)...);
     return {data_, slicing.first, std::move(slicing.second)};
   }
 
-  template <typename... Args> auto operator()(Args&&... args) -> detail::slice_request<ref_array<T, N>, Args...>
+  template <typename... Args>[[deprecated]] auto operator()(Args&&... args) -> detail::slice_request<ref_array<T, N>, Args...>
   {
     static_assert(sizeof...(args) == N, "invalid number of arguments");
     auto slice = detail::default_slicing(descriptor_, std::forward<Args>(args)...);
     return {data_, slice};
   }
 
-  template <typename... Args> auto operator()(Args&&... args) -> detail::element_request<T&, Args...>
+  template <typename... Args>[[deprecated]] auto operator()(Args&&... args) -> detail::element_request<T&, Args...>
   {
     static_assert(sizeof...(args) == N, "invalid number of arguments");
     // TODO: check boundaries
     return data_[descriptor_(index_t{std::forward<Args>(args)}...)];
   }
 
-  template <typename... Args> decltype(auto) operator()(Args&&... args) const
+  template <typename... Args>[[deprecated]] decltype(auto) operator()(Args&&... args) const
   {
     return static_cast<ref_array<const T, N>>(*this)(std::forward<Args>(args)...);
   }
@@ -284,54 +284,54 @@ public:
     return data_[descriptor_(i)];
   }
 
-  auto operator()() -> ref_array<T, 1>& { return *this; }
-  auto operator()() const -> ref_array<const T, 1> { return *this; }
+  [[deprecated]] auto operator()() -> ref_array<T, 1>& { return *this; }
+  [[deprecated]] auto operator()() const -> ref_array<const T, 1> { return *this; }
 
   template <typename Rng, typename U = range::range_value_t<Rng>, typename = meta::requires<range::Range<Rng>>>
-  auto operator()(const Rng& rng) -> ind_array<T, 1>
+  [[deprecated]] auto operator()(const Rng& rng) -> ind_array<T, 1>
   {
     static_assert(std::is_convertible<U, index_t>::value, "arbitrary ranges must contain indexes");
     auto slicing = detail::indirect_slicing(this->descriptor_, rng);
     return {data_, slicing.first[0], std::move(slicing.second)};
   }
 
-  auto operator()(typename const_vector<index_t>::container_type indexes) -> ind_array<T, 1>
+  [[deprecated]] auto operator()(typename const_vector<index_t>::container_type indexes) -> ind_array<T, 1>
   {
     for (auto& index : indexes)
       index = this->descriptor()(index);
     return {this->data_, indexes.size(), std::move(indexes)};
   }
 
-  auto operator()(const base_slice<1>& slice) -> ref_array<T, 1>
+  [[deprecated]] auto operator()(const base_slice<1>& slice) -> ref_array<T, 1>
   {
     auto new_slice = detail::default_slicing(this->descriptor_, slice);
     return {data_, new_slice};
   }
 
-  auto operator()(index_t i) -> T& { return (*this)[i]; }
+  [[deprecated]] auto operator()(index_t i) -> T& { return (*this)[i]; }
 
   template <typename Rng, typename U = range::range_value_t<Rng>, typename = meta::requires<range::Range<Rng>>>
-  auto operator()(const Rng& rng) const -> ind_array<const T, 1>
+  [[deprecated]] auto operator()(const Rng& rng) const -> ind_array<const T, 1>
   {
     static_assert(std::is_convertible<U, index_t>::value, "arbitrary ranges must contain indexes");
     auto slicing = detail::indirect_slicing(this->descriptor_, rng);
     return {data_, slicing.first[0], std::move(slicing.second)};
   }
 
-  auto operator()(typename const_vector<index_t>::container_type indexes) const -> ind_array<const T, 1>
+  [[deprecated]] auto operator()(typename const_vector<index_t>::container_type indexes) const -> ind_array<const T, 1>
   {
     for (auto& index : indexes)
       index = this->descriptor()(index);
     return {this->data_, indexes.size(), std::move(indexes)};
   }
 
-  auto operator()(const base_slice<1>& slice) const -> ref_array<const T, 1>
+  [[deprecated]] auto operator()(const base_slice<1>& slice) const -> ref_array<const T, 1>
   {
     auto new_slice = detail::default_slicing(this->descriptor_, slice);
     return {data_, new_slice};
   }
 
-  auto operator()(index_t i) const -> const T& { return (*this)[i]; }
+  [[deprecated]] auto operator()(index_t i) const -> const T& { return (*this)[i]; }
 
   auto begin() -> iterator { return {data_, descriptor_.begin()}; }
   auto end() -> iterator { return {data_, descriptor_.end()}; }

@@ -105,7 +105,7 @@ public:
     return {data_, row_info.first, std::move(row_info.second)};
   }
 
-  template <typename... Args> auto operator()(Args&&... args) -> detail::indirect_request<ind_array<T, N>, Args...>
+  template <typename... Args>[[deprecated]] auto operator()(Args&&... args) -> detail::indirect_request<ind_array<T, N>, Args...>
   {
     static_assert(sizeof...(args) == N, "invalid number of arguments");
     auto slicing = detail::indirect_slicing(descriptor_, std::forward<Args>(args)...);
@@ -114,7 +114,7 @@ public:
     return {data_, slicing.first, std::move(slicing.second)};
   }
 
-  template <typename... Args> auto operator()(Args&&... args) -> detail::slice_request<ind_array<T, N>, Args...>
+  template <typename... Args>[[deprecated]] auto operator()(Args&&... args) -> detail::slice_request<ind_array<T, N>, Args...>
   {
     auto slice = detail::default_slicing(descriptor_, std::forward<Args>(args)...);
     auto indexes = typename vector_type::container_type();
@@ -126,14 +126,15 @@ public:
     return {data_, slice.extents, std::move(indexes)};
   }
 
-  template <typename... Args> auto operator()(Args&&... args) -> detail::element_request<T&, Args...>
+  template <typename... Args>[[deprecated]] auto operator()(Args&&... args) -> detail::element_request<T&, Args...>
   {
     static_assert(sizeof...(args) == N, "invalid number of arguments");
     // TODO: check boundaries
     return data_[indexes_[descriptor_(index_t{std::forward<Args>(args)}...)]];
   }
 
-  template <typename... Args> auto operator()(Args&&... args) const -> detail::indirect_request<ind_array<const T, N>, Args...>
+  template <typename... Args>
+  [[deprecated]] auto operator()(Args&&... args) const -> detail::indirect_request<ind_array<const T, N>, Args...>
   {
     static_assert(sizeof...(args) == N, "invalid number of arguments");
     auto slicing = detail::indirect_slicing(descriptor_, std::forward<Args>(args)...);
@@ -142,7 +143,8 @@ public:
     return {data_, slicing.first, std::move(slicing.second)};
   }
 
-  template <typename... Args> auto operator()(Args&&... args) const -> detail::slice_request<ind_array<const T, N>, Args...>
+  template <typename... Args>
+  [[deprecated]] auto operator()(Args&&... args) const -> detail::slice_request<ind_array<const T, N>, Args...>
   {
     auto slice = detail::default_slicing(descriptor_, std::forward<Args>(args)...);
     auto indexes = typename vector_type::container_type();
@@ -154,7 +156,7 @@ public:
     return {data_, slice.extents, std::move(indexes)};
   }
 
-  template <typename... Args> auto operator()(Args&&... args) const -> detail::element_request<const T&, Args...>
+  template <typename... Args>[[deprecated]] auto operator()(Args&&... args) const -> detail::element_request<const T&, Args...>
   {
     static_assert(sizeof...(args) == N, "invalid number of arguments");
     // TODO: check boundaries
@@ -290,7 +292,7 @@ public:
   }
 
   template <typename Rng, typename U = range::range_value_t<Rng>, typename = meta::requires<range::Range<Rng>>>
-  auto operator()(const Rng& rng) -> ind_array<T, 1>
+  [[deprecated]] auto operator()(const Rng& rng) -> ind_array<T, 1>
   {
     static_assert(std::is_convertible<U, index_t>::value, "arbitrary ranges must contain indexes");
 
@@ -299,23 +301,23 @@ public:
     return {data_, slicing.first[0], std::move(indexes)};
   }
 
-  auto operator()(typename vector_type::container_type indexes) -> ind_array<T, 1>
+  [[deprecated]] auto operator()(typename vector_type::container_type indexes) -> ind_array<T, 1>
   {
     inplace_map_indexes(indexes);
     return {this->data_, indexes.size(), std::move(indexes)};
   }
 
-  auto operator()(const base_slice<1>& slice) -> ind_array<T, 1>
+  [[deprecated]] auto operator()(const base_slice<1>& slice) -> ind_array<T, 1>
   {
     auto new_slice = detail::default_slicing(descriptor_, slice);
     auto indexes = map_indexes(new_slice);
     return {data_, new_slice.extent, std::move(indexes)};
   }
 
-  auto operator()(index_t i) -> T& { return (*this)[i]; }
+  [[deprecated]] auto operator()(index_t i) -> T& { return (*this)[i]; }
 
   template <typename Rng, typename U = range::range_value_t<Rng>, typename = meta::requires<range::Range<Rng>>>
-  auto operator()(const Rng& rng) const -> ind_array<const T, 1>
+  [[deprecated]] auto operator()(const Rng& rng) const -> ind_array<const T, 1>
   {
     static_assert(std::is_convertible<U, index_t>::value, "arbitrary ranges must contain indexes");
 
@@ -324,20 +326,20 @@ public:
     return {data_, slicing.first[0], std::move(indexes)};
   }
 
-  auto operator()(typename vector_type::container_type indexes) const -> ind_array<const T, 1>
+  [[deprecated]] auto operator()(typename vector_type::container_type indexes) const -> ind_array<const T, 1>
   {
     inplace_map_indexes(indexes);
     return {this->data_, indexes.size(), std::move(indexes)};
   }
 
-  auto operator()(const base_slice<1>& slice) const -> ind_array<const T, 1>
+  [[deprecated]] auto operator()(const base_slice<1>& slice) const -> ind_array<const T, 1>
   {
     auto new_slice = detail::default_slicing(descriptor_, slice);
     auto indexes = map_indexes(new_slice);
     return {data_, new_slice.extent, std::move(indexes)};
   }
 
-  auto operator()(index_t i) const -> const T& { return (*this)[i]; }
+  [[deprecated]] auto operator()(index_t i) const -> const T& { return (*this)[i]; }
 
   auto begin() -> iterator { return {data_, indexes_.begin()}; }
   auto end() -> iterator { return {data_, indexes_.end()}; }

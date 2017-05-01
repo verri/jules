@@ -528,13 +528,13 @@ public:
 
   /// \group Indexing
   /// Optimized indirect indexing from temporary indexes.
-  auto operator()(const_vector<index_t> indexes) -> ind_array<value_type, 1>
+  [[deprecated]] auto operator()(const_vector<index_t> indexes) -> ind_array<value_type, 1>
   {
     return {this->data_, indexes.size(), std::move(indexes)};
   }
 
   /// \group Indexing
-  auto operator()(const_vector<index_t> indexes) const -> ind_array<const value_type, 1>
+  [[deprecated]] auto operator()(const_vector<index_t> indexes) const -> ind_array<const value_type, 1>
   {
     return {this->data_, indexes.size(), std::move(indexes)};
   }

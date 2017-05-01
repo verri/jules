@@ -134,14 +134,14 @@ public:
   /// \group Index
   /// Returns the memory position of the index.
   /// \param indexes Index that can be either an array or more than one argument.
-  constexpr auto operator()(const extent_type& indexes) const -> index_t
+  [[deprecated]] constexpr auto operator()(const extent_type& indexes) const -> index_t
   {
     return std::inner_product(std::begin(indexes), std::end(indexes), std::begin(strides), start);
   }
 
   /// \group Index
   template <typename... Args, typename = detail::n_indexes_enabler<N, Args...>>
-  constexpr auto operator()(Args&&... indexes) const -> index_t
+  [[deprecated]] constexpr auto operator()(Args&&... indexes) const -> index_t
   {
     static_assert(sizeof...(Args) == N, "invalid number of arguments");
     // static_assert(all_args(std::is_convertible<Args, index_t>::value...), "indexes must be convertible to index_t");
@@ -268,11 +268,9 @@ public:
   /// Effectively the product of the extents.
   constexpr auto size() const { return extent; }
 
-  [[deprecated("to be removed in v0.2 series")]] constexpr auto dimensions() const { return extent; }
-
   /// \group Index
   /// Returns the memory position of the `index`.
-  constexpr auto operator()(index_t index) const -> index_t { return start + index * stride; }
+  [[deprecated]] constexpr auto operator()(index_t index) const -> index_t { return start + index * stride; }
 
   constexpr auto begin() const -> iterator { return cbegin(); }
   constexpr auto end() const -> iterator { return cend(); }
