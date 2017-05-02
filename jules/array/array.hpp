@@ -429,7 +429,7 @@ public:
   /// \tparam _
   ///   \exclude
   template <typename Rng, typename U = range::range_value_t<std::decay_t<Rng>>,
-            typename _ = meta::requires<range::Range<std::decay_t<Rng>>, meta::negation<Array<std::decay_t<Rng>>>>>
+            typename _ = meta::requires<range::Range<std::decay_t<Rng>>, std::negation<Array<std::decay_t<Rng>>>>>
   base_array(Rng&& rng) : base_array(uninitialized, range::size(rng))
   {
     // clang-format off

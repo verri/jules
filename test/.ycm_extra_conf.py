@@ -11,6 +11,7 @@ flags = [
 '..',
 '-I',
 '../third_party/Catch/single_include',
+'-stdlib=libc++'
 ]
 
 

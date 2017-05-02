@@ -9,6 +9,7 @@ flags = [
 'c++',
 '-I',
 '..',
+'-stdlib=libc++'
 ]
 
 

@@ -86,7 +86,7 @@ public:
 
   template <typename Iter, typename Sent, typename R = range::iterator_value_t<Iter>,
             typename = std::enable_if_t<std::is_convertible<R, named_column_type>::value>,
-            typename = meta::requires<range::Sentinel<Sent, Iter>, meta::negation<range::InputIterator<Iter>>>, int = 0>
+            typename = meta::requires<range::Sentinel<Sent, Iter>, std::negation<range::InputIterator<Iter>>>, int = 0>
   base_dataframe(Iter first, Sent last) : base_dataframe(first, last, 0u)
   {
   }
