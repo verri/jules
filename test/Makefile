@@ -2,12 +2,9 @@ SUFFIXES += .d
 
 SRC = array/slice.cpp array/ref_array.cpp array/ind_array.cpp array/array.cpp \
 			array/vector.cpp array/matrix.cpp array/blas.cpp array/math.cpp \
-			dataframe/column_model.cpp dataframe/column.cpp dataframe/dataframe.cpp \
-			dataframe/action.cpp \
-			range/range.cpp random/random.cpp \
-			numeric/numeric.cpp \
-			debug/debug.cpp \
-			const_vector/const_vector.cpp
+			core/range.cpp core/debug.cpp \
+			base/random.cpp base/numeric.cpp \
+			base/const_vector.cpp
 
 OBJ := $(SRC:.cpp=.o) test_suite.o
 DEP := $(SRC:.cpp=.d) test_suite.d
