@@ -18,6 +18,14 @@ template <typename T, template <typename> class Expression>
 struct compiles<T, Expression, std::void_t<Expression<T>>> : std::true_type {
 };
 
+template <typename T, typename R, template <typename> class Expression, typename = std::void_t<>>
+struct compiles_same : std::false_type {
+};
+
+template <typename T, typename R, template <typename> class Expression>
+struct compiles_same<T, R, Expression, std::void_t<std::enable_if_t<std::is_same<R, Expression<T>>::value>>> : std::true_type {
+};
+
 template <typename... Checks> using requires = std::enable_if_t<std::conjunction<Checks...>::value>;
 
 template <typename... Checks> using fallback = std::enable_if_t<std::conjunction<std::negation<Checks...>>::value>;
