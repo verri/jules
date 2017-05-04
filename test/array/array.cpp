@@ -59,8 +59,12 @@ TEST_CASE("Basic array functionalities", "[array]")
     CHECK(result.second == expr2.end());
   }
 
-  auto&& expr3 = jules::apply(matrix1, [](int a) { return -a; });
-  auto&& expr4 = -matrix1;
+  auto expr3 = jules::apply(matrix1, [](int a) { return -a; });
+  auto expr4 = -matrix1;
+
+  CHECK(expr3.row_count() == matrix1.row_count());
+  CHECK(expr3.column_count() == matrix1.column_count());
+
   CHECK(expr3.extents() == expr4.extents());
   {
     auto result = std::mismatch(expr3.begin(), expr3.end(), expr4.begin());
@@ -70,6 +74,9 @@ TEST_CASE("Basic array functionalities", "[array]")
 
   auto vector2 = eval(matrix1[0] + matrix2[1]);
   static_assert(std::is_same<decltype(vector2), jules::vector<int>>::value, "it should be a vector");
+
+  auto expr5 = -vector2;
+  CHECK(expr5.length() == vector2.length());
 }
 
 TEST_CASE("Type inference for as_vector", "[array]")

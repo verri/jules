@@ -35,6 +35,12 @@ template <typename R, typename... Checks> using requires_t = std::enable_if_t<st
 template <typename R, typename... Checks>
 using fallback_t = std::enable_if_t<std::conjunction<std::negation<Checks>...>::value, R>;
 
+template <typename...> struct always_false : std::false_type {
+};
+
+template <typename...> struct always_true : std::true_type {
+};
+
 } // namespace meta
 } // namespace jules
 
