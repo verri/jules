@@ -129,7 +129,7 @@ public:
   /// Effectively the product of the extents.
   constexpr auto size() const { return prod(extents); }
 
-  [[deprecated("to be removed in v0.2 series")]] constexpr auto dimensions() const { return extents; }
+  constexpr auto dimensions() const { return extents; }
 
   /// \group Index
   /// Returns the memory position of the index.
@@ -267,6 +267,8 @@ public:
 
   /// Effectively the product of the extents.
   constexpr auto size() const { return extent; }
+
+  constexpr auto dimensions() const -> std::array<index_t, 1ul> { return {{extent}}; }
 
   /// \group Index
   /// Returns the memory position of the `index`.
