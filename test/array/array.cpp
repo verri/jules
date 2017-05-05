@@ -1,4 +1,5 @@
 #include "jules/array/all.hpp"
+#include "jules/array/meta/expression.hpp"
 #include "jules/base/numeric.hpp"
 
 #include <catch.hpp>
@@ -49,6 +50,8 @@ TEST_CASE("Basic array functionalities", "[array]")
   auto expr0 = jules::make_expr_array<2>(matrix1.begin(), matrix1.end(), matrix2.begin(), matrix2.end(),
                                          [](const int& a, const int& b) { return a + b; }, matrix1.extents());
 
+  static_assert(jules::ArrayExpression<decltype(expr0)>::value);
+
   auto expr1 = jules::apply(matrix1, matrix2, [](int a, int b) { return a + b; });
   auto expr2 = matrix1 + matrix2;
 
@@ -77,6 +80,8 @@ TEST_CASE("Basic array functionalities", "[array]")
 
   auto expr5 = -vector2;
   CHECK(expr5.length() == vector2.length());
+
+  static_assert(jules::ArrayExpression<decltype(expr5)>::value);
 }
 
 TEST_CASE("Type inference for as_vector", "[array]")

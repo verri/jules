@@ -11,19 +11,19 @@
 namespace jules
 {
 
-template <typename T, typename> struct ArrayExpression : std::false_type {
+template <typename T, typename = void> struct ArrayExpression : std::false_type {
 };
 
 template <typename T>
-struct ArrayExpression<                              //
-  T, meta::requires<                                 //
-       std::negation<meta::DefaultConstructible<T>>, //
-       std::negation<meta::CopyConstructible<T>>,    //
-       std::negation<meta::MoveConstructible<T>>,    //
-       std::negation<meta::Copyable>,                //
-       std::negation<meta::Movable>,                 //
-       meta::CommonArray<T>,                         //
-       range::ForwardRange<T>                        //
+struct ArrayExpression<                        //
+  T, meta::requires<                           //
+       std::negation<DefaultConstructible<T>>, //
+       std::negation<CopyConstructible<T>>,    //
+       std::negation<MoveConstructible<T>>,    //
+       std::negation<Copyable<T>>,             //
+       std::negation<Movable<T>>,              //
+       range::InputRange<T>,                   //
+       CommonArray<T>                          //
        >> : std::true_type {
 };
 

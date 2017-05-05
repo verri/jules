@@ -1,8 +1,10 @@
-// Copyright (c) 2016 Filipe Verri <filipeverri@gmail.com>
+// Copyright (c) 2017 Filipe Verri <filipeverri@gmail.com>
 // Inspired by https://foonathan.github.io/blog/2016/09/09/cpp14-concepts.html
 
 #ifndef JULES_CORE_META_H
 #define JULES_CORE_META_H
+
+#include <range/v3/utility/concepts.hpp>
 
 #include <type_traits>
 
@@ -42,6 +44,13 @@ template <typename...> struct always_true : std::true_type {
 };
 
 } // namespace meta
+
+using ranges::v3::DefaultConstructible;
+using ranges::v3::CopyConstructible;
+using ranges::v3::MoveConstructible;
+using ranges::v3::Copyable;
+using ranges::v3::Movable;
+
 } // namespace jules
 
 #endif // JULES_CORE_META_H
