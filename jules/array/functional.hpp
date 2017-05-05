@@ -67,8 +67,8 @@
 #define BINARY_APPLY_OPERATION(TX__, X__, TY__, Y__)                                                                             \
   template <UNPACK TX__, UNPACK TY__, typename Operator> auto apply(UNPACK X__ lhs, UNPACK Y__ rhs, Operator&& op)               \
   {                                                                                                                              \
-    DEBUG_ASSERT(lhs.extents() == rhs.extents(), debug::default_module, debug::level::extents_check, "extents mismatch");        \
-    return make_expr_array<N>(lhs.begin(), lhs.end(), rhs.begin(), rhs.end(), std::forward<Operator>(op), lhs.extents());        \
+    DEBUG_ASSERT(lhs.dimensions() == rhs.dimensions(), debug::default_module, debug::level::extents_check, "extents mismatch");  \
+    return make_expr_array<N>(lhs.begin(), lhs.end(), rhs.begin(), rhs.end(), std::forward<Operator>(op), lhs.dimensions());     \
   }
 
 #define BINARY_OPERATION(TX__, X__, TY__, Y__, OP__)                                                                             \
@@ -105,7 +105,7 @@
 #define UNARY_APPLY_OPERATION(TX__, X__, N__)                                                                                    \
   template <UNPACK TX__, typename Operator> auto apply(UNPACK X__ operand, Operator&& op)                                        \
   {                                                                                                                              \
-    return make_expr_array<N>(operand.begin(), operand.end(), std::forward<Operator>(op), operand.extents());                    \
+    return make_expr_array<N>(operand.begin(), operand.end(), std::forward<Operator>(op), operand.dimensions());                 \
   }
 
 #define UNARY_OPERATION(TX__, X__, N__, OP__)                                                                                    \

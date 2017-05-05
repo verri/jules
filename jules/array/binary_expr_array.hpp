@@ -78,9 +78,8 @@ public:
   using const_iterator = iterator;
 
 public:
-  // TODO: receive dimensions instead of extents.
   binary_expr_array(LhsIt lhs_first, LhsIt lhs_last, RhsIt rhs_first, RhsIt rhs_last, const Op& op,
-                    typename base_slice<N>::extent_type extents)
+                    const std::array<index_t, order>& extents)
     : expr_array<Op, N>(std::move(op), extents), lhs_first_{lhs_first}, lhs_last_{lhs_last}, rhs_first_{rhs_first}, rhs_last_{
                                                                                                                       rhs_last}
   {

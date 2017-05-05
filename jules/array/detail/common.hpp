@@ -83,17 +83,16 @@ struct Array<binary_expr_array<LhsIt, RhsIt, F, N>> : public std::true_type {
 // Helpers for operators
 
 template <std::size_t M, typename It, typename F>
-auto make_expr_array(It first, It last, F&& f, typename base_slice<M>::extent_type extent)
-  -> unary_expr_array<It, std::decay_t<F>, M>
+auto make_expr_array(It first, It last, F&& f, const std::array<index_t, M>& extents) -> unary_expr_array<It, std::decay_t<F>, M>
 {
-  return {first, last, std::forward<F>(f), extent};
+  return {first, last, std::forward<F>(f), extents};
 }
 
 template <std::size_t M, typename LhsIt, typename RhsIt, typename F>
 auto make_expr_array(LhsIt lhs_first, LhsIt lhs_last, RhsIt rhs_first, RhsIt rhs_last, F&& f,
-                     typename base_slice<M>::extent_type extent) -> binary_expr_array<LhsIt, RhsIt, std::decay_t<F>, M>
+                     const std::array<index_t, M>& extents) -> binary_expr_array<LhsIt, RhsIt, std::decay_t<F>, M>
 {
-  return {lhs_first, lhs_last, rhs_first, rhs_last, std::forward<F>(f), extent};
+  return {lhs_first, lhs_last, rhs_first, rhs_last, std::forward<F>(f), extents};
 }
 
 } // namespace jules

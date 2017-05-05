@@ -160,6 +160,8 @@ public:
 
   auto size() const -> index_t { return descriptor_.size(); }
 
+  auto dimensions() const { return descriptor_.extents; }
+
   auto row_count() const -> index_t { return extents()[0]; }
   auto column_count() const -> index_t { return extents()[1]; }
 
@@ -350,6 +352,8 @@ public:
   auto size() const -> index_t { return descriptor_.size(); }
 
   auto length() const -> index_t { return size(); }
+
+  auto dimensions() const -> std::array<index_t, 1ul> { return {{descriptor_.extent}}; }
 
 protected:
   ref_array() = default;

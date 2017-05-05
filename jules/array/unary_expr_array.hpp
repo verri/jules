@@ -73,8 +73,7 @@ public:
   using const_iterator = iterator;
 
 public:
-  // TODO: receive dimensions instead of extents.
-  unary_expr_array(It it_first, It it_last, Op op, typename base_slice<order>::extent_type extents)
+  unary_expr_array(It it_first, It it_last, Op op, const std::array<index_t, order>& extents)
     : expr_array<Op, N>(std::move(op), extents), it_first_{it_first}, it_last_{it_last}
   {
   }

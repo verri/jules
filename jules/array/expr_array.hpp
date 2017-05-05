@@ -4,7 +4,6 @@
 /// \exclude
 #define JULES_ARRAY_EXPR_ARRAY_H
 
-#include <jules/array/slice.hpp> // TODO: remove
 #include <jules/core/type.hpp>
 
 namespace jules
@@ -19,8 +18,7 @@ public:
 
   using difference_type = distance_t;
 
-  // TODO: receive dimensions instead of extents.
-  expr_array(Op op, typename base_slice<order>::extent_type extents) : op_{std::move(op)}, dimensions_{extents} {}
+  expr_array(Op op, const std::array<index_t, order>& extents) : op_{std::move(op)}, dimensions_{extents} {}
 
   expr_array(const expr_array& source) = delete;
   expr_array(expr_array&& source) noexcept = delete;

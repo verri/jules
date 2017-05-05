@@ -176,6 +176,7 @@ public:
   auto data() const { return data_; }
   auto extents() const { return descriptor_.extents; }
   auto size() const { return indexes_.size(); }
+  auto dimensions() const { return descriptor_.extents; }
 
   auto row_count() const { return extents()[0]; }
   auto column_count() const { return extents()[1]; }
@@ -355,6 +356,7 @@ public:
   auto extents() const { return descriptor_.extent; }
   auto size() const { return indexes_.size(); }
   auto length() const { return size(); }
+  auto dimensions() const -> std::array<index_t, 1ul> { return {{descriptor_.extent}}; }
 
 private:
   template <typename Range> auto map_indexes(const Range& rng) const
