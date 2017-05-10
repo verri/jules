@@ -20,7 +20,6 @@ template <typename T> using row_count = decltype(std::declval<const T&>().row_co
 template <typename T> using column_count = decltype(std::declval<const T&>().column_count());
 template <typename T> using eval = decltype(eval(std::declval<const T&>()));
 } // namespace result
-
 } // namespace meta
 
 template <typename T, typename = void> struct CommonArray : std::false_type {

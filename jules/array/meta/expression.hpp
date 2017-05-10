@@ -11,11 +11,11 @@
 namespace jules
 {
 
-template <typename T, typename = void> struct ArrayExpression : std::false_type {
+template <typename T, typename = void> struct ExpressionArray : std::false_type {
 };
 
 template <typename T>
-struct ArrayExpression<                        //
+struct ExpressionArray<                        //
   T, meta::requires<                           //
        std::negation<DefaultConstructible<T>>, //
        std::negation<CopyConstructible<T>>,    //
