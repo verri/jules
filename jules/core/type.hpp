@@ -181,17 +181,12 @@ public:
 /// \module Coercion Rules
 using coercion_rules = base_coercion_rules<numeric_rule, string_rule, index_rule, integer_rule, uinteger_rule>;
 
-namespace detail
-{
-
 // Tag type utility
 
 template <typename T> struct tag {
   static_assert(std::is_same<T, std::decay_t<T>>::value, "type cannot have qualifiers");
   using untag = T;
 };
-
-} // namespace detail
 
 // Recursive initializer_list
 
