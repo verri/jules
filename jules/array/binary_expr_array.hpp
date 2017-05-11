@@ -36,7 +36,7 @@ public:
     using iterator_category = std::input_iterator_tag;
     using value_type = decltype(std::declval<const Op&>()(std::declval<lhs_result>(), std::declval<rhs_result>()));
     using difference_type = distance_t;
-    using reference = const value_type&;
+    using reference = value_type&&;
     using pointer = void;
 
     constexpr iterator() = default;
