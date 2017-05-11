@@ -30,7 +30,7 @@ struct ReferenceArray<                                                          
        CommonArray<T>,                                                                             //
        std::conditional_t<(T::order == 1ul),                                                       //
                           meta::compiles_same<T, typename T::value_type&, meta::result::indexing>, //
-                          meta::compiles<T, meta::result::indexing>>                              //
+                          meta::compiles<T, meta::result::indexing>>                               //
        >> : std::true_type {
 };
 

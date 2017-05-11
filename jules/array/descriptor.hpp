@@ -4,10 +4,9 @@
 /// \exclude
 #define JULES_ARRAY_DESCRIPTOR_H
 
-#include <jules/core/type.hpp>
-#include <jules/core/debug.hpp>
-#include <jules/array/meta/index.hpp>
 #include <jules/base/numeric.hpp>
+#include <jules/core/debug.hpp>
+#include <jules/core/type.hpp>
 
 namespace jules
 {
@@ -78,7 +77,9 @@ public:
     constexpr auto operator*() const -> value_type { return (*descriptor_)(indexes_); }
 
   private:
-    constexpr iterator(const descriptor* descriptor, std::array<index_t, N> indexes) : descriptor_{descriptor}, indexes_{indexes} {}
+    constexpr iterator(const descriptor* descriptor, std::array<index_t, N> indexes) : descriptor_{descriptor}, indexes_{indexes}
+    {
+    }
 
     const descriptor* descriptor_;
     std::array<index_t, N> indexes_;
@@ -91,7 +92,8 @@ public:
   /// \param strides Number of skip positions in each dimension.
   ///   It defaults to consistent strides based on the `extents`.
   /// \notes If `strides` are inferred, `extents` cannot be zero.
-  constexpr descriptor(index_t start, std::array<index_t, N> extents, std::array<index_t, N> strides) : start{start}, extents{extents}, strides{strides}
+  constexpr descriptor(index_t start, std::array<index_t, N> extents, std::array<index_t, N> strides)
+    : start{start}, extents{extents}, strides{strides}
   {
   }
 
@@ -142,9 +144,9 @@ public:
 
   constexpr auto drop_dimension() const -> descriptor<N - 1> { return drop_dimension_impl(std::make_index_sequence<N - 1>{}); }
 
-  index_t start = 0ul;                           //< Start position.
+  index_t start = 0ul;                                      //< Start position.
   std::array<index_t, N> extents = repeat<N, index_t>(0ul); //< Size in each dimension.
-  std::array<index_t, N> strides; //< Skip in each dimension.
+  std::array<index_t, N> strides;                           //< Skip in each dimension.
 
 private:
   auto end_index() const { return end_index_impl(std::make_index_sequence<N>{}); }
@@ -249,7 +251,7 @@ public:
   constexpr auto cbegin() const -> iterator { return {start, strides[0]}; }
   constexpr auto cend() const -> iterator { return {start + strides[0] * extents[0], strides[0]}; }
 
-  index_t start = 0ul;  //< Start position.
+  index_t start = 0ul;                      //< Start position.
   std::array<index_t, 1> extents = {{0ul}}; //< Number of position.
   std::array<index_t, 1> strides = {{1ul}}; //< Skip positions.
 };

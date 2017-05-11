@@ -1,7 +1,6 @@
-#include <jules/array/sliced_array.hpp>
-#include <jules/array/meta/reference.hpp>
 #include <jules/array/meta/common.hpp>
 #include <jules/array/meta/reference.hpp>
+#include <jules/array/sliced_array.hpp>
 
 #include <catch.hpp>
 
