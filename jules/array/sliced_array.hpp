@@ -4,9 +4,9 @@
 /// \exclude
 #define JULES_ARRAY_SLICED_ARRAY_H
 
-#include <jules/array/descriptor.hpp>
 #include <jules/array/detail/iterator.hpp>
 #include <jules/array/meta/common.hpp>
+#include <jules/array/strided_descriptor.hpp>
 #include <jules/core/debug.hpp>
 #include <jules/core/type.hpp>
 
@@ -45,10 +45,10 @@ public:
   using value_type = T;
 
   /// \group member_types Class Types and Constants
-  using iterator = detail::iterator_from_indexes<T, typename descriptor<order>::iterator>;
+  using iterator = detail::iterator_from_indexes<T, typename strided_descriptor<order>::iterator>;
 
   /// \group member_types Class Types and Constants
-  using const_iterator = detail::iterator_from_indexes<const T, typename descriptor<order>::iterator>;
+  using const_iterator = detail::iterator_from_indexes<const T, typename strided_descriptor<order>::iterator>;
 
   /// \group member_types Class Types and Constants
   using size_type = index_t;
@@ -56,7 +56,7 @@ public:
   /// \group member_types Class Types and Constants
   using difference_type = distance_t;
 
-  sliced_array(value_type* data, descriptor<order> descriptor) : data_{data}, descriptor_{descriptor} {}
+  sliced_array(value_type* data, strided_descriptor<order> strided_descriptor) : data_{data}, descriptor_{strided_descriptor} {}
 
   ~sliced_array() = default;
 
@@ -132,7 +132,7 @@ protected:
     DEBUG_ASSERT(it == source.end(), debug::default_module, debug::level::unreachable, "should never happen");
   }
 
-  template <typename U, std::size_t M> static decltype(auto) at(U* data, const descriptor<M>& desc, index_t i)
+  template <typename U, std::size_t M> static decltype(auto) at(U* data, const strided_descriptor<M>& desc, index_t i)
   {
     // clang-format off
     if constexpr (M == 1) {
@@ -151,7 +151,7 @@ protected:
   T* data_;
 
   /// \exclude
-  descriptor<order> descriptor_;
+  strided_descriptor<order> descriptor_;
 };
 
 template <typename T, std::size_t N> auto eval(const sliced_array<T, N>& source) -> const sliced_array<T, N>& { return source; }

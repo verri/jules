@@ -5,6 +5,7 @@
 #define JULES_ARRAY_EXPR_ARRAY_H
 
 #include <jules/core/type.hpp>
+#include <jules/array/descriptor.hpp>
 
 namespace jules
 {
@@ -18,7 +19,7 @@ public:
 
   using difference_type = distance_t;
 
-  expr_array(Op op, const std::array<index_t, order>& extents) : op_{std::move(op)}, dimensions_{extents} {}
+  expr_array(Op op, const std::array<index_t, order>& extents) : op_{std::move(op)}, descriptor_{extents} {}
 
   expr_array(const expr_array& source) = delete;
   expr_array(expr_array&& source) noexcept = delete;
@@ -30,50 +31,28 @@ public:
   {
     // clang-format off
     if constexpr (order == 1ul)
-      return dimensions_[0];
+      return descriptor_.extents[0];
     else
-      return dimensions_;
+      return descriptor_.extents;
     // clang-format on
   }
 
-  auto dimensions() const { return dimensions_; }
+  auto dimensions() const { return descriptor_.extents; }
 
-  auto size() const
-  {
-    // clang-format off
-    if constexpr (order == 1ul)
-      return dimensions_[0];
-    else if constexpr (order == 2ul)
-      return dimensions_[0] * dimensions_[1];
-    else
-      return prod(dimensions_);
-    // clang-format on
-  }
+  auto size() const { return descriptor_.size(); }
 
-  template <typename _ = void>
-  auto length() const -> meta::requires_t<size_type, meta::always_true<_>, std::bool_constant<(order == 1ul)>>
-  {
-    return dimensions_[0];
-  }
+  auto length() const { return descriptor_.length(); }
 
-  template <typename _ = void>
-  auto row_count() const -> meta::requires_t<size_type, meta::always_true<_>, std::bool_constant<(order > 1ul)>>
-  {
-    return dimensions_[0];
-  }
+  auto row_count() const { return descriptor_.row_count(); }
 
-  template <typename _ = void>
-  auto column_count() const -> meta::requires_t<size_type, meta::always_true<_>, std::bool_constant<(order > 1ul)>>
-  {
-    return dimensions_[1];
-  }
+  auto column_count() const { return descriptor_.column_count(); }
 
 protected:
   template <typename... Args> decltype(auto) operate(Args&&... args) const { return op_(std::forward<Args>(args)...); }
 
 private:
   Op op_;
-  std::array<size_type, order> dimensions_;
+  descriptor<order> descriptor_;
 };
 
 } // namespace jules
