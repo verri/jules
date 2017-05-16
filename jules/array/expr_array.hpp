@@ -4,8 +4,8 @@
 /// \exclude
 #define JULES_ARRAY_EXPR_ARRAY_H
 
-#include <jules/core/type.hpp>
 #include <jules/array/descriptor.hpp>
+#include <jules/core/type.hpp>
 
 namespace jules
 {

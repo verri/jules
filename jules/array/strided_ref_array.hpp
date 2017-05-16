@@ -1,8 +1,8 @@
 // Copyright (c) 2017 Filipe Verri <filipeverri@gmail.com>
 
-#ifndef JULES_ARRAY_SLICED_ARRAY_H
+#ifndef JULES_ARRAY_STRIDED_REF_ARRAY_H
 /// \exclude
-#define JULES_ARRAY_SLICED_ARRAY_H
+#define JULES_ARRAY_STRIDED_REF_ARRAY_H
 
 #include <jules/array/detail/iterator.hpp>
 #include <jules/array/meta/common.hpp>
@@ -13,17 +13,17 @@
 namespace jules
 {
 
-/// Array with non-owned, non-continous data.
+/// Array with non-owned, non-continuous data.
 ///
-/// This class represents a sliced view of an concrete array.
+/// This class represents a strided_ref view of an concrete array.
 ///
 /// \module Array Types
 /// \notes This class is not meant to be used in user code.
-template <typename T, std::size_t N> class sliced_array
+template <typename T, std::size_t N> class strided_ref_array
 {
   static_assert(N > 0u, "invalid array dimension");
 
-  template <typename, std::size_t> friend class sliced_array;
+  template <typename, std::size_t> friend class strided_ref_array;
 
 public:
   /// \group member_types Class Types and Constants
@@ -56,12 +56,14 @@ public:
   /// \group member_types Class Types and Constants
   using difference_type = distance_t;
 
-  sliced_array(value_type* data, strided_descriptor<order> strided_descriptor) : data_{data}, descriptor_{strided_descriptor} {}
+  strided_ref_array(value_type* data, strided_descriptor<order> strided_descriptor) : data_{data}, descriptor_{strided_descriptor}
+  {
+  }
 
-  ~sliced_array() = default;
+  ~strided_ref_array() = default;
 
   /// \group Assignment
-  template <typename Array> auto operator=(const Array& source) -> meta::requires_t<sliced_array&, CommonArray<Array>>
+  template <typename Array> auto operator=(const Array& source) -> meta::requires_t<strided_ref_array&, CommonArray<Array>>
   {
     static_assert(Array::order == order, "array order mismatch");
     static_assert(std::is_assignable<value_type&, typename Array::value_type>::value, "incompatible assignment");
@@ -70,7 +72,7 @@ public:
   }
 
   /// \group Assignment
-  template <typename U> auto operator=(const U& source) -> meta::fallback_t<sliced_array&, Array<U>>
+  template <typename U> auto operator=(const U& source) -> meta::fallback_t<strided_ref_array&, Array<U>>
   {
     static_assert(std::is_assignable<value_type&, U>::value, "incompatible assignment");
     for (auto& elem : *this)
@@ -79,14 +81,14 @@ public:
   }
 
   /// \group Assignment
-  auto operator=(const sliced_array& source) -> sliced_array&
+  auto operator=(const strided_ref_array& source) -> strided_ref_array&
   {
     assign_from_array(source);
     return *this;
   }
 
   /// Implicitly convertable to hold const values.
-  operator sliced_array<const value_type, order>() const { return {data_, descriptor_}; }
+  operator strided_ref_array<const value_type, order>() const { return {data_, descriptor_}; }
 
   /// \group Indexing
   decltype(auto) operator[](index_t i)
@@ -143,19 +145,22 @@ protected:
     // clang-format on
   }
 
-  sliced_array() = default;
-  sliced_array(const sliced_array& source) = default;
-  sliced_array(sliced_array&& source) noexcept = default;
+  strided_ref_array() = default;
+  strided_ref_array(const strided_ref_array& source) = default;
+  strided_ref_array(strided_ref_array&& source) noexcept = default;
 
   /// \exclude
-  T* data_;
+  value_type* data_;
 
   /// \exclude
   strided_descriptor<order> descriptor_;
 };
 
-template <typename T, std::size_t N> auto eval(const sliced_array<T, N>& source) -> const sliced_array<T, N>& { return source; }
+template <typename T, std::size_t N> auto eval(const strided_ref_array<T, N>& source) -> const strided_ref_array<T, N>&
+{
+  return source;
+}
 
 } // namespace jules
 
-#endif // JULES_ARRAY_SLICED_ARRAY_H
+#endif // JULES_ARRAY_STRIDED_REF_ARRAY_H

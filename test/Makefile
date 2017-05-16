@@ -1,6 +1,6 @@
 SUFFIXES += .d
 
-SRC = array/sliced_array.cpp \
+SRC = array/strided_ref_array.cpp \
 			array/slice.cpp array/ref_array.cpp array/ind_array.cpp array/array.cpp \
 			array/vector.cpp array/matrix.cpp array/blas.cpp array/math.cpp \
 			core/range.cpp core/debug.cpp \

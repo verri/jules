@@ -18,7 +18,7 @@ namespace detail
 template <typename T, typename It> class iterator_from_indexes
 {
 public:
-  using iterator_category = std::forward_iterator_tag;
+  using iterator_category = typename std::iterator_traits<It>::iterator_category;
   using value_type = T;
   using difference_type = distance_t;
   using pointer = T*;
@@ -43,6 +43,19 @@ public:
   {
     auto copy = *this;
     ++(*this);
+    return copy;
+  }
+
+  constexpr auto operator--() -> iterator_from_indexes&
+  {
+    --it_;
+    return *this;
+  }
+
+  constexpr auto operator--(int) -> iterator_from_indexes
+  {
+    auto copy = *this;
+    --(*this);
     return copy;
   }
 
