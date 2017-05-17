@@ -17,6 +17,8 @@ struct all_index {
 
 constexpr auto all = all_index{};
 
+constexpr auto slice() noexcept { return all; }
+
 class bounded_index
 {
 public:
@@ -63,11 +65,11 @@ struct bounded_strided_slice {
   index_t stride;
 };
 
-constexpr auto slice(index_t start, bounded_index extent) noexcept -> bounded_slice { return {start, extent}; }
+constexpr auto slice(index_t start, bounded_index extent) noexcept -> bounded_slice { return {start, std::move(extent)}; }
 
 constexpr auto slice(index_t start, bounded_index extent, index_t stride) noexcept -> bounded_strided_slice
 {
-  return {start, extent, stride};
+  return {start, std::move(extent), stride};
 }
 } // namespace slicing
 } // namespace jules
