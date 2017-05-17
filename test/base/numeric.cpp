@@ -71,6 +71,19 @@ TEST_CASE("Base numeric utilities", "[numeric]")
     CHECK(jules::prod(std::array<double, 0>{}) == 1.0);
     CHECK(jules::min(std::array<double, 0>{}) == std::numeric_limits<double>::infinity());
     CHECK(jules::max(std::array<double, 0>{}) == -std::numeric_limits<double>::infinity());
+
+    // constexpr prod
+    constexpr auto a0 = std::array<int, 0>{};
+    constexpr auto a1 = std::array<int, 1>{{0}};
+    constexpr auto a2 = std::array<int, 2>{{3, 4}};
+
+    static_assert(jules::prod(a0) == 1);
+    static_assert(jules::prod(a1) == 0);
+    static_assert(jules::prod(a2) == 12);
+
+    static_assert(noexcept(jules::prod(a0)));
+    static_assert(noexcept(jules::prod(a1)));
+    static_assert(noexcept(jules::prod(a2)));
   }
   SECTION("Logical")
   {

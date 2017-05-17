@@ -27,6 +27,14 @@ constexpr auto repeat_impl(const T& value, std::index_sequence<I...>) -> std::ar
   return {{((void)I, value)...}};
 }
 
+template <typename T, std::size_t N, std::size_t... I>
+constexpr auto prod_impl(const std::array<T, N>& arr, std::index_sequence<I...>)
+  noexcept(N == 0 || noexcept(std::declval<const T&>() * std::declval<const T&>()))
+  -> T
+{
+  return (numeric_traits<T>::multiplicative_identity() * ... * arr[I]);
+}
+
 struct forward_arithmetic {
   template <typename T> decltype(auto) operator+(T&& value) { return std::forward<T>(value); }
   template <typename T> decltype(auto) operator*(T&& value) { return std::forward<T>(value); }
@@ -138,6 +146,12 @@ template <typename Rng, typename T = range::range_value_t<Rng>, typename = meta:
 auto prod(const Rng& rng, T start = numeric_traits<T>::multiplicative_identity())
 {
   return ::jules::prod(range::begin(rng), range::end(rng), std::move(start));
+}
+
+template <typename T, std::size_t N>
+constexpr auto prod(const std::array<T, N>& arr) noexcept(noexcept(detail::prod_impl(arr, std::make_index_sequence<N>()))) -> T
+{
+  return detail::prod_impl(arr, std::make_index_sequence<N>());
 }
 
 /// \group Sum

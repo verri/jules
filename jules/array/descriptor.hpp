@@ -24,34 +24,34 @@ template <std::size_t N> class descriptor
 
 public:
   /// \group Constructor
-  constexpr descriptor(std::array<index_t, N> extents) : extents{extents} {}
+  constexpr descriptor(const std::array<index_t, N>& extents) noexcept : extents{extents} {}
 
   /// \group Constructor
-  constexpr descriptor() = default;
+  constexpr descriptor() noexcept {};
 
-  constexpr descriptor(const descriptor& source) = default;
+  constexpr descriptor(const descriptor& source) noexcept = default;
   constexpr descriptor(descriptor&& source) noexcept = default;
 
-  constexpr auto operator=(const descriptor& source) -> descriptor& = default;
+  constexpr auto operator=(const descriptor& source) noexcept -> descriptor& = default;
   constexpr auto operator=(descriptor&& source) noexcept -> descriptor& = default;
 
   /// Effectively the product of the extents.
-  constexpr auto size() const { return prod(extents); }
+  constexpr auto size() const noexcept { return prod(extents); }
 
   template <typename _ = void>
-  auto length() const -> meta::requires_t<index_t, meta::always_true<_>, std::bool_constant<(N == 1ul)>>
+  constexpr auto length() const noexcept -> meta::requires_t<index_t, meta::always_true<_>, std::bool_constant<(N == 1ul)>>
   {
     return extents[0];
   }
 
   template <typename _ = void>
-  auto row_count() const -> meta::requires_t<index_t, meta::always_true<_>, std::bool_constant<(N > 1ul)>>
+  constexpr auto row_count() const noexcept -> meta::requires_t<index_t, meta::always_true<_>, std::bool_constant<(N > 1ul)>>
   {
     return extents[0];
   }
 
   template <typename _ = void>
-  auto column_count() const -> meta::requires_t<index_t, meta::always_true<_>, std::bool_constant<(N > 1ul)>>
+  constexpr auto column_count() const noexcept -> meta::requires_t<index_t, meta::always_true<_>, std::bool_constant<(N > 1ul)>>
   {
     return extents[1];
   }
@@ -59,7 +59,7 @@ public:
   /// \group Index
   /// Returns the memory position of the index.
   /// \param indexes Index that can be either an array or more than one argument.
-  constexpr auto operator()(const std::array<index_t, N>& indexes) const -> index_t
+  constexpr auto operator()(const std::array<index_t, N>& indexes) const noexcept -> index_t
   {
     // clang-format off
     if constexpr (N == 1) {
@@ -79,12 +79,15 @@ public:
     // clang-format on
   }
 
-  constexpr auto drop_dimension() const -> descriptor<N - 1> { return drop_dimension_impl(std::make_index_sequence<N - 1>{}); }
+  constexpr auto drop_dimension() const noexcept -> descriptor<N - 1>
+  {
+    return drop_dimension_impl(std::make_index_sequence<N - 1>{});
+  }
 
   std::array<index_t, N> extents = repeat<N, index_t>(0ul); //< Size in each dimension.
 
 private:
-  template <std::size_t... I> auto drop_dimension_impl(std::index_sequence<I...>) const -> descriptor<N - 1>
+  template <std::size_t... I> constexpr auto drop_dimension_impl(std::index_sequence<I...>) const noexcept -> descriptor<N - 1>
   {
     return {{extents[I + 1]...}};
   }

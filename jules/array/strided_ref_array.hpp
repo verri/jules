@@ -5,6 +5,7 @@
 #define JULES_ARRAY_STRIDED_REF_ARRAY_H
 
 #include <jules/array/detail/iterator.hpp>
+#include <jules/array/mapper.hpp>
 #include <jules/array/meta/common.hpp>
 #include <jules/array/strided_descriptor.hpp>
 #include <jules/core/debug.hpp>
@@ -19,11 +20,11 @@ namespace jules
 ///
 /// \module Array Types
 /// \notes This class is not meant to be used in user code.
-template <typename T, std::size_t N> class strided_ref_array
+template <typename T, std::size_t N, typename Mapper = identity_mapper> class strided_ref_array
 {
   static_assert(N > 0u, "invalid array dimension");
 
-  template <typename, std::size_t> friend class strided_ref_array;
+  template <typename, std::size_t, typename> friend class strided_ref_array;
 
 public:
   /// \group member_types Class Types and Constants
@@ -56,7 +57,8 @@ public:
   /// \group member_types Class Types and Constants
   using difference_type = distance_t;
 
-  strided_ref_array(value_type* data, strided_descriptor<order> strided_descriptor) : data_{data}, descriptor_{strided_descriptor}
+  strided_ref_array(value_type* data, strided_descriptor<order> strided_descriptor, Mapper mapper = {})
+    : data_{data}, descriptor_{strided_descriptor}, mapper_{std::move(mapper)}
   {
   }
 
@@ -88,20 +90,20 @@ public:
   }
 
   /// Implicitly convertable to hold const values.
-  operator strided_ref_array<const value_type, order>() const { return {data_, descriptor_}; }
+  operator strided_ref_array<const value_type, order, Mapper>() const { return {data_, descriptor_, mapper_}; }
 
   /// \group Indexing
   decltype(auto) operator[](index_t i)
   {
     DEBUG_ASSERT(i < descriptor_.extents[0], debug::default_module, debug::level::boundary_check, "out of range");
-    return at(data_, descriptor_, i);
+    return at(data_, descriptor_, mapper_, i);
   }
 
   /// \group Indexing
   decltype(auto) operator[](index_t i) const
   {
     DEBUG_ASSERT(i < descriptor_.extents[0], debug::default_module, debug::level::boundary_check, "out of range");
-    return at(data_, descriptor_, i);
+    return at(data_, descriptor_, mapper_, i);
   }
 
   auto begin() -> iterator { return {data_, descriptor_.begin()}; }
@@ -115,11 +117,11 @@ public:
 
   auto size() const -> size_type { return descriptor_.size(); }
 
-  template <typename _ = void>
-  auto length() const -> meta::requires_t<size_type, meta::always_true<_>, std::bool_constant<(order == 1ul)>>
-  {
-    return descriptor_.extents[0u];
-  }
+  auto length() const { return descriptor_.length(); }
+
+  auto row_count() const { return descriptor_.row_count(); }
+
+  auto column_count() const { return descriptor_.column_count(); }
 
   auto dimensions() const -> std::array<index_t, order> { return descriptor_.extents; }
 
@@ -134,11 +136,14 @@ protected:
     DEBUG_ASSERT(it == source.end(), debug::default_module, debug::level::unreachable, "should never happen");
   }
 
-  template <typename U, std::size_t M> static decltype(auto) at(U* data, const strided_descriptor<M>& desc, index_t i)
+  // Static so I do not need to implement for const and non-const.
+  template <typename U, std::size_t M>
+  static decltype(auto) at(U* data, const strided_descriptor<M>& desc, const Mapper& mapper, index_t i)
   {
     // clang-format off
     if constexpr (M == 1) {
-      return data[desc({{i}})];
+      const auto pos = mapper(desc({{i}}));
+      return data[pos];
     } else {
       return; // TODO...
     }
@@ -154,6 +159,9 @@ protected:
 
   /// \exclude
   strided_descriptor<order> descriptor_;
+
+  /// \exclude
+  Mapper mapper_;
 };
 
 template <typename T, std::size_t N> auto eval(const strided_ref_array<T, N>& source) -> const strided_ref_array<T, N>&
