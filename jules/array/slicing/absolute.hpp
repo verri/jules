@@ -11,19 +11,34 @@ inline namespace slicing
 {
 
 struct absolute_slice {
+
+  absolute_slice() = delete;
+
+  constexpr absolute_slice(index_t start, index_t extent) noexcept : start{start}, extent{extent} {}
+
   index_t start;
   index_t extent;
 };
 
 struct absolute_strided_slice {
+  absolute_strided_slice() = delete;
+
+  constexpr absolute_strided_slice(index_t start, index_t extent, index_t stride) noexcept
+    : start{start}, extent{extent}, stride{stride}
+  {
+  }
+
   index_t start;
   index_t extent;
   index_t stride;
 };
 
-auto slice(index_t start, index_t extent) -> absolute_slice { return {start, extent}; }
+constexpr auto slice(index_t start, index_t extent) noexcept -> absolute_slice { return {start, extent}; }
 
-auto slice(index_t start, index_t extent, index_t stride) -> absolute_strided_slice { return {start, extent, stride}; }
+constexpr auto slice(index_t start, index_t extent, index_t stride) noexcept -> absolute_strided_slice
+{
+  return {start, extent, stride};
+}
 } // namespace slicing
 } // namespace jules
 

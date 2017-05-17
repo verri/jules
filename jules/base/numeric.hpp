@@ -28,9 +28,8 @@ constexpr auto repeat_impl(const T& value, std::index_sequence<I...>) -> std::ar
 }
 
 template <typename T, std::size_t N, std::size_t... I>
-constexpr auto prod_impl(const std::array<T, N>& arr, std::index_sequence<I...>)
-  noexcept(N == 0 || noexcept(std::declval<const T&>() * std::declval<const T&>()))
-  -> T
+constexpr auto prod_impl(const std::array<T, N>& arr,
+                         std::index_sequence<I...>) noexcept(noexcept(std::declval<const T&>() * std::declval<const T&>())) -> T
 {
   return (numeric_traits<T>::multiplicative_identity() * ... * arr[I]);
 }

@@ -186,6 +186,7 @@ using coercion_rules = base_coercion_rules<numeric_rule, string_rule, index_rule
 template <typename T> struct tag {
   static_assert(std::is_same<T, std::decay_t<T>>::value, "type cannot have qualifiers");
   using untag = T;
+  template <typename U> constexpr auto operator==(const tag<U>&) { return std::is_same<T, U>::value; }
 };
 
 // Recursive initializer_list
