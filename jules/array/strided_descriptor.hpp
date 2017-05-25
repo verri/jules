@@ -251,10 +251,10 @@ public:
 
   /// \group Index
   /// Returns the memory position of the `index`.
-  constexpr auto operator()(const std::array<index_t, 1>& index) const noexcept -> index_t
-  {
-    return start + index[0] * strides[0];
-  }
+  constexpr auto operator()(const std::array<index_t, 1>& index) const noexcept -> index_t { return (*this)(index[0]); }
+
+  /// \group Index
+  constexpr auto operator()(index_t index) const noexcept -> index_t { return start + index * strides[0]; }
 
   constexpr auto begin() const noexcept -> iterator { return cbegin(); }
   constexpr auto end() const noexcept -> iterator { return cend(); }

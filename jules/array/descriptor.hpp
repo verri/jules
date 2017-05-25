@@ -58,7 +58,6 @@ public:
 
   /// \group Index
   /// Returns the memory position of the index.
-  /// \param indexes Index that can be either an array or more than one argument.
   constexpr auto operator()(const std::array<index_t, N>& indexes) const noexcept -> index_t
   {
     // clang-format off
@@ -77,6 +76,13 @@ public:
       return pos;
     }
     // clang-format on
+  }
+
+  /// \group Index
+  constexpr auto operator()(index_t index) const noexcept -> index_t
+  {
+    static_assert(N == 1);
+    return index;
   }
 
   constexpr auto drop_dimension() const noexcept -> descriptor<N - 1>

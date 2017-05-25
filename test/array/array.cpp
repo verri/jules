@@ -1,3 +1,4 @@
+#ifdef NOT_DEFINED
 #include "jules/array/all.hpp"
 #include "jules/array/meta/expression.hpp"
 #include "jules/base/numeric.hpp"
@@ -120,3 +121,4 @@ TEST_CASE("Empty array operations", "[array]")
   CHECK(prod(empty) == 1.0);
   CHECK(max(empty) == -std::numeric_limits<jules::numeric>::infinity());
 }
+#endif

@@ -1,3 +1,4 @@
+#ifdef NOT_DEFINED
 #include "jules/base/numeric.hpp"
 #include "jules/array/all.hpp"
 
@@ -118,3 +119,4 @@ TEST_CASE("Base numeric utilities", "[numeric]")
     CHECK(all(jules::as_vector(bix) == jules::as_vector(0u, 1u, 2u)));
   }
 }
+#endif

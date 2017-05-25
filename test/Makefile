@@ -1,14 +1,8 @@
 SUFFIXES += .d
 
-SRC = array/strided_ref_array.cpp array/slicing.cpp \
-			array/slice.cpp array/ref_array.cpp array/ind_array.cpp array/array.cpp \
-			array/vector.cpp array/matrix.cpp array/blas.cpp array/math.cpp \
-			core/range.cpp core/debug.cpp \
-			base/random.cpp base/numeric.cpp \
-			base/const_vector.cpp
-
-OBJ := $(SRC:.cpp=.o) test_suite.o
-DEP := $(SRC:.cpp=.d) test_suite.d
+SRC = $(shell find . -name '*.cpp')
+OBJ := $(SRC:.cpp=.o)
+DEP := $(SRC:.cpp=.d)
 
 CXXFLAGS += -DJULES_DEBUG_THROWS -std=c++1z -Wall -Wextra -pedantic -I.. -isystem../third_party/Catch/single_include
 LDFLAGS += -lblas

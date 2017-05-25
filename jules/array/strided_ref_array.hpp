@@ -4,6 +4,7 @@
 /// \exclude
 #define JULES_ARRAY_STRIDED_REF_ARRAY_H
 
+#include <jules/array/detail/common.hpp>
 #include <jules/array/detail/iterator.hpp>
 #include <jules/array/mapper.hpp>
 #include <jules/array/meta/common.hpp>
@@ -68,9 +69,7 @@ public:
   /// \group Assignment
   template <typename Array> auto operator=(const common_array_base<Array>& source) -> strided_ref_array&
   {
-    static_assert(Array::order == order, "array order mismatch");
-    static_assert(std::is_assignable<value_type&, typename Array::value_type>::value, "incompatible assignment");
-    assign_from_array(source);
+    detail::array_assign(source, *this);
     return *this;
   }
 
@@ -78,15 +77,14 @@ public:
   template <typename U> auto operator=(const U& source) -> strided_ref_array&
   {
     static_assert(std::is_assignable<value_type&, U>::value, "incompatible assignment");
-    for (auto& elem : *this)
-      elem = source;
+    range::fill(*this, source);
     return *this;
   }
 
   /// \group Assignment
   auto operator=(const strided_ref_array& source) -> strided_ref_array&
   {
-    assign_from_array(source);
+    detail::array_assign(source, *this);
     return *this;
   }
 
@@ -127,23 +125,13 @@ public:
   auto dimensions() const noexcept -> std::array<size_type, order> { return descriptor_.extents; }
 
 protected:
-  template <typename Array> auto assign_from_array(const common_array_base<Array>& source)
-  {
-    DEBUG_ASSERT(this->dimensions() == source.dimensions(), debug::default_module, debug::level::extents_check,
-                 "dimensions mismatch");
-    auto it = source.begin();
-    for (auto& elem : *this)
-      elem = *it++;
-    DEBUG_ASSERT(it == source.end(), debug::default_module, debug::level::unreachable, "should never happen");
-  }
-
-  // Static so I do not need to implement for const and non-const.
   template <typename U, std::size_t M>
   static decltype(auto) at(U* data, const strided_descriptor<M>& desc, const Mapper& mapper, size_type i)
   {
+    detail::assert_in_bound(i, desc.extents[0]);
     // clang-format off
     if constexpr (M == 1) {
-      const auto pos = mapper(desc({{i}}));
+      const auto pos = mapper(desc(i));
       return data[pos];
     } else {
       return; // TODO...

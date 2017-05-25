@@ -9,12 +9,9 @@
 
 #include <iterator>
 
-namespace jules
-{
 /// \exclude
-namespace detail
+namespace jules::detail
 {
-/// \exclude
 template <typename T, typename It> class iterator_from_indexes
 {
 public:
@@ -72,7 +69,6 @@ private:
   It it_;
 };
 
-} // namespace detail
-} // namespace jules
+} // namespace jules::detail
 
 #endif // JULES_ARRAY_DETAIL_ITERATOR_H

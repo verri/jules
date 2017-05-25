@@ -1,3 +1,4 @@
+#ifdef NOT_DEFINED
 #include "jules/base/const_vector.hpp"
 #include "jules/array/all.hpp"
 
@@ -60,3 +61,4 @@ TEST_CASE("Assigning constant vectors", "[const_vector]")
   CHECK(a == b);
   CHECK(a == c);
 }
+#endif

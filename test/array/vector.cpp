@@ -1,3 +1,4 @@
+#ifdef NOT_DEFINED
 #include "jules/array/all.hpp"
 
 #include <catch.hpp>
@@ -173,3 +174,4 @@ TEST_CASE("Vector tutorial", "[array]")
     CHECK(all(x == jules::as_vector(1, 2, 3, 4, 5, 6, 7, 8, 9, 10)));
   }
 }
+#endif

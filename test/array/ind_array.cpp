@@ -1,3 +1,4 @@
+#ifdef NOT_DEFINED
 #include "jules/array/ind_array.hpp"
 
 #include <catch.hpp>
@@ -29,3 +30,4 @@ TEST_CASE("Basic indirect array functionalities", "[array]")
   for (auto value : values)
     CHECK(static_cast<double>(value) == 2.0);
 }
+#endif

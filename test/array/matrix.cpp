@@ -1,3 +1,4 @@
+#ifdef NOT_DEFINED
 #include "jules/array/all.hpp"
 
 #include <catch.hpp>
@@ -248,3 +249,4 @@ TEST_CASE("Matrix tutorial", "[array]")
     CHECK(all(x == jules::matrix<long>{{0, 0, 0}, {-1, -3, -5}}));
   }
 }
+#endif

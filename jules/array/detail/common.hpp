@@ -4,97 +4,49 @@
 // Proverbs 21:21 (ESV)
 
 #ifndef JULES_ARRAY_DETAIL_COMMON_H
+/// \exclude
 #define JULES_ARRAY_DETAIL_COMMON_H
 
-#include <jules/base/numeric.hpp>
-#include <jules/core/type.hpp>
+#include <jules/array/meta/common.hpp>
+#include <jules/core/debug.hpp>
 
-#include <type_traits>
-
-namespace jules
-{
-// Forward declaration
-
-template <std::size_t> class base_slice;
-template <> class base_slice<1>;
-
-template <typename, std::size_t> class base_array;
-template <typename, std::size_t> class contiguous_array;
-template <typename, std::size_t> class ref_array;
-template <typename, std::size_t> class ind_array;
-
-template <typename T> class base_array<T, 1>;
-template <typename T> class ref_array<T, 1>;
-template <typename T> class ind_array<T, 1>;
-
-template <typename, typename, typename, std::size_t> class binary_expr_array;
-template <typename, typename, std::size_t> class unary_expr_array;
-
-namespace detail
+/// \exclude
+namespace jules::detail
 {
 
-// Enablers
-template <std::size_t N, typename... Types>
-using n_indexes_enabler = std::enable_if_t<N == sizeof...(Types) && all_args(std::is_convertible<Types, uint>::value...)>;
-
-// Request checks
-
-template <typename T> constexpr auto index_or_slice()
+template <typename Source, typename Dest>
+static auto array_assign(const common_array_base<Source>& source, common_array_base<Dest>& destination)
 {
-  return std::is_convertible<T, uint>::value || std::is_convertible<T, base_slice<1>>::value;
+  static_assert(Source::order == Dest::order, "array order mismatch");
+  static_assert(std::is_assignable_v<typename Dest::value_type&, const typename Source::value_type&>, "incompatible assignment");
+
+  DEBUG_ASSERT(source.dimensions() == destination.dimensions(), debug::default_module, debug::level::extents_check,
+               "dimensions mismatch");
+
+  auto it = source.begin();
+  for (auto& elem : destination)
+    elem = *it++;
+
+  DEBUG_ASSERT(it == source.end(), debug::default_module, debug::level::unreachable, "should never happen");
 }
 
-template <typename Return, typename... Args>
-using element_request = std::enable_if_t<all_args(std::is_convertible<Args, uint>::value...), Return>;
-
-template <typename Return, typename... Args>
-using slice_request =
-  std::enable_if_t<all_args(index_or_slice<Args>()...) && !all_args(std::is_convertible<Args, uint>::value...), Return>;
-
-template <typename Return, typename... Args>
-using indirect_request = std::enable_if_t<!all_args(index_or_slice<Args>()...), Return>;
-
-} // namespace detail
-
-// Concept checking
-
-template <typename T> struct Array : public std::false_type {
-};
-
-template <typename T, std::size_t N> struct Array<base_array<T, N>> : public std::true_type {
-};
-
-template <typename T, std::size_t N> struct Array<contiguous_array<T, N>> : public std::true_type {
-};
-
-template <typename T, std::size_t N> struct Array<ref_array<T, N>> : public std::true_type {
-};
-
-template <typename T, std::size_t N> struct Array<ind_array<T, N>> : public std::true_type {
-};
-
-template <typename It, typename F, std::size_t N> struct Array<unary_expr_array<It, F, N>> : public std::true_type {
-};
-
-template <typename LhsIt, typename RhsIt, typename F, std::size_t N>
-struct Array<binary_expr_array<LhsIt, RhsIt, F, N>> : public std::true_type {
-};
-
-// Helpers for operators
-
-template <std::size_t M, typename It, typename F>
-auto make_expr_array(It first, It last, F&& f, const std::array<index_t, M>& extents) -> unary_expr_array<It, std::decay_t<F>, M>
+template <typename = void> static auto assert_in_bound(index_t index, index_t extent)
 {
-  return {first, last, std::forward<F>(f), extents};
+  DEBUG_ASSERT(index < extent, debug::default_module, debug::level::boundary_check, "out of range");
 }
 
-template <std::size_t M, typename LhsIt, typename RhsIt, typename F>
-auto make_expr_array(LhsIt lhs_first, LhsIt lhs_last, RhsIt rhs_first, RhsIt rhs_last, F&& f,
-                     const std::array<index_t, M>& extents) -> binary_expr_array<LhsIt, RhsIt, std::decay_t<F>, M>
+template <std::size_t N> static auto assert_in_bound(const std::array<index_t, N>& indexes, const std::array<index_t, N>& extents)
 {
-  return {lhs_first, lhs_last, rhs_first, rhs_last, std::forward<F>(f), extents};
+  return assert_in_bound(indexes, extents, std::make_index_sequence<N>());
 }
 
-} // namespace jules
+template <std::size_t N, std::size_t... I>
+static auto assert_in_bound(const std::array<index_t, N>& indexes, const std::array<index_t, N>& extents,
+                            std::index_sequence<I...>)
+{
+  DEBUG_ASSERT(((indexes[I] < extents[I]) && ...), debug::default_module, debug::level::boundary_check, "out of range");
+}
+
+} // namespace jules::detail
 
 #endif // JULES_ARRAY_DETAIL_COMMON_H

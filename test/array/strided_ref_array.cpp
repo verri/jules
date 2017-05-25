@@ -1,6 +1,6 @@
-#include <jules/array/meta/common.hpp>
-#include <jules/array/meta/reference.hpp>
-#include <jules/array/strided_ref_array.hpp>
+#include "jules/array/strided_ref_array.hpp"
+#include "jules/array/meta/common.hpp"
+#include "jules/array/meta/reference.hpp"
 
 #include <catch.hpp>
 
@@ -8,7 +8,7 @@
 
 TEST_CASE("1-D strided reference array view", "[array]")
 {
-  constexpr auto size = 20ul;
+  constexpr auto size = jules::index_t{20u};
 
   auto x = std::vector<double>(size, 0.0);
   REQUIRE(x.size() == size);

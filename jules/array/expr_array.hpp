@@ -27,16 +27,6 @@ public:
   constexpr auto operator=(const expr_array& source) -> expr_array& = delete;
   constexpr auto operator=(expr_array&& source) noexcept -> expr_array& = delete;
 
-  [[deprecated]] auto extents() const
-  {
-    // clang-format off
-    if constexpr (order == 1ul)
-      return descriptor_.extents[0];
-    else
-      return descriptor_.extents;
-    // clang-format on
-  }
-
   constexpr auto dimensions() const noexcept { return descriptor_.extents; }
 
   constexpr auto size() const noexcept { return descriptor_.size(); }
