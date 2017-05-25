@@ -20,7 +20,8 @@ namespace jules
 ///
 /// \module Array Types
 /// \notes This class is not meant to be used in user code.
-template <typename T, std::size_t N, typename Mapper = identity_mapper> class strided_ref_array
+template <typename T, std::size_t N, typename Mapper = identity_mapper>
+class strided_ref_array : public common_array_base<strided_ref_array<T, N, Mapper>>
 {
   static_assert(N > 0u, "invalid array dimension");
 
@@ -65,7 +66,7 @@ public:
   ~strided_ref_array() = default;
 
   /// \group Assignment
-  template <typename Array> auto operator=(const Array& source) -> meta::requires_t<strided_ref_array&, CommonArray<Array>>
+  template <typename Array> auto operator=(const common_array_base<Array>& source) -> strided_ref_array&
   {
     static_assert(Array::order == order, "array order mismatch");
     static_assert(std::is_assignable<value_type&, typename Array::value_type>::value, "incompatible assignment");
@@ -74,7 +75,7 @@ public:
   }
 
   /// \group Assignment
-  template <typename U> auto operator=(const U& source) -> meta::fallback_t<strided_ref_array&, Array<U>>
+  template <typename U> auto operator=(const U& source) -> strided_ref_array&
   {
     static_assert(std::is_assignable<value_type&, U>::value, "incompatible assignment");
     for (auto& elem : *this)
@@ -126,7 +127,7 @@ public:
   auto dimensions() const -> std::array<index_t, order> { return descriptor_.extents; }
 
 protected:
-  template <typename Array> auto assign_from_array(const Array& source)
+  template <typename Array> auto assign_from_array(const common_array_base<Array>& source)
   {
     DEBUG_ASSERT(this->dimensions() == source.dimensions(), debug::default_module, debug::level::extents_check,
                  "dimensions mismatch");

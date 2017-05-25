@@ -35,4 +35,16 @@ TEST_CASE("1-D strided reference array view", "[array]")
   CHECK((w.dimensions() == std::array<jules::index_t, 1ul>{{x.size() / 2u}}));
 
   CHECK(w[1u] == 1.0);
+
+  auto y = std::vector<double>(size, 1.0);
+  REQUIRE(x.size() == y.size());
+
+  auto a = jules::strided_ref_array<double, 1u>(x.data(), {0u, {{x.size()}}});
+  auto b = jules::strided_ref_array<double, 1u>(y.data(), {0u, {{y.size()}}});
+
+  a = b;
+  CHECK(x == y);
+
+  a = 2.0;
+  CHECK(std::find_if(x.begin(), x.end(), [](auto value) { return value != 2.0; }) == x.end());
 }
