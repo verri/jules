@@ -94,37 +94,37 @@ public:
   operator strided_ref_array<const value_type, order, Mapper>() const { return {data_, descriptor_, mapper_}; }
 
   /// \group Indexing
-  decltype(auto) operator[](index_t i)
+  decltype(auto) operator[](size_type i)
   {
     DEBUG_ASSERT(i < descriptor_.extents[0], debug::default_module, debug::level::boundary_check, "out of range");
     return at(data_, descriptor_, mapper_, i);
   }
 
   /// \group Indexing
-  decltype(auto) operator[](index_t i) const
+  decltype(auto) operator[](size_type i) const
   {
     DEBUG_ASSERT(i < descriptor_.extents[0], debug::default_module, debug::level::boundary_check, "out of range");
     return at(data_, descriptor_, mapper_, i);
   }
 
-  auto begin() -> iterator { return {data_, descriptor_.begin()}; }
-  auto end() -> iterator { return {data_, descriptor_.end()}; }
+  auto begin() noexcept -> iterator { return {data_, descriptor_.begin()}; }
+  auto end() noexcept -> iterator { return {data_, descriptor_.end()}; }
 
-  auto begin() const -> const_iterator { return cbegin(); }
-  auto end() const -> const_iterator { return cend(); }
+  auto begin() const noexcept -> const_iterator { return cbegin(); }
+  auto end() const noexcept -> const_iterator { return cend(); }
 
-  auto cbegin() const -> const_iterator { return {data_, descriptor_.begin()}; }
-  auto cend() const -> const_iterator { return {data_, descriptor_.end()}; }
+  auto cbegin() const noexcept -> const_iterator { return {data_, descriptor_.begin()}; }
+  auto cend() const noexcept -> const_iterator { return {data_, descriptor_.end()}; }
 
-  auto size() const -> size_type { return descriptor_.size(); }
+  auto size() const noexcept { return descriptor_.size(); }
 
-  auto length() const { return descriptor_.length(); }
+  auto length() const noexcept { return descriptor_.length(); }
 
-  auto row_count() const { return descriptor_.row_count(); }
+  auto row_count() const noexcept { return descriptor_.row_count(); }
 
-  auto column_count() const { return descriptor_.column_count(); }
+  auto column_count() const noexcept { return descriptor_.column_count(); }
 
-  auto dimensions() const -> std::array<index_t, order> { return descriptor_.extents; }
+  auto dimensions() const noexcept -> std::array<size_type, order> { return descriptor_.extents; }
 
 protected:
   template <typename Array> auto assign_from_array(const common_array_base<Array>& source)
@@ -139,7 +139,7 @@ protected:
 
   // Static so I do not need to implement for const and non-const.
   template <typename U, std::size_t M>
-  static decltype(auto) at(U* data, const strided_descriptor<M>& desc, const Mapper& mapper, index_t i)
+  static decltype(auto) at(U* data, const strided_descriptor<M>& desc, const Mapper& mapper, size_type i)
   {
     // clang-format off
     if constexpr (M == 1) {

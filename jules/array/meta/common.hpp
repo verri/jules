@@ -48,34 +48,34 @@ struct CommonArray<                                                             
 template <typename Derived> class common_array_base
 {
 public:
-  auto size() const { return self().size(); }
+  auto size() const noexcept { return self().size(); }
 
-  auto dimensions() const { return self().dimensions(); }
+  auto dimensions() const noexcept { return self().dimensions(); }
 
-  auto length() const { return self().length(); }
+  auto length() const noexcept { return self().length(); }
 
-  auto row_count() const { return self().row_count(); }
+  auto row_count() const noexcept { return self().row_count(); }
 
-  auto column_count() const { return self().column_count(); }
+  auto column_count() const noexcept { return self().column_count(); }
 
-  auto begin() { return self().begin(); }
+  auto begin() noexcept { return self().begin(); }
 
-  auto end() { return self().end(); }
+  auto end() noexcept { return self().end(); }
 
-  auto begin() const { return self().begin(); }
+  auto begin() const noexcept { return self().begin(); }
 
-  auto end() const { return self().end(); }
+  auto end() const noexcept { return self().end(); }
 
-  auto cbegin() const { return self().cbegin(); }
+  auto cbegin() const noexcept { return self().cbegin(); }
 
-  auto cend() const { return self().cend(); }
+  auto cend() const noexcept { return self().cend(); }
 
 protected:
-  common_array_base() = default;
+  constexpr common_array_base() noexcept = default;
 
 private:
-  auto self() const -> const Derived& { return static_cast<const Derived&>(*this); }
-  auto self() -> Derived& { return static_cast<Derived&>(*this); }
+  constexpr auto self() const noexcept -> const Derived& { return static_cast<const Derived&>(*this); }
+  constexpr auto self() noexcept -> Derived& { return static_cast<Derived&>(*this); }
 };
 
 } // namespace jules

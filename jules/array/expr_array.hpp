@@ -19,13 +19,13 @@ public:
 
   using difference_type = distance_t;
 
-  expr_array(Op op, const std::array<index_t, order>& extents) : op_{std::move(op)}, descriptor_{extents} {}
+  constexpr expr_array(Op op, const std::array<index_t, order>& extents) : op_{std::move(op)}, descriptor_{extents} {}
 
-  expr_array(const expr_array& source) = delete;
-  expr_array(expr_array&& source) noexcept = delete;
+  constexpr expr_array(const expr_array& source) = delete;
+  constexpr expr_array(expr_array&& source) noexcept = delete;
 
-  auto operator=(const expr_array& source) -> expr_array& = delete;
-  auto operator=(expr_array&& source) noexcept -> expr_array& = delete;
+  constexpr auto operator=(const expr_array& source) -> expr_array& = delete;
+  constexpr auto operator=(expr_array&& source) noexcept -> expr_array& = delete;
 
   [[deprecated]] auto extents() const
   {
@@ -37,15 +37,15 @@ public:
     // clang-format on
   }
 
-  auto dimensions() const { return descriptor_.extents; }
+  constexpr auto dimensions() const noexcept { return descriptor_.extents; }
 
-  auto size() const { return descriptor_.size(); }
+  constexpr auto size() const noexcept { return descriptor_.size(); }
 
-  auto length() const { return descriptor_.length(); }
+  constexpr auto length() const noexcept { return descriptor_.length(); }
 
-  auto row_count() const { return descriptor_.row_count(); }
+  constexpr auto row_count() const noexcept { return descriptor_.row_count(); }
 
-  auto column_count() const { return descriptor_.column_count(); }
+  constexpr auto column_count() const noexcept { return descriptor_.column_count(); }
 
 protected:
   template <typename... Args> decltype(auto) operate(Args&&... args) const { return op_(std::forward<Args>(args)...); }
