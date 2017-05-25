@@ -70,8 +70,6 @@ public:
     /// \notes It does not check if the strided_descriptors are the same.
     constexpr auto operator==(const iterator& other) const noexcept { return indexes_ == other.indexes_; }
 
-    /// \notes It only checks if the strided_descriptors are the same if `JULES_DEBUG_LEVEL` >=
-    /// `incompatible_comparison`.
     constexpr auto operator!=(const iterator& other) const noexcept { return !(*this == other); }
 
     constexpr auto operator*() const noexcept -> value_type { return (*descriptor_)(indexes_); }

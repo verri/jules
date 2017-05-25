@@ -38,21 +38,21 @@ public:
   /// Effectively the product of the extents.
   constexpr auto size() const noexcept { return prod(extents); }
 
-  template <typename _ = void>
-  constexpr auto length() const noexcept -> meta::requires_t<index_t, meta::always_true<_>, std::bool_constant<(N == 1ul)>>
+  constexpr auto length() const noexcept -> index_t
   {
+    static_assert(N == 1u);
     return extents[0];
   }
 
-  template <typename _ = void>
-  constexpr auto row_count() const noexcept -> meta::requires_t<index_t, meta::always_true<_>, std::bool_constant<(N > 1ul)>>
+  constexpr auto row_count() const noexcept -> index_t
   {
+    static_assert(N > 1u);
     return extents[0];
   }
 
-  template <typename _ = void>
-  constexpr auto column_count() const noexcept -> meta::requires_t<index_t, meta::always_true<_>, std::bool_constant<(N > 1ul)>>
+  constexpr auto column_count() const noexcept -> index_t
   {
+    static_assert(N > 1u);
     return extents[1];
   }
 
@@ -81,7 +81,7 @@ public:
   /// \group Index
   constexpr auto operator()(index_t index) const noexcept -> index_t
   {
-    static_assert(N == 1);
+    static_assert(N == 1u);
     return index;
   }
 

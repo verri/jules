@@ -86,18 +86,10 @@ public:
   operator ref_array<const value_type, order>() const { return {data_, descriptor_}; }
 
   /// \group Indexing
-  decltype(auto) operator[](size_type i)
-  {
-    DEBUG_ASSERT(i < descriptor_.extents[0], debug::default_module, debug::level::boundary_check, "out of range");
-    return at(data_, descriptor_, i);
-  }
+  decltype(auto) operator[](size_type i) { return at(data_, descriptor_, i); }
 
   /// \group Indexing
-  decltype(auto) operator[](size_type i) const
-  {
-    DEBUG_ASSERT(i < descriptor_.extents[0], debug::default_module, debug::level::boundary_check, "out of range");
-    return at(data_, descriptor_, i);
-  }
+  decltype(auto) operator[](size_type i) const { return at(data_, descriptor_, i); }
 
   auto begin() noexcept -> iterator { return data_; }
   auto end() noexcept -> iterator { return data_ + size(); }

@@ -47,6 +47,17 @@ static auto assert_in_bound(const std::array<index_t, N>& indexes, const std::ar
   DEBUG_ASSERT(((indexes[I] < extents[I]) && ...), debug::default_module, debug::level::boundary_check, "out of range");
 }
 
+template <typename T, std::size_t N> static auto array_cat(const T& head, const std::array<T, N>& tail) -> std::array<T, N + 1>
+{
+  return array_cat(head, tail, std::make_index_sequence<N>());
+}
+
+template <typename T, std::size_t N, std::size_t... I>
+static auto array_cat(const T& head, const std::array<T, N>& tail, std::index_sequence<I...>) -> std::array<T, N + 1>
+{
+  return {{head, tail[I]...}};
+}
+
 } // namespace jules::detail
 
 #endif // JULES_ARRAY_DETAIL_COMMON_H
