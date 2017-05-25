@@ -5,13 +5,15 @@
 #define JULES_ARRAY_BINARY_EXPR_ARRAY_H
 
 #include <jules/array/expr_array.hpp>
+#include <jules/array/meta/common.hpp>
 
 #include <iterator>
 
 namespace jules
 {
 
-template <typename LhsIt, typename RhsIt, typename Op, size_t N> class binary_expr_array : public expr_array<Op, N>
+template <typename LhsIt, typename RhsIt, typename Op, size_t N>
+class binary_expr_array : public expr_array<Op, N>, public common_array_base<binary_expr_array<LhsIt, RhsIt, Op, N>>
 {
   /// \exclude
   using lhs_result = decltype(*std::declval<LhsIt&>());
@@ -96,6 +98,12 @@ public:
 
   auto cbegin() const -> const_iterator { return {lhs_first_, rhs_first_, this}; }
   auto cend() const -> const_iterator { return {lhs_last_, rhs_last_, this}; }
+
+  using expr_array<Op, N>::size;
+  using expr_array<Op, N>::dimensions;
+  using expr_array<Op, N>::length;
+  using expr_array<Op, N>::row_count;
+  using expr_array<Op, N>::column_count;
 
 private:
   LhsIt lhs_first_, lhs_last_;

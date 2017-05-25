@@ -5,13 +5,15 @@
 #define JULES_ARRAY_UNARY_EXPR_ARRAY_H
 
 #include <jules/array/expr_array.hpp>
+#include <jules/array/meta/common.hpp>
 
 #include <iterator>
 
 namespace jules
 {
 
-template <typename It, typename Op, std::size_t N> class unary_expr_array : public expr_array<Op, N>
+template <typename It, typename Op, std::size_t N>
+class unary_expr_array : public expr_array<Op, N>, public common_array_base<unary_expr_array<It, Op, N>>
 {
   /// \exclude
   using iterator_result = decltype(*std::declval<It&>());
@@ -89,6 +91,12 @@ public:
 
   auto cbegin() const -> iterator { return {it_first_, this}; }
   auto cend() const -> iterator { return {it_last_, this}; }
+
+  using expr_array<Op, N>::size;
+  using expr_array<Op, N>::dimensions;
+  using expr_array<Op, N>::length;
+  using expr_array<Op, N>::row_count;
+  using expr_array<Op, N>::column_count;
 
 private:
   It it_first_, it_last_;
