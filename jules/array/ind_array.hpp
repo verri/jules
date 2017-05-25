@@ -44,7 +44,7 @@ public:
   /// In C++17, we can provide a helper that generates a view with more security.
   ind_array() = default;
   ind_array(T* data, std::array<index_t, N> extents, vector_type indexes)
-    : data_{data}, descriptor_{0ul, extents}, indexes_(std::move(indexes))
+    : data_{data}, descriptor_{0u, extents}, indexes_(std::move(indexes))
   {
   }
   ind_array(const ind_array& source) = default;
@@ -224,7 +224,7 @@ public:
   /// *TODO*: Explain why the user should probably not call this function.
   /// In C++17, we can provide a helper that generates a view with more security.
   ind_array() = default;
-  ind_array(T* data, index_t extent, vector_type indexes) : data_{data}, descriptor_{0ul, extent}, indexes_(std::move(indexes)) {}
+  ind_array(T* data, index_t extent, vector_type indexes) : data_{data}, descriptor_{0u, extent}, indexes_(std::move(indexes)) {}
   ind_array(const ind_array& source) = default;
   ind_array(ind_array&& source) noexcept = default;
 
@@ -356,7 +356,7 @@ public:
   auto extents() const { return descriptor_.extent; }
   auto size() const { return indexes_.size(); }
   auto length() const { return size(); }
-  auto dimensions() const -> std::array<index_t, 1ul> { return {{descriptor_.extent}}; }
+  auto dimensions() const -> std::array<index_t, 1u> { return {{descriptor_.extent}}; }
 
 private:
   template <typename Range> auto map_indexes(const Range& rng) const

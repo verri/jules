@@ -66,9 +66,9 @@ public:
     } else if constexpr (N == 2) {
       return indexes[0] + extents[0] * indexes[1];
     } else {
-      auto stride = 1ul;
-      auto pos = 0ul;
-      for (auto i = 0ul; i < N; ++i)
+      auto stride = index_t{1u};
+      auto pos = index_t{0u};
+      for (auto i = index_t{0u}; i < N; ++i)
       {
         pos += stride * indexes[i];
         stride *= extents[i];
@@ -90,7 +90,7 @@ public:
     return drop_dimension_impl(std::make_index_sequence<N - 1>{});
   }
 
-  std::array<index_t, N> extents = repeat<N, index_t>(0ul); //< Size in each dimension.
+  std::array<index_t, N> extents = repeat<N, index_t>(0u); //< Size in each dimension.
 
 private:
   template <std::size_t... I> constexpr auto drop_dimension_impl(std::index_sequence<I...>) const noexcept -> descriptor<N - 1>

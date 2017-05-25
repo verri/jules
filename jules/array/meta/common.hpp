@@ -31,11 +31,11 @@ struct CommonArray<                                                             
   T, meta::requires<                                                                                   //
        meta::always_true<typename T::value_type>,                                                      //
        std::is_same<decltype(T::order), const std::size_t>,                                            //
-       std::bool_constant<(T::order > 0ul)>,                                                           //
+       std::bool_constant<(T::order > 0u)>,                                                            //
        meta::compiles_same<T, typename T::size_type, meta::result::size>,                              //
        meta::compiles_same<T, std::array<typename T::size_type, T::order>, meta::result::dimensions>,  //
        meta::compiles<T, meta::result::eval>,                                                          //
-       std::conditional_t<(T::order == 1ul),                                                           //
+       std::conditional_t<(T::order == 1u),                                                            //
                           meta::compiles_same<T, typename T::size_type, meta::result::length>,         //
                           std::conjunction<                                                            //
                             meta::compiles_same<T, typename T::size_type, meta::result::row_count>,    //

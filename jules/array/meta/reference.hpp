@@ -28,7 +28,7 @@ struct ReferenceArray<                                                          
   T, meta::requires<                                                                               //
        range::ForwardRange<T>,                                                                     //
        CommonArray<T>,                                                                             //
-       std::conditional_t<(T::order == 1ul),                                                       //
+       std::conditional_t<(T::order == 1u),                                                        //
                           meta::compiles_same<T, typename T::value_type&, meta::result::indexing>, //
                           meta::compiles<T, meta::result::indexing>>                               //
        >> : std::true_type {

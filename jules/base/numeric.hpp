@@ -289,7 +289,7 @@ auto which(Iter first, Sent last) -> const_vector<index_t>
 {
   auto indexes = std::vector<index_t>();
   auto it = first;
-  for (auto index = 0ul; it != last; ++index)
+  for (auto index = index_t{0u}; it != last; ++index)
     if (*it++)
       indexes.push_back(index);
   return {std::move(indexes)};

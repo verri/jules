@@ -48,7 +48,7 @@ public:
 
     constexpr auto operator++() noexcept -> iterator&
     {
-      auto i = index_t{0ul};
+      auto i = index_t{0u};
       for (; i < N - 1; ++i) {
         indexes_[i] = (indexes_[i] + 1) % descriptor_->extents[i];
         if (indexes_[i] != 0)
@@ -85,9 +85,9 @@ public:
   };
 
   /// \group Constructor
-  /// \param start Start position of the slicing. It defaults to 0ul.
+  /// \param start Start position of the slicing. It defaults to 0u.
   /// \param extents Size of the slicing in each dimension.
-  ///   It defaults to 0ul.
+  ///   It defaults to 0u.
   /// \param strides Number of skip positions in each dimension.
   ///   It defaults to consistent strides based on the `extents`.
   /// \notes If `strides` are inferred, `extents` cannot be zero.
@@ -99,9 +99,9 @@ public:
   /// \group Constructor
   constexpr strided_descriptor(index_t start, std::array<index_t, N> extents) noexcept : start{start}, extents{extents}
   {
-    auto tmp = 1ul;
-    for (auto i = 0ul; i < N; ++i) {
-      DEBUG_ASSERT(extents[i] != 0ul, debug::default_module, debug::level::invalid_argument,
+    auto tmp = index_t{1u};
+    for (auto i = index_t{0u}; i < N; ++i) {
+      DEBUG_ASSERT(extents[i] != 0u, debug::default_module, debug::level::invalid_argument,
                    "zero extents while inferring strides");
       strides[i] = tmp;
       tmp *= extents[i];
@@ -143,16 +143,16 @@ public:
     return drop_dimension_impl(std::make_index_sequence<N - 1>{});
   }
 
-  index_t start = 0ul;                                      //< Start position.
-  std::array<index_t, N> extents = repeat<N, index_t>(0ul); //< Size in each dimension.
-  std::array<index_t, N> strides;                           //< Skip in each dimension.
+  index_t start = 0u;                                      //< Start position.
+  std::array<index_t, N> extents = repeat<N, index_t>(0u); //< Size in each dimension.
+  std::array<index_t, N> strides;                          //< Skip in each dimension.
 
 private:
   constexpr auto end_index() const noexcept { return end_index_impl(std::make_index_sequence<N>{}); }
 
   template <std::size_t... I> constexpr auto end_index_impl(std::index_sequence<I...>) const noexcept -> std::array<index_t, N>
   {
-    return {{(I == N - 1 ? extents[I] : 0ul)...}};
+    return {{(I == N - 1 ? extents[I] : 0u)...}};
   }
 
   template <std::size_t... I>
@@ -219,11 +219,11 @@ public:
   };
 
   /// \group Constructor
-  /// \param start Start position of the slicing. It defaults to 0ul.
+  /// \param start Start position of the slicing. It defaults to 0u.
   /// \param extents Size of the slicing in each dimension.
-  ///   It defaults to 0ul.
+  ///   It defaults to 0u.
   /// \param strides Number of skip positions in each dimension.
-  ///   It defaults to 1ul.
+  ///   It defaults to 1u.
   constexpr strided_descriptor(index_t start, const std::array<index_t, 1>& extents,
                                const std::array<index_t, 1>& strides) noexcept
     : start{start}, extents{extents}, strides{strides}
@@ -260,9 +260,9 @@ public:
   constexpr auto cbegin() const noexcept -> iterator { return {start, strides[0]}; }
   constexpr auto cend() const noexcept -> iterator { return {start + strides[0] * extents[0], strides[0]}; }
 
-  index_t start = 0ul;                      //< Start position.
-  std::array<index_t, 1> extents = {{0ul}}; //< Number of position.
-  std::array<index_t, 1> strides = {{1ul}}; //< Skip positions.
+  index_t start = 0u;                      //< Start position.
+  std::array<index_t, 1> extents = {{0u}}; //< Number of position.
+  std::array<index_t, 1> strides = {{1u}}; //< Skip positions.
 };
 
 } // namespace jules
