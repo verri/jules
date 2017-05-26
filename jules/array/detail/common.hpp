@@ -30,7 +30,7 @@ static auto array_assign(const common_array_base<Source>& source, common_array_b
   DEBUG_ASSERT(it == source.end(), debug::default_module, debug::level::unreachable, "should never happen");
 }
 
-static auto assert_in_bound(index_t index, index_t extent) -> void
+static inline auto assert_in_bound(index_t index, index_t extent) -> void
 {
   (void)assert_in_bound;
   DEBUG_ASSERT(index < extent, debug::default_module, debug::level::boundary_check, "out of range");
@@ -59,7 +59,7 @@ static auto array_cat(const T& head, const std::array<T, N>& tail, std::index_se
   return {{head, tail[I]...}};
 }
 
-static auto seq_size(index_t start, index_t stop, index_t step) -> index_t
+static inline auto seq_size(index_t start, index_t stop, index_t step) -> index_t
 {
   (void)seq_size;
   auto size = (start < stop ? stop - start : start - stop);

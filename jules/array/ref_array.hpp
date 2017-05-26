@@ -83,22 +83,22 @@ public:
   }
 
   /// Implicitly convertable to hold const values.
-  operator ref_array<const value_type, order>() const { return {data_, descriptor_}; }
+  operator ref_array<const value_type, order>() const { return {data(), descriptor_}; }
 
   /// \group Indexing
-  decltype(auto) operator[](size_type i) { return at(data_, descriptor_, i); }
+  decltype(auto) operator[](size_type i) { return at(data(), descriptor_, i); }
 
   /// \group Indexing
-  decltype(auto) operator[](size_type i) const { return at(data_, descriptor_, i); }
+  decltype(auto) operator[](size_type i) const { return at(data(), descriptor_, i); }
 
-  auto begin() noexcept -> iterator { return data_; }
-  auto end() noexcept -> iterator { return data_ + size(); }
+  auto begin() noexcept -> iterator { return data(); }
+  auto end() noexcept -> iterator { return data() + size(); }
 
   auto begin() const noexcept -> const_iterator { return cbegin(); }
   auto end() const noexcept -> const_iterator { return cend(); }
 
-  auto cbegin() const noexcept -> const_iterator { return data_; }
-  auto cend() const noexcept -> const_iterator { return data_ + size(); }
+  auto cbegin() const noexcept -> const_iterator { return data(); }
+  auto cend() const noexcept -> const_iterator { return data() + size(); }
 
   auto size() const noexcept { return descriptor_.size(); }
 
@@ -111,6 +111,10 @@ public:
   auto dimensions() const noexcept -> std::array<size_type, order> { return descriptor_.extents; }
 
 protected:
+  auto data() -> value_type* { return data_; }
+
+  auto data() const -> const value_type* { return data_; }
+
   template <typename U, std::size_t M> static decltype(auto) at(U* data, const descriptor<M>& desc, size_type i)
   {
     detail::assert_in_bound(i, desc.extents[0]);
@@ -128,10 +132,10 @@ protected:
   ref_array(ref_array&& source) noexcept = default;
 
   /// \exclude
-  value_type* data_;
+  value_type* const data_;
 
   /// \exclude
-  descriptor<order> descriptor_;
+  const descriptor<order> descriptor_;
 };
 
 template <typename T, std::size_t N> auto eval(const ref_array<T, N>& source) -> const ref_array<T, N>& { return source; }

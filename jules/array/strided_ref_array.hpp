@@ -89,22 +89,22 @@ public:
   }
 
   /// Implicitly convertable to hold const values.
-  operator strided_ref_array<const value_type, order, Mapper>() const { return {data_, descriptor_, mapper_}; }
+  operator strided_ref_array<const value_type, order, Mapper>() const { return {data(), descriptor_, mapper_}; }
 
   /// \group Indexing
-  decltype(auto) operator[](size_type i) { return at(data_, descriptor_, mapper_, i); }
+  decltype(auto) operator[](size_type i) { return at(data(), descriptor_, mapper_, i); }
 
   /// \group Indexing
-  decltype(auto) operator[](size_type i) const { return at(data_, descriptor_, mapper_, i); }
+  decltype(auto) operator[](size_type i) const { return at(data(), descriptor_, mapper_, i); }
 
-  auto begin() noexcept -> iterator { return {data_, descriptor_.begin()}; }
-  auto end() noexcept -> iterator { return {data_, descriptor_.end()}; }
+  auto begin() noexcept -> iterator { return {data(), descriptor_.begin()}; }
+  auto end() noexcept -> iterator { return {data(), descriptor_.end()}; }
 
   auto begin() const noexcept -> const_iterator { return cbegin(); }
   auto end() const noexcept -> const_iterator { return cend(); }
 
-  auto cbegin() const noexcept -> const_iterator { return {data_, descriptor_.begin()}; }
-  auto cend() const noexcept -> const_iterator { return {data_, descriptor_.end()}; }
+  auto cbegin() const noexcept -> const_iterator { return {data(), descriptor_.begin()}; }
+  auto cend() const noexcept -> const_iterator { return {data(), descriptor_.end()}; }
 
   auto size() const noexcept { return descriptor_.size(); }
 
@@ -117,6 +117,10 @@ public:
   auto dimensions() const noexcept -> std::array<size_type, order> { return descriptor_.extents; }
 
 protected:
+  auto data() -> value_type* { return data_; }
+
+  auto data() const -> const value_type* { return data_; }
+
   template <typename U, std::size_t M>
   static decltype(auto) at(U* data, const strided_descriptor<M>& desc, const Mapper& mapper, size_type i)
   {
@@ -136,13 +140,13 @@ protected:
   strided_ref_array(strided_ref_array&& source) noexcept = default;
 
   /// \exclude
-  value_type* data_;
+  value_type* const data_;
 
   /// \exclude
-  strided_descriptor<order> descriptor_;
+  const strided_descriptor<order> descriptor_;
 
   /// \exclude
-  Mapper mapper_;
+  const Mapper mapper_;
 };
 
 template <typename T, std::size_t N> auto eval(const strided_ref_array<T, N>& source) -> const strided_ref_array<T, N>&
