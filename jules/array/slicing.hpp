@@ -4,16 +4,17 @@
 #define JULES_ARRAY_SLICING_H
 
 #include <jules/array/detail/common.hpp>
+#include <jules/array/slicing/absolute.hpp>
 #include <jules/array/strided_descriptor.hpp>
 
 #define CHECK_BOUNDS(I, MAX)                                                                                                     \
   DEBUG_ASSERT((I) < (MAX), debug::default_module, debug::level::boundary_check, "slicing out of array limits");
 
 #define CHECK_STRIDE(X)                                                                                                          \
-  DEBUG_ASSERT((X).strides[0u] > 0u, debug::default_module, debug::level::invalid_argument, "invalid slicing stride");
+  DEBUG_ASSERT((X).stride > 0u, debug::default_module, debug::level::invalid_argument, "invalid slicing stride");
 
 #define CHECK_EXTENT(X)                                                                                                          \
-  DEBUG_ASSERT((X).extents[0u] > 0u, debug::default_module, debug::level::invalid_argument, "invalid slicing extent");
+  DEBUG_ASSERT((X).extent > 0u, debug::default_module, debug::level::invalid_argument, "invalid slicing extent");
 
 namespace jules::detail
 {
@@ -22,7 +23,7 @@ namespace jules::detail
 
 static inline constexpr auto slicing_size(index_t) noexcept -> index_t { return 1u; }
 
-static inline constexpr auto slicing_size(const strided_descriptor<1>& slice) noexcept -> index_t { return slice.size(); }
+static inline constexpr auto slicing_size(const absolute_strided_slice& slice) noexcept -> index_t { return slice.extent; }
 
 template <typename Rng, typename = meta::requires<range::SizedRange<Rng>>> auto slicing_size(const Rng& rng) -> index_t
 {
@@ -40,27 +41,27 @@ auto slicing_size(Args&&... args) -> index_t
 template <std::size_t D, std::size_t N> auto do_slice(strided_descriptor<N>&) -> void;
 
 template <std::size_t D, std::size_t N, typename... Args>
-auto do_slice(strided_descriptor<N>&, const strided_descriptor<1>&, Args&&...) -> void;
+auto do_slice(strided_descriptor<N>&, const absolute_strided_slice&, Args&&...) -> void;
 
 template <std::size_t D, std::size_t N, typename... Args> auto do_slice(strided_descriptor<N>&, index_t, Args&&...) -> void;
 
-template <std::size_t D, std::size_t N> auto do_slice(strided_descriptor<N>&)
+template <std::size_t D, std::size_t N> auto do_slice(strided_descriptor<N>&) -> void
 {
   static_assert(N == D, "invalid number of arguments");
 }
 
 template <std::size_t D, std::size_t N, typename... Args>
-auto do_slice(strided_descriptor<N>& result, const strided_descriptor<1>& slice, Args&&... args) -> void
+auto do_slice(strided_descriptor<N>& result, const absolute_strided_slice& slice, Args&&... args) -> void
 {
   static_assert(N - D - 1 == sizeof...(args), "invalid number of arguments");
 
   CHECK_STRIDE(slice);
   CHECK_EXTENT(slice);
-  CHECK_BOUNDS(slice.start + slice.extents[0u] * slice.strides[0u], result.extents[D] + 1u);
+  CHECK_BOUNDS(slice.start + slice.extent * slice.stride, result.extents[D] + 1u);
 
   result.start += result.strides[D] * slice.start;
-  result.strides[D] = result.strides[D] * slice.strides[0u];
-  result.extents[D] = slice.extents[0u];
+  result.strides[D] = result.strides[D] * slice.stride;
+  result.extents[D] = slice.extent;
 
   do_slice<D + 1>(result, args...);
 }
@@ -101,7 +102,7 @@ auto do_slice(std::array<index_t, N>&, std::vector<index_t>&, const strided_desc
 
 template <std::size_t D, std::size_t N, typename... Args>
 auto do_slice(std::array<index_t, N>&, std::vector<index_t>&, const strided_descriptor<N>&, std::array<index_t, D>,
-              const strided_descriptor<1>&, Args&&...) -> void;
+              const absolute_strided_slice&, Args&&...) -> void;
 
 template <std::size_t D, std::size_t N, typename Rng, typename... Args, typename T = range::range_value_t<Rng>,
           typename = meta::requires<range::SizedRange<Rng>>>
@@ -145,19 +146,19 @@ auto do_slice(std::array<index_t, N>& extents, std::vector<index_t>& indexes, co
 
 template <std::size_t D, std::size_t N, typename... Args>
 auto do_slice(std::array<index_t, N>& extents, std::vector<index_t>& indexes, const strided_descriptor<N>& descriptor,
-              std::array<index_t, D> ix, const strided_descriptor<1>& slice, Args&&... args)
+              std::array<index_t, D> ix, const absolute_strided_slice& slice, Args&&... args)
 {
   constexpr auto I = N - D - 1;
   static_assert(I == sizeof...(args), "invalid number of arguments");
 
   CHECK_STRIDE(slice);
   CHECK_EXTENT(slice)
-  CHECK_BOUNDS(slice.start + slice.extents[0u] * slice.strides[0u], descriptor.extents[I] + 1u);
+  CHECK_BOUNDS(slice.start + slice.extent * slice.stride, descriptor.extents[I] + 1u);
 
-  extents[I] = slice.size();
+  extents[I] = slice.extent;
 
-  for (index_t i : slice)
-    do_slice(extents, indexes, descriptor, detail::array_cat(i, ix), args...);
+  for (index_t i = 0u; i < slice.extent; ++i)
+    do_slice(extents, indexes, descriptor, detail::array_cat(slice.start + i * slice.stride, ix), args...);
 }
 
 template <std::size_t N, typename Tuple, std::size_t... I>
@@ -178,10 +179,6 @@ template <std::size_t N, typename... Args> auto indirect_slicing(const strided_d
   static_assert(sizeof...(args) == N, "invalid number of arguments");
   return indirect_slicing_impl(descriptor, std::forward_as_tuple(args...), std::make_index_sequence<N>());
 }
-
-// Actual slicing function
-
-template <typename... Args> auto array_slice(Args&&...);
 
 } // namespace jules::detail
 

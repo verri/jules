@@ -55,4 +55,15 @@ TEST_CASE("1-D strided reference array view", "[array]")
 
   c[0][1u] = 4.0;
   CHECK(x[c.row_count()] == 4.0);
+
+  a[{0u, a.size(), 1u}] = 0.0;
+  CHECK(std::find_if(x.begin(), x.end(), [](auto value) { return value != 0.0; }) == x.end());
+
+  CHECK_THROWS((a[{0u, a.size(), 2u}]));
+
+  a[{1u, 2u, 2u}] = 1.0;
+  CHECK((x[1] == 1.0 && x[3] == 1.0));
+
+  c[0u][{0u, c.column_count(), 1u}] = 2.0;
+  CHECK((x[0] == 2.0 && x[c.row_count()] == 2.0));
 }
