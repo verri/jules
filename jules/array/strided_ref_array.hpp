@@ -6,8 +6,9 @@
 
 #include <jules/array/detail/common.hpp>
 #include <jules/array/detail/iterator.hpp>
-#include <jules/array/mapper.hpp>
+#include <jules/array/detail/mapper.hpp>
 #include <jules/array/meta/common.hpp>
+#include <jules/array/slicing.hpp>
 #include <jules/array/strided_descriptor.hpp>
 #include <jules/core/debug.hpp>
 #include <jules/core/type.hpp>
@@ -21,8 +22,8 @@ namespace jules
 ///
 /// \module Array Types
 /// \notes This class is not meant to be used in user code.
-template <typename T, std::size_t N, typename Mapper = identity_mapper>
-class strided_ref_array : public common_array_base<strided_ref_array<T, N, Mapper>>
+template <typename T, std::size_t N, typename Mapper = detail::identity_mapper>
+class strided_ref_array : public common_array_base<strided_ref_array<T, N, Mapper>>, private Mapper
 {
   static_assert(N > 0u, "invalid array dimension");
 
@@ -60,16 +61,16 @@ public:
   using difference_type = distance_t;
 
   strided_ref_array(value_type* data, strided_descriptor<order> strided_descriptor, Mapper mapper = {})
-    : data_{data}, descriptor_{strided_descriptor}, mapper_{std::move(mapper)}
+    : Mapper{std::move(mapper)}, data_{data}, descriptor_{strided_descriptor}
   {
   }
 
-  ~strided_ref_array() = default;
+  ~strided_ref_array(){}; // not default to disable default copy, move, assignment, ...
 
   /// \group Assignment
   template <typename Array> auto operator=(const common_array_base<Array>& source) -> strided_ref_array&
   {
-    detail::array_assign(source, *this);
+    detail::array_assign(*this, source);
     return *this;
   }
 
@@ -84,18 +85,18 @@ public:
   /// \group Assignment
   auto operator=(const strided_ref_array& source) -> strided_ref_array&
   {
-    detail::array_assign(source, *this);
+    detail::array_assign(*this, source);
     return *this;
   }
 
   /// Implicitly convertable to hold const values.
-  operator strided_ref_array<const value_type, order, Mapper>() const { return {data(), descriptor_, mapper_}; }
+  operator strided_ref_array<const value_type, order, Mapper>() const { return {data(), descriptor_, mapper()}; }
 
   /// \group Indexing
-  decltype(auto) operator[](size_type i) { return at(data(), descriptor_, mapper_, i); }
+  decltype(auto) operator[](size_type i) { return at(data(), descriptor_, mapper(), i); }
 
   /// \group Indexing
-  decltype(auto) operator[](size_type i) const { return at(data(), descriptor_, mapper_, i); }
+  decltype(auto) operator[](size_type i) const { return at(data(), descriptor_, mapper(), i); }
 
   auto begin() noexcept -> iterator { return {data(), descriptor_.begin()}; }
   auto end() noexcept -> iterator { return {data(), descriptor_.end()}; }
@@ -121,21 +122,26 @@ protected:
 
   auto data() const -> const value_type* { return data_; }
 
+  auto mapper() -> Mapper& { return *this; }
+
+  auto mapper() const -> const Mapper& { return *this; }
+
   template <typename U, std::size_t M>
   static decltype(auto) at(U* data, const strided_descriptor<M>& desc, const Mapper& mapper, size_type i)
   {
     detail::assert_in_bound(i, desc.extents[0]);
     // clang-format off
     if constexpr (M == 1) {
-      const auto pos = mapper(desc(i));
+      const auto pos = mapper.map(desc(i));
       return data[pos];
     } else {
-      return; // TODO...
+      auto new_desc = desc.drop_dimension();
+      new_desc.start = desc.start + desc.strides[0] * i;
+      return strided_ref_array<U, M - 1, Mapper>{data, std::move(new_desc), mapper};
     }
     // clang-format on
   }
 
-  strided_ref_array() = default;
   strided_ref_array(const strided_ref_array& source) = default;
   strided_ref_array(strided_ref_array&& source) noexcept = default;
 
@@ -144,9 +150,6 @@ protected:
 
   /// \exclude
   const strided_descriptor<order> descriptor_;
-
-  /// \exclude
-  const Mapper mapper_;
 };
 
 template <typename T, std::size_t N> auto eval(const strided_ref_array<T, N>& source) -> const strided_ref_array<T, N>&

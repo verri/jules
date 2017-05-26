@@ -158,7 +158,7 @@ private:
   template <std::size_t... I>
   constexpr auto drop_dimension_impl(std::index_sequence<I...>) const noexcept -> strided_descriptor<N - 1>
   {
-    return {start, {extents[I + 1]...}, {strides[I + 1]...}};
+    return {start, {{extents[I + 1]...}}, {{strides[I + 1]...}}};
   }
 };
 

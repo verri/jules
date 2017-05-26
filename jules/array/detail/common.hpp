@@ -15,7 +15,7 @@ namespace jules::detail
 {
 
 template <typename Source, typename Dest>
-static auto array_assign(const common_array_base<Source>& source, common_array_base<Dest>& destination)
+static auto array_assign(common_array_base<Source>& destination, const common_array_base<Dest>& source)
 {
   static_assert(Source::order == Dest::order, "array order mismatch");
   static_assert(std::is_assignable_v<typename Dest::value_type&, const typename Source::value_type&>, "incompatible assignment");
@@ -32,7 +32,6 @@ static auto array_assign(const common_array_base<Source>& source, common_array_b
 
 static inline auto assert_in_bound(index_t index, index_t extent) -> void
 {
-  (void)assert_in_bound;
   DEBUG_ASSERT(index < extent, debug::default_module, debug::level::boundary_check, "out of range");
 }
 
@@ -61,7 +60,6 @@ static auto array_cat(const T& head, const std::array<T, N>& tail, std::index_se
 
 static inline auto seq_size(index_t start, index_t stop, index_t step) -> index_t
 {
-  (void)seq_size;
   auto size = (start < stop ? stop - start : start - stop);
   size += size % step == 0u ? 0u : 1u;
   size /= step;

@@ -183,6 +183,10 @@ template <std::size_t N, typename... Args> auto indirect_slicing(const strided_d
   return indirect_slicing_impl(descriptor, std::forward_as_tuple(args...), std::make_index_sequence<N>());
 }
 
+// Actual slicing function
+
+template <typename... Args> auto array_slice(Args&&...);
+
 } // namespace jules::detail
 
 #undef CHECK_BOUNDS

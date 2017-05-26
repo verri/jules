@@ -47,4 +47,12 @@ TEST_CASE("1-D strided reference array view", "[array]")
 
   a = 2.0;
   CHECK(std::find_if(x.begin(), x.end(), [](auto value) { return value != 2.0; }) == x.end());
+
+  auto c = jules::strided_ref_array<double, 2u>(x.data(), {0u, {{x.size() / 2, 2u}}});
+
+  c[0][0] = 3.0;
+  CHECK(x[0] == 3.0);
+
+  c[0][1u] = 4.0;
+  CHECK(x[c.row_count()] == 4.0);
 }

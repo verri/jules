@@ -57,12 +57,12 @@ public:
 
   ref_array(value_type* data, descriptor<order> descriptor) : data_{data}, descriptor_{descriptor} {}
 
-  ~ref_array() = default;
+  ~ref_array(){};
 
   /// \group Assignment
   template <typename Array> auto operator=(const common_array_base<Array>& source) -> ref_array&
   {
-    detail::array_assign(source, *this);
+    detail::array_assign(*this, source);
     return *this;
   }
 
@@ -78,7 +78,7 @@ public:
   /// \group Assignment
   auto operator=(const ref_array& source) -> ref_array&
   {
-    assign_from_array(source);
+    detail::array_assign(*this, source);
     return *this;
   }
 
@@ -127,7 +127,6 @@ protected:
     // clang-format on
   }
 
-  ref_array() = default;
   ref_array(const ref_array& source) = default;
   ref_array(ref_array&& source) noexcept = default;
 
