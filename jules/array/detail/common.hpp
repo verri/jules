@@ -7,8 +7,16 @@
 /// \exclude
 #define JULES_ARRAY_DETAIL_COMMON_H
 
+#include <jules/array/detail/mapper.hpp>
 #include <jules/array/meta/common.hpp>
 #include <jules/core/debug.hpp>
+
+// Forward declarations
+namespace jules
+{
+template <typename T, std::size_t N, typename Mapper = detail::identity_mapper> class strided_ref_array;
+template <typename T, std::size_t N, typename Mapper, typename... Indexes> class strided_ref_array_proxy;
+}
 
 /// \exclude
 namespace jules::detail

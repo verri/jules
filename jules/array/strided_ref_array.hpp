@@ -17,65 +17,6 @@
 namespace jules
 {
 
-template <typename T, std::size_t N, typename Mapper = detail::identity_mapper> class strided_ref_array;
-template <typename T, std::size_t N, typename Mapper, typename... Indexes> class strided_ref_array_proxy;
-
-// TODO: should I put it in another file?
-namespace detail
-{
-template <typename T, typename = void> struct promote_index_helper {
-  using type = absolute_strided_slice;
-};
-
-template <typename T> struct promote_index_helper<T, std::enable_if_t<std::is_convertible_v<T, index_t>>> {
-  using type = index_t;
-};
-
-template <typename T> constexpr auto promote_index(T&& index) -> typename promote_index_helper<T>::type { return index; }
-
-template <typename T, std::size_t N, typename Mapper, typename... Args>
-auto array_slice(T* data, const strided_descriptor<N>& descriptor, Mapper mapper, Args&&... args)
-{
-  static_assert(sizeof...(Args) > 0u);
-  // clang-format off
-  if constexpr (((std::is_convertible_v<Args, index_t> || std::is_convertible_v<Args, absolute_strided_slice>) && ...)) {
-    auto new_descriptor = detail::default_slicing(descriptor, promote_index(std::forward<Args>(args))...);
-    return strided_ref_array<T, N, Mapper>{data, std::move(new_descriptor), std::move(mapper)};
-  } else {
-    return; // TODO
-  }
-  // clang-format on
-}
-
-template <typename T, std::size_t N, typename Mapper>
-static decltype(auto) array_at(T* data, const strided_descriptor<N>& desc, const Mapper& mapper, index_t i)
-{
-  detail::assert_in_bound(i, desc.extents[0]);
-  // clang-format off
-  if constexpr (N == 1) {
-    const auto pos = mapper.map(desc(i));
-    return data[pos];
-  } else {
-    auto new_desc = desc.drop_dimension();
-    new_desc.start = desc.start + desc.strides[0] * i;
-    return strided_ref_array<T, N - 1, Mapper>{data, std::move(new_desc), mapper};
-  }
-  // clang-format on
-}
-
-template <typename T, std::size_t N, typename Mapper, typename Index>
-static decltype(auto) array_at(T* data, const strided_descriptor<N>& desc, const Mapper& mapper, Index&& index)
-{
-  // clang-format off
-  if constexpr (N == 1) {
-    return detail::array_slice(data, desc, mapper, std::forward<Index>(index));
-  } else {
-    return strided_ref_array_proxy<T, N, Mapper, Index>{data, desc, mapper, std::forward<Index>(index)};
-  }
-  // clang-format on
-}
-} // namespace detail
-
 template <typename T, std::size_t N, typename Mapper, typename... Indexes> class strided_ref_array_proxy
 {
   static_assert(sizeof...(Indexes) < N);
@@ -87,6 +28,8 @@ public:
   }
 
   decltype(auto) operator[](index_t i) && { return at(i); }
+
+  decltype(auto) operator[](absolute_slice slice) && { return at(slice); }
 
   decltype(auto) operator[](absolute_strided_slice slice) && { return at(slice); }
 
@@ -196,6 +139,12 @@ public:
 
   /// \group Indexing
   decltype(auto) operator[](size_type i) const { return detail::array_at(data(), descriptor_, mapper(), i); }
+
+  /// \group Indexing
+  decltype(auto) operator[](absolute_slice slice) { return detail::array_at(data(), descriptor_, mapper(), slice); }
+
+  /// \group Indexing
+  decltype(auto) operator[](absolute_slice slice) const { return detail::array_at(data(), descriptor_, mapper(), slice); }
 
   /// \group Indexing
   decltype(auto) operator[](absolute_strided_slice slice) { return detail::array_at(data(), descriptor_, mapper(), slice); }
