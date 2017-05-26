@@ -20,13 +20,9 @@ namespace jules::detail
 
 // Slicing size
 
-static constexpr auto slicing_size(index_t) -> index_t
-{
-  (void)slicing_size;
-  return 1u;
-}
+static inline constexpr auto slicing_size(index_t) noexcept -> index_t { return 1u; }
 
-auto slicing_size(const strided_descriptor<1>& slice) -> index_t { return slice.size(); }
+static inline constexpr auto slicing_size(const strided_descriptor<1>& slice) noexcept -> index_t { return slice.size(); }
 
 template <typename Rng, typename = meta::requires<range::SizedRange<Rng>>> auto slicing_size(const Rng& rng) -> index_t
 {

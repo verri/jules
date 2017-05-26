@@ -21,4 +21,10 @@ TEST_CASE("Basic reference array functionalities", "[array]")
   matrix = 2.0;
   for (auto value : values)
     CHECK(value == 2.0);
+
+  matrix[0u][0u] = 3.0;
+  CHECK(values[0] == 3.0);
+
+  matrix[0u][1u] = 4.0;
+  CHECK(values[matrix.row_count()] == 4.0);
 }

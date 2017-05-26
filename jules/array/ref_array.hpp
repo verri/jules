@@ -7,6 +7,7 @@
 #include <jules/array/descriptor.hpp>
 #include <jules/array/detail/common.hpp>
 #include <jules/array/meta/common.hpp>
+#include <jules/array/strided_ref_array.hpp>
 #include <jules/core/type.hpp>
 
 namespace jules
@@ -85,6 +86,10 @@ public:
   /// Implicitly convertable to hold const values.
   operator ref_array<const value_type, order>() const { return {data(), descriptor_}; }
 
+  operator strided_ref_array<value_type, order>() { return {data(), {0u, dimensions()}}; }
+
+  operator strided_ref_array<const value_type, order>() const { return {data(), {0u, dimensions()}}; }
+
   /// \group Indexing
   decltype(auto) operator[](size_type i) { return at(data(), descriptor_, i); }
 
@@ -115,6 +120,10 @@ protected:
 
   auto data() const -> const value_type* { return data_; }
 
+  auto as_strided() -> strided_ref_array<T, N> { return *this; }
+
+  auto as_strided() const -> strided_ref_array<const T, N> { return *this; }
+
   template <typename U, std::size_t M> static decltype(auto) at(U* data, const descriptor<M>& desc, size_type i)
   {
     detail::assert_in_bound(i, desc.extents[0]);
@@ -122,7 +131,8 @@ protected:
     if constexpr (M == 1) {
       return data[i];
     } else {
-      return; // TODO...
+      const auto new_desc = strided_descriptor<M>{i, desc.extents};
+      return strided_ref_array<U, M - 1>{data, new_desc.drop_dimension()};
     }
     // clang-format on
   }

@@ -95,7 +95,7 @@ public:
 private:
   template <std::size_t... I> constexpr auto drop_dimension_impl(std::index_sequence<I...>) const noexcept -> descriptor<N - 1>
   {
-    return {{extents[I + 1]...}};
+    return {{{extents[I + 1]...}}};
   }
 };
 
