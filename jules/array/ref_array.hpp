@@ -96,6 +96,30 @@ public:
   /// \group Indexing
   decltype(auto) operator[](size_type i) const { return at(data(), descriptor_, i); }
 
+  /// \group Indexing
+  decltype(auto) operator[](absolute_slice slice) { return as_strided()[slice]; }
+
+  /// \group Indexing
+  decltype(auto) operator[](absolute_slice slice) const { return as_strided()[slice]; }
+
+  /// \group Indexing
+  decltype(auto) operator[](absolute_strided_slice slice) { return as_strided()[slice]; }
+
+  /// \group Indexing
+  decltype(auto) operator[](absolute_strided_slice slice) const { return as_strided()[slice]; }
+
+  /// \group Indexing
+  template <typename Rng, typename = meta::requires<range::SizedRange<Rng>>> decltype(auto) operator[](const Rng& rng)
+  {
+    return as_strided()[rng];
+  }
+
+  /// \group Indexing
+  template <typename Rng, typename = meta::requires<range::SizedRange<Rng>>> decltype(auto) operator[](const Rng& rng) const
+  {
+    return as_strided()[rng];
+  }
+
   auto begin() noexcept -> iterator { return data(); }
   auto end() noexcept -> iterator { return data() + size(); }
 
