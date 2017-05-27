@@ -7,14 +7,13 @@
 /// \exclude
 #define JULES_ARRAY_DETAIL_COMMON_H
 
-#include <jules/array/detail/mapper.hpp>
 #include <jules/array/meta/common.hpp>
 #include <jules/core/debug.hpp>
 
 // Forward declarations
 namespace jules
 {
-template <typename T, std::size_t N, typename Mapper = detail::identity_mapper> class strided_ref_array;
+template <typename T, std::size_t N, typename Mapper> class strided_ref_array;
 template <typename T, std::size_t N, typename Mapper, typename... Indexes> class strided_ref_array_proxy;
 }
 
@@ -55,15 +54,15 @@ static auto assert_in_bound(const std::array<index_t, N>& indexes, const std::ar
   DEBUG_ASSERT(((indexes[I] < extents[I]) && ...), debug::default_module, debug::level::boundary_check, "out of range");
 }
 
-template <typename T, std::size_t N> static auto array_cat(const T& head, const std::array<T, N>& tail) -> std::array<T, N + 1>
-{
-  return array_cat(head, tail, std::make_index_sequence<N>());
-}
-
 template <typename T, std::size_t N, std::size_t... I>
 static auto array_cat(const T& head, const std::array<T, N>& tail, std::index_sequence<I...>) -> std::array<T, N + 1>
 {
   return {{head, tail[I]...}};
+}
+
+template <typename T, std::size_t N> static auto array_cat(const T& head, const std::array<T, N>& tail) -> std::array<T, N + 1>
+{
+  return array_cat(head, tail, std::make_index_sequence<N>());
 }
 
 static inline auto seq_size(index_t start, index_t stop, index_t step) -> index_t

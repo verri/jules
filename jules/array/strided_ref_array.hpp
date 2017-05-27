@@ -6,7 +6,7 @@
 
 #include <jules/array/detail/common.hpp>
 #include <jules/array/detail/iterator.hpp>
-#include <jules/array/detail/mapper.hpp>
+#include <jules/array/mapper.hpp>
 #include <jules/array/meta/common.hpp>
 #include <jules/array/slicing.hpp>
 #include <jules/array/slicing/absolute.hpp>
@@ -20,10 +20,11 @@ namespace jules
 template <typename T, std::size_t N, typename Mapper, typename... Indexes> class strided_ref_array_proxy
 {
   static_assert(sizeof...(Indexes) < N);
+  static_assert(Mapper::order == N);
 
 public:
-  strided_ref_array_proxy(T* data, strided_descriptor<N> descriptor, Mapper mapper, Indexes... indexes)
-    : data_{data}, descriptor_{std::move(descriptor)}, mapper_{std::move(mapper)}, indexes_(std::forward<Indexes>(indexes)...)
+  strided_ref_array_proxy(T* data, Mapper mapper, Indexes... indexes)
+    : data_{data}, mapper_{std::move(mapper)}, indexes_(std::forward<Indexes>(indexes)...)
   {
   }
 
@@ -32,6 +33,11 @@ public:
   decltype(auto) operator[](absolute_slice slice) && { return at(slice); }
 
   decltype(auto) operator[](absolute_strided_slice slice) && { return at(slice); }
+
+  template <typename Rng, typename = meta::requires<range::SizedRange<Rng>>> decltype(auto) operator[](const Rng& rng) &&
+  {
+    return at(rng);
+  }
 
 private:
   template <typename Index> decltype(auto) at(Index&& index) &&
@@ -44,16 +50,15 @@ private:
     // clang-format off
     if constexpr (sizeof...(Indexes) == N - 1) {
       return detail::array_slice(
-        data_, std::move(descriptor_), std::move(mapper_), std::get<I>(indexes_)..., std::forward<Index>(index));
+        data_, std::move(mapper_), std::get<I>(indexes_)..., std::forward<Index>(index));
     } else {
       return strided_ref_array_proxy<T, N, Mapper, Indexes..., Index>{
-        data_, std::move(descriptor_), std::move(mapper_), std::get<I>(indexes_)..., std::forward<Index>(index)};
+        data_, std::move(mapper_), std::get<I>(indexes_)..., std::forward<Index>(index)};
     }
     // clang-format on
   }
 
   T* data_;
-  strided_descriptor<N> descriptor_;
   Mapper mapper_;
   std::tuple<Indexes...> indexes_;
 };
@@ -68,6 +73,7 @@ template <typename T, std::size_t N, typename Mapper>
 class strided_ref_array : public common_array_base<strided_ref_array<T, N, Mapper>>, private Mapper
 {
   static_assert(N > 0u, "invalid array dimension");
+  static_assert(std::is_same_v<Mapper, detail::identity_mapper<N>> || std::is_same_v<Mapper, detail::vector_mapper<N>>);
 
   template <typename, std::size_t, typename> friend class strided_ref_array;
 
@@ -91,10 +97,10 @@ public:
   using value_type = T;
 
   /// \group member_types Class Types and Constants
-  using iterator = detail::iterator_from_indexes<T, typename strided_descriptor<order>::iterator>;
+  using iterator = detail::iterator_from_indexes<T, typename Mapper::iterator>;
 
   /// \group member_types Class Types and Constants
-  using const_iterator = detail::iterator_from_indexes<const T, typename strided_descriptor<order>::iterator>;
+  using const_iterator = detail::iterator_from_indexes<const T, typename Mapper::iterator>;
 
   /// \group member_types Class Types and Constants
   using size_type = index_t;
@@ -102,10 +108,7 @@ public:
   /// \group member_types Class Types and Constants
   using difference_type = distance_t;
 
-  strided_ref_array(value_type* data, strided_descriptor<order> strided_descriptor, Mapper mapper = {})
-    : Mapper{std::move(mapper)}, data_{data}, descriptor_{strided_descriptor}
-  {
-  }
+  strided_ref_array(value_type* data, Mapper mapper) : Mapper{std::move(mapper)}, data_{data} {}
 
   ~strided_ref_array(){}; // not default to disable default copy, move, assignment, ...
 
@@ -132,44 +135,56 @@ public:
   }
 
   /// Implicitly convertable to hold const values.
-  operator strided_ref_array<const value_type, order, Mapper>() const { return {data(), descriptor_, mapper()}; }
+  operator strided_ref_array<const value_type, order, Mapper>() const { return {data(), mapper()}; }
 
   /// \group Indexing
-  decltype(auto) operator[](size_type i) { return detail::array_at(data(), descriptor_, mapper(), i); }
+  decltype(auto) operator[](size_type i) { return detail::array_at(data(), mapper(), i); }
 
   /// \group Indexing
-  decltype(auto) operator[](size_type i) const { return detail::array_at(data(), descriptor_, mapper(), i); }
+  decltype(auto) operator[](size_type i) const { return detail::array_at(data(), mapper(), i); }
 
   /// \group Indexing
-  decltype(auto) operator[](absolute_slice slice) { return detail::array_at(data(), descriptor_, mapper(), slice); }
+  decltype(auto) operator[](absolute_slice slice) { return detail::array_at(data(), mapper(), slice); }
 
   /// \group Indexing
-  decltype(auto) operator[](absolute_slice slice) const { return detail::array_at(data(), descriptor_, mapper(), slice); }
+  decltype(auto) operator[](absolute_slice slice) const { return detail::array_at(data(), mapper(), slice); }
 
   /// \group Indexing
-  decltype(auto) operator[](absolute_strided_slice slice) { return detail::array_at(data(), descriptor_, mapper(), slice); }
+  decltype(auto) operator[](absolute_strided_slice slice) { return detail::array_at(data(), mapper(), slice); }
 
   /// \group Indexing
-  decltype(auto) operator[](absolute_strided_slice slice) const { return detail::array_at(data(), descriptor_, mapper(), slice); }
+  decltype(auto) operator[](absolute_strided_slice slice) const { return detail::array_at(data(), mapper(), slice); }
 
-  auto begin() noexcept -> iterator { return {data(), descriptor_.begin()}; }
-  auto end() noexcept -> iterator { return {data(), descriptor_.end()}; }
+  /// \group Indexing
+  template <typename Rng, typename = meta::requires<range::SizedRange<Rng>>> decltype(auto) operator[](const Rng& rng)
+  {
+    return detail::array_at(data(), mapper(), rng);
+  }
+
+  /// \group Indexing
+  template <typename Rng, typename = meta::requires<range::SizedRange<Rng>>> decltype(auto) operator[](const Rng& rng) const
+  {
+    return detail::array_at(data(), mapper(), rng);
+  }
+
+  auto begin() noexcept -> iterator { return {data(), this->index_begin()}; }
+  auto end() noexcept -> iterator { return {data(), this->index_end()}; }
 
   auto begin() const noexcept -> const_iterator { return cbegin(); }
   auto end() const noexcept -> const_iterator { return cend(); }
 
-  auto cbegin() const noexcept -> const_iterator { return {data(), descriptor_.begin()}; }
-  auto cend() const noexcept -> const_iterator { return {data(), descriptor_.end()}; }
+  auto cbegin() const noexcept -> const_iterator { return {data(), this->index_begin()}; }
+  auto cend() const noexcept -> const_iterator { return {data(), this->index_end()}; }
 
-  auto size() const noexcept { return descriptor_.size(); }
+  auto size() const noexcept { return this->descriptor().size(); }
 
-  auto length() const noexcept { return descriptor_.length(); }
+  auto length() const noexcept { return this->descriptor().length(); }
 
-  auto row_count() const noexcept { return descriptor_.row_count(); }
+  auto row_count() const noexcept { return this->descriptor().row_count(); }
 
-  auto column_count() const noexcept { return descriptor_.column_count(); }
+  auto column_count() const noexcept { return this->descriptor().column_count(); }
 
-  auto dimensions() const noexcept -> std::array<size_type, order> { return descriptor_.extents; }
+  auto dimensions() const noexcept -> std::array<size_type, order> { return this->descriptor().extents; }
 
 protected:
   auto data() -> value_type* { return data_; }
@@ -183,12 +198,10 @@ protected:
 
   /// \exclude
   value_type* const data_;
-
-  /// \exclude
-  const strided_descriptor<order> descriptor_;
 };
 
-template <typename T, std::size_t N> auto eval(const strided_ref_array<T, N>& source) -> const strided_ref_array<T, N>&
+template <typename T, std::size_t N, typename Mapper>
+auto eval(const strided_ref_array<T, N, Mapper>& source) -> const strided_ref_array<T, N, Mapper>&
 {
   return source;
 }
