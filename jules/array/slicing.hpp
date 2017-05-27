@@ -187,24 +187,24 @@ template <std::size_t N, typename... Args> static auto indirect_slicing(const st
 
 template <typename T, typename Mapper, typename... Args> static auto array_slice(T* data, Mapper mapper, Args&&... args)
 {
-  constexpr auto N = Mapper::order;
+  constexpr auto order = Mapper::order;
   static_assert(sizeof...(Args) > 0u);
   // clang-format off
   if constexpr (((std::is_convertible_v<Args, index_t> || std::is_convertible_v<Args, absolute_strided_slice>) && ...)) {
     auto new_descriptor = detail::default_slicing(mapper.descriptor(), std::forward<Args>(args)...);
-    if constexpr (std::is_same_v<Mapper, detail::identity_mapper<N>>) {
-      return strided_ref_array<T, N, Mapper>{data, {std::move(new_descriptor)}};
+    if constexpr (std::is_same_v<Mapper, identity_mapper<order>>) {
+      return strided_ref_array<T, Mapper>{data, {std::move(new_descriptor)}};
     } else {
       auto indexes = mapper.map(new_descriptor);
-      return strided_ref_array<T, N, Mapper>{data, {{0u, new_descriptor.extents}, std::move(indexes)}};
+      return strided_ref_array<T, Mapper>{data, {{0u, new_descriptor.extents}, std::move(indexes)}};
     }
   } else {
     auto [extents, positions] = detail::indirect_slicing(mapper.descriptor(), std::forward<Args>(args)...);
-    if constexpr (std::is_same_v<Mapper, detail::identity_mapper<N>>) {
-      return strided_ref_array<T, N, detail::vector_mapper<N>>{data, {{0u, extents}, {std::move(positions)}}};
+    if constexpr (std::is_same_v<Mapper, identity_mapper<order>>) {
+      return strided_ref_array<T, vector_mapper<order>>{data, {{0u, extents}, {std::move(positions)}}};
     } else {
       auto indexes = mapper.map(std::move(positions));
-      return strided_ref_array<T, N, detail::vector_mapper<N>>{data, {{0u, extents}, std::move(indexes)}};
+      return strided_ref_array<T, vector_mapper<order>>{data, {{0u, extents}, std::move(indexes)}};
     }
   }
   // clang-format on
@@ -220,7 +220,7 @@ template <typename T, typename Mapper> static decltype(auto) array_at(T* data, c
     return data[pos];
   } else {
     auto new_mapper = mapper.drop_dimension(i);
-    return strided_ref_array<T, Mapper::order - 1, decltype(new_mapper)>{data, std::move(new_mapper)};
+    return strided_ref_array<T, decltype(new_mapper)>{data, std::move(new_mapper)};
   }
   // clang-format on
 }
@@ -232,7 +232,7 @@ static decltype(auto) array_at(T* data, const Mapper& mapper, Index&& index)
   if constexpr (Mapper::order == 1) {
     return detail::array_slice(data, mapper, std::forward<Index>(index));
   } else {
-    return strided_ref_array_proxy<T, Mapper::order, Mapper, Index>{data, mapper, std::forward<Index>(index)};
+    return strided_ref_array_proxy<T, Mapper, Index>{data, mapper, std::forward<Index>(index)};
   }
   // clang-format on
 }

@@ -8,7 +8,7 @@
 #include <jules/core/debug.hpp>
 #include <jules/core/type.hpp>
 
-namespace jules::detail
+namespace jules
 {
 
 template <std::size_t N> class identity_mapper
@@ -94,6 +94,6 @@ private:
   const_vector<index_t> indexes_;
 };
 
-} // namespace jules::detail
+} // namespace jules
 
 #endif // JULES_ARRAY_DETAIL_MAPPER_H

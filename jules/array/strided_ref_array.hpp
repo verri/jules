@@ -17,10 +17,11 @@
 namespace jules
 {
 
-template <typename T, std::size_t N, typename Mapper, typename... Indexes> class strided_ref_array_proxy
+/// \exclude
+template <typename T, typename Mapper, typename... Indexes> class strided_ref_array_proxy
 {
-  static_assert(sizeof...(Indexes) < N);
-  static_assert(Mapper::order == N);
+  static constexpr auto order = Mapper::order;
+  static_assert(sizeof...(Indexes) < order);
 
 public:
   strided_ref_array_proxy(T* data, Mapper mapper, Indexes... indexes)
@@ -48,11 +49,11 @@ private:
   template <typename Index, std::size_t... I> decltype(auto) at(Index&& index) &&
   {
     // clang-format off
-    if constexpr (sizeof...(Indexes) == N - 1) {
+    if constexpr (sizeof...(Indexes) == order - 1) {
       return detail::array_slice(
         data_, std::move(mapper_), std::get<I>(indexes_)..., std::forward<Index>(index));
     } else {
-      return strided_ref_array_proxy<T, N, Mapper, Indexes..., Index>{
+      return strided_ref_array_proxy<T, Mapper, Indexes..., Index>{
         data_, std::move(mapper_), std::get<I>(indexes_)..., std::forward<Index>(index)};
     }
     // clang-format on
@@ -69,13 +70,12 @@ private:
 ///
 /// \module Array Types
 /// \notes This class is not meant to be used in user code.
-template <typename T, std::size_t N, typename Mapper>
-class strided_ref_array : public common_array_base<strided_ref_array<T, N, Mapper>>, private Mapper
+template <typename T, typename Mapper>
+class strided_ref_array : public common_array_base<strided_ref_array<T, Mapper>>, private Mapper
 {
-  static_assert(N > 0u, "invalid array dimension");
-  static_assert(std::is_same_v<Mapper, detail::identity_mapper<N>> || std::is_same_v<Mapper, detail::vector_mapper<N>>);
+  static_assert(Mapper::order > 0u, "invalid array dimension");
 
-  template <typename, std::size_t, typename> friend class strided_ref_array;
+  template <typename, typename> friend class strided_ref_array;
 
 public:
   /// \group member_types Class Types and Constants
@@ -91,7 +91,7 @@ public:
   /// (5) Unsigned integer type that can store the dimensions of the array.
   ///
   /// (6) Signed integer type that can store differences between sizes.
-  static constexpr auto order = N;
+  static constexpr auto order = Mapper::order;
 
   /// \group member_types Class Types and Constants
   using value_type = T;
@@ -135,7 +135,7 @@ public:
   }
 
   /// Implicitly convertable to hold const values.
-  operator strided_ref_array<const value_type, order, Mapper>() const { return {data(), mapper()}; }
+  operator strided_ref_array<const value_type, Mapper>() const { return {data(), mapper()}; }
 
   /// \group Indexing
   decltype(auto) operator[](size_type i) { return detail::array_at(data(), mapper(), i); }
@@ -200,8 +200,8 @@ protected:
   value_type* const data_;
 };
 
-template <typename T, std::size_t N, typename Mapper>
-auto eval(const strided_ref_array<T, N, Mapper>& source) -> const strided_ref_array<T, N, Mapper>&
+template <typename T, typename Mapper>
+auto eval(const strided_ref_array<T, Mapper>& source) -> const strided_ref_array<T, Mapper>&
 {
   return source;
 }
