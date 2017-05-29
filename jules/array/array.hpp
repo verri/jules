@@ -208,7 +208,7 @@ public:
   auto operator=(const array& source) -> array&
   {
     DEBUG_ASSERT(this != &source, debug::default_module, debug::level::invalid_argument, "self assignment");
-    if (this->size() != source->size()) {
+    if (this->size() != source.size()) {
       clear();
       this->data_ = this->allocate(source.size());
     } else {
@@ -235,16 +235,16 @@ public:
     static_assert(Array::order == order, "array order mismatch");
     static_assert(std::is_assignable<value_type&, typename Array::value_type>::value, "incompatible assignment");
 
-    if (this->size() != source->size()) {
-      clear();
-      this->data_ = this->allocate(source.size());
-    } else {
-      this->destroy(this->data(), this->size());
-    }
+    // Source might contain references to this.
+    const auto old_data = this->data();
+    const auto old_size = this->size();
 
     this->data_ = this->allocate(source.size());
-    this->descriptor_ = {0, source.dimensions()};
+    this->descriptor_ = {source.dimensions()};
     this->construct(this->data(), source.begin(), source.size());
+
+    this->destroy(old_data, old_size);
+    this->deallocate(old_data, old_size);
 
     return *this;
   }

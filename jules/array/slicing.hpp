@@ -6,6 +6,7 @@
 #include <jules/array/detail/common.hpp>
 #include <jules/array/mapper.hpp>
 #include <jules/array/slicing/absolute.hpp>
+#include <jules/array/slicing/bounded.hpp>
 #include <jules/array/strided_descriptor.hpp>
 
 #define CHECK_BOUNDS(I, MAX)                                                                                                     \
@@ -59,7 +60,7 @@ static auto do_slice(strided_descriptor<N>& result, const absolute_strided_slice
 
   CHECK_STRIDE(slice);
   CHECK_EXTENT(slice);
-  CHECK_BOUNDS(slice.start + slice.extent * slice.stride, result.extents[D] + 1u);
+  CHECK_BOUNDS(slice.start + (slice.extent - 1u) * slice.stride, result.extents[D]);
 
   result.start += result.strides[D] * slice.start;
   result.strides[D] = result.strides[D] * slice.stride;
@@ -156,7 +157,7 @@ static auto do_slice(std::array<index_t, N>& extents, std::vector<index_t>& inde
 
   CHECK_STRIDE(slice);
   CHECK_EXTENT(slice)
-  CHECK_BOUNDS(slice.start + slice.extent * slice.stride, descriptor.extents[I] + 1u);
+  CHECK_BOUNDS(slice.start + (slice.extent - 1u) * slice.stride, descriptor.extents[I]);
 
   extents[I] = slice.extent;
 
@@ -221,6 +222,18 @@ template <typename T, typename Mapper> static decltype(auto) array_at(T* data, c
   } else {
     auto new_mapper = mapper.drop_dimension(i);
     return strided_ref_array<T, decltype(new_mapper)>{data, std::move(new_mapper)};
+  }
+  // clang-format on
+}
+
+template <typename T, typename Mapper> static decltype(auto) array_at(T* data, const Mapper& mapper, every_index)
+{
+  const auto& descriptor = mapper.descriptor();
+  // clang-format off
+  if constexpr (Mapper::order == 1) {
+    return strided_ref_array<T, Mapper>{data, mapper};
+  } else {
+    return strided_ref_array_proxy<T, Mapper, absolute_strided_slice>{data, mapper, slice(0u, descriptor.extents[0], 1u)};
   }
   // clang-format on
 }

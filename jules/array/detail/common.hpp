@@ -1,4 +1,4 @@
-// Copyright (c) 2016 Filipe Verri <filipeverri@gmail.com>
+// Copyright (c) 2017 Filipe Verri <filipeverri@gmail.com>
 
 // Whoever pursues righteousness and kindness will find life, righteousness, and honor.
 // Proverbs 21:21 (ESV)
@@ -22,8 +22,8 @@ template <typename T, typename Mapper, typename... Indexes> class strided_ref_ar
 namespace jules::detail
 {
 
-template <typename Source, typename Dest>
-static auto array_assign(common_array_base<Source>& destination, const common_array_base<Dest>& source)
+template <typename Dest, typename Source>
+static auto array_assign(common_array_base<Dest>& destination, const common_array_base<Source>& source)
 {
   static_assert(Source::order == Dest::order, "array order mismatch");
   static_assert(std::is_assignable_v<typename Dest::value_type&, const typename Source::value_type&>, "incompatible assignment");
@@ -66,7 +66,8 @@ template <typename T, std::size_t N> static auto array_cat(const T& head, const 
   return array_cat(head, tail, std::make_index_sequence<N>());
 }
 
-static inline auto seq_size(index_t start, index_t stop, index_t step) -> index_t
+// [start, stop)
+static inline constexpr auto seq_size(index_t start, index_t stop, index_t step) -> index_t
 {
   auto size = (start < stop ? stop - start : start - stop);
   size += size % step == 0u ? 0u : 1u;

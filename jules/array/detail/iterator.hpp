@@ -56,9 +56,15 @@ public:
     return copy;
   }
 
+  constexpr auto operator+(difference_type n) const -> iterator_from_indexes { return {data_, std::next(it_, n)}; }
+
+  constexpr auto operator-(difference_type n) const -> iterator_from_indexes { return {data_, std::prev(it_, n)}; }
+
   constexpr auto operator==(const iterator_from_indexes& other) const { return it_ == other.it_; }
 
   constexpr auto operator!=(const iterator_from_indexes& other) const { return !(*this == other); }
+
+  constexpr auto operator-(const iterator_from_indexes& other) const { return std::distance(other.it_, it_); }
 
   constexpr auto operator*() -> reference { return data_[*it_]; }
 

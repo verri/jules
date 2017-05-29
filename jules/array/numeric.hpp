@@ -1,3 +1,5 @@
+// Copyright (c) 2017 Filipe Verri <filipeverri@gmail.com>
+
 #ifndef JULES_ARRAY_NUMERIC_H
 #define JULES_ARRAY_NUMERIC_H
 
@@ -39,7 +41,8 @@ template <typename T, typename Array> auto to_vector(const common_array_base<Arr
   return {source.begin(), source.end()};
 }
 
-template <typename T, typename Rng, typename = meta::requires<range::SizedRange<Rng>>> auto to_vector(const Rng& rng)
+template <typename T, typename Rng, typename = meta::requires<range::SizedRange<Rng>, std::negation<CommonArray<Rng>>>>
+auto to_vector(const Rng& rng)
 {
   return array<T, 1u>(rng);
 }

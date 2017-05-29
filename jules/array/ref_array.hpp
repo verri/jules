@@ -68,7 +68,7 @@ public:
   }
 
   /// \group Assignment
-  template <typename U> auto operator=(const U& source) -> ref_array&
+  template <typename U, typename = meta::fallback<CommonArray<U>>> auto operator=(const U& source) -> ref_array&
   {
     static_assert(std::is_assignable<value_type&, U>::value, "incompatible assignment");
     for (auto& elem : *this)
@@ -107,6 +107,34 @@ public:
 
   /// \group Indexing
   decltype(auto) operator[](absolute_strided_slice slice) const { return as_strided()[slice]; }
+
+  /// \group Indexing
+  decltype(auto) operator[](every_index)
+  {
+    // clang-format off
+    if constexpr (order == 1) return (*this); else return as_strided()[every];
+    // clang-format on
+  }
+
+  /// \group Indexing
+  decltype(auto) operator[](every_index) const
+  {
+    // clang-format off
+    if constexpr (order == 1) return (*this); else return as_strided()[every];
+    // clang-format on
+  }
+
+  /// \group Indexing
+  decltype(auto) operator[](bounded_slice slice) { return as_strided()[slice]; }
+
+  /// \group Indexing
+  decltype(auto) operator[](bounded_slice slice) const { return as_strided()[slice]; }
+
+  /// \group Indexing
+  decltype(auto) operator[](bounded_strided_slice slice) { return as_strided()[slice]; }
+
+  /// \group Indexing
+  decltype(auto) operator[](bounded_strided_slice slice) const { return as_strided()[slice]; }
 
   /// \group Indexing
   template <typename Rng, typename = meta::requires<range::SizedRange<Rng>>> decltype(auto) operator[](const Rng& rng)

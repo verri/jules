@@ -10,6 +10,7 @@
 #include <jules/array/meta/common.hpp>
 #include <jules/array/slicing.hpp>
 #include <jules/array/slicing/absolute.hpp>
+#include <jules/array/slicing/bounded.hpp>
 #include <jules/array/strided_descriptor.hpp>
 #include <jules/core/debug.hpp>
 #include <jules/core/type.hpp>
@@ -34,6 +35,15 @@ public:
   decltype(auto) operator[](absolute_slice slice) && { return at(slice); }
 
   decltype(auto) operator[](absolute_strided_slice slice) && { return at(slice); }
+
+  decltype(auto) operator[](every_index) && { return at(slice(0u, mapper_.descriptor().extents[sizeof...(Indexes)], 1u)); }
+
+  decltype(auto) operator[](bounded_slice slice) && { return at(eval(slice, mapper_->descriptor().extents[sizeof...(Indexes)])); }
+
+  decltype(auto) operator[](bounded_strided_slice slice) &&
+  {
+    return at(eval(slice, mapper_->descriptor().extents[sizeof...(Indexes)]));
+  }
 
   template <typename Rng, typename = meta::requires<range::SizedRange<Rng>>> decltype(auto) operator[](const Rng& rng) &&
   {
@@ -120,7 +130,7 @@ public:
   }
 
   /// \group Assignment
-  template <typename U> auto operator=(const U& source) -> strided_ref_array&
+  template <typename U, typename = meta::fallback<CommonArray<U>>> auto operator=(const U& source) -> strided_ref_array&
   {
     static_assert(std::is_assignable<value_type&, U>::value, "incompatible assignment");
     range::fill(*this, source);
@@ -154,6 +164,36 @@ public:
 
   /// \group Indexing
   decltype(auto) operator[](absolute_strided_slice slice) const { return detail::array_at(data(), mapper(), slice); }
+
+  /// \group Indexing
+  decltype(auto) operator[](every_index index) { return detail::array_at(data(), mapper(), index); }
+
+  /// \group Indexing
+  decltype(auto) operator[](every_index index) const { return detail::array_at(data(), mapper(), index); }
+
+  /// \group Indexing
+  decltype(auto) operator[](bounded_slice slice)
+  {
+    return detail::array_at(data(), mapper(), eval(slice, this->descriptor().extents[0u]));
+  }
+
+  /// \group Indexing
+  decltype(auto) operator[](bounded_slice slice) const
+  {
+    return detail::array_at(data(), mapper(), eval(slice, this->descriptor().extents[0u]));
+  }
+
+  /// \group Indexing
+  decltype(auto) operator[](bounded_strided_slice slice)
+  {
+    return detail::array_at(data(), mapper(), eval(slice, this->descriptor().extents[0u]));
+  }
+
+  /// \group Indexing
+  decltype(auto) operator[](bounded_strided_slice slice) const
+  {
+    return detail::array_at(data(), mapper(), eval(slice, this->descriptor().extents[0u]));
+  }
 
   /// \group Indexing
   template <typename Rng, typename = meta::requires<range::SizedRange<Rng>>> decltype(auto) operator[](const Rng& rng)
