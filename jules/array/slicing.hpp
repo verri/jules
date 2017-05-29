@@ -197,15 +197,15 @@ template <typename T, typename Mapper, typename... Args> static auto array_slice
       return strided_ref_array<T, Mapper>{data, {std::move(new_descriptor)}};
     } else {
       auto indexes = mapper.map(new_descriptor);
-      return strided_ref_array<T, Mapper>{data, {{0u, new_descriptor.extents}, std::move(indexes)}};
+      return strided_ref_array<T, Mapper>{data, {new_descriptor.extents, std::move(indexes)}};
     }
   } else {
     auto [extents, positions] = detail::indirect_slicing(mapper.descriptor(), std::forward<Args>(args)...);
     if constexpr (std::is_same_v<Mapper, identity_mapper<order>>) {
-      return strided_ref_array<T, vector_mapper<order>>{data, {{0u, extents}, {std::move(positions)}}};
+      return strided_ref_array<T, vector_mapper<order>>{data, {extents, {std::move(positions)}}};
     } else {
       auto indexes = mapper.map(std::move(positions));
-      return strided_ref_array<T, vector_mapper<order>>{data, {{0u, extents}, std::move(indexes)}};
+      return strided_ref_array<T, vector_mapper<order>>{data, {extents, std::move(indexes)}};
     }
   }
   // clang-format on
@@ -214,7 +214,7 @@ template <typename T, typename Mapper, typename... Args> static auto array_slice
 template <typename T, typename Mapper> static decltype(auto) array_at(T* data, const Mapper& mapper, index_t i)
 {
   const auto& descriptor = mapper.descriptor();
-  detail::assert_in_bound(i, descriptor.extents[0]);
+  DEBUG_ASSERT(i < descriptor.extents[0], debug::default_module, debug::level::boundary_check, "out of range");
   // clang-format off
   if constexpr (Mapper::order == 1) {
     const auto pos = mapper.map(descriptor(i));

@@ -139,13 +139,27 @@ public:
   /// \group Indexing
   template <typename Rng, typename = meta::requires<range::SizedRange<Rng>>> decltype(auto) operator[](const Rng& rng)
   {
-    return as_strided()[rng];
+    // clang-format off
+    if constexpr (order == 1 && std::is_same_v<Rng, const_vector<index_t>>) {
+      DEBUG_ASSERT(max(rng) < this->length(), debug::default_module, debug::level::boundary_check, "out of range");
+      return strided_ref_array<value_type, vector_mapper<1u>>{this->data(), {{{rng.size()}}, rng}};
+    } else {
+      return as_strided()[rng];
+    }
+    // clang-format on
   }
 
   /// \group Indexing
   template <typename Rng, typename = meta::requires<range::SizedRange<Rng>>> decltype(auto) operator[](const Rng& rng) const
   {
-    return as_strided()[rng];
+    // clang-format off
+    if constexpr (order == 1 && std::is_same_v<Rng, const_vector<index_t>>) {
+      DEBUG_ASSERT(max(rng) < this->length(), debug::default_module, debug::level::boundary_check, "out of range");
+      return strided_ref_array<const value_type, vector_mapper<1u>>{this->data(), {{{rng.size()}}, rng}};
+    } else {
+      return as_strided()[rng];
+    }
+    // clang-format on
   }
 
   auto begin() noexcept -> iterator { return data(); }
@@ -178,7 +192,7 @@ protected:
 
   template <typename U, std::size_t M> static decltype(auto) at(U* data, const descriptor<M>& desc, size_type i)
   {
-    detail::assert_in_bound(i, desc.extents[0]);
+    DEBUG_ASSERT(i < desc.extents[0], debug::default_module, debug::level::boundary_check, "out of range");
     // clang-format off
     if constexpr (M == 1) {
       return data[i];

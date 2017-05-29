@@ -42,9 +42,11 @@ public:
   static constexpr auto order = N;
   using iterator = typename const_vector<index_t>::const_iterator;
 
-  vector_mapper(const strided_descriptor<N>& descriptor, const_vector<index_t> indexes)
-    : descriptor_{descriptor}, indexes_{std::move(indexes)}
+  vector_mapper(const std::array<index_t, N>& extents, const_vector<index_t> indexes)
+    : descriptor_{0u, extents}, indexes_{std::move(indexes)}
   {
+    DEBUG_ASSERT(indexes_.size() == descriptor_.size(), debug::default_module, debug::level::invalid_argument,
+                 "invalid descriptor for mapper");
   }
 
   auto map(index_t index) const
@@ -79,14 +81,13 @@ public:
     auto dropped = descriptor_.drop_dimension();
     dropped.start = descriptor_.start + i; // strides[0] is always 1u for vector mapped.
 
-    const auto new_descriptor = strided_descriptor<N - 1>{0u, dropped.extents};
     auto new_indexes = typename const_vector<index_t>::container_type();
 
-    new_indexes.reserve(new_descriptor.size());
+    new_indexes.reserve(prod(dropped.extents));
     for (const auto index : dropped)
       new_indexes.push_back(map(index));
 
-    return {new_descriptor, {std::move(new_indexes)}};
+    return {dropped.extents, {std::move(new_indexes)}};
   }
 
 private:
