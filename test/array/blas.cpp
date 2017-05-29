@@ -1,6 +1,5 @@
-#ifdef NOT_DEFINED
 #include "jules/array/blas.hpp"
-#include "jules/array/all.hpp"
+#include "jules/array/array.hpp"
 
 #include <catch.hpp>
 
@@ -27,4 +26,3 @@ TEST_CASE("Matrix multiplication", "[blas]")
   static_assert(std::is_same<decltype(expected), decltype(prod)>::value, "");
   CHECK(all(expected == prod));
 }
-#endif

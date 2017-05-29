@@ -6,8 +6,10 @@
 
 #include <jules/array/allocator.hpp>
 #include <jules/array/functional.hpp>
+#include <jules/array/math.hpp>
 #include <jules/array/numeric.hpp>
 #include <jules/array/ref_array.hpp>
+#include <jules/base/async.hpp>
 #include <jules/base/numeric.hpp>
 
 /// TODO: XXΧ: There are no strong guarantees if an exceptions occurs. It possibly will
@@ -156,7 +158,10 @@ public:
   }
 
   /// \group constructors
-  array(array&& source) noexcept : ref_array<value_type, order>{move_ptr(source.data_), std::move(source.descriptor_)} {}
+  array(array&& source) noexcept
+    : ref_array<value_type, order>{std::exchange(source.data_, nullptr), std::move(source.descriptor_)}
+  {
+  }
 
   /// \group constructors
   /// \tparam _

@@ -1,5 +1,5 @@
 #ifdef NOT_DEFINED
-#include "jules/array/all.hpp"
+#include "jules/array/array.hpp"
 
 #include <catch.hpp>
 

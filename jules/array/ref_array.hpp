@@ -161,14 +161,15 @@ protected:
     // clang-format on
   }
 
+  ref_array() : data_{nullptr}, descriptor_{{{}}} {}
   ref_array(const ref_array& source) = default;
   ref_array(ref_array&& source) noexcept = default;
 
   /// \exclude
-  value_type* const data_;
+  value_type* data_;
 
   /// \exclude
-  const descriptor<order> descriptor_;
+  descriptor<order> descriptor_;
 };
 
 template <typename T, std::size_t N> auto eval(const ref_array<T, N>& source) -> const ref_array<T, N>& { return source; }

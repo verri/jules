@@ -1,6 +1,5 @@
-#ifdef NOT_DEFINED
 #include "jules/core/range.hpp"
-#include "jules/array/all.hpp"
+#include "jules/array/array.hpp"
 
 #include <catch.hpp>
 
@@ -23,4 +22,3 @@ TEST_CASE("Basic range::view usage", "[range]")
   REQUIRE(numbers_vector.size() == 5u);
   CHECK(all(numbers_vector == as_vector(0, 2, 4, 6, 8)));
 }
-#endif

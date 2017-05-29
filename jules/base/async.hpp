@@ -33,8 +33,6 @@ template <typename F> auto defer(F&& f) { return defer_helper<F>{std::forward<F>
 
 #define JULES_DEFER(...) auto JULES_TOKEN_PASTE(_deferred, __LINE__) = ::jules::detail::defer([&] { __VA_ARGS__; })
 
-template <typename T> auto move_ptr(T*& pointer) { return std::exchange(pointer, nullptr); }
-
 } // namespace jules
 
 #endif // JULES_BASE_ASYNC_H
