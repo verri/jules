@@ -4,8 +4,10 @@
 /// \exclude
 #define JULES_ARRAY_BINARY_EXPR_ARRAY_H
 
+#include <jules/array/detail/common.hpp>
 #include <jules/array/expr_array.hpp>
 #include <jules/array/meta/common.hpp>
+#include <jules/array/meta/expression.hpp>
 
 #include <iterator>
 
@@ -110,9 +112,12 @@ private:
   RhsIt rhs_first_, rhs_last_;
 };
 
-template <typename Lhs, typename Rhs, typename Op, std::size_t N>
-auto eval(const binary_expr_array<Lhs, Rhs, Op, N>& source)
-  -> base_array<typename binary_expr_array<Lhs, Rhs, Op, N>::value_type, N>
+template <typename LhsIt, typename RhsIt, typename Op, std::size_t N>
+binary_expr_array(LhsIt, LhsIt, RhsIt, RhsIt, Op, const std::array<index_t, N>&)->binary_expr_array<LhsIt, RhsIt, Op, N>;
+
+template <typename LhsIt, typename RhsIt, typename Op, std::size_t N>
+auto eval(const binary_expr_array<LhsIt, RhsIt, Op, N>& source)
+  -> array<typename binary_expr_array<LhsIt, RhsIt, Op, N>::value_type, N>
 {
   return {source};
 }

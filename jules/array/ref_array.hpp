@@ -45,10 +45,10 @@ public:
   using value_type = T;
 
   /// \group member_types Class Types and Constants
-  using iterator = T*;
+  using iterator = value_type*;
 
   /// \group member_types Class Types and Constants
-  using const_iterator = const T*;
+  using const_iterator = const value_type*;
 
   /// \group member_types Class Types and Constants
   using size_type = index_t;

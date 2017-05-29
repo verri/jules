@@ -4,8 +4,10 @@
 /// \exclude
 #define JULES_ARRAY_UNARY_EXPR_ARRAY_H
 
+#include <jules/array/detail/common.hpp>
 #include <jules/array/expr_array.hpp>
 #include <jules/array/meta/common.hpp>
+#include <jules/array/meta/expression.hpp>
 
 #include <iterator>
 
@@ -76,7 +78,7 @@ public:
 
 public:
   unary_expr_array(It it_first, It it_last, Op op, const std::array<index_t, order>& extents)
-    : expr_array<Op, N>(std::move(op), extents), it_first_{it_first}, it_last_{it_last}
+    : expr_array<Op, order>(std::move(op), extents), it_first_{it_first}, it_last_{it_last}
   {
   }
 
@@ -92,18 +94,21 @@ public:
   auto cbegin() const -> iterator { return {it_first_, this}; }
   auto cend() const -> iterator { return {it_last_, this}; }
 
-  using expr_array<Op, N>::size;
-  using expr_array<Op, N>::dimensions;
-  using expr_array<Op, N>::length;
-  using expr_array<Op, N>::row_count;
-  using expr_array<Op, N>::column_count;
+  using expr_array<Op, order>::size;
+  using expr_array<Op, order>::dimensions;
+  using expr_array<Op, order>::length;
+  using expr_array<Op, order>::row_count;
+  using expr_array<Op, order>::column_count;
 
 private:
   It it_first_, it_last_;
 };
 
 template <typename It, typename Op, std::size_t N>
-auto eval(const unary_expr_array<It, Op, N>& source) -> base_array<typename unary_expr_array<It, Op, N>::value_type, N>
+unary_expr_array(It, It, Op, const std::array<index_t, N>&)->unary_expr_array<It, Op, N>;
+
+template <typename It, typename Op, std::size_t N>
+auto eval(const unary_expr_array<It, Op, N>& source) -> array<typename unary_expr_array<It, Op, N>::value_type, N>
 {
   return {source};
 }

@@ -1,7 +1,7 @@
 #ifndef JULES_ARRAY_NUMERIC_H
 #define JULES_ARRAY_NUMERIC_H
 
-#include <jules/array/array.hpp>
+#include <jules/array/meta/common.hpp>
 #include <jules/base/const_vector.hpp>
 #include <jules/core/debug.hpp>
 #include <jules/core/meta.hpp>
@@ -13,6 +13,8 @@
 
 namespace jules
 {
+
+template <typename, std::size_t> class array;
 
 static inline auto seq(const index_t start, const index_t stop, const distance_t step = 1) -> const_vector<index_t>
 {
@@ -31,37 +33,34 @@ static inline auto seq(const index_t start, const index_t stop, const distance_t
   return {std::move(indexes)};
 }
 
-template <typename T, typename A> auto to_vector(A&& array) -> meta::requires_t<vector<T>, Array<std::decay_t<A>>>
+template <typename T, typename Array> auto to_vector(const common_array_base<Array>& source) -> array<T, 1u>
 {
   // TODO: Optimize if A is a temporary.
-  return {array.begin(), array.end()};
+  return {source.begin(), source.end()};
 }
 
-template <typename T, typename Rng, typename = meta::requires<range::Range<std::decay_t<Rng>>>>
-auto to_vector(Rng&& rng) -> meta::fallback_t<vector<T>, Array<std::decay_t<Rng>>>
+template <typename T, typename Rng, typename = meta::requires<range::SizedRange<Rng>>> auto to_vector(const Rng& rng)
 {
-  return {std::forward<Rng>(rng)};
+  return array<T, 1u>(rng);
 }
 
 // If higher order, copy elements column-wise.
-template <typename A> auto as_vector(A&& array) -> meta::requires_t<vector<typename A::value_type>, Array<std::decay_t<A>>>
+template <typename Array> auto as_vector(const common_array_base<Array>& source) -> array<typename Array::value_type, 1u>
 {
   // TODO: Optimize if A is a temporary.
-  return {array.begin(), array.end()};
+  return {source.begin(), source.end()};
 }
 
-template <typename Rng, typename R = range::range_value_t<std::decay_t<Rng>>,
-          typename = meta::requires<range::Range<std::decay_t<Rng>>>>
-auto as_vector(Rng&& rng) -> meta::fallback_t<vector<R>, Array<std::decay_t<Rng>>>
+template <typename Rng, typename R = range::range_value_t<Rng>> auto as_vector(const Rng& rng) -> array<R, 1u>
 {
-  return to_vector<R>(std::forward<Rng>(rng));
+  return to_vector<R>(rng);
 }
 
 template <typename... Args, typename = std::enable_if_t<(sizeof...(Args) > 1)>> auto as_vector(Args&&... args)
 {
   using R = std::common_type_t<Args...>;
   auto values = std::array<R, sizeof...(Args)>{{std::forward<Args>(args)...}};
-  return vector<R>(std::make_move_iterator(std::begin(values)), std::make_move_iterator(std::end(values)));
+  return array<R, 1u>(std::make_move_iterator(std::begin(values)), std::make_move_iterator(std::end(values)));
 }
 
 } // namespace jules
