@@ -1,5 +1,4 @@
-// Copyright (c) 2016 Filipe Verri <filipeverri@gmail.com>
-// TODO: XXX: Possible candidate to be a standalone module.
+// Copyright (c) 2017 Filipe Verri <filipeverri@gmail.com>
 
 #ifndef JULES_CORE_RANGE_H
 #define JULES_CORE_RANGE_H

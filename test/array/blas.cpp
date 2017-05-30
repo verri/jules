@@ -1,4 +1,3 @@
-#include "jules/array/blas.hpp"
 #include "jules/array/array.hpp"
 
 #include <catch.hpp>

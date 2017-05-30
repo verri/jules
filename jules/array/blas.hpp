@@ -1,9 +1,10 @@
-// Copyright (c) 2016 Filipe Verri <filipeverri@gmail.com>
+// Copyright (c) 2017 Filipe Verri <filipeverri@gmail.com>
 
+#if __has_include(<cblas.h>)
 #ifndef JULES_ARRAY_BLAS_H
 #define JULES_ARRAY_BLAS_H
 
-#include <jules/array/array.hpp>
+#include <jules/array/detail/common.hpp>
 #include <jules/core/debug.hpp>
 
 namespace jules
@@ -35,12 +36,12 @@ template <typename T> static inline auto safe_int_cast(T value)
   return static_cast<int>(value);
 }
 
-template <typename T> auto product(const matrix<T>& lhs, const matrix<T>& rhs) -> matrix<T>
+template <typename T> auto product(const array<T, 2u>& lhs, const array<T, 2u>& rhs) -> array<T, 2u>
 {
   DEBUG_ASSERT(lhs.size() > 0 && rhs.size() > 0, debug::default_module, debug::level::invalid_argument, "empty matrix");
   DEBUG_ASSERT(lhs.column_count() == rhs.row_count(), debug::default_module, debug::level::invalid_argument, "invalid extents");
 
-  auto result = matrix<T>(lhs.row_count(), rhs.column_count());
+  auto result = array<T, 2u>(lhs.row_count(), rhs.column_count());
 
   const auto k = safe_int_cast(lhs.column_count()); // same as rhs.row_count()
   const auto result_row_count = safe_int_cast(result.row_count());
@@ -61,3 +62,4 @@ template <typename T> auto product(const matrix<T>& lhs, const matrix<T>& rhs) -
 } // namespace jules
 
 #endif // JULES_ARRAY_BLAS_H
+#endif // __has_include(<cblas.h>)

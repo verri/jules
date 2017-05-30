@@ -5,6 +5,7 @@
 #define JULES_ARRAY_ARRAY_H
 
 #include <jules/array/allocator.hpp>
+#include <jules/array/blas.hpp>
 #include <jules/array/functional.hpp>
 #include <jules/array/math.hpp>
 #include <jules/array/numeric.hpp>
