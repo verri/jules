@@ -38,11 +38,11 @@ public:
 
   decltype(auto) operator[](every_index) && { return at(slice(0u, mapper_.descriptor().extents[sizeof...(Indexes)], 1u)); }
 
-  decltype(auto) operator[](bounded_slice slice) && { return at(eval(slice, mapper_->descriptor().extents[sizeof...(Indexes)])); }
+  decltype(auto) operator[](bounded_slice slice) && { return at(eval(slice, mapper_.descriptor().extents[sizeof...(Indexes)])); }
 
   decltype(auto) operator[](bounded_strided_slice slice) &&
   {
-    return at(eval(slice, mapper_->descriptor().extents[sizeof...(Indexes)]));
+    return at(eval(slice, mapper_.descriptor().extents[sizeof...(Indexes)]));
   }
 
   template <typename Rng, typename = meta::requires<range::SizedRange<Rng>>> decltype(auto) operator[](const Rng& rng) &&
@@ -51,19 +51,20 @@ public:
   }
 
 private:
-  template <typename Index> decltype(auto) at(Index&& index) &&
+  template <typename Index> decltype(auto) at(Index&& index)
   {
-    return at(std::forward<Index>(index), std::make_index_sequence<sizeof...(Indexes)>());
+    return at_impl(std::forward<Index>(index), std::make_index_sequence<sizeof...(Indexes)>());
   }
 
-  template <typename Index, std::size_t... I> decltype(auto) at(Index&& index) &&
+  template <typename Index, std::size_t... I> decltype(auto) at_impl(Index&& index, std::index_sequence<I...>)
   {
     // clang-format off
     if constexpr (sizeof...(Indexes) == order - 1) {
       return detail::array_slice(
         data_, std::move(mapper_), std::get<I>(indexes_)..., std::forward<Index>(index));
     } else {
-      return strided_ref_array_proxy<T, Mapper, Indexes..., Index>{
+      using IndexType = std::conditional_t<std::is_rvalue_reference_v<Index>, std::decay_t<Index>, Index>;
+      return strided_ref_array_proxy<T, Mapper, Indexes..., IndexType>{
         data_, std::move(mapper_), std::get<I>(indexes_)..., std::forward<Index>(index)};
     }
     // clang-format on
@@ -154,16 +155,16 @@ public:
   decltype(auto) operator[](size_type i) const { return detail::array_at(data(), mapper(), i); }
 
   /// \group Indexing
-  decltype(auto) operator[](absolute_slice slice) { return detail::array_at(data(), mapper(), slice); }
+  decltype(auto) operator[](absolute_slice slice) { return detail::array_at(data(), mapper(), std::move(slice)); }
 
   /// \group Indexing
-  decltype(auto) operator[](absolute_slice slice) const { return detail::array_at(data(), mapper(), slice); }
+  decltype(auto) operator[](absolute_slice slice) const { return detail::array_at(data(), mapper(), std::move(slice)); }
 
   /// \group Indexing
-  decltype(auto) operator[](absolute_strided_slice slice) { return detail::array_at(data(), mapper(), slice); }
+  decltype(auto) operator[](absolute_strided_slice slice) { return detail::array_at(data(), mapper(), std::move(slice)); }
 
   /// \group Indexing
-  decltype(auto) operator[](absolute_strided_slice slice) const { return detail::array_at(data(), mapper(), slice); }
+  decltype(auto) operator[](absolute_strided_slice slice) const { return detail::array_at(data(), mapper(), std::move(slice)); }
 
   /// \group Indexing
   decltype(auto) operator[](every_index index) { return detail::array_at(data(), mapper(), index); }

@@ -245,7 +245,8 @@ static decltype(auto) array_at(T* data, const Mapper& mapper, Index&& index)
   if constexpr (Mapper::order == 1) {
     return detail::array_slice(data, mapper, std::forward<Index>(index));
   } else {
-    return strided_ref_array_proxy<T, Mapper, Index>{data, mapper, std::forward<Index>(index)};
+    using IndexType = std::conditional_t<std::is_rvalue_reference_v<Index>, std::decay_t<Index>, Index>;
+    return strided_ref_array_proxy<T, Mapper, IndexType>{data, mapper, std::forward<Index>(index)};
   }
   // clang-format on
 }
