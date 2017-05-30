@@ -13,6 +13,57 @@
 namespace jules
 {
 
+template <typename T, std::size_t N, std::size_t M> class ref_array_every_proxy
+{
+  static_assert(M >= 1u && M < N);
+
+public:
+  ref_array_every_proxy(T* data, const descriptor<N>& descriptor) : data_{data}, descriptor_{descriptor} {}
+
+  decltype(auto) operator[](index_t i) && { return at(i); }
+
+  decltype(auto) operator[](absolute_slice slice) && { return at(slice); }
+
+  decltype(auto) operator[](absolute_strided_slice slice) && { return at(slice); }
+
+  decltype(auto) operator[](every_index) &&
+  {
+    // clang-format off
+    if constexpr (M == N - 1) {
+      return ref_array<T, N>{data_, descriptor_};
+    } else {
+      return ref_array_every_proxy<T, N, M + 1>{data_, descriptor_};
+    }
+    // clang-format on
+  }
+
+  decltype(auto) operator[](bounded_slice slice) && { return at(slice); }
+
+  decltype(auto) operator[](bounded_strided_slice slice) && { return at(slice); }
+
+  template <typename Rng, typename = meta::requires<range::SizedRange<Rng>>> decltype(auto) operator[](const Rng& rng) &&
+  {
+    return at(rng);
+  }
+
+private:
+  template <typename Index> decltype(auto) at(Index&& index)
+  {
+    return at(std::forward<Index>(index), std::make_index_sequence<M>());
+  }
+
+  template <std::size_t> using slice_type = absolute_strided_slice;
+
+  template <typename Index, std::size_t... I> decltype(auto) at(Index&& index, std::index_sequence<I...>)
+  {
+    using proxy_type = strided_ref_array_proxy<T, identity_mapper<N>, slice_type<I>...>;
+    return proxy_type{data_, {{0u, descriptor_.extents}}, slice(0u, descriptor_.extents[I], 1u)...}[std::forward<Index>(index)];
+  }
+
+  T* data_;
+  descriptor<N> descriptor_;
+};
+
 /// Array with non-owned, continuous data.
 ///
 /// This class represents a ref view of an concrete array.
@@ -112,7 +163,10 @@ public:
   decltype(auto) operator[](every_index)
   {
     // clang-format off
-    if constexpr (order == 1) return (*this); else return as_strided()[every];
+    if constexpr (order == 1)
+      return (*this);
+    else
+      return ref_array_every_proxy<value_type, N, 1u>{this->data(), descriptor_};
     // clang-format on
   }
 
@@ -120,7 +174,10 @@ public:
   decltype(auto) operator[](every_index) const
   {
     // clang-format off
-    if constexpr (order == 1) return (*this); else return as_strided()[every];
+    if constexpr (order == 1)
+      return (*this);
+    else
+      return ref_array_every_proxy<const value_type, N, 1u>{this->data(), descriptor_};
     // clang-format on
   }
 

@@ -16,6 +16,7 @@ namespace jules
 template <typename T, std::size_t> class array;
 template <typename T, typename Mapper> class strided_ref_array;
 template <typename T, typename Mapper, typename... Indexes> class strided_ref_array_proxy;
+template <typename T, std::size_t N> class ref_array;
 }
 
 /// \exclude
