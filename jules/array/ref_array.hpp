@@ -37,9 +37,9 @@ public:
     // clang-format on
   }
 
-  decltype(auto) operator[](bounded_slice slice) && { return at(slice); }
+  decltype(auto) operator[](bounded_slice slice) && { return at(eval(slice, descriptor_.extents[M])); }
 
-  decltype(auto) operator[](bounded_strided_slice slice) && { return at(slice); }
+  decltype(auto) operator[](bounded_strided_slice slice) && { return at(eval(slice, descriptor_.extents[M])); }
 
   template <typename Rng, typename = meta::requires<range::SizedRange<Rng>>> decltype(auto) operator[](const Rng& rng) &&
   {
@@ -53,6 +53,26 @@ private:
   }
 
   template <std::size_t> using slice_type = absolute_strided_slice;
+
+  template <std::size_t... I> decltype(auto) at(absolute_slice slice, std::index_sequence<I...>)
+  {
+    // clang-format off
+    if constexpr (M == N - 1)
+    {
+      const auto last_dim = descriptor_.extents[N - 1];
+      DEBUG_ASSERT(slice.start + slice.extent - 1u < last_dim, debug::default_module, debug::level::boundary_check, "out of range");
+
+      const auto stride = prod(descriptor_.extents) / last_dim;
+      descriptor_.extents[N - 1] = slice.extent;
+
+      return ref_array<T, N>{data_ + slice.start * stride, descriptor_};
+    }
+    else
+    {
+      return at<absolute_slice&&>(std::move(slice), std::make_index_sequence<M>());
+    }
+    // clang-format on
+  }
 
   template <typename Index, std::size_t... I> decltype(auto) at(Index&& index, std::index_sequence<I...>)
   {
@@ -142,81 +162,66 @@ public:
   operator strided_ref_array<const value_type, identity_mapper<order>>() const { return {data(), {{0u, dimensions()}}}; }
 
   /// \group Indexing
-  decltype(auto) operator[](size_type i) { return at(data(), descriptor_, i); }
+  decltype(auto) operator[](size_type i) { return detail::array_at(data(), descriptor_, i); }
 
   /// \group Indexing
-  decltype(auto) operator[](size_type i) const { return at(data(), descriptor_, i); }
+  decltype(auto) operator[](size_type i) const { return detail::array_at(data(), descriptor_, i); }
 
   /// \group Indexing
-  decltype(auto) operator[](absolute_slice slice) { return as_strided()[slice]; }
+  decltype(auto) operator[](absolute_slice slice) { return detail::array_at(data(), descriptor_, std::move(slice)); }
 
   /// \group Indexing
-  decltype(auto) operator[](absolute_slice slice) const { return as_strided()[slice]; }
+  decltype(auto) operator[](absolute_slice slice) const { return detail::array_at(data(), descriptor_, std::move(slice)); }
 
   /// \group Indexing
-  decltype(auto) operator[](absolute_strided_slice slice) { return as_strided()[slice]; }
+  decltype(auto) operator[](absolute_strided_slice slice) { return detail::array_at(data(), descriptor_, std::move(slice)); }
 
   /// \group Indexing
-  decltype(auto) operator[](absolute_strided_slice slice) const { return as_strided()[slice]; }
-
-  /// \group Indexing
-  decltype(auto) operator[](every_index)
+  decltype(auto) operator[](absolute_strided_slice slice) const
   {
-    // clang-format off
-    if constexpr (order == 1)
-      return (*this);
-    else
-      return ref_array_every_proxy<value_type, N, 1u>{this->data(), descriptor_};
-    // clang-format on
+    return detail::array_at(data(), descriptor_, std::move(slice));
   }
 
   /// \group Indexing
-  decltype(auto) operator[](every_index) const
+  decltype(auto) operator[](every_index index) { return detail::array_at(data(), descriptor_, index); }
+
+  /// \group Indexing
+  decltype(auto) operator[](every_index index) const { return detail::array_at(data(), descriptor_, index); }
+
+  /// \group Indexing
+  decltype(auto) operator[](bounded_slice slice)
   {
-    // clang-format off
-    if constexpr (order == 1)
-      return (*this);
-    else
-      return ref_array_every_proxy<const value_type, N, 1u>{this->data(), descriptor_};
-    // clang-format on
+    return detail::array_at(data(), descriptor_, eval(slice, descriptor_.extents[0u]));
   }
 
   /// \group Indexing
-  decltype(auto) operator[](bounded_slice slice) { return as_strided()[slice]; }
+  decltype(auto) operator[](bounded_slice slice) const
+  {
+    return detail::array_at(data(), descriptor_, eval(slice, descriptor_.extents[0u]));
+  }
 
   /// \group Indexing
-  decltype(auto) operator[](bounded_slice slice) const { return as_strided()[slice]; }
+  decltype(auto) operator[](bounded_strided_slice slice)
+  {
+    return detail::array_at(data(), descriptor_, eval(slice, descriptor_.extents[0u]));
+  }
 
   /// \group Indexing
-  decltype(auto) operator[](bounded_strided_slice slice) { return as_strided()[slice]; }
-
-  /// \group Indexing
-  decltype(auto) operator[](bounded_strided_slice slice) const { return as_strided()[slice]; }
+  decltype(auto) operator[](bounded_strided_slice slice) const
+  {
+    return detail::array_at(data(), descriptor_, eval(slice, descriptor_.extents[0u]));
+  }
 
   /// \group Indexing
   template <typename Rng, typename = meta::requires<range::SizedRange<Rng>>> decltype(auto) operator[](const Rng& rng)
   {
-    // clang-format off
-    if constexpr (order == 1 && std::is_same_v<Rng, const_vector<index_t>>) {
-      DEBUG_ASSERT(max(rng) < this->length(), debug::default_module, debug::level::boundary_check, "out of range");
-      return strided_ref_array<value_type, vector_mapper<1u>>{this->data(), {{{rng.size()}}, rng}};
-    } else {
-      return as_strided()[rng];
-    }
-    // clang-format on
+    return detail::array_at(data(), descriptor_, rng);
   }
 
   /// \group Indexing
   template <typename Rng, typename = meta::requires<range::SizedRange<Rng>>> decltype(auto) operator[](const Rng& rng) const
   {
-    // clang-format off
-    if constexpr (order == 1 && std::is_same_v<Rng, const_vector<index_t>>) {
-      DEBUG_ASSERT(max(rng) < this->length(), debug::default_module, debug::level::boundary_check, "out of range");
-      return strided_ref_array<const value_type, vector_mapper<1u>>{this->data(), {{{rng.size()}}, rng}};
-    } else {
-      return as_strided()[rng];
-    }
-    // clang-format on
+    return detail::array_at(data(), descriptor_, rng);
   }
 
   auto begin() noexcept -> iterator { return data(); }
@@ -242,23 +247,6 @@ protected:
   auto data() -> value_type* { return data_; }
 
   auto data() const -> const value_type* { return data_; }
-
-  auto as_strided() -> strided_ref_array<value_type, identity_mapper<order>> { return *this; }
-
-  auto as_strided() const -> strided_ref_array<const value_type, identity_mapper<order>> { return *this; }
-
-  template <typename U, std::size_t M> static decltype(auto) at(U* data, const descriptor<M>& desc, size_type i)
-  {
-    DEBUG_ASSERT(i < desc.extents[0], debug::default_module, debug::level::boundary_check, "out of range");
-    // clang-format off
-    if constexpr (M == 1) {
-      return data[i];
-    } else {
-      const auto new_desc = strided_descriptor<M>{i, desc.extents};
-      return strided_ref_array<U, identity_mapper<M - 1>>{data, {new_desc.drop_dimension()}};
-    }
-    // clang-format on
-  }
 
   ref_array() : data_{nullptr}, descriptor_{{{}}} {}
   ref_array(const ref_array& source) = default;

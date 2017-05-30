@@ -3,6 +3,7 @@
 #ifndef JULES_ARRAY_SLICING_H
 #define JULES_ARRAY_SLICING_H
 
+#include <jules/array/descriptor.hpp>
 #include <jules/array/detail/common.hpp>
 #include <jules/array/mapper.hpp>
 #include <jules/array/slicing/absolute.hpp>
@@ -249,6 +250,60 @@ static decltype(auto) array_at(T* data, const Mapper& mapper, Index&& index)
     return strided_ref_array_proxy<T, Mapper, IndexType>{data, mapper, std::forward<Index>(index)};
   }
   // clang-format on
+}
+
+template <typename U, std::size_t M> static decltype(auto) array_at(U* data, const descriptor<M>& desc, index_t i)
+{
+  DEBUG_ASSERT(i < desc.extents[0], debug::default_module, debug::level::boundary_check, "out of range");
+  // clang-format off
+  if constexpr (M == 1) {
+    return data[i];
+  } else {
+    const auto new_desc = strided_descriptor<M>{i, desc.extents};
+    return strided_ref_array<U, identity_mapper<M - 1>>{data, {new_desc.drop_dimension()}};
+  }
+  // clang-format on
+}
+
+template <typename U, std::size_t M> static decltype(auto) array_at(U* data, const descriptor<M>& desc, every_index)
+{
+  // clang-format off
+  if constexpr (M == 1)
+    return ref_array<U, M>{data, desc};
+  else
+    return ref_array_every_proxy<U, M, 1u>{data, desc};
+  // clang-format on
+}
+
+template <typename U, std::size_t M, typename Rng, typename = meta::requires<range::SizedRange<Rng>>>
+static decltype(auto) array_at(U* data, const descriptor<M>& desc, const Rng& rng)
+{
+  // clang-format off
+  if constexpr (M == 1 && std::is_same_v<Rng, const_vector<index_t>>) {
+    DEBUG_ASSERT(max(rng) < desc.length(), debug::default_module, debug::level::boundary_check, "out of range");
+    return strided_ref_array<U, vector_mapper<1u>>{data, {{{rng.size()}}, rng}};
+  } else {
+    return array_at(data, identity_mapper<M>{{0u, desc.extents}}, rng);
+  }
+  // clang-format on
+}
+
+template <typename U, std::size_t M> static decltype(auto) array_at(U* data, const descriptor<M>& desc, absolute_slice slice)
+{
+  // clang-format off
+  if constexpr (M == 1) {
+    DEBUG_ASSERT(slice.start + slice.extent - 1u < desc.extents[0], debug::default_module, debug::level::boundary_check, "out of range");
+    return ref_array<U, 1u>{data + slice.start, {{slice.extent}}};
+  } else {
+    return array_at(data, identity_mapper<M>{{0u, desc.extents}}, std::move(slice));
+  }
+  // clang-format on
+}
+
+template <typename U, std::size_t M, typename Index>
+static decltype(auto) array_at(U* data, const descriptor<M>& desc, Index&& index)
+{
+  return array_at(data, identity_mapper<M>{{0u, desc.extents}}, std::forward<Index>(index));
 }
 
 } // namespace jules::detail
