@@ -62,30 +62,35 @@ template <typename T, typename C> auto to_vector(base_column<C>&& column) -> arr
   return {std::make_move_iterator(data), std::make_move_iterator(data + size)};
 }
 
-// TODO: strong guarantees
-// template <typename T, typename C> auto to_matrix(const base_dataframe<C>& df) -> array<T, 2u>
-// {
-//   auto temp = std::vector<base_column<C>>();
-//   auto data_vector = std::vector<contiguous_array<const T, 1>>();
-//
-//   for (auto i = 0u; i < df.column_count(); ++i) {
-//     const auto& column = df.at(i).column;
-//     if (column.elements_type() == typeid(T)) {
-//       data_vector.push_back(to_view<T>(column));
-//     } else {
-//       temp.push_back(to_column<T>(column));
-//       data_vector.push_back(to_view<T>(temp.back()));
-//     }
-//   }
-//
-//   auto result = base_array<T, 2>(uninitialized, df.row_count(), df.column_count());
-//   auto it = result.begin();
-//   for (const auto& data : data_vector)
-//     for (const T& value : data)
-//       ::new (static_cast<void*>(it++)) T(value);
-//
-//   return result;
-// }
+template <typename T, typename C> auto to_matrix(const base_dataframe<C>& df) -> array<T, 2u>
+{
+  const auto nrow = df.row_count();
+  const auto ncol = df.column_count();
+
+  auto temp = std::vector<base_column<C>>();
+  auto data_vector = std::vector<const T*>();
+
+  data_vector.reserve(ncol);
+
+  for (const auto & [ name, column ] : df) {
+    (void)name;
+    if (column.elements_type() == typeid(T)) {
+      data_vector.push_back(column.template data<T>());
+    } else {
+      temp.push_back(to_column<T>(column));
+      data_vector.push_back(temp.back().template data<T>());
+    }
+  }
+
+  auto values = std::vector<T>();
+  values.reserve(nrow * ncol);
+
+  for (const auto data : data_vector)
+    for (const auto i : indices(nrow))
+      values.push_back(data[i]);
+
+  return array<T, 2>(std::make_move_iterator(values.begin()), df.row_count(), df.column_count());
+}
 
 } // namespace jules
 
