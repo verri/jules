@@ -19,63 +19,6 @@
 namespace jules
 {
 
-/// \exclude
-template <typename T, typename Mapper, typename... Indexes> class strided_ref_array_proxy
-{
-  static constexpr auto order = Mapper::order;
-  static_assert(sizeof...(Indexes) < order);
-
-public:
-  strided_ref_array_proxy(T* data, Mapper mapper, Indexes... indexes)
-    : data_{data}, mapper_{std::move(mapper)}, indexes_(std::forward<Indexes>(indexes)...)
-  {
-  }
-
-  decltype(auto) operator[](index_t i) && { return at(i); }
-
-  decltype(auto) operator[](absolute_slice slice) && { return at(slice); }
-
-  decltype(auto) operator[](absolute_strided_slice slice) && { return at(slice); }
-
-  decltype(auto) operator[](every_index) && { return at(slice(0u, mapper_.descriptor().extents[sizeof...(Indexes)], 1u)); }
-
-  decltype(auto) operator[](bounded_slice slice) && { return at(eval(slice, mapper_.descriptor().extents[sizeof...(Indexes)])); }
-
-  decltype(auto) operator[](bounded_strided_slice slice) &&
-  {
-    return at(eval(slice, mapper_.descriptor().extents[sizeof...(Indexes)]));
-  }
-
-  template <typename Rng, typename = meta::requires<range::SizedRange<Rng>>> decltype(auto) operator[](const Rng& rng) &&
-  {
-    return at(rng);
-  }
-
-private:
-  template <typename Index> decltype(auto) at(Index&& index)
-  {
-    return at_impl(std::forward<Index>(index), std::make_index_sequence<sizeof...(Indexes)>());
-  }
-
-  template <typename Index, std::size_t... I> decltype(auto) at_impl(Index&& index, std::index_sequence<I...>)
-  {
-    // clang-format off
-    if constexpr (sizeof...(Indexes) == order - 1) {
-      return detail::array_slice(
-        data_, std::move(mapper_), std::get<I>(indexes_)..., std::forward<Index>(index));
-    } else {
-      using IndexType = std::conditional_t<std::is_rvalue_reference_v<Index>, std::decay_t<Index>, Index>;
-      return strided_ref_array_proxy<T, Mapper, Indexes..., IndexType>{
-        data_, std::move(mapper_), std::get<I>(indexes_)..., std::forward<Index>(index)};
-    }
-    // clang-format on
-  }
-
-  T* data_;
-  Mapper mapper_;
-  std::tuple<Indexes...> indexes_;
-};
-
 /// Array with non-owned, non-continuous data.
 ///
 /// This class represents a strided_ref view of an concrete array.

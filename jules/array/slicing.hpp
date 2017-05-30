@@ -308,6 +308,141 @@ static decltype(auto) array_at(U* data, const descriptor<M>& desc, Index&& index
 
 } // namespace jules::detail
 
+// Proxy types
+namespace jules
+{
+
+/// \exclude
+template <typename T, typename Mapper, typename... Indexes> class strided_ref_array_proxy
+{
+  static constexpr auto order = Mapper::order;
+  static_assert(sizeof...(Indexes) < order);
+
+public:
+  strided_ref_array_proxy(T* data, Mapper mapper, Indexes... indexes)
+    : data_{data}, mapper_{std::move(mapper)}, indexes_(std::forward<Indexes>(indexes)...)
+  {
+  }
+
+  decltype(auto) operator[](index_t i) && { return at(i); }
+
+  decltype(auto) operator[](absolute_slice slice) && { return at(slice); }
+
+  decltype(auto) operator[](absolute_strided_slice slice) && { return at(slice); }
+
+  decltype(auto) operator[](every_index) && { return at(slice(0u, mapper_.descriptor().extents[sizeof...(Indexes)], 1u)); }
+
+  decltype(auto) operator[](bounded_slice slice) && { return at(eval(slice, mapper_.descriptor().extents[sizeof...(Indexes)])); }
+
+  decltype(auto) operator[](bounded_strided_slice slice) &&
+  {
+    return at(eval(slice, mapper_.descriptor().extents[sizeof...(Indexes)]));
+  }
+
+  template <typename Rng, typename = meta::requires<range::SizedRange<Rng>>> decltype(auto) operator[](const Rng& rng) &&
+  {
+    return at(rng);
+  }
+
+private:
+  template <typename Index> decltype(auto) at(Index&& index)
+  {
+    return at_impl(std::forward<Index>(index), std::make_index_sequence<sizeof...(Indexes)>());
+  }
+
+  template <typename Index, std::size_t... I> decltype(auto) at_impl(Index&& index, std::index_sequence<I...>)
+  {
+    // clang-format off
+    if constexpr (sizeof...(Indexes) == order - 1) {
+      return detail::array_slice(
+        data_, std::move(mapper_), std::get<I>(indexes_)..., std::forward<Index>(index));
+    } else {
+      using IndexType = std::conditional_t<std::is_rvalue_reference_v<Index>, std::decay_t<Index>, Index>;
+      return strided_ref_array_proxy<T, Mapper, Indexes..., IndexType>{
+        data_, std::move(mapper_), std::get<I>(indexes_)..., std::forward<Index>(index)};
+    }
+    // clang-format on
+  }
+
+  T* data_;
+  Mapper mapper_;
+  std::tuple<Indexes...> indexes_;
+};
+
+/// \exclude
+template <typename T, std::size_t N, std::size_t M> class ref_array_every_proxy
+{
+  static_assert(M >= 1u && M < N);
+
+public:
+  ref_array_every_proxy(T* data, const descriptor<N>& descriptor) : data_{data}, descriptor_{descriptor} {}
+
+  decltype(auto) operator[](index_t i) && { return at(i); }
+
+  decltype(auto) operator[](absolute_slice slice) && { return at(slice); }
+
+  decltype(auto) operator[](absolute_strided_slice slice) && { return at(slice); }
+
+  decltype(auto) operator[](every_index) &&
+  {
+    // clang-format off
+    if constexpr (M == N - 1) {
+      return ref_array<T, N>{data_, descriptor_};
+    } else {
+      return ref_array_every_proxy<T, N, M + 1>{data_, descriptor_};
+    }
+    // clang-format on
+  }
+
+  decltype(auto) operator[](bounded_slice slice) && { return at(eval(slice, descriptor_.extents[M])); }
+
+  decltype(auto) operator[](bounded_strided_slice slice) && { return at(eval(slice, descriptor_.extents[M])); }
+
+  template <typename Rng, typename = meta::requires<range::SizedRange<Rng>>> decltype(auto) operator[](const Rng& rng) &&
+  {
+    return at(rng);
+  }
+
+private:
+  template <typename Index> decltype(auto) at(Index&& index)
+  {
+    return at(std::forward<Index>(index), std::make_index_sequence<M>());
+  }
+
+  template <std::size_t> using slice_type = absolute_strided_slice;
+
+  template <std::size_t... I> decltype(auto) at(absolute_slice slice, std::index_sequence<I...>)
+  {
+    // clang-format off
+    if constexpr (M == N - 1)
+    {
+      const auto last_dim = descriptor_.extents[N - 1];
+      DEBUG_ASSERT(slice.start + slice.extent - 1u < last_dim, debug::default_module, debug::level::boundary_check, "out of range");
+
+      const auto stride = prod(descriptor_.extents) / last_dim;
+      descriptor_.extents[N - 1] = slice.extent;
+
+      return ref_array<T, N>{data_ + slice.start * stride, descriptor_};
+    }
+    else
+    {
+      return at<absolute_slice&&>(std::move(slice), std::make_index_sequence<M>());
+    }
+    // clang-format on
+  }
+
+  template <typename Index, std::size_t... I> decltype(auto) at(Index&& index, std::index_sequence<I...>)
+  {
+    using proxy_type = strided_ref_array_proxy<T, identity_mapper<N>, slice_type<I>...>;
+    return proxy_type{data_, {{0u, descriptor_.extents}}, slice(0u, descriptor_.extents[I], 1u)...}[std::forward<Index>(index)];
+  }
+
+  T* data_;
+  descriptor<N> descriptor_;
+};
+
+} // namespace jules
+
 #undef CHECK_BOUNDS
 #undef CHECK_STRIDE
 #undef CHECK_EXTENT
