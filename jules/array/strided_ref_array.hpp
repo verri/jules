@@ -8,6 +8,7 @@
 #include <jules/array/detail/iterator.hpp>
 #include <jules/array/mapper.hpp>
 #include <jules/array/meta/common.hpp>
+#include <jules/array/meta/reference.hpp>
 #include <jules/array/slicing.hpp>
 #include <jules/array/slicing/absolute.hpp>
 #include <jules/array/slicing/bounded.hpp>
