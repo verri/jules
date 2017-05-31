@@ -5,6 +5,7 @@
 #define JULES_ARRAY_BLAS_H
 
 #include <jules/array/detail/common.hpp>
+#include <jules/array/functional.hpp>
 #include <jules/core/debug.hpp>
 
 namespace jules
@@ -36,12 +37,14 @@ template <typename T> static inline auto safe_int_cast(T value)
   return static_cast<int>(value);
 }
 
-template <typename T> auto product(const array<T, 2u>& lhs, const array<T, 2u>& rhs) -> array<T, 2u>
+template <typename T, typename U, typename R = std::remove_const_t<T>>
+auto product(const ref_array<T, 2u>& lhs, const ref_array<U, 2u>& rhs, R alpha = numeric_traits<R>::multiplicative_identity())
+  -> meta::requires_t<array<R, 2u>, std::is_same<decltype(lhs.begin()), decltype(rhs.begin())>>
 {
   DEBUG_ASSERT(lhs.size() > 0 && rhs.size() > 0, debug::default_module, debug::level::invalid_argument, "empty matrix");
   DEBUG_ASSERT(lhs.column_count() == rhs.row_count(), debug::default_module, debug::level::invalid_argument, "invalid extents");
 
-  auto result = array<T, 2u>(lhs.row_count(), rhs.column_count());
+  auto result = array<R, 2u>(uninitialized, lhs.row_count(), rhs.column_count());
 
   const auto k = safe_int_cast(lhs.column_count()); // same as rhs.row_count()
   const auto result_row_count = safe_int_cast(result.row_count());
@@ -49,14 +52,24 @@ template <typename T> auto product(const array<T, 2u>& lhs, const array<T, 2u>& 
   const auto lhs_row_count = safe_int_cast(lhs.row_count());
   const auto rhs_row_count = safe_int_cast(rhs.row_count());
 
-  cblas<T>::gemm(CblasColMajor, CblasNoTrans, CblasNoTrans,     //
-                 result_row_count, result_column_count, k, 1.0, //
-                 lhs.data(), lhs_row_count,                     //
-                 rhs.data(), rhs_row_count,                     //
+  cblas<R>::gemm(CblasColMajor, CblasNoTrans, CblasNoTrans,       //
+                 result_row_count, result_column_count, k, alpha, //
+                 lhs.begin(), lhs_row_count,                      //
+                 rhs.begin(), rhs_row_count,                      //
                  0.0, result.data(), result_row_count);
 
   return result;
 }
+
+template <typename T, typename U, typename V, typename R = std::remove_const_t<T>,
+          typename = meta::requires<std::is_same<std::remove_const_t<T>, std::remove_const_t<U>>, std::is_convertible<V, R>>>
+auto product(const unary_expr_array<T*, left_operation<V, std::multiplies<>>, 2u>& lhs, const ref_array<U, 2u>& rhs)
+{
+  const auto new_lhs = ref_array<T, 2u>{lhs.first(), {lhs.dimensions()}};
+  return product(new_lhs, rhs, lhs.op().lhs);
+}
+
+// TODO: other optimized versions.
 
 } // namespace blas
 } // namespace jules

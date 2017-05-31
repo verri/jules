@@ -18,6 +18,9 @@ template <typename, typename> class strided_ref_array;
 template <typename, typename, typename...> class strided_ref_array_proxy;
 template <typename, std::size_t> class ref_array;
 template <typename, std::size_t, std::size_t> class ref_array_every_proxy;
+template <typename, typename, std::size_t> class unary_expr_array;
+template <typename, typename> struct left_operation;
+template <typename, typename> struct right_operation;
 }
 
 /// \exclude

@@ -100,6 +100,9 @@ public:
   using expr_array<Op, order>::row_count;
   using expr_array<Op, order>::column_count;
 
+  /// \exclude
+  auto first() const { return it_first_; }
+
 private:
   It it_first_, it_last_;
 };

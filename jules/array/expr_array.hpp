@@ -37,6 +37,9 @@ public:
 
   constexpr auto column_count() const noexcept { return descriptor_.column_count(); }
 
+  /// \exclude
+  auto op() const -> const Op& { return op_; }
+
 protected:
   template <typename... Args> decltype(auto) operate(Args&&... args) const { return op_(std::forward<Args>(args)...); }
 
