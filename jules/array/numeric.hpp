@@ -3,6 +3,7 @@
 #ifndef JULES_ARRAY_NUMERIC_H
 #define JULES_ARRAY_NUMERIC_H
 
+#include <jules/array/builder.hpp>
 #include <jules/array/meta/common.hpp>
 #include <jules/base/const_vector.hpp>
 #include <jules/core/debug.hpp>
@@ -61,9 +62,12 @@ template <typename Rng, typename R = range::range_value_t<Rng>> auto as_vector(c
 
 template <typename... Args, typename = std::enable_if_t<(sizeof...(Args) > 1)>> auto as_vector(Args&&... args)
 {
-  using R = std::common_type_t<Args...>;
-  auto values = std::array<R, sizeof...(Args)>{{std::forward<Args>(args)...}};
-  return array<R, 1u>(std::make_move_iterator(std::begin(values)), std::make_move_iterator(std::end(values)));
+  using R = std::common_type_t<std::decay_t<Args>...>;
+  auto builder = array_builder<R, 1u>{{sizeof...(Args)}};
+
+  (builder.push(std::forward<Args>(args)), ...);
+
+  return array<R, 1u>(std::move(builder));
 }
 
 } // namespace jules

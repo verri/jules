@@ -1,7 +1,7 @@
 // Copyright (c) 2017 Filipe Verri <filipeverri@gmail.com>
 
-#ifndef JULES_ARRAY_DETAIL_ALLOCATOR_H
-#define JULES_ARRAY_DETAIL_ALLOCATOR_H
+#ifndef JULES_ARRAY_ALLOCATOR_H
+#define JULES_ARRAY_ALLOCATOR_H
 
 #include <jules/array/descriptor.hpp>
 #include <jules/core/type.hpp>
@@ -67,4 +67,4 @@ private:
 
 } // namespace jules
 
-#endif // JULES_ARRAY_DETAIL_ALLOCATOR_H
+#endif // JULES_ARRAY_ALLOCATOR_H

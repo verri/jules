@@ -6,6 +6,7 @@
 
 #include <jules/array/allocator.hpp>
 #include <jules/array/blas.hpp>
+#include <jules/array/builder.hpp>
 #include <jules/array/functional.hpp>
 #include <jules/array/math.hpp>
 #include <jules/array/numeric.hpp>
@@ -196,6 +197,9 @@ public:
     static_assert(std::is_constructible<value_type, range::reference_t<Iter>>::value, "incompatible value types");
     this->construct(this->data(), begin, this->size());
   }
+
+  /// \group constructors
+  array(array_builder<value_type, order> builder) : ref_array<value_type, order>{builder.release(), {builder.extents()}} {}
 
   /// \group assignment Assignment
   ///

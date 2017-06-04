@@ -62,6 +62,7 @@ template <typename T, typename C> auto to_vector(base_column<C>&& column) -> arr
   return {std::make_move_iterator(data), std::make_move_iterator(data + size)};
 }
 
+// TODO: move temporaries
 template <typename T, typename C> auto to_matrix(const base_dataframe<C>& df) -> array<T, 2u>
 {
   const auto nrow = df.row_count();
@@ -82,14 +83,13 @@ template <typename T, typename C> auto to_matrix(const base_dataframe<C>& df) ->
     }
   }
 
-  auto values = std::vector<T>();
-  values.reserve(nrow * ncol);
+  auto builder = array_builder<T, 2u>{{nrow, ncol}};
 
   for (const auto data : data_vector)
     for (const auto i : indices(nrow))
-      values.push_back(data[i]);
+      builder.push(data[i]);
 
-  return array<T, 2>(std::make_move_iterator(values.begin()), df.row_count(), df.column_count());
+  return array<T, 2>(std::move(builder));
 }
 
 } // namespace jules
