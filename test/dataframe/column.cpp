@@ -105,7 +105,7 @@ TEST_CASE("Column to_view vs as_vector", "[dataframe]")
     view1[i] = -1;
 
   CHECK(all(view2 == -1));
-  CHECK(all(vector == jules::as_vector(0, 1, 2, 3, 4, 5)));
+  CHECK(all(vector == jules::cat(0, 1, 2, 3, 4, 5)));
 }
 
 TEST_CASE("Column tutorial", "[dataframe]")

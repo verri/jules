@@ -15,6 +15,8 @@ namespace jules
 template <typename T, std::size_t N> class array_builder : private array_allocator<T>
 {
 public:
+  using value_type = T;
+
   explicit array_builder(const std::array<index_t, N>& extents) : data_{this->allocate(prod(extents))}, extents_{extents} {}
 
   ~array_builder()
@@ -43,21 +45,21 @@ public:
 
   auto is_complete() const noexcept { return count_ == prod(extents_); }
 
-  auto push(const T& value)
+  auto push_back(const T& value)
   {
     DEBUG_ASSERT(!is_complete(), debug::default_module, debug::level::invalid_state, "builder is already complete");
     ::new (static_cast<void*>(data_ + count_)) T(value);
     ++count_;
   }
 
-  auto push(T&& value) noexcept
+  auto push_back(T&& value) noexcept
   {
     DEBUG_ASSERT(!is_complete(), debug::default_module, debug::level::invalid_state, "builder is already complete");
     ::new (static_cast<void*>(data_ + count_)) T(std::move(value));
     ++count_;
   }
 
-  template <typename... Args> auto emplace(Args&&... args) noexcept(noexcept(T(std::declval<Args>()...)))
+  template <typename... Args> auto emplace_back(Args&&... args) noexcept(noexcept(T(std::declval<Args>()...)))
   {
     DEBUG_ASSERT(!is_complete(), debug::default_module, debug::level::invalid_state, "builder is already complete");
     ::new (static_cast<void*>(data_ + count_)) T(std::forward<Args>(args)...);

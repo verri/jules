@@ -88,7 +88,7 @@ TEST_CASE("Type inference for as_vector", "[array]")
   auto array = std::array<jules::integer, 5>{{1, 2, 3, 4, 5}};
   auto vector1 = jules::to_vector<jules::integer>(array);
   auto vector2 = jules::as_vector(array);
-  auto vector3 = jules::as_vector(jules::integer{1}, 2, 3, 4, 5);
+  auto vector3 = jules::cat(jules::integer{1}, 2, 3, 4, 5);
 
   static_assert(std::is_same<decltype(vector1), decltype(vector2)>::value, "should be the same type");
   static_assert(std::is_same<decltype(vector2), decltype(vector3)>::value, "should be the same type");

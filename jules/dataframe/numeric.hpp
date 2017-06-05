@@ -87,7 +87,7 @@ template <typename T, typename C> auto to_matrix(const base_dataframe<C>& df) ->
 
   for (const auto data : data_vector)
     for (const auto i : indices(nrow))
-      builder.push(data[i]);
+      builder.push_back(data[i]);
 
   return array<T, 2>(std::move(builder));
 }

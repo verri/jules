@@ -60,12 +60,52 @@ template <typename Rng, typename R = range::range_value_t<Rng>> auto as_vector(c
   return to_vector<R>(rng);
 }
 
-template <typename... Args, typename = std::enable_if_t<(sizeof...(Args) > 1)>> auto as_vector(Args&&... args)
+namespace detail
 {
-  using R = std::common_type_t<std::decay_t<Args>...>;
-  auto builder = array_builder<R, 1u>{{sizeof...(Args)}};
 
-  (builder.push(std::forward<Args>(args)), ...);
+template <typename T, typename = void> struct cat_value_type {
+  using type = std::decay_t<T>;
+};
+
+template <typename T> struct cat_value_type<T, meta::requires<range::SizedRange<std::decay_t<T>>>> {
+  using type = range::value_type_t<T>;
+};
+
+template <typename T> using cat_value_type_t = typename cat_value_type<T>::type;
+
+template <typename T>
+constexpr auto cat_size(const T& rng) noexcept -> meta::requires_t<index_t, range::SizedRange<std::decay_t<T>>>
+{
+  return range::size(rng);
+}
+
+template <typename T> constexpr auto cat_size(const T&) noexcept -> meta::fallback_t<index_t, range::SizedRange<std::decay_t<T>>>
+{
+  return 1u;
+}
+
+template <typename T, typename Rng>
+auto cat_push(array_builder<T, 1u>& builder, const Rng& rng) -> meta::requires<range::SizedRange<std::decay_t<Rng>>>
+{
+  range::copy(rng, range::back_inserter(builder));
+}
+
+template <typename T, typename U>
+auto cat_push(array_builder<T, 1u>& builder, U&& value) -> meta::fallback<range::SizedRange<std::decay_t<U>>>
+{
+  builder.push_back(std::forward<U>(value));
+}
+
+} // namespace detail
+
+template <typename... Args> auto cat(Args&&... args)
+{
+  using R = std::common_type_t<detail::cat_value_type_t<Args>...>;
+  const auto size = (index_t{} + ... + detail::cat_size(args));
+
+  auto builder = array_builder<R, 1u>{{size}};
+
+  (detail::cat_push(builder, std::forward<Args>(args)), ...);
 
   return array<R, 1u>(std::move(builder));
 }

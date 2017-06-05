@@ -14,6 +14,7 @@ TEST_CASE("Empty constant vector", "[const_vector]")
 TEST_CASE("Constructing constant vectors", "[const_vector]")
 {
   using jules::as_vector;
+  using jules::cat;
   using jules::index_t;
 
   auto vec = std::vector<index_t>(5ul);
@@ -36,7 +37,7 @@ TEST_CASE("Constructing constant vectors", "[const_vector]")
   CHECK(d.size() == 5u);
 
   CHECK(a == jules::seq(1u, 5u));
-  CHECK(all(as_vector(b) == as_vector(0u, 0u, 0u, 0u, 0u)));
+  CHECK(all(as_vector(b) == cat(0u, 0u, 0u, 0u, 0u)));
   CHECK(all(as_vector(c) == 0u));
   CHECK(all(as_vector(d) == 6u));
 }

@@ -114,7 +114,7 @@ TEST_CASE("Base numeric utilities", "[numeric]")
     CHECK(bix.size() == count(b));
     CHECK(cix.size() == 0u);
 
-    CHECK(all(jules::as_vector(aix) == jules::as_vector(0u, 2u)));
-    CHECK(all(jules::as_vector(bix) == jules::as_vector(0u, 1u, 2u)));
+    CHECK(all(jules::as_vector(aix) == jules::cat(0u, 2u)));
+    CHECK(all(jules::as_vector(bix) == jules::cat(0u, 1u, 2u)));
   }
 }
