@@ -3,6 +3,7 @@
 #ifndef JULES_BASE_RANDOM_H
 #define JULES_BASE_RANDOM_H
 
+#include <jules/base/const_vector.hpp>
 #include <jules/base/numeric.hpp>
 #include <jules/core/meta.hpp>
 #include <jules/core/range.hpp>
@@ -14,15 +15,19 @@
 namespace jules
 {
 
-static thread_local auto random_engine = std::mt19937{};
+static inline auto construct_default_random_engine() noexcept
+{
+  return std::mt19937{std::random_device{}()};
+}
+
+static thread_local auto random_engine = construct_default_random_engine();
 
 template <typename Dist> auto sample(Dist& dist) { return dist(random_engine); }
 
 template <typename Dist> auto sample(index_t n, Dist& dist)
 {
-  auto rng = range::view::generate_n([&] { return dist(random_engine); }, n);
-  auto compatible_rng = rng | range::view::bounded;
-  return std::vector<bool>(range::begin(compatible_rng), range::end(compatible_rng));
+  auto rng = range::view::generate_n([&] { return dist(random_engine); }, n) | range::view::bounded;
+  return const_vector<decltype(dist(random_engine))>(range::begin(rng), range::end(rng));
 }
 
 static inline auto bernoulli_sample(index_t n, numeric p)
