@@ -7,6 +7,14 @@ TEST_CASE("Basic random operations", "[random]")
 {
   using namespace jules;
 
+  CHECK(canon_sample() < 1);
+  CHECK(canon_sample() >= 0);
+
+  auto rd = std::random_device{};
+
+  CHECK(canon_sample(rd) < 1);
+  CHECK(canon_sample(rd) >= 0);
+
   CHECK(bernoulli_sample(0.0) == false);
   CHECK(bernoulli_sample(1.0) == true);
 
