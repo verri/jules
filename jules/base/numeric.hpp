@@ -8,8 +8,10 @@
 #include <jules/core/meta.hpp>
 #include <jules/core/range.hpp>
 
+#include <algorithm>
 #include <array>
 #include <cmath>
+#include <functional>
 #include <type_traits>
 #include <utility>
 #include <vector>
@@ -57,24 +59,6 @@ template <std::size_t N, typename T> constexpr auto repeat(const T& value)
 
 /// \group Repeat
 template <typename T> auto repeat(index_t N, const T& value) { return std::vector<T>(N, value); }
-
-/// \group Length
-///
-/// Returns either the length of a `Range` or the distance of a pair of iterators.
-///
-/// \module Arithmetic
-/// \notes The value may be negative if random-access iterators are used and `first`
-///   is reachable from `last`.
-template <typename Iter, typename Sent, typename = meta::requires<range::Sentinel<Sent, Iter>>> auto length(Iter first, Sent last)
-{
-  return range::distance(first, last);
-}
-
-/// \group Length
-template <typename Rng, typename = meta::requires<range::Range<Rng>>> auto length(const Rng& rng)
-{
-  return ::jules::length(range::begin(rng), range::end(rng));
-}
 
 /// \group Max
 ///
@@ -186,14 +170,14 @@ template <typename Iter, typename Sent, typename T = range::iterator_value_t<Ite
           typename = meta::requires<range::Sentinel<Sent, Iter>>>
 auto mean(Iter first, Sent last, T start = numeric_traits<T>::additive_identity())
 {
-  return ::jules::sum(first, last, std::move(start)) / ::jules::length(first, last);
+  return ::jules::sum(first, last, std::move(start)) / range::distance(first, last);
 }
 
 /// \group Mean
 template <typename Rng, typename T = range::range_value_t<Rng>, typename = meta::requires<range::Range<Rng>>>
 auto mean(const Rng& rng, T start = numeric_traits<T>::additive_identity())
 {
-  return ::jules::sum(rng, std::move(start)) / ::jules::length(rng);
+  return ::jules::sum(rng, std::move(start)) / range::size(rng);
 }
 
 /// \group Var
@@ -207,7 +191,7 @@ template <typename Iter, typename Sent, typename T = range::iterator_value_t<Ite
           typename = meta::requires<range::Sentinel<Sent, Iter>>>
 auto var(Iter first, Sent last, T start = numeric_traits<T>::additive_identity())
 {
-  const auto N = ::jules::length(first, last);
+  const auto N = range::distance(first, last);
   const auto mu = ::jules::mean(first, last, start);
   auto result = std::move(start);
   for (auto it = first; it != last; ++it)
@@ -243,6 +227,37 @@ auto sd(const Rng& rng, T start = numeric_traits<T>::additive_identity())
   return std::sqrt(::jules::var(rng, std::move(start)));
 }
 
+/// \group Nth
+///
+/// Returns the nth lesser of the elements either in a `Range` or in the sequence [`first`, `last`).
+///
+/// \module Arithmetic
+/// \notes Memory complexity is O(size(rng)) or O(distance(first, last)).
+template <typename Iter, typename Sent, typename Compare = std::less<>, typename T = range::iterator_value_t<Iter>,
+          typename = meta::requires<range::Sentinel<Sent, Iter>>>
+auto nth(Iter first, Sent last, index_t n, Compare cmp = {})
+{
+  auto values = std::vector<T>{};
+  values.reserve(range::distance(first, last));
+  range::copy(first, last, range::back_inserter(values));
+
+  std::nth_element(values.begin(), values.begin() + n, values.end(), cmp);
+  return T{std::move(values[n])};
+}
+
+/// \group Nth
+template <typename Rng, typename Compare = std::less<>, typename T = range::range_value_t<Rng>,
+          typename = meta::requires<range::Range<Rng>>>
+auto nth(const Rng& rng, index_t n, Compare cmp = {})
+{
+  auto values = std::vector<T>{};
+  values.reserve(range::size(rng));
+  range::copy(rng, range::back_inserter(values));
+
+  std::nth_element(values.begin(), values.begin() + n, values.end(), cmp);
+  return T{std::move(values[n])};
+}
+
 /// \group Count
 ///
 /// Returns the number of true elements in a `Range` or in the sequence [`first`, `last`).
@@ -270,13 +285,13 @@ template <typename Rng, typename = meta::requires<range::Range<Rng>>> auto count
 /// \module Logical
 template <typename Iter, typename Sent, typename = meta::requires<range::Sentinel<Sent, Iter>>> auto freq(Iter first, Sent last)
 {
-  return static_cast<numeric>(::jules::count(first, last)) / ::jules::length(first, last);
+  return static_cast<numeric>(::jules::count(first, last)) / range::distance(first, last);
 }
 
 /// \group Freq
 template <typename Rng, typename = meta::requires<range::Range<Rng>>> auto freq(const Rng& rng)
 {
-  return static_cast<numeric>(::jules::count(rng)) / ::jules::length(rng);
+  return static_cast<numeric>(::jules::count(rng)) / range::size(rng);
 }
 
 /// \group Which

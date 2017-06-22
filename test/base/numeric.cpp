@@ -13,7 +13,6 @@ TEST_CASE("Base numeric utilities", "[numeric]")
     auto a = jules::repeat<10>(2);
     auto b = jules::repeat(10u, 2);
 
-    CHECK(jules::length(a) == jules::length(b));
     CHECK(all(jules::as_vector(a) == 2));
     CHECK(all(jules::as_vector(b) == 2));
     CHECK(all(jules::as_vector(a) == jules::as_vector(b)));
@@ -28,10 +27,6 @@ TEST_CASE("Base numeric utilities", "[numeric]")
     const auto a = std::vector<long>{1, 2, 3, 4};
     const auto b = std::array<long, 4>{{1, 2, 3, 4}};
     const auto c = jules::vector<long>{1, 2, 3, 4};
-
-    CHECK(jules::length(a.begin(), a.end()) == a.size());
-    CHECK(jules::length(b) == b.size());
-    CHECK(length(c) == c.length());
 
     CHECK(jules::sum(a.begin(), a.end()) == 10);
     CHECK(jules::sum(b) == 10);
@@ -60,6 +55,10 @@ TEST_CASE("Base numeric utilities", "[numeric]")
     CHECK(jules::max(a.begin(), a.end()) == 4);
     CHECK(jules::max(b) == 4);
     CHECK(max(c) == 4);
+
+    CHECK(jules::nth(a.begin(), a.end(), 1) == 2);
+    CHECK(jules::nth(b, 1) == 2);
+    CHECK(nth(c, 1) == 2);
 
     // Limits
     CHECK(jules::sum(std::array<unsigned, 0>{}) == 0u);
