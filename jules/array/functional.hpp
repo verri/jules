@@ -78,21 +78,24 @@ static auto apply(const common_array_base<ArrayA>& lhs, const common_array_base<
   BINARY_LEFT_TYPE_OPERATION(OP__, FUNCTOR__)
 
 #define BINARY_OPERATION(OP__, FUNCTOR__)                                                                                        \
-  template <typename ArrayA, typename ArrayB>                                                                                    \
+  template <typename ArrayA, typename ArrayB,                                                                                    \
+            typename R = std::result_of_t<FUNCTOR__(const typename ArrayA::value_type&, const typename ArrayB::value_type&)>>    \
   auto operator OP__(const common_array_base<ArrayA>& lhs, const common_array_base<ArrayB>& rhs)                                 \
   {                                                                                                                              \
     return apply(lhs, rhs, FUNCTOR__{});                                                                                         \
   }
 
 #define BINARY_RIGHT_TYPE_OPERATION(OP__, FUNCTOR__)                                                                             \
-  template <typename Array, typename T, typename = meta::fallback<CommonArray<T>>>                                               \
+  template <typename Array, typename T, typename = meta::fallback<CommonArray<T>>,                                               \
+            typename R = std::result_of_t<FUNCTOR__(const typename Array::value_type&, const T&)>>                               \
   auto operator OP__(const common_array_base<Array>& lhs, T rhs)                                                                 \
   {                                                                                                                              \
     return apply(lhs, right_operation<T, FUNCTOR__>{std::move(rhs), {}});                                                        \
   }
 
 #define BINARY_LEFT_TYPE_OPERATION(OP__, FUNCTOR__)                                                                              \
-  template <typename T, typename Array, typename = meta::fallback<CommonArray<T>>>                                               \
+  template <typename T, typename Array, typename = meta::fallback<CommonArray<T>>,                                               \
+            typename R = std::result_of_t<FUNCTOR__(const T&, const typename Array::value_type&)>>                               \
   auto operator OP__(T lhs, const common_array_base<Array>& rhs)                                                                 \
   {                                                                                                                              \
     return apply(rhs, left_operation<T, FUNCTOR__>{std::move(lhs), {}});                                                         \

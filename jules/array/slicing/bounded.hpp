@@ -17,9 +17,9 @@ inline namespace slicing
 struct every_index {
 };
 
-constexpr auto every = every_index{};
+static constexpr auto every = every_index{};
 
-constexpr auto slice() noexcept { return every; }
+static inline constexpr auto slice() noexcept { return every; }
 
 class bounded_index
 {
@@ -69,9 +69,12 @@ struct bounded_slice {
   bounded_index extent;
 };
 
-constexpr auto slice(index_t start, bounded_index extent) noexcept -> bounded_slice { return {start, std::move(extent)}; }
+static inline constexpr auto slice(index_t start, bounded_index extent) noexcept -> bounded_slice
+{
+  return {start, std::move(extent)};
+}
 
-constexpr auto slice(index_t start, bounded_index extent, index_t stride) noexcept -> bounded_strided_slice
+static inline constexpr auto slice(index_t start, bounded_index extent, index_t stride) noexcept -> bounded_strided_slice
 {
   return {start, std::move(extent), stride};
 }
