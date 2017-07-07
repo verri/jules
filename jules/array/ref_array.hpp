@@ -57,6 +57,8 @@ public:
   using difference_type = distance_t;
 
   ref_array(value_type* data, descriptor<order> descriptor) : data_{data}, descriptor_{descriptor} {}
+  ref_array(const ref_array& source) = default;
+  ref_array(ref_array&& source) noexcept = default;
 
   ~ref_array(){};
 
@@ -178,8 +180,6 @@ protected:
   auto data() const -> const value_type* { return data_; }
 
   ref_array() : data_{nullptr}, descriptor_{{{}}} {}
-  ref_array(const ref_array& source) = default;
-  ref_array(ref_array&& source) noexcept = default;
 
   /// \exclude
   value_type* data_;

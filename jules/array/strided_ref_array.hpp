@@ -64,6 +64,8 @@ public:
   using difference_type = distance_t;
 
   strided_ref_array(value_type* data, Mapper mapper) : Mapper{std::move(mapper)}, data_{data} {}
+  strided_ref_array(const strided_ref_array& source) = default;
+  strided_ref_array(strided_ref_array&& source) noexcept = default;
 
   ~strided_ref_array(){}; // not default to disable default copy, move, assignment, ...
 
@@ -177,9 +179,6 @@ protected:
   auto data() const -> const value_type* { return data_; }
 
   auto mapper() const -> const Mapper& { return *this; }
-
-  strided_ref_array(const strided_ref_array& source) = default;
-  strided_ref_array(strided_ref_array&& source) noexcept = default;
 
   /// \exclude
   value_type* const data_;
