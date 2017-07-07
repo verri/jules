@@ -63,7 +63,7 @@ template <typename G = decltype(random_engine)> auto uniform_index_sample(index_
 }
 
 template <typename G = decltype(random_engine)>
-auto uniform_index_sample(index_t n, index_t end, no_replacement_t, G& g = random_engine) -> const_vector<index_t>
+auto uniform_index_sample(no_replacement_t, index_t n, index_t end, G& g = random_engine) -> const_vector<index_t>
 {
   // inspired by John D. Cook, http://stackoverflow.com/a/311716/15485
   auto t = index_t{0};

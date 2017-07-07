@@ -70,6 +70,10 @@ public:
 
   auto cend() const noexcept { return self().cend(); }
 
+  operator const Derived&() const { return self(); }
+
+  operator Derived&() { return self(); }
+
 protected:
   constexpr common_array_base() noexcept = default;
 

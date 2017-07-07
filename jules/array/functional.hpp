@@ -45,12 +45,35 @@ template <typename Array, typename Op> static auto apply(const common_array_base
   return unary_expr_array(operand.begin(), operand.end(), std::move(op), operand.dimensions());
 }
 
+template <typename Array, typename Op> static auto apply(in_place_t, common_array_base<Array>& operand, Op op) -> Array&
+{
+  for (auto& value : operand)
+    op(value);
+  return operand;
+}
+
 template <typename ArrayA, typename ArrayB, typename Op>
 static auto apply(const common_array_base<ArrayA>& lhs, const common_array_base<ArrayB>& rhs, Op op)
 {
   static_assert(ArrayA::order == ArrayB::order);
   DEBUG_ASSERT(lhs.dimensions() == rhs.dimensions(), debug::default_module, debug::level::extents_check, "extents mismatch");
   return binary_expr_array(lhs.begin(), lhs.end(), rhs.begin(), rhs.end(), std::move(op), lhs.dimensions());
+}
+
+template <typename ArrayA, typename ArrayB, typename Op>
+static auto apply(in_place_t, common_array_base<ArrayA>& lhs, const common_array_base<ArrayB>& rhs, Op op) -> ArrayA&
+{
+  static_assert(ArrayA::order == ArrayB::order);
+  DEBUG_ASSERT(lhs.dimensions() == rhs.dimensions(), debug::default_module, debug::level::extents_check, "extents mismatch");
+
+  auto itl = lhs.begin();
+  auto itr = rhs.begin();
+  const auto end = lhs.end();
+
+  while (itl != end)
+    op(*itl++, *itr++);
+
+  return lhs;
 }
 
 #define OPERATIONS_LIST                                                                                                          \
@@ -70,12 +93,21 @@ static auto apply(const common_array_base<ArrayA>& lhs, const common_array_base<
   BINARY_COMBINATIONS(<, std::less<>)                                                                                            \
   BINARY_COMBINATIONS(<=, std::less_equal<>)                                                                                     \
   BINARY_COMBINATIONS(>, std::greater<>)                                                                                         \
-  BINARY_COMBINATIONS(>=, std::greater_equal<>)
+  BINARY_COMBINATIONS(>=, std::greater_equal<>)                                                                                  \
+  BINARY_INPLACE_COMBINATIONS(+)                                                                                                 \
+  BINARY_INPLACE_COMBINATIONS(-)                                                                                                 \
+  BINARY_INPLACE_COMBINATIONS(*)                                                                                                 \
+  BINARY_INPLACE_COMBINATIONS(/)                                                                                                 \
+  BINARY_INPLACE_COMBINATIONS(%)
 
 #define BINARY_COMBINATIONS(OP__, FUNCTOR__)                                                                                     \
   BINARY_OPERATION(OP__, FUNCTOR__)                                                                                              \
   BINARY_RIGHT_TYPE_OPERATION(OP__, FUNCTOR__)                                                                                   \
   BINARY_LEFT_TYPE_OPERATION(OP__, FUNCTOR__)
+
+#define BINARY_INPLACE_COMBINATIONS(OP__)                                                                                        \
+  BINARY_INPLACE_OPERATION(OP__)                                                                                                 \
+  BINARY_INPLACE_TYPE_OPERATION(OP__)
 
 #define BINARY_OPERATION(OP__, FUNCTOR__)                                                                                        \
   template <typename ArrayA, typename ArrayB,                                                                                    \
@@ -83,6 +115,14 @@ static auto apply(const common_array_base<ArrayA>& lhs, const common_array_base<
   auto operator OP__(const common_array_base<ArrayA>& lhs, const common_array_base<ArrayB>& rhs)                                 \
   {                                                                                                                              \
     return apply(lhs, rhs, FUNCTOR__{});                                                                                         \
+  }
+
+// TODO: It should not participate in overload if operation doesn't exist.
+#define BINARY_INPLACE_OPERATION(OP__)                                                                                           \
+  template <typename ArrayA, typename ArrayB>                                                                                    \
+  auto operator OP__##=(common_array_base<ArrayA>& lhs, const common_array_base<ArrayB>& rhs)->ArrayA&                           \
+  {                                                                                                                              \
+    return apply(in_place, lhs, rhs, [](auto& x, const auto& y) { x OP__## = y; });                                              \
   }
 
 #define BINARY_RIGHT_TYPE_OPERATION(OP__, FUNCTOR__)                                                                             \
@@ -99,6 +139,14 @@ static auto apply(const common_array_base<ArrayA>& lhs, const common_array_base<
   auto operator OP__(T lhs, const common_array_base<Array>& rhs)                                                                 \
   {                                                                                                                              \
     return apply(rhs, left_operation<T, FUNCTOR__>{std::move(lhs), {}});                                                         \
+  }
+
+// TODO: It should not participate in overload if operation doesn't exist.
+#define BINARY_INPLACE_TYPE_OPERATION(OP__)                                                                                      \
+  template <typename Array, typename T, typename = meta::fallback<CommonArray<T>>>                                               \
+  auto operator OP__##=(common_array_base<Array>& lhs, const T& rhs)->Array&                                                     \
+  {                                                                                                                              \
+    return apply(in_place, lhs, [&rhs](auto& x) { x OP__## = rhs; });                                                            \
   }
 
 #define UNARY_OPERATIONS_LIST                                                                                                    \

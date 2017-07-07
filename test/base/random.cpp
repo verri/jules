@@ -21,7 +21,7 @@ TEST_CASE("Basic random operations", "[random]")
   const auto samples = bernoulli_sample(10u, 0.5);
   CHECK(samples.size() == 10u);
 
-  const auto ix = uniform_index_sample(10, 10, no_replacement);
+  const auto ix = uniform_index_sample(no_replacement, 10, 10);
   CHECK(ix.size() == 10u);
 
   {
