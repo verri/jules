@@ -32,6 +32,16 @@ template <typename Array> auto log(const common_array_base<Array>& array)
   return apply(array, [](const auto& v) { return std::log(v); });
 }
 
+template <typename Array> auto sin(const common_array_base<Array>& array)
+{
+  return apply(array, [](const auto& v) { return std::sin(v); });
+}
+
+template <typename Array> auto cos(const common_array_base<Array>& array)
+{
+  return apply(array, [](const auto& v) { return std::cos(v); });
+}
+
 } // namespace jules
 
 #endif // JULES_ARRAY_MATH_H
