@@ -117,9 +117,10 @@ static auto apply(in_place_t, common_array_base<ArrayA>& lhs, const common_array
     return apply(lhs, rhs, FUNCTOR__{});                                                                                         \
   }
 
-// TODO: It should not participate in overload if operation doesn't exist.
 #define BINARY_INPLACE_OPERATION(OP__)                                                                                           \
-  template <typename ArrayA, typename ArrayB>                                                                                    \
+  template <typename ArrayA, typename ArrayB,                                                                                    \
+            typename = decltype(std::declval<typename ArrayA::value_type&>() OP__## =                                            \
+                                  std::declval<const typename ArrayB::value_type&>())>                                           \
   auto operator OP__##=(common_array_base<ArrayA>& lhs, const common_array_base<ArrayB>& rhs)->ArrayA&                           \
   {                                                                                                                              \
     return apply(in_place, lhs, rhs, [](auto& x, const auto& y) { x OP__## = y; });                                              \
@@ -141,9 +142,9 @@ static auto apply(in_place_t, common_array_base<ArrayA>& lhs, const common_array
     return apply(rhs, left_operation<T, FUNCTOR__>{std::move(lhs), {}});                                                         \
   }
 
-// TODO: It should not participate in overload if operation doesn't exist.
 #define BINARY_INPLACE_TYPE_OPERATION(OP__)                                                                                      \
-  template <typename Array, typename T, typename = meta::fallback<CommonArray<T>>>                                               \
+  template <typename Array, typename T, typename = meta::fallback<CommonArray<T>>,                                               \
+            typename = decltype(std::declval<typename Array::value_type&>() OP__## = std::declval<const T&>())>                  \
   auto operator OP__##=(common_array_base<Array>& lhs, const T& rhs)->Array&                                                     \
   {                                                                                                                              \
     return apply(in_place, lhs, [&rhs](auto& x) { x OP__## = rhs; });                                                            \

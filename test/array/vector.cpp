@@ -108,6 +108,13 @@ TEST_CASE("Vector tutorial", "[array]")
     x = eval(x + x);
     CHECK(all(x == jules::cat(0, 4, 8, 12, 16)));
 
+    x += 1;
+    CHECK(all(x == jules::cat(0, 4, 8, 12, 16) + 1));
+
+    // Can be dangerous if rhs depends on lhs.
+    x += x + x;
+    CHECK(all(x == 3 * (jules::cat(0, 4, 8, 12, 16) + 1)));
+
     // This one is tricky. We must guarantee that the Memory of x is not freed before the
     // expression is evaluated.
     x = x - x;
