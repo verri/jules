@@ -20,6 +20,7 @@ template <typename T> using indexing = decltype(std::declval<T&>()[index_t()]);
 template <typename T> using slice_indexing = decltype(std::declval<T&>()[std::declval<absolute_slice>()]);
 template <typename T> using strided_indexing = decltype(std::declval<T&>()[std::declval<absolute_strided_slice>()]);
 template <typename T> using indirect_indexing = decltype(std::declval<T&>()[std::declval<const_vector<index_t>>()]);
+template <typename T> using public_data = decltype(std::declval<T&>().data());
 } // namespace result
 } // namespace meta
 
@@ -28,14 +29,15 @@ template <typename T, typename = void> struct ReferenceArray : std::false_type {
 
 // TODO: bidirectional in the future
 template <typename T>
-struct ReferenceArray<                                    //
-  T, meta::requires<                                      //
-       range::ForwardRange<T>,                            //
-       CommonArray<T>,                                    //
-       meta::compiles<T, meta::result::indexing>,         //
-       meta::compiles<T, meta::result::slice_indexing>,   //
-       meta::compiles<T, meta::result::strided_indexing>, //
-       meta::compiles<T, meta::result::indirect_indexing> //
+struct ReferenceArray<                                             //
+  T, meta::requires<                                               //
+       range::ForwardRange<T>,                                     //
+       CommonArray<T>,                                             //
+       meta::compiles<T, meta::result::indexing>,                  //
+       meta::compiles<T, meta::result::slice_indexing>,            //
+       meta::compiles<T, meta::result::strided_indexing>,          //
+       meta::compiles<T, meta::result::indirect_indexing>,         //
+       std::negation<meta::compiles<T, meta::result::public_data>> //
        >> : std::true_type {
 };
 

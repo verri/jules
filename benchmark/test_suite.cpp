@@ -18,6 +18,14 @@ auto operator<<(std::ostream& os, const Array& array) -> std::ostream&
   return os << " }";
 }
 
+template <typename T, std::size_t N> auto operator<<(std::ostream& os, const jules::array<T, N>& array) -> std::ostream&
+{
+  os << '{';
+  for (const auto i : jules::indices(array.dimensions()[0u]))
+    os << ' ' << array[i];
+  return os << " }";
+}
+
 int main()
 {
   using jules::slice;

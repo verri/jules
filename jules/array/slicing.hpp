@@ -377,9 +377,45 @@ template <typename T, std::size_t N, std::size_t M> class ref_array_every_proxy
 public:
   ref_array_every_proxy(T* data, const descriptor<N>& descriptor) : data_{data}, descriptor_{descriptor} {}
 
-  decltype(auto) operator[](index_t i) && { return at(i); }
+  decltype(auto) operator[](index_t i) &&
+  {
+    // clang-format off
+    if constexpr (M == N - 1)
+    {
+      const auto last_dim = descriptor_.extents[N - 1];
+      DEBUG_ASSERT(i < last_dim, debug::default_module, debug::level::boundary_check, "out of range");
 
-  decltype(auto) operator[](absolute_slice slice) && { return at(slice); }
+      const auto stride = prod(descriptor_.extents) / last_dim;
+      descriptor_.extents[N - 1] = 1u;
+
+      return ref_array<T, N>{data_ + i * stride, descriptor_};
+    }
+    else
+    {
+      return at(slice);
+    }
+    // clang-format on
+  }
+
+  decltype(auto) operator[](absolute_slice slice) &&
+  {
+    // clang-format off
+    if constexpr (M == N - 1)
+    {
+      const auto last_dim = descriptor_.extents[N - 1];
+      DEBUG_ASSERT(slice.start + slice.extent - 1u < last_dim, debug::default_module, debug::level::boundary_check, "out of range");
+
+      const auto stride = prod(descriptor_.extents) / last_dim;
+      descriptor_.extents[N - 1] = slice.extent;
+
+      return ref_array<T, N>{data_ + slice.start * stride, descriptor_};
+    }
+    else
+    {
+      return at(slice);
+    }
+    // clang-format on
+  }
 
   decltype(auto) operator[](absolute_strided_slice slice) && { return at(slice); }
 
@@ -410,26 +446,6 @@ private:
   }
 
   template <std::size_t> using slice_type = absolute_strided_slice;
-
-  template <std::size_t... I> decltype(auto) at(absolute_slice slice, std::index_sequence<I...>)
-  {
-    // clang-format off
-    if constexpr (M == N - 1)
-    {
-      const auto last_dim = descriptor_.extents[N - 1];
-      DEBUG_ASSERT(slice.start + slice.extent - 1u < last_dim, debug::default_module, debug::level::boundary_check, "out of range");
-
-      const auto stride = prod(descriptor_.extents) / last_dim;
-      descriptor_.extents[N - 1] = slice.extent;
-
-      return ref_array<T, N>{data_ + slice.start * stride, descriptor_};
-    }
-    else
-    {
-      return at<absolute_slice&&>(std::move(slice), std::make_index_sequence<M>());
-    }
-    // clang-format on
-  }
 
   template <typename Index, std::size_t... I> decltype(auto) at(Index&& index, std::index_sequence<I...>)
   {
