@@ -41,27 +41,74 @@ template <typename T> struct array_allocator {
   }
 
   template <std::size_t N>
-  auto construct(value_type* to, recursive_initializer_list_t<value_type, N> values, const descriptor<N>& desc)
+  auto construct(value_type* to, recursive_initializer_list_t<value_type, N> values,
+                 const descriptor<N>& desc) noexcept(std::is_nothrow_copy_constructible_v<value_type>)
   {
-    // TODO: save constructed indexes to delete them if it can throw.
-    // TODO: annotate with noexcept otherwise
-    construct_impl(to, values, desc);
+    // clang-format off
+    if constexpr(std::is_nothrow_copy_constructible_v<value_type>) {
+      construct_recursive(to, values, desc);
+    } else {
+      auto constructed_count = index_t{0};
+      try {
+        construct_recursive(constructed_count, to, values, desc);
+      } catch (...) {
+        destroy_recursive(constructed_count, to, values, desc);
+        throw;
+      }
+    }
+    // clang-format on
   }
 
   void destroy(value_type* data, index_t size) noexcept { std::destroy_n(data, size); }
 
 private:
   template <std::size_t N, typename List, typename... Args>
-  auto construct_impl(value_type* to, List values, const descriptor<N>& desc, Args... indexes)
+  auto construct_recursive(value_type* to, List values, const descriptor<N>& desc, Args... indexes) noexcept
   {
     for (auto i = index_t{0u}; i < desc.extents[sizeof...(Args)]; ++i)
-      construct_impl(to, *(values.begin() + i), desc, indexes..., i);
+      construct_recursive(to, *(values.begin() + i), desc, indexes..., i);
   }
 
   template <std::size_t N, typename... Args>
-  auto construct_impl(value_type* to, const value_type& value, const descriptor<N>& desc, Args... indexes)
+  auto construct_recursive(value_type* to, const value_type& value, const descriptor<N>& desc, Args... indexes) noexcept
   {
     ::new (static_cast<void*>(to + desc({{indexes...}}))) value_type(value);
+  }
+
+  template <std::size_t N, typename List, typename... Args>
+  auto construct_recursive(index_t& constructed_count, value_type* to, List values, const descriptor<N>& desc, Args... indexes)
+  {
+    for (auto i = index_t{0u}; i < desc.extents[sizeof...(Args)]; ++i)
+      construct_recursive(constructed_count, to, *(values.begin() + i), desc, indexes..., i);
+  }
+
+  template <std::size_t N, typename... Args>
+  auto construct_recursive(index_t& constructed_count, value_type* to, const value_type& value, const descriptor<N>& desc,
+                           Args... indexes)
+  {
+    ::new (static_cast<void*>(to + desc({{indexes...}}))) value_type(value);
+    ++constructed_count;
+  }
+
+  template <std::size_t N, typename List, typename... Args>
+  auto destroy_recursive(index_t& constructed_count, value_type* to, List values, const descriptor<N>& desc,
+                         Args... indexes) noexcept
+  {
+    for (auto i = index_t{0u}; i < desc.extents[sizeof...(Args)]; ++i) {
+      destroy_recursive(constructed_count, to, *(values.begin() + i), desc, indexes..., i);
+      if (constructed_count == 0)
+        return;
+    }
+  }
+
+  template <std::size_t N, typename... Args>
+  auto destroy_recursive(index_t& constructed_count, value_type* to, const value_type&, const descriptor<N>& desc,
+                         Args... indexes) noexcept
+  {
+    if (constructed_count == 0)
+      return;
+    (to + desc({{indexes...}}))->~value_type();
+    --constructed_count;
   }
 };
 

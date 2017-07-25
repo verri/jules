@@ -14,9 +14,6 @@
 #include <jules/base/async.hpp>
 #include <jules/base/numeric.hpp>
 
-/// TODO: XXΧ: There are no strong guarantees if an exceptions occurs. It possibly will
-/// cause a memory leak.
-
 namespace jules
 {
 
@@ -122,7 +119,12 @@ public:
   template <typename... Dims, typename _ = requires_dimensions<Dims...>>
   explicit array(Dims... dims) : array(allocate_tag{}, dims...)
   {
-    this->construct(this->data(), this->size());
+    try {
+      this->construct(this->data(), this->size());
+    } catch (...) {
+      this->deallocate(this->data(), this->size());
+      throw;
+    }
   }
 
   /// \group constructors
@@ -131,7 +133,12 @@ public:
   template <typename... Dims, typename _ = requires_dimensions<Dims...>>
   array(const value_type& value, Dims... dims) : array(allocate_tag{}, dims...)
   {
-    this->construct(this->data(), this->size(), value);
+    try {
+      this->construct(this->data(), this->size(), value);
+    } catch (...) {
+      this->deallocate(this->data(), this->size());
+      throw;
+    }
   }
 
   /// \group constructors
@@ -142,7 +149,12 @@ public:
   template <typename It, typename... Dims, typename R = range::iterator_value_t<It>, typename _ = requires_dimensions<Dims...>>
   array(It it, Dims... dims) : array(allocate_tag{}, dims...)
   {
-    this->construct(this->data(), it, this->size());
+    try {
+      this->construct(this->data(), it, this->size());
+    } catch (...) {
+      this->deallocate(this->data(), this->size());
+      throw;
+    }
   }
 
   /// \group constructors
@@ -150,13 +162,24 @@ public:
   {
     this->descriptor_ = this->calculate_descriptor(values);
     this->data_ = this->allocate(this->descriptor_.size());
-    this->construct(this->data(), values, this->descriptor_);
+
+    try {
+      this->construct(this->data(), values, this->descriptor_);
+    } catch (...) {
+      this->deallocate(this->data(), this->size());
+      throw;
+    }
   }
 
   /// \group constructors
   array(const array& source) : ref_array<value_type, order>{this->allocate(source.size()), source.descriptor_}
   {
-    this->construct(this->data(), source.data(), this->size());
+    try {
+      this->construct(this->data(), source.data(), this->size());
+    } catch (...) {
+      this->deallocate(this->data(), this->size());
+      throw;
+    }
   }
 
   /// \group constructors
@@ -174,7 +197,12 @@ public:
   {
     static_assert(Array::order == order, "array order mismatch");
     static_assert(std::is_constructible<value_type, const typename Array::value_type&>::value, "incompatible value types");
-    this->construct(this->data(), source.begin(), this->size());
+    try {
+      this->construct(this->data(), source.begin(), this->size());
+    } catch (...) {
+      this->deallocate(this->data(), this->size());
+      throw;
+    }
   }
 
   /// \group constructors
@@ -184,7 +212,12 @@ public:
     static_assert(order == 1u, "Only vectors can be initialized from a range");
     static_assert(std::is_constructible<value_type, range::reference_t<range::iterator_t<Rng>>>::value,
                   "incompatible value types");
-    this->construct(this->data(), range::begin(rng), this->size());
+    try {
+      this->construct(this->data(), range::begin(rng), this->size());
+    } catch (...) {
+      this->deallocate(this->data(), this->size());
+      throw;
+    }
   }
 
   /// \group constructors
@@ -195,7 +228,12 @@ public:
   {
     static_assert(order == 1u, "Only vectors can be initialized from a pair of iterators");
     static_assert(std::is_constructible<value_type, range::reference_t<Iter>>::value, "incompatible value types");
-    this->construct(this->data(), begin, this->size());
+    try {
+      this->construct(this->data(), begin, this->size());
+    } catch (...) {
+      this->deallocate(this->data(), this->size());
+      throw;
+    }
   }
 
   /// \group constructors
@@ -213,14 +251,21 @@ public:
   auto operator=(const array& source) -> array&
   {
     DEBUG_ASSERT(this != &source, debug::default_module, debug::level::invalid_argument, "self assignment");
-    if (this->size() != source.size()) {
-      clear();
-      this->data_ = this->allocate(source.size());
-    } else {
-      this->destroy(this->data(), this->size());
-    }
-    this->descriptor_ = source.descriptor_;
-    this->construct(this->data(), source.data(), source.size());
+
+    auto new_data = this->allocate(source.size());
+    auto success = false;
+
+    JULES_DEFER({
+      if (success) {
+        clear();
+        this->data_ = new_data;
+        this->descriptor_ = source.descriptor_;
+      }
+    });
+
+    this->construct(new_data, source.data(), source.size());
+    success = true;
+
     return *this;
   }
 
@@ -240,16 +285,19 @@ public:
     static_assert(Array::order == order, "array order mismatch");
     static_assert(std::is_assignable<value_type&, typename Array::value_type>::value, "incompatible assignment");
 
-    // Source might contain references to this.
-    const auto old_data = this->data();
-    const auto old_size = this->size();
+    auto new_data = this->allocate(source.size());
+    auto success = false;
 
-    this->data_ = this->allocate(source.size());
-    this->descriptor_ = {source.dimensions()};
-    this->construct(this->data(), source.begin(), source.size());
+    JULES_DEFER({
+      if (success) {
+        clear();
+        this->data_ = new_data;
+        this->descriptor_ = {source.dimensions()};
+      }
+    });
 
-    this->destroy(old_data, old_size);
-    this->deallocate(old_data, old_size);
+    this->construct(new_data, source.begin(), source.size());
+    success = true;
 
     return *this;
   }
@@ -289,7 +337,7 @@ private:
   }
 
   /// \exclude
-  auto clear()
+  auto clear() noexcept
   {
     if (this->data()) {
       this->destroy(this->data(), this->size());
