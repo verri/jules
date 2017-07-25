@@ -62,32 +62,34 @@ template <typename T, typename C> auto to_vector(base_column<C>&& column) -> arr
   return {std::make_move_iterator(data), std::make_move_iterator(data + size)};
 }
 
-// TODO: move temporaries
 template <typename T, typename C> auto to_matrix(const base_dataframe<C>& df) -> array<T, 2u>
 {
   const auto nrow = df.row_count();
   const auto ncol = df.column_count();
 
   auto temp = std::vector<base_column<C>>();
-  auto data_vector = std::vector<const T*>();
+  auto data_vector = std::vector<std::pair<bool, const T*>>();
 
   data_vector.reserve(ncol);
 
   for (const auto & [ name, column ] : df) {
     (void)name;
     if (column.elements_type() == typeid(T)) {
-      data_vector.push_back(column.template data<T>());
+      data_vector.push_back({false, column.template data<T>()});
     } else {
       temp.push_back(to_column<T>(column));
-      data_vector.push_back(temp.back().template data<T>());
+      data_vector.push_back({true, temp.back().template data<T>()});
     }
   }
 
   auto builder = array_builder<T, 2u>{{nrow, ncol}};
 
-  for (const auto data : data_vector)
+  for (const auto[should_move, data] : data_vector)
     for (const auto i : indices(nrow))
-      builder.push_back(data[i]);
+      if (should_move)
+        builder.push_back(std::move(data[i]));
+      else
+        builder.push_back(data[i]);
 
   return array<T, 2>(std::move(builder));
 }
