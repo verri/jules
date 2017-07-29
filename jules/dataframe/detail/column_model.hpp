@@ -187,7 +187,13 @@ protected:
   auto can_coerce_(tag<type> tag) const -> bool final { return specific::can_coerce_(tag); }
 
 public:
+  using typename std::vector<T>::iterator;
+  using typename std::vector<T>::const_iterator;
+
   using std::vector<T>::vector;
+
+  generate_concrete_coercions(iterator begin, iterator end) : std::vector<T>(begin, end) {}
+  generate_concrete_coercions(const_iterator begin, const_iterator end) : std::vector<T>(begin, end) {}
 
   generate_concrete_coercions() = default;
   generate_concrete_coercions(const generate_concrete_coercions&) = default;
