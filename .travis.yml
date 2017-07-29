@@ -1,0 +1,29 @@
+sudo: false
+language: generic
+dist: trusty
+
+env:
+  - COMPILER_NAME=gcc CXX=g++-7 CC=gcc-7 COVERAGE=true CXXFLAGS="-O0 -g --coverage"
+  - COMPILER_NAME=gcc CXX=g++-7 CC=gcc-7 COVERAGE=false CXXFLAGS="-O2 -DNDEBUG"
+
+addons:
+  apt:
+    sources:
+      - ubuntu-toolchain-r-test
+    packages:
+      - g++-7
+      - valgrind
+      - libblas-dev
+      - catch
+
+install:
+  - git submodule init
+  - git submodule update
+  - git clone https://github.com/ericniebler/range-v3.git third_party/range-v3
+  - git clone https://github.com/foonathan/debug_assert.git third_party/debug_assert
+
+script:
+  - CXXFLAGS="$CXXFLAGS -isystem../third_party/range-v3/include -isystem../third_party/debug_assert" make test
+
+after_success:
+  - if test "$COVERAGE" == "true"; then bash <(curl -s https://codecov.io/bash) -x $(which gcov-7); fi
