@@ -4,7 +4,7 @@ SRC = $(shell find . -name '*.cpp')
 OBJ := $(SRC:.cpp=.o)
 DEP := $(SRC:.cpp=.d)
 
-CXXFLAGS += -DJULES_DEBUG_THROWS -std=c++1z -Wall -Wextra -pedantic -I.. -isystem../third_party/Catch/single_include
+CXXFLAGS += -DJULES_DEBUG_THROWS -std=c++1z -Wall -Wextra -pedantic -I..
 LDFLAGS += -lblas
 
 NODEPS = clean

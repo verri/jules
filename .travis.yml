@@ -14,16 +14,16 @@ addons:
       - g++-7
       - valgrind
       - libblas-dev
-      - catch
 
 install:
   - git submodule init
   - git submodule update
   - git clone https://github.com/ericniebler/range-v3.git third_party/range-v3
   - git clone https://github.com/foonathan/debug_assert.git third_party/debug_assert
+  - git clone https://github.com/philsquared/Catch.git third_party/Catch
 
 script:
-  - CXXFLAGS="$CXXFLAGS -isystem../third_party/range-v3/include -isystem../third_party/debug_assert" make test
+  - CXXFLAGS="$CXXFLAGS -isystem../third_party/range-v3/include -isystem../third_party/debug_assert -isystem../third_party/Catch/single_include" make test
 
 after_success:
   - if test "$COVERAGE" == "true"; then bash <(curl -s https://codecov.io/bash) -x $(which gcov-7); fi
