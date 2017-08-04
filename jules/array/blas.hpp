@@ -4,8 +4,8 @@
 #ifndef JULES_ARRAY_BLAS_H
 #define JULES_ARRAY_BLAS_H
 
-#include <jules/array/detail/common.hpp>
 #include <jules/array/functional.hpp>
+#include <jules/array/fwd.hpp>
 #include <jules/core/debug.hpp>
 
 namespace jules

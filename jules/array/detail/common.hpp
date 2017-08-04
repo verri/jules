@@ -7,21 +7,9 @@
 /// \exclude
 #define JULES_ARRAY_DETAIL_COMMON_H
 
+#include <jules/array/fwd.hpp>
 #include <jules/array/meta/common.hpp>
 #include <jules/core/debug.hpp>
-
-// Forward declarations
-namespace jules
-{
-template <typename, std::size_t> class array;
-template <typename, typename> class strided_ref_array;
-template <typename, typename, typename...> class strided_ref_array_proxy;
-template <typename, std::size_t> class ref_array;
-template <typename, std::size_t, std::size_t> class ref_array_every_proxy;
-template <typename, typename, std::size_t> class unary_expr_array;
-template <typename, typename> struct left_operation;
-template <typename, typename> struct right_operation;
-}
 
 /// \exclude
 namespace jules::detail
