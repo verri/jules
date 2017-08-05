@@ -4,6 +4,7 @@
 #define JULES_ARRAY_IO_H
 
 #include <jules/array/fwd.hpp>
+#include <jules/array/meta/reference.hpp>
 #include <jules/core/type.hpp>
 
 #include <ostream>
@@ -36,21 +37,30 @@ public:
 
   using std::basic_ostream<CharT, Traits>::operator<<;
 
-  template <typename T, std::size_t N> auto operator<<(const array<T, N>& a) -> array_ostream
+  template <typename T, std::size_t N> auto operator<<(const array<T, N>& a) -> array_ostream& { return (*this) << ref(a); }
+
+  template <typename RefArray> auto operator<<(RefArray a) -> meta::requires_t<array_ostream&, ReferenceArray<RefArray>>
   {
+    constexpr auto N = RefArray::order;
+
     if (fmts_.size() == 0)
       fmts_.emplace_back();
     auto& fmt = fmts_[N <= fmts_.size() ? fmts_.size() - N : 0];
 
     (*this) << fmt.before;
     const auto dim_size = a.dimensions()[0];
-    if (dim_size == 0)
-      return (*this) << fmt.after;
+    if (dim_size == 0) {
+      (*this) << fmt.after;
+      return *this;
+    }
 
     (*this) << a[0];
-    for (auto i = index_t{1}; i < dim_size; ++i)
-      (*this) << fmt.separator << a[i];
-    return (*this) << fmt.after;
+    for (auto i = index_t{1}; i < dim_size; ++i) {
+      (*this) << fmt.separator;
+      (*this) << a[i];
+    }
+    (*this) << fmt.after;
+    return *this;
   }
 
 private:
