@@ -9,23 +9,6 @@ constexpr auto N = 10000u;
 void f(void*) {}
 static volatile auto use = f;
 
-template <typename Array, typename = jules::meta::requires<jules::ReferenceArray<Array>>>
-auto operator<<(std::ostream& os, const Array& array) -> std::ostream&
-{
-  os << '{';
-  for (const auto i : jules::indices(array.dimensions()[0u]))
-    os << ' ' << array[i];
-  return os << " }";
-}
-
-template <typename T, std::size_t N> auto operator<<(std::ostream& os, const jules::array<T, N>& array) -> std::ostream&
-{
-  os << '{';
-  for (const auto i : jules::indices(array.dimensions()[0u]))
-    os << ' ' << array[i];
-  return os << " }";
-}
-
 int main()
 {
   using jules::slice;

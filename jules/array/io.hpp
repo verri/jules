@@ -15,7 +15,7 @@ namespace jules
 {
 
 template <typename CharT, typename Traits = std::char_traits<CharT>> struct basic_dim_fmt {
-  std::basic_string<CharT, Traits> before = {CharT('{')}, separator = {CharT('\t')}, after = {CharT('}')};
+  std::basic_string<CharT, Traits> before = {CharT('{')}, separator = {CharT(' ')}, after = {CharT('}')};
 };
 
 template <typename CharT, typename Traits = std::char_traits<CharT>>
@@ -139,9 +139,8 @@ template <typename CharT, typename Traits, typename RefArray>
 auto operator<<(std::basic_ostream<CharT, Traits>& os, RefArray a)
   -> meta::requires_t<std::basic_ostream<CharT, Traits>&, ReferenceArray<RefArray>>
 {
-  if (auto os_ptr = dynamic_cast<array_ostream<CharT, Traits>*>(&os)) {
+  if (auto os_ptr = dynamic_cast<array_ostream<CharT, Traits>*>(&os))
     return (*os_ptr) << a;
-  }
 
   os << CharT('{');
   const auto dim_size = a.dimensions()[0];
@@ -150,7 +149,7 @@ auto operator<<(std::basic_ostream<CharT, Traits>& os, RefArray a)
 
   os << a[0];
   for (auto i = index_t{1}; i < dim_size; ++i)
-    os << CharT('\t') << a[i];
+    os << CharT(' ') << a[i];
   return os << CharT('}');
 }
 
