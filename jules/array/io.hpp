@@ -129,6 +129,31 @@ template <typename CharT, typename Traits> auto& operator<<(array_ostream<CharT,
   return os;
 }
 
+template <typename CharT, typename Traits, typename T, std::size_t N>
+auto operator<<(std::basic_ostream<CharT, Traits>& os, const array<T, N>& a) -> std::basic_ostream<CharT, Traits>&
+{
+  return os << ref(a);
+}
+
+template <typename CharT, typename Traits, typename RefArray>
+auto operator<<(std::basic_ostream<CharT, Traits>& os, RefArray a)
+  -> meta::requires_t<std::basic_ostream<CharT, Traits>&, ReferenceArray<RefArray>>
+{
+  if (auto os_ptr = dynamic_cast<array_ostream<CharT, Traits>*>(&os)) {
+    return (*os_ptr) << a;
+  }
+
+  os << CharT('{');
+  const auto dim_size = a.dimensions()[0];
+  if (dim_size == 0)
+    return os << CharT('}');
+
+  os << a[0];
+  for (auto i = index_t{1}; i < dim_size; ++i)
+    os << CharT('\t') << a[i];
+  return os << CharT('}');
+}
+
 } // namespace jules
 
 #endif // JULES_ARRAY_IO_H
