@@ -154,4 +154,14 @@ TEST_CASE("Column tutorial", "[dataframe]")
   CHECK(a.size() == 0u);
   CHECK(b.size() == c.size());
   CHECK(b.elements_type() == c.elements_type());
+
+  // View with different type
+  auto dview = jules::to_view<double>(b);
+  // b now holds double
+  CHECK(b.elements_type() == typeid(double));
+
+  // To vector, on the other hand, doesn't convert
+  auto fcopy = jules::to_vector<jules::string>(b);
+  // b still holds double
+  CHECK(b.elements_type() == typeid(double));
 }
