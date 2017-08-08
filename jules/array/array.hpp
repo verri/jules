@@ -124,6 +124,7 @@ public:
       this->construct(this->data(), this->size());
     } catch (...) {
       this->deallocate(this->data(), this->size());
+      this->data_ = nullptr;
       throw;
     }
   }
@@ -138,6 +139,7 @@ public:
       this->construct(this->data(), this->size(), value);
     } catch (...) {
       this->deallocate(this->data(), this->size());
+      this->data_ = nullptr;
       throw;
     }
   }
@@ -154,6 +156,7 @@ public:
       this->construct(this->data(), it, this->size());
     } catch (...) {
       this->deallocate(this->data(), this->size());
+      this->data_ = nullptr;
       throw;
     }
   }
@@ -168,6 +171,7 @@ public:
       this->construct(this->data(), values, this->descriptor_);
     } catch (...) {
       this->deallocate(this->data(), this->size());
+      this->data_ = nullptr;
       throw;
     }
   }
@@ -179,6 +183,7 @@ public:
       this->construct(this->data(), source.data(), this->size());
     } catch (...) {
       this->deallocate(this->data(), this->size());
+      this->data_ = nullptr;
       throw;
     }
   }
@@ -202,6 +207,7 @@ public:
       this->construct(this->data(), source.begin(), this->size());
     } catch (...) {
       this->deallocate(this->data(), this->size());
+      this->data_ = nullptr;
       throw;
     }
   }
@@ -217,6 +223,7 @@ public:
       this->construct(this->data(), range::begin(rng), this->size());
     } catch (...) {
       this->deallocate(this->data(), this->size());
+      this->data_ = nullptr;
       throw;
     }
   }
@@ -233,6 +240,7 @@ public:
       this->construct(this->data(), begin, this->size());
     } catch (...) {
       this->deallocate(this->data(), this->size());
+      this->data_ = nullptr;
       throw;
     }
   }

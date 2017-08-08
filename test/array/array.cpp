@@ -119,3 +119,28 @@ TEST_CASE("Empty array operations", "[array]")
   CHECK(prod(empty) == 1.0);
   CHECK(max(empty) == -std::numeric_limits<jules::numeric>::infinity());
 }
+
+TEST_CASE("Safe throwing constructor", "[array]")
+{
+  struct Foo {
+    Foo(bool t = true)
+    {
+      if (t)
+        throw t;
+    }
+    Foo(const Foo&) { throw true; }
+    Foo(Foo&&) = default;
+  };
+
+  auto foos = std::vector<Foo>();
+  for (const auto i : jules::indices(10))
+    foos.emplace_back(false);
+
+  auto foo = Foo{false};
+
+  CHECK_NOTHROW(jules::vector<Foo>{});
+  CHECK_THROWS(jules::vector<Foo>(10u));
+  CHECK_THROWS(jules::vector<Foo>(foo, 10u));
+  CHECK_THROWS(jules::vector<Foo>(foos.data(), foos.size()));
+  CHECK_THROWS(jules::vector<Foo>(foos));
+}

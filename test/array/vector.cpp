@@ -8,6 +8,10 @@ TEST_CASE("Vector tutorial", "[array]")
 {
   SECTION("Constructors")
   {
+    // Non-initialized
+    auto fast = jules::vector<>(jules::uninitialized, 20u);
+    CHECK(fast.size() == 20u);
+
     // Default constructor.
     auto empty = jules::vector<>();
     CHECK(empty.size() == 0u);
