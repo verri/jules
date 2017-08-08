@@ -195,9 +195,11 @@ TEST_CASE("Reading an empty dataframe from an empty string", "[dataframe]")
   CHECK(df.column_count() == 0u);
   CHECK_FALSE(df);
 
-  auto null_stream = std::stringstream();
+  auto bad_stream = std::stringstream();
+  auto tmp = 0;
+  bad_stream >> tmp;
 
-  auto df2 = jules::dataframe::read(null_stream);
+  auto df2 = jules::dataframe::read(bad_stream);
   CHECK(df2.row_count() == 0u);
   CHECK(df2.column_count() == 0u);
   CHECK_FALSE(df2);
@@ -238,7 +240,7 @@ TEST_CASE("Reading matrix of integers", "[dataframe]")
     using jules::default_rule<Foo>::coerce_from;
   };
 
-  using my_coercion_rules = jules::base_coercion_rules<my_integer_rules, my_string_rules>;
+  using my_coercion_rules = jules::base_coercion_rules<my_integer_rules, my_string_rules, my_foo_rules>;
   using my_dataframe = jules::base_dataframe<my_coercion_rules>;
 
   auto opts = my_dataframe::read_options();
@@ -345,4 +347,8 @@ TEST_CASE("Reading and writing a well-formed dataframe", "[dataframe]")
 
   const auto& c3 = df.at(2);
   CHECK(c3.name == "z");
+
+  auto os3 = std::stringstream();
+  os3 << dataframe{};
+  CHECK(os3.str() == "");
 }
