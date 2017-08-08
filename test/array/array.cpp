@@ -142,5 +142,6 @@ TEST_CASE("Safe throwing constructor", "[array]")
   CHECK_THROWS(jules::vector<Foo>(10u));
   CHECK_THROWS(jules::vector<Foo>(foo, 10u));
   CHECK_THROWS(jules::vector<Foo>(foos.data(), foos.size()));
+  CHECK_THROWS(jules::vector<Foo>(foos.begin(), foos.end()));
   CHECK_THROWS(jules::vector<Foo>(foos));
 }

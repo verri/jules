@@ -10,6 +10,11 @@ TEST_CASE("Matrix tutorial", "[array]")
 
   SECTION("Constructors")
   {
+    // Non-initialized
+    auto fast = jules::matrix<>(jules::uninitialized, 2u, 5u);
+    CHECK(fast.row_count() == 2u);
+    CHECK(fast.column_count() == 5u);
+
     // Default constructor.
     auto empty = jules::matrix<>();
     CHECK(empty.size() == 0u);
