@@ -68,3 +68,31 @@ TEST_CASE("Array formatted output", "[array]")
   jawss << jules::space_separated << mat;
   CHECK(wss.str() == L"1 2\n3 4");
 }
+
+TEST_CASE("Exceptional array formatted output", "[array]")
+{
+  auto ss = std::stringstream();
+  auto jss = jules::array_ostream(ss);
+
+  // Resetting format
+  jss.dimensions_format({});
+  jss << jules::vector<int>{1, 2, 3};
+  CHECK(ss.str() == "{1 2 3}");
+
+  // Empty array
+  ss.str("");
+  jss.dimensions_format({});
+  jss << jules::vector<>{};
+  CHECK(ss.str() == "{}");
+
+  // Setting non-existent dimension format
+  ss.str("");
+  jss.dimensions_format({});
+  jss << jules::dimensions_format(1, "("s, ", "s, ")"s) << jules::matrix<int>{{1, 2}, {3, 4}};
+  CHECK(ss.str() == "{(1, 2) (3, 4)}");
+
+  // Empty array directly
+  ss.str("");
+  ss << jules::vector<>{};
+  CHECK(ss.str() == "{}");
+}
