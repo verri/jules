@@ -44,6 +44,8 @@ TEST_CASE("Base numeric utilities", "[numeric]")
     CHECK(jules::sd(b) == Approx(std::sqrt(6 / 3)));
     CHECK(sd(c) == Approx(std::sqrt(6 / 3)));
 
+    CHECK(std::tuple(mean(c), sd(c)) == meansd(c));
+
     CHECK(jules::prod(a.begin(), a.end()) == 24);
     CHECK(jules::prod(b) == 24);
     CHECK(prod(c) == 24);

@@ -7,7 +7,7 @@ TEST_CASE("Array builder", "[array]")
   struct Foo {
     Foo(int, char, double) : ptr{new int[10u]} {}
     ~Foo() { delete[] ptr; }
-    int *ptr;
+    int* ptr;
   };
 
   auto b = jules::array_builder<Foo, 1>(std::array<jules::index_t, 1u>{{3u}});

@@ -19,27 +19,27 @@ auto normal_pdf(const common_array_base<Array>& array, typename Array::value_typ
 
 template <typename Array> auto abs(const common_array_base<Array>& array)
 {
-  return apply(array, [](const auto& v) { return std::abs(v); });
+  return apply(array, [](const auto& v) { return abs(v); });
 }
 
 template <typename Array> auto sqrt(const common_array_base<Array>& array)
 {
-  return apply(array, [](const auto& v) { return std::sqrt(v); });
+  return apply(array, [](const auto& v) { return sqrt(v); });
 }
 
 template <typename Array> auto log(const common_array_base<Array>& array)
 {
-  return apply(array, [](const auto& v) { return std::log(v); });
+  return apply(array, [](const auto& v) { return log(v); });
 }
 
 template <typename Array> auto sin(const common_array_base<Array>& array)
 {
-  return apply(array, [](const auto& v) { return std::sin(v); });
+  return apply(array, [](const auto& v) { return sin(v); });
 }
 
 template <typename Array> auto cos(const common_array_base<Array>& array)
 {
-  return apply(array, [](const auto& v) { return std::cos(v); });
+  return apply(array, [](const auto& v) { return cos(v); });
 }
 
 } // namespace jules

@@ -213,18 +213,48 @@ auto var(const Rng& rng, T start = numeric_traits<T>::additive_identity())
 ///
 /// \module Arithmetic
 /// \notes [jules::numeric_traits<T>]() must implement `additive_identity`.
+/// \notes It might promote the result type since it calls sqrt.
 template <typename Iter, typename Sent, typename T = range::iterator_value_t<Iter>,
           typename = meta::requires<range::Sentinel<Sent, Iter>>>
 auto sd(Iter first, Sent last, T start = numeric_traits<T>::additive_identity())
 {
-  return std::sqrt(::jules::var(first, last, std::move(start)));
+  return sqrt(::jules::var(first, last, std::move(start)));
 }
 
 /// \group Sd
 template <typename Rng, typename T = range::range_value_t<Rng>, typename = meta::requires<range::Range<Rng>>>
 auto sd(const Rng& rng, T start = numeric_traits<T>::additive_identity())
 {
-  return std::sqrt(::jules::var(rng, std::move(start)));
+  return sqrt(::jules::var(rng, std::move(start)));
+}
+
+/// \group MeanSd
+///
+/// Efficiently calculates both *corrected* mean and sample standard deviation of the
+/// elements either in a `Range` or in the sequence [`first`, `last`).
+///
+/// \module Arithmetic
+/// \notes [jules::numeric_traits<T>]() must implement `additive_identity`.
+/// \notes It might promote the result type since it calls sqrt.
+template <typename Iter, typename Sent, typename T = range::iterator_value_t<Iter>,
+          typename = meta::requires<range::Sentinel<Sent, Iter>>>
+auto meansd(Iter first, Sent last, T start = numeric_traits<T>::additive_identity())
+{
+  const auto n = range::distance(first, last);
+  const auto mu = ::jules::mean(first, last, start);
+  auto result = std::move(start);
+
+  for (auto it = first; it != last; ++it)
+    result += square(*it - mu);
+
+  return std::tuple(mu, sqrt(result / (n - 1)));
+}
+
+/// \group MeanSd
+template <typename Rng, typename T = range::range_value_t<Rng>, typename = meta::requires<range::Range<Rng>>>
+auto meansd(const Rng& rng, T start = numeric_traits<T>::additive_identity())
+{
+  return ::jules::meansd(range::begin(rng), range::end(rng), std::move(start));
 }
 
 /// \group Nth
