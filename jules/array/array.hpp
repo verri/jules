@@ -397,11 +397,11 @@ private:
 
 template <typename Array> array(const common_array_base<Array>&)->array<typename Array::value_type, Array::order>;
 
-template <typename T, std::size_t N> auto ref(array<T, N>& a) -> ref_array<T, N> { return static_cast<ref_array<T, N>&>(a); }
+template <typename T, std::size_t N> auto ref(array<T, N>& a) -> ref_array<T, N> { return {a.data(), {a.dimensions()}}; }
 
 template <typename T, std::size_t N> auto ref(const array<T, N>& a) -> ref_array<const T, N>
 {
-  return static_cast<ref_array<const T, N>>(static_cast<const ref_array<T, N>&>(a));
+  return {a.data(), {a.dimensions()}};
 }
 
 /// \group array_alias Array Aliasing

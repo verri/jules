@@ -57,7 +57,7 @@ public:
   using difference_type = distance_t;
 
   ref_array(value_type* data, descriptor<order> descriptor) : data_{data}, descriptor_{descriptor} {}
-  ref_array(const ref_array& source) = default;
+  ref_array(const ref_array& source) = delete;
   ref_array(ref_array&& source) noexcept = default;
 
   ~ref_array(){};
@@ -189,6 +189,18 @@ protected:
 };
 
 template <typename T, std::size_t N> auto eval(const ref_array<T, N>& source) -> const ref_array<T, N>& { return source; }
+
+template <typename T, std::size_t N> auto eval(ref_array<T, N>& source) -> ref_array<T, N>& { return source; }
+
+template <std::size_t D, typename T, std::size_t N> auto drop(const ref_array<T, N>& source) -> ref_array<const T, D>
+{
+  return {source.begin(), {detail::drop_one_level_extents<D>(source.dimensions())}};
+}
+
+template <std::size_t D, typename T, std::size_t N> auto drop(ref_array<T, N>& source) -> ref_array<T, D>
+{
+  return {source.begin(), {detail::drop_one_level_extents<D>(source.dimensions())}};
+}
 
 } // namespace jules
 

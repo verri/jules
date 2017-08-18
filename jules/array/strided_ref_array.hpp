@@ -64,7 +64,7 @@ public:
   using difference_type = distance_t;
 
   strided_ref_array(value_type* data, Mapper mapper) : Mapper{std::move(mapper)}, data_{data} {}
-  strided_ref_array(const strided_ref_array& source) = default;
+  strided_ref_array(const strided_ref_array& source) = delete;
   strided_ref_array(strided_ref_array&& source) noexcept = default;
 
   ~strided_ref_array(){}; // not default to disable default copy, move, assignment, ...
@@ -173,12 +173,12 @@ public:
 
   auto dimensions() const noexcept -> std::array<size_type, order> { return this->descriptor().extents; }
 
+  auto mapper() const -> const Mapper& { return *this; }
+
 protected:
   auto data() -> value_type* { return data_; }
 
   auto data() const -> const value_type* { return data_; }
-
-  auto mapper() const -> const Mapper& { return *this; }
 
   /// \exclude
   value_type* const data_;
@@ -189,6 +189,19 @@ auto eval(const strided_ref_array<T, Mapper>& source) -> const strided_ref_array
 {
   return source;
 }
+
+template <typename T, typename Mapper> auto eval(strided_ref_array<T, Mapper>& source) -> strided_ref_array<T, Mapper>&
+{
+  return source;
+}
+
+template <std::size_t D, typename T, template <std::size_t> typename Mapper, std::size_t N>
+auto drop(const strided_ref_array<T, Mapper<N>>& source) -> strided_ref_array<const T, Mapper<D>>;
+// TODO
+
+template <std::size_t D, typename T, template <std::size_t> typename Mapper, std::size_t N>
+auto drop(strided_ref_array<T, Mapper<N>>& source) -> strided_ref_array<T, Mapper<D>>;
+// TODO
 
 } // namespace jules
 

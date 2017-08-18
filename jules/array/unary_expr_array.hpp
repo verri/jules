@@ -116,6 +116,11 @@ auto eval(const unary_expr_array<It, Op, N>& source) -> array<typename unary_exp
   return {source};
 }
 
+template <std::size_t D, typename It, typename Op, std::size_t N> auto drop(const unary_expr_array<It, Op, N>& source)
+{
+  return unary_expr_array(source.begin(), source.end(), identity, detail::drop_one_level_extents(source.dimensions()));
+}
+
 } // namespace jules
 
 #endif // JULES_ARRAY_UNARY_EXPR_ARRAY_H

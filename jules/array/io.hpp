@@ -140,7 +140,7 @@ auto operator<<(std::basic_ostream<CharT, Traits>& os, RefArray a)
   -> meta::requires_t<std::basic_ostream<CharT, Traits>&, ReferenceArray<RefArray>>
 {
   if (auto os_ptr = dynamic_cast<array_ostream<CharT, Traits>*>(&os))
-    return (*os_ptr) << a;
+    return (*os_ptr) << std::move(a);
 
   os << CharT('{');
   const auto dim_size = a.dimensions()[0];

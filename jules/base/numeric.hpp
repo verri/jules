@@ -43,7 +43,13 @@ struct forward_arithmetic {
   template <typename T> friend decltype(auto) operator*(T&& value, forward_arithmetic) { return std::forward<T>(value); }
 };
 
+struct identity_t {
+  template <typename T> constexpr decltype(auto) operator()(T&& x) const noexcept { return std::forward<T>(x); }
+};
+
 } // namespace detail
+
+constexpr static auto identity = detail::identity_t{};
 
 /// \group Repeat
 ///

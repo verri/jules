@@ -4,20 +4,20 @@
 #define JULES_ARRAY_NUMERIC_H
 
 #include <jules/array/builder.hpp>
+#include <jules/array/fwd.hpp>
 #include <jules/array/meta/common.hpp>
 #include <jules/base/const_vector.hpp>
 #include <jules/core/debug.hpp>
 #include <jules/core/meta.hpp>
 #include <jules/core/type.hpp>
 
+#include <algorithm>
 #include <iterator>
 #include <type_traits>
 #include <vector>
 
 namespace jules
 {
-
-template <typename, std::size_t> class array;
 
 static inline auto seq(const index_t start, const index_t stop, const distance_t step = 1) -> const_vector<index_t>
 {
