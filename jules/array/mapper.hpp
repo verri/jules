@@ -25,11 +25,16 @@ public:
   constexpr auto index_begin() const noexcept -> iterator { return descriptor_.begin(); }
   constexpr auto index_end() const noexcept -> iterator { return descriptor_.end(); }
 
-  constexpr auto drop_dimension(index_t i) const noexcept -> identity_mapper<N - 1>
+  constexpr auto drop_first_dimension(index_t i) const noexcept -> identity_mapper<N - 1>
   {
-    auto new_descriptor = descriptor_.drop_dimension();
+    auto new_descriptor = descriptor_.discard_dimension();
     new_descriptor.start = descriptor_.start + descriptor_.strides[0] * i;
     return {new_descriptor};
+  }
+
+  template <std::size_t D> constexpr auto drop_one_level_dimensions() const -> identity_mapper<D>
+  {
+    return {descriptor_.drop_one_level_dimensions<D>()};
   }
 
 private:
@@ -75,10 +80,9 @@ public:
   auto index_begin() const noexcept -> iterator { return indexes_.begin(); }
   auto index_end() const noexcept -> iterator { return indexes_.end(); }
 
-  auto drop_dimension(index_t i) const noexcept -> vector_mapper<N - 1>
+  auto drop_first_dimension(index_t i) const noexcept -> vector_mapper<N - 1>
   {
-
-    auto dropped = descriptor_.drop_dimension();
+    auto dropped = descriptor_.discard_dimension();
     dropped.start = descriptor_.start + i; // strides[0] is always 1u for vector mapped.
 
     auto new_indexes = typename const_vector<index_t>::container_type();
@@ -88,6 +92,11 @@ public:
       new_indexes.push_back(map(index));
 
     return {dropped.extents, {std::move(new_indexes)}};
+  }
+
+  template <std::size_t D> constexpr auto drop_one_level_dimensions() const -> vector_mapper<D>
+  {
+    return {descriptor_.drop_one_level_dimensions(), indexes_};
   }
 
 private:

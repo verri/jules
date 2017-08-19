@@ -56,15 +56,21 @@ static inline constexpr auto seq_size(index_t start, index_t stop, index_t step)
 }
 
 template <std::size_t D, std::size_t N>
-static auto drop_one_level_extents(const std::array<index_t, N>& extents) -> std::array<index_t, D>
+constexpr auto drop_one_level_extents(const std::array<index_t, N>& extents) -> std::array<index_t, D>
 {
   static_assert(D <= N);
   DEBUG_ASSERT(
     std::accumulate(begin(extents), end(extents), index_t{}, [](auto acc, auto d) { return acc + (d == 1 ? 1 : 0); }) >= N - D,
     debug::default_module, debug::level::invalid_argument, "array dimensions cannot be dropped");
 
-  auto new_extents = repeat<D, index_t>(0u);
-  std::copy_if(begin(extents), end(extents), begin(new_extents), [](auto d) { return d != 1; });
+  auto new_extents = repeat<D, index_t>(1u);
+  std::copy_if(begin(extents), end(extents), begin(new_extents), [dropped_count = index_t{0u}](auto d) mutable->bool {
+    if (dropped_count == N - D || d != 1)
+      return true;
+    ++dropped_count;
+    return false;
+  });
+
   return new_extents;
 }
 

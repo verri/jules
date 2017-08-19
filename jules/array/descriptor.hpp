@@ -4,6 +4,7 @@
 /// \exclude
 #define JULES_ARRAY_DESCRIPTOR_H
 
+#include <jules/array/detail/common.hpp>
 #include <jules/base/numeric.hpp>
 #include <jules/core/debug.hpp>
 #include <jules/core/type.hpp>
@@ -85,15 +86,20 @@ public:
     return index;
   }
 
-  constexpr auto drop_dimension() const noexcept -> descriptor<N - 1>
+  constexpr auto discard_dimension() const noexcept -> descriptor<N - 1>
   {
-    return drop_dimension_impl(std::make_index_sequence<N - 1>{});
+    return discard_dimension_impl(std::make_index_sequence<N - 1>{});
+  }
+
+  template <std::size_t D> constexpr auto drop_one_level_dimensions() const -> descriptor<D>
+  {
+    return {detail::drop_one_level_extents<D>(extents)};
   }
 
   std::array<index_t, N> extents = repeat<N, index_t>(0u); //< Size in each dimension.
 
 private:
-  template <std::size_t... I> constexpr auto drop_dimension_impl(std::index_sequence<I...>) const noexcept -> descriptor<N - 1>
+  template <std::size_t... I> constexpr auto discard_dimension_impl(std::index_sequence<I...>) const noexcept -> descriptor<N - 1>
   {
     return {{{extents[I + 1]...}}};
   }

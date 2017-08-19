@@ -138,9 +138,36 @@ public:
   constexpr auto cbegin() const noexcept -> iterator { return {this, {}}; }
   constexpr auto cend() const noexcept -> iterator { return {this, end_index()}; }
 
-  constexpr auto drop_dimension() const noexcept -> strided_descriptor<N - 1>
+  constexpr auto discard_dimension() const noexcept -> strided_descriptor<N - 1>
   {
-    return drop_dimension_impl(std::make_index_sequence<N - 1>{});
+    return discard_dimension_impl(std::make_index_sequence<N - 1>{});
+  }
+
+  template <std::size_t D> constexpr auto drop_one_level_dimensions() const -> strided_descriptor<D>
+  {
+    static_assert(D < N);
+    DEBUG_ASSERT(std::accumulate(std::begin(extents), std::end(extents), index_t{},
+                                 [](auto acc, auto d) { return acc + (d == 1 ? 1 : 0); }) >= N - D,
+                 debug::default_module, debug::level::invalid_argument, "array dimensions cannot be dropped");
+
+    auto dropped_count = index_t{0u};
+    auto new_extents = repeat<D, index_t>(1u);
+    auto new_strides = repeat<D, index_t>(1u);
+    auto current = index_t{0u};
+
+    for (const auto i : indices(N)) {
+      if (dropped_count == N - D || extents[i] != 1) {
+        new_extents[current] = extents[i];
+        new_strides[current] = strides[i];
+        ++current;
+      } else {
+        ++dropped_count;
+      }
+    }
+
+    DEBUG_ASSERT(dropped_count == N - D, debug::default_module, debug::level::unreachable, "");
+
+    return {start, new_extents, new_strides};
   }
 
   index_t start = 0u;                                      //< Start position.
@@ -156,7 +183,7 @@ private:
   }
 
   template <std::size_t... I>
-  constexpr auto drop_dimension_impl(std::index_sequence<I...>) const noexcept -> strided_descriptor<N - 1>
+  constexpr auto discard_dimension_impl(std::index_sequence<I...>) const noexcept -> strided_descriptor<N - 1>
   {
     return {start, {{extents[I + 1]...}}, {{strides[I + 1]...}}};
   }
@@ -259,6 +286,12 @@ public:
 
   constexpr auto cbegin() const noexcept -> iterator { return {start, strides[0]}; }
   constexpr auto cend() const noexcept -> iterator { return {start + strides[0] * extents[0], strides[0]}; }
+
+  template <std::size_t D> constexpr auto drop_one_level_dimensions() const noexcept -> strided_descriptor<D>
+  {
+    static_assert(D == 1);
+    return *this;
+  }
 
   index_t start = 0u;                      //< Start position.
   std::array<index_t, 1> extents = {{0u}}; //< Number of position.

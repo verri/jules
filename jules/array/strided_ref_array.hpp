@@ -19,6 +19,12 @@
 namespace jules
 {
 
+template <std::size_t D, typename U, template <std::size_t> typename MapType, std::size_t M>
+auto drop(const strided_ref_array<U, MapType<M>>& source) -> strided_ref_array<const U, MapType<D>>;
+
+template <std::size_t D, typename U, template <std::size_t> typename MapType, std::size_t M>
+auto drop(strided_ref_array<U, MapType<M>>& source) -> strided_ref_array<U, MapType<D>>;
+
 /// Array with non-owned, non-continuous data.
 ///
 /// This class represents a strided_ref view of an concrete array.
@@ -173,9 +179,15 @@ public:
 
   auto dimensions() const noexcept -> std::array<size_type, order> { return this->descriptor().extents; }
 
-  auto mapper() const -> const Mapper& { return *this; }
+  template <std::size_t D, typename U, template <std::size_t> typename MapType, std::size_t M>
+  friend auto drop(const strided_ref_array<U, MapType<M>>& source) -> strided_ref_array<const U, MapType<D>>;
+
+  template <std::size_t D, typename U, template <std::size_t> typename MapType, std::size_t M>
+  friend auto drop(strided_ref_array<U, MapType<M>>& source) -> strided_ref_array<U, MapType<D>>;
 
 protected:
+  auto mapper() const -> const Mapper& { return *this; }
+
   auto data() -> value_type* { return data_; }
 
   auto data() const -> const value_type* { return data_; }
@@ -195,13 +207,17 @@ template <typename T, typename Mapper> auto eval(strided_ref_array<T, Mapper>& s
   return source;
 }
 
-template <std::size_t D, typename T, template <std::size_t> typename Mapper, std::size_t N>
-auto drop(const strided_ref_array<T, Mapper<N>>& source) -> strided_ref_array<const T, Mapper<D>>;
-// TODO
+template <std::size_t D, typename U, template <std::size_t> typename MapType, std::size_t M>
+auto drop(const strided_ref_array<U, MapType<M>>& source) -> strided_ref_array<const U, MapType<D>>
+{
+  return {source.data(), source.mapper().template drop_one_level_dimensions<D>()};
+}
 
-template <std::size_t D, typename T, template <std::size_t> typename Mapper, std::size_t N>
-auto drop(strided_ref_array<T, Mapper<N>>& source) -> strided_ref_array<T, Mapper<D>>;
-// TODO
+template <std::size_t D, typename U, template <std::size_t> typename MapType, std::size_t M>
+auto drop(strided_ref_array<U, MapType<M>>& source) -> strided_ref_array<U, MapType<D>>
+{
+  return {source.data(), source.mapper().template drop_one_level_dimensions<D>()};
+}
 
 } // namespace jules
 

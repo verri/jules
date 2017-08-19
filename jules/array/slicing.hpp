@@ -221,7 +221,7 @@ template <typename T, typename Mapper> static decltype(auto) array_at(T* data, c
     const auto pos = mapper.map(descriptor(i));
     return data[pos];
   } else {
-    auto new_mapper = mapper.drop_dimension(i);
+    auto new_mapper = mapper.drop_first_dimension(i);
     return strided_ref_array<T, decltype(new_mapper)>{data, std::move(new_mapper)};
   }
   // clang-format on
@@ -260,7 +260,7 @@ template <typename U, std::size_t M> static decltype(auto) array_at(U* data, con
     return data[i];
   } else {
     const auto new_desc = strided_descriptor<M>{i, desc.extents};
-    return strided_ref_array<U, identity_mapper<M - 1>>{data, {new_desc.drop_dimension()}};
+    return strided_ref_array<U, identity_mapper<M - 1>>{data, {new_desc.discard_dimension()}};
   }
   // clang-format on
 }
