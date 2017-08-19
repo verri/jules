@@ -93,7 +93,7 @@ public:
 
   template <std::size_t D> constexpr auto drop_one_level_dimensions() const -> descriptor<D>
   {
-    return {detail::drop_one_level_extents<D>(extents)};
+    return {detail::template drop_one_level_extents<D>(extents)};
   }
 
   std::array<index_t, N> extents = repeat<N, index_t>(0u); //< Size in each dimension.

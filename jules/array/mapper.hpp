@@ -34,7 +34,7 @@ public:
 
   template <std::size_t D> constexpr auto drop_one_level_dimensions() const -> identity_mapper<D>
   {
-    return {descriptor_.drop_one_level_dimensions<D>()};
+    return {descriptor_.template drop_one_level_dimensions<D>()};
   }
 
 private:
@@ -96,7 +96,7 @@ public:
 
   template <std::size_t D> constexpr auto drop_one_level_dimensions() const -> vector_mapper<D>
   {
-    return {descriptor_.drop_one_level_dimensions(), indexes_};
+    return {descriptor_.template drop_one_level_dimensions<D>(), indexes_};
   }
 
 private:
