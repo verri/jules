@@ -35,21 +35,21 @@ namespace detail
 
 // Enablers
 template <std::size_t N, typename... Types>
-using n_indexes_enabler = std::enable_if_t<N == sizeof...(Types) && all_args(std::is_convertible<Types, uint>::value...)>;
+using n_indexes_enabler = std::enable_if_t<N == sizeof...(Types) && all_args(std::is_convertible<Types, size_t>::value...)>;
 
 // Request checks
 
 template <typename T> constexpr auto index_or_slice()
 {
-  return std::is_convertible<T, uint>::value || std::is_convertible<T, base_slice<1>>::value;
+  return std::is_convertible<T, size_t>::value || std::is_convertible<T, base_slice<1>>::value;
 }
 
 template <typename Return, typename... Args>
-using element_request = std::enable_if_t<all_args(std::is_convertible<Args, uint>::value...), Return>;
+using element_request = std::enable_if_t<all_args(std::is_convertible<Args, size_t>::value...), Return>;
 
 template <typename Return, typename... Args>
 using slice_request =
-  std::enable_if_t<all_args(index_or_slice<Args>()...) && !all_args(std::is_convertible<Args, uint>::value...), Return>;
+  std::enable_if_t<all_args(index_or_slice<Args>()...) && !all_args(std::is_convertible<Args, size_t>::value...), Return>;
 
 template <typename Return, typename... Args>
 using indirect_request = std::enable_if_t<!all_args(index_or_slice<Args>()...), Return>;
