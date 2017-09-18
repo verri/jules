@@ -4,8 +4,10 @@ SRC = $(shell find . -name '*.cpp')
 OBJ := $(SRC:.cpp=.o)
 DEP := $(SRC:.cpp=.d)
 
+BLASLIBS := $(shell ../util/find_blas --libs)
+
 CXXFLAGS += -DJULES_DEBUG_THROWS -std=c++1z -Wall -Wextra -pedantic -I..
-LDFLAGS += $(shell pkg-config --libs cblas)
+LDFLAGS += $(BLASLIBS)
 
 NODEPS = clean
 

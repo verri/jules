@@ -1,0 +1,2 @@
+#!/bin/sh
+pkg-config --silence-errors $1 openblas || pkg-config --silence-errors $1 cblas || pkg-config --silence-errors $1 blas
