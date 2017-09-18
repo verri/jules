@@ -24,6 +24,7 @@ TEST_CASE("Matrix multiplication", "[blas]")
 
   static_assert(std::is_same<decltype(expected), decltype(prod)>::value);
   CHECK(all(expected == prod));
+  CHECK(all(prod == product(a, b)));
 
   const auto optimized = jules::blas::product(2.0 * a, b);
   CHECK(all(2.0 * expected == optimized));

@@ -116,10 +116,15 @@ auto eval(const unary_expr_array<It, Op, N>& source) -> array<typename unary_exp
   return {source};
 }
 
-template <std::size_t D, typename It, typename Op, std::size_t N> auto drop(const unary_expr_array<It, Op, N>& source)
+template <std::size_t D, typename It, typename Op, std::size_t N> auto drop_to(const unary_expr_array<It, Op, N>& source)
 {
   return unary_expr_array(source.begin(), source.end(), identity,
                           detail::template drop_one_level_extents<D>(source.dimensions()));
+}
+
+template <typename It, typename Op, std::size_t N> decltype(auto) drop(const unary_expr_array<It, Op, N>& source)
+{
+  return drop_to<1>(source);
 }
 
 } // namespace jules

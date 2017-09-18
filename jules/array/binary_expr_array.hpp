@@ -123,10 +123,16 @@ auto eval(const binary_expr_array<LhsIt, RhsIt, Op, N>& source)
 }
 
 template <std::size_t D, typename LhsIt, typename RhsIt, typename Op, std::size_t N>
-auto drop(const binary_expr_array<LhsIt, RhsIt, Op, N>& source)
+auto drop_to(const binary_expr_array<LhsIt, RhsIt, Op, N>& source)
 {
   return unary_expr_array(source.begin(), source.end(), identity,
                           detail::template drop_one_level_extents<D>(source.dimensions()));
+}
+
+template <typename LhsIt, typename RhsIt, typename Op, std::size_t N>
+decltype(auto) drop(const binary_expr_array<LhsIt, RhsIt, Op, N>& source)
+{
+  return drop_to<1>(source);
 }
 
 } // namespace jules

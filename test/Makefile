@@ -5,7 +5,7 @@ OBJ := $(SRC:.cpp=.o)
 DEP := $(SRC:.cpp=.d)
 
 CXXFLAGS += -DJULES_DEBUG_THROWS -std=c++1z -Wall -Wextra -pedantic -I..
-LDFLAGS += -lblas
+LDFLAGS += $(shell pkg-config --libs cblas)
 
 NODEPS = clean
 

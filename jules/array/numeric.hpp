@@ -6,6 +6,8 @@
 #include <jules/array/builder.hpp>
 #include <jules/array/fwd.hpp>
 #include <jules/array/meta/common.hpp>
+#include <jules/array/meta/reference.hpp>
+#include <jules/array/slicing.hpp>
 #include <jules/base/const_vector.hpp>
 #include <jules/core/debug.hpp>
 #include <jules/core/meta.hpp>
@@ -34,6 +36,37 @@ static inline auto seq(const index_t start, const index_t stop, const distance_t
     indexes.push_back(i);
 
   return {std::move(indexes)};
+}
+
+namespace detail
+{
+template <typename R, typename RefArrayA, typename RefArrayB>
+auto product_impl(const RefArrayA lhs, const RefArrayB& rhs)
+  -> meta::requires_t<array<R, 2u>, ReferenceArray<RefArrayA>, ReferenceArray<RefArrayB>>
+{
+  static_assert(RefArrayA::order == 2u && RefArrayB::order == 2u);
+
+  DEBUG_ASSERT(lhs.size() > 0 && rhs.size() > 0, debug::default_module, debug::level::invalid_argument, "empty matrix");
+  DEBUG_ASSERT(lhs.column_count() == rhs.row_count(), debug::default_module, debug::level::invalid_argument, "invalid extents");
+
+  const auto m = lhs.row_count();
+  const auto p = rhs.column_count();
+
+  auto builder = array_builder<R, 2u>{{m, p}};
+
+  for (const auto j : indices(p))
+    for (const auto i : indices(m))
+      builder.push_back(sum(lhs[i][every] * drop(rhs[every][j])));
+
+  return {std::move(builder)};
+}
+} // namespace detail
+
+template <typename ArrayA, typename ArrayB,
+          typename R = decltype(std::declval<typename ArrayA::value_type>() * std::declval<typename ArrayB::value_type>())>
+auto product(const common_array_base<ArrayA>& lhs, const common_array_base<ArrayB>& rhs) -> array<R, 2u>
+{
+  return detail::product_impl<R>(eval(static_cast<const ArrayA&>(lhs)), eval(static_cast<const ArrayB&>(rhs)));
 }
 
 template <typename T, typename Array> auto to_vector(const common_array_base<Array>& source) -> array<T, 1u>
