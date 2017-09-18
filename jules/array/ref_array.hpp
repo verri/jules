@@ -188,23 +188,14 @@ protected:
   descriptor<order> descriptor_;
 };
 
-template <typename T, std::size_t N> auto eval(const ref_array<T, N>& source) -> const ref_array<T, N>& { return source; }
+template <typename T, std::size_t N> auto eval(ref_array<T, N> source) -> ref_array<T, N> { return source; }
 
-template <typename T, std::size_t N> auto eval(ref_array<T, N>& source) -> ref_array<T, N>& { return source; }
-
-template <std::size_t D, typename T, std::size_t N> auto drop_to(const ref_array<T, N>& source) -> ref_array<const T, D>
+template <std::size_t D, typename T, std::size_t N> auto drop_to(ref_array<T, N> source) -> ref_array<T, D>
 {
   return {source.begin(), {detail::template drop_one_level_extents<D>(source.dimensions())}};
 }
 
-template <std::size_t D, typename T, std::size_t N> auto drop_to(ref_array<T, N>& source) -> ref_array<T, D>
-{
-  return {source.begin(), {detail::template drop_one_level_extents<D>(source.dimensions())}};
-}
-
-template <typename T, std::size_t N> decltype(auto) drop(const ref_array<T, N>& source) { return drop_to<1>(source); }
-
-template <typename T, std::size_t N> decltype(auto) drop(ref_array<T, N>& source) { return drop_to<1>(source); }
+template <typename T, std::size_t N> decltype(auto) drop(ref_array<T, N> source) { return drop_to<1>(source); }
 
 } // namespace jules
 
