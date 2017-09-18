@@ -6,7 +6,7 @@ DEP := $(SRC:.cpp=.d)
 
 BLASLIBS := $(shell ../util/find_blas --libs)
 
-CXXFLAGS += -DJULES_DEBUG_THROWS -std=c++1z -Wall -Wextra -pedantic -I..
+CXXFLAGS += -DJULES_DEBUG_THROWS -std=c++1z -Wall -Wextra -pedantic -I../include
 LDFLAGS += $(BLASLIBS)
 
 NODEPS = clean

@@ -8,7 +8,7 @@ flags = [
 '-x',
 'c++',
 '-I',
-'..',
+'../include',
 '-I',
 '../third_party/Catch/single_include',
 '-stdlib=libc++'
