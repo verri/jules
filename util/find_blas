@@ -1,2 +1,5 @@
 #!/bin/sh
-pkg-config --silence-errors $1 openblas || pkg-config --silence-errors $1 cblas || pkg-config --silence-errors $1 blas
+pkg-config --silence-errors $1 openblas ||
+  pkg-config --silence-errors $1 cblas ||
+  pkg-config --silence-errors $1 blas ||
+  echo "CBLAS libraries couldn't be found automatically. CBLASLIB must be set."
