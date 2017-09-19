@@ -191,8 +191,7 @@ template <typename T, typename Mapper, typename... Args> static auto array_slice
 {
   constexpr auto order = Mapper::order;
   static_assert(sizeof...(Args) > 0u);
-  // clang-format off
-  if constexpr (((std::is_convertible_v<Args, index_t> || std::is_convertible_v<Args, absolute_strided_slice>) && ...)) {
+  if constexpr (((std::is_convertible_v<Args, index_t> || std::is_convertible_v<Args, absolute_strided_slice>)&&...)) {
     auto new_descriptor = detail::default_slicing(mapper.descriptor(), std::forward<Args>(args)...);
     if constexpr (std::is_same_v<Mapper, identity_mapper<order>>) {
       return strided_ref_array<T, Mapper>{data, {std::move(new_descriptor)}};
@@ -201,7 +200,7 @@ template <typename T, typename Mapper, typename... Args> static auto array_slice
       return strided_ref_array<T, Mapper>{data, {new_descriptor.extents, std::move(indexes)}};
     }
   } else {
-    auto [extents, positions] = detail::indirect_slicing(mapper.descriptor(), std::forward<Args>(args)...);
+    auto[extents, positions] = detail::indirect_slicing(mapper.descriptor(), std::forward<Args>(args)...);
     if constexpr (std::is_same_v<Mapper, identity_mapper<order>>) {
       return strided_ref_array<T, vector_mapper<order>>{data, {extents, {std::move(positions)}}};
     } else {
@@ -209,14 +208,12 @@ template <typename T, typename Mapper, typename... Args> static auto array_slice
       return strided_ref_array<T, vector_mapper<order>>{data, {extents, std::move(indexes)}};
     }
   }
-  // clang-format on
 }
 
 template <typename T, typename Mapper> static decltype(auto) array_at(T* data, const Mapper& mapper, index_t i)
 {
   const auto& descriptor = mapper.descriptor();
   DEBUG_ASSERT(i < descriptor.extents[0], debug::default_module, debug::level::boundary_check, "out of range");
-  // clang-format off
   if constexpr (Mapper::order == 1) {
     const auto pos = mapper.map(descriptor(i));
     return data[pos];
@@ -224,80 +221,63 @@ template <typename T, typename Mapper> static decltype(auto) array_at(T* data, c
     auto new_mapper = mapper.drop_first_dimension(i);
     return strided_ref_array<T, decltype(new_mapper)>{data, std::move(new_mapper)};
   }
-  // clang-format on
 }
 
 template <typename T, typename Mapper> static decltype(auto) array_at(T* data, const Mapper& mapper, every_index)
 {
   const auto& descriptor = mapper.descriptor();
-  // clang-format off
   if constexpr (Mapper::order == 1) {
     return strided_ref_array<T, Mapper>{data, mapper};
   } else {
     return strided_ref_array_proxy<T, Mapper, absolute_strided_slice>{data, mapper, slice(0u, descriptor.extents[0], 1u)};
   }
-  // clang-format on
-}
-
-template <typename T, typename Mapper, typename Index>
-static decltype(auto) array_at(T* data, const Mapper& mapper, Index&& index)
-{
-  // clang-format off
   if constexpr (Mapper::order == 1) {
     return detail::array_slice(data, mapper, std::forward<Index>(index));
   } else {
     using IndexType = std::conditional_t<std::is_rvalue_reference_v<Index>, std::decay_t<Index>, Index>;
     return strided_ref_array_proxy<T, Mapper, IndexType>{data, mapper, std::forward<Index>(index)};
   }
-  // clang-format on
 }
 
 template <typename U, std::size_t M> static decltype(auto) array_at(U* data, const descriptor<M>& desc, index_t i)
 {
   DEBUG_ASSERT(i < desc.extents[0], debug::default_module, debug::level::boundary_check, "out of range");
-  // clang-format off
   if constexpr (M == 1) {
     return data[i];
   } else {
     const auto new_desc = strided_descriptor<M>{i, desc.extents};
     return strided_ref_array<U, identity_mapper<M - 1>>{data, {new_desc.discard_dimension()}};
   }
-  // clang-format on
 }
 
 template <typename U, std::size_t M> static decltype(auto) array_at(U* data, const descriptor<M>& desc, every_index)
 {
-  // clang-format off
   if constexpr (M == 1)
     return ref_array<U, M>{data, desc};
   else
     return ref_array_every_proxy<U, M, 1u>{data, desc};
-  // clang-format on
 }
 
 template <typename U, std::size_t M, typename Rng, typename = meta::requires<range::SizedRange<Rng>>>
 static decltype(auto) array_at(U* data, const descriptor<M>& desc, const Rng& rng)
 {
-  // clang-format off
   if constexpr (M == 1 && std::is_same_v<Rng, const_vector<index_t>>) {
     DEBUG_ASSERT(max(rng) < desc.length(), debug::default_module, debug::level::boundary_check, "out of range");
     return strided_ref_array<U, vector_mapper<1u>>{data, {{{rng.size()}}, rng}};
   } else {
     return array_at(data, identity_mapper<M>{{0u, desc.extents}}, rng);
   }
-  // clang-format on
 }
 
 template <typename U, std::size_t M> static decltype(auto) array_at(U* data, const descriptor<M>& desc, absolute_slice slice)
 {
-  // clang-format off
   if constexpr (M == 1) {
-    DEBUG_ASSERT(slice.start + slice.extent - 1u < desc.extents[0], debug::default_module, debug::level::boundary_check, "out of range");
+    DEBUG_ASSERT(slice.start + slice.extent - 1u < desc.extents[0], debug::default_module, debug::level::boundary_check,
+                 "out of range");
     return ref_array<U, 1u>{data + slice.start, {{slice.extent}}};
   } else {
     return array_at(data, identity_mapper<M>{{0u, desc.extents}}, std::move(slice));
   }
-  // clang-format on
 }
 
 template <typename U, std::size_t M, typename Index>
@@ -351,16 +331,13 @@ private:
 
   template <typename Index, std::size_t... I> decltype(auto) at_impl(Index&& index, std::index_sequence<I...>)
   {
-    // clang-format off
     if constexpr (sizeof...(Indexes) == order - 1) {
-      return detail::array_slice(
-        data_, std::move(mapper_), std::get<I>(indexes_)..., std::forward<Index>(index));
+      return detail::array_slice(data_, std::move(mapper_), std::get<I>(indexes_)..., std::forward<Index>(index));
     } else {
       using IndexType = std::conditional_t<std::is_rvalue_reference_v<Index>, std::decay_t<Index>, Index>;
-      return strided_ref_array_proxy<T, Mapper, Indexes..., IndexType>{
-        data_, std::move(mapper_), std::get<I>(indexes_)..., std::forward<Index>(index)};
+      return strided_ref_array_proxy<T, Mapper, Indexes..., IndexType>{data_, std::move(mapper_), std::get<I>(indexes_)...,
+                                                                       std::forward<Index>(index)};
     }
-    // clang-format on
   }
 
   T* data_;
@@ -378,9 +355,7 @@ public:
 
   decltype(auto) operator[](index_t i) &&
   {
-    // clang-format off
-    if constexpr (M == N - 1)
-    {
+    if constexpr (M == N - 1) {
       const auto last_dim = descriptor_.extents[N - 1];
       DEBUG_ASSERT(i < last_dim, debug::default_module, debug::level::boundary_check, "out of range");
 
@@ -388,45 +363,36 @@ public:
       descriptor_.extents[N - 1] = 1u;
 
       return ref_array<T, N>{data_ + i * stride, descriptor_};
-    }
-    else
-    {
+    } else {
       return at(slice);
     }
-    // clang-format on
   }
 
   decltype(auto) operator[](absolute_slice slice) &&
   {
-    // clang-format off
-    if constexpr (M == N - 1)
-    {
+    if constexpr (M == N - 1) {
       const auto last_dim = descriptor_.extents[N - 1];
-      DEBUG_ASSERT(slice.start + slice.extent - 1u < last_dim, debug::default_module, debug::level::boundary_check, "out of range");
+      DEBUG_ASSERT(slice.start + slice.extent - 1u < last_dim, debug::default_module, debug::level::boundary_check,
+                   "out of range");
 
       const auto stride = prod(descriptor_.extents) / last_dim;
       descriptor_.extents[N - 1] = slice.extent;
 
       return ref_array<T, N>{data_ + slice.start * stride, descriptor_};
-    }
-    else
-    {
+    } else {
       return at(slice);
     }
-    // clang-format on
   }
 
   decltype(auto) operator[](absolute_strided_slice slice) && { return at(slice); }
 
   decltype(auto) operator[](every_index) &&
   {
-    // clang-format off
     if constexpr (M == N - 1) {
       return ref_array<T, N>{data_, descriptor_};
     } else {
       return ref_array_every_proxy<T, N, M + 1>{data_, descriptor_};
     }
-    // clang-format on
   }
 
   decltype(auto) operator[](bounded_slice slice) && { return at(eval(slice, descriptor_.extents[M])); }

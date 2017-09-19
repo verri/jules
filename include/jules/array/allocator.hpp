@@ -45,8 +45,7 @@ template <typename T> struct array_allocator
   auto construct(value_type* to, recursive_initializer_list_t<value_type, N> values,
                  const descriptor<N>& desc) noexcept(std::is_nothrow_copy_constructible_v<value_type>)
   {
-    // clang-format off
-    if constexpr(std::is_nothrow_copy_constructible_v<value_type>) {
+    if constexpr (std::is_nothrow_copy_constructible_v<value_type>) {
       construct_recursive(to, values, desc);
     } else {
       auto constructed_count = index_t{0};
@@ -57,7 +56,6 @@ template <typename T> struct array_allocator
         throw;
       }
     }
-    // clang-format on
   }
 
   void destroy(value_type* data, index_t size) noexcept { std::destroy_n(data, size); }

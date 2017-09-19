@@ -61,7 +61,6 @@ public:
   /// Returns the memory position of the index.
   constexpr auto operator()(const std::array<index_t, N>& indexes) const noexcept -> index_t
   {
-    // clang-format off
     if constexpr (N == 1) {
       return indexes[0];
     } else if constexpr (N == 2) {
@@ -69,14 +68,12 @@ public:
     } else {
       auto stride = index_t{1u};
       auto pos = index_t{0u};
-      for (auto i = index_t{0u}; i < N; ++i)
-      {
+      for (auto i = index_t{0u}; i < N; ++i) {
         pos += stride * indexes[i];
         stride *= extents[i];
       }
       return pos;
     }
-    // clang-format on
   }
 
   /// \group Index

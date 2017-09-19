@@ -12,9 +12,7 @@ namespace jules
 inline namespace slicing
 {
 
-// clang-format off
-template <typename F>
-class relative_index
+template <typename F> class relative_index
 {
 public:
   template <typename G> friend constexpr auto make_relative_index(G g) noexcept -> relative_index<G>;
@@ -33,7 +31,6 @@ private:
   constexpr relative_index(tag<relative_index>, F f) noexcept : f_{std::move(f)} {}
   F f_;
 };
-// clang-format on
 
 template <typename G> constexpr auto make_relative_index(G g) noexcept -> relative_index<G> { return {{}, std::move(g)}; }
 
