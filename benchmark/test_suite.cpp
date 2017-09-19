@@ -11,9 +11,9 @@ static volatile auto use = f;
 
 int main()
 {
-  using jules::slice;
-  using jules::seq;
   using jules::every;
+  using jules::seq;
+  using jules::slice;
 
   JULES_DEFER({
     std::cout << "\nExiting." << std::endl;

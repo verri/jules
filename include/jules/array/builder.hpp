@@ -31,8 +31,7 @@ public:
 
   array_builder(array_builder&& source) noexcept
     : data_{std::exchange(source.data_, nullptr)}, extents_{source.extents_}, count_{std::exchange(source.count_, 0u)}
-  {
-  }
+  {}
 
   auto operator=(const array_builder&) -> array_builder& = delete;
 

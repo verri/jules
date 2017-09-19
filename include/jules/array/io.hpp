@@ -14,7 +14,8 @@
 namespace jules
 {
 
-template <typename CharT, typename Traits = std::char_traits<CharT>> struct basic_dim_fmt {
+template <typename CharT, typename Traits = std::char_traits<CharT>> struct basic_dim_fmt
+{
   std::basic_string<CharT, Traits> before = {CharT('{')}, separator = {CharT(' ')}, after = {CharT('}')};
 };
 
@@ -70,24 +71,24 @@ private:
 
 namespace manip
 {
-struct comma_separated_t {
-};
-struct space_separated_t {
-};
-struct tab_separated_t {
-};
+struct comma_separated_t
+{};
+struct space_separated_t
+{};
+struct tab_separated_t
+{};
 } // namespace manip
 
 constexpr auto comma_separated = manip::comma_separated_t{};
 constexpr auto space_separated = manip::space_separated_t{};
 constexpr auto tab_separated = manip::tab_separated_t{};
 
-template <typename CharT, typename Traits> struct dimensions_format {
+template <typename CharT, typename Traits> struct dimensions_format
+{
   dimensions_format(std::size_t dim, std::basic_string<CharT, Traits> before, std::basic_string<CharT, Traits> separator,
                     std::basic_string<CharT, Traits> after)
     : dim{dim}, fmt{std::move(before), std::move(separator), std::move(after)}
-  {
-  }
+  {}
   std::size_t dim;
   basic_dim_fmt<CharT, Traits> fmt;
 };

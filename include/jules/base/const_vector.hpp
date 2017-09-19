@@ -69,8 +69,7 @@ public:
   /// \group constructors
   template <typename... Args, typename = std::enable_if_t<(sizeof...(Args) > 1)>>
   const_vector(Args&&... args) : data_{std::make_shared<container_type>(std::forward<Args>(args)...)}
-  {
-  }
+  {}
 
   /// \group constructors
   template <typename Arg> explicit const_vector(Arg&& arg) : data_{std::make_shared<container_type>(std::forward<Arg>(arg))} {}
@@ -81,8 +80,7 @@ public:
   /// \group constructors
   const_vector(std::initializer_list<value_type> init, const allocator_type& alloc = {})
     : data_{std::make_shared<container_type>(init, alloc)}
-  {
-  }
+  {}
 
   /// \group constructors
   const_vector(const const_vector& source) = default;
@@ -193,6 +191,6 @@ public:
 private:
   std::shared_ptr<container_type> data_;
 };
-}
+} // namespace jules
 
 #endif // JULES_BASE_CONST_VECTOR_H

@@ -77,8 +77,7 @@ public:
   private:
     constexpr iterator(const strided_descriptor* strided_descriptor, std::array<index_t, N> indexes) noexcept
       : descriptor_{strided_descriptor}, indexes_{indexes}
-    {
-    }
+    {}
 
     const strided_descriptor* descriptor_;
     std::array<index_t, N> indexes_;
@@ -93,8 +92,7 @@ public:
   /// \notes If `strides` are inferred, `extents` cannot be zero.
   constexpr strided_descriptor(index_t start, std::array<index_t, N> extents, std::array<index_t, N> strides) noexcept
     : start{start}, extents{extents}, strides{strides}
-  {
-  }
+  {}
 
   /// \group Constructor
   constexpr strided_descriptor(index_t start, std::array<index_t, N> extents) noexcept : start{start}, extents{extents}
@@ -254,8 +252,7 @@ public:
   constexpr strided_descriptor(index_t start, const std::array<index_t, 1>& extents,
                                const std::array<index_t, 1>& strides) noexcept
     : start{start}, extents{extents}, strides{strides}
-  {
-  }
+  {}
 
   /// \group Constructor
   constexpr strided_descriptor(index_t start, const std::array<index_t, 1>& extents) noexcept : start{start}, extents{extents} {}

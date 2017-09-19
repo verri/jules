@@ -12,7 +12,8 @@
 namespace jules
 {
 
-template <typename Op> struct base_dataframe_action {
+template <typename Op> struct base_dataframe_action
+{
 
   base_dataframe_action(Op op) : op_{std::move(op)} {}
 

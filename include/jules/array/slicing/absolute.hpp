@@ -10,20 +10,21 @@ namespace jules
 inline namespace slicing
 {
 
-struct absolute_strided_slice {
+struct absolute_strided_slice
+{
   absolute_strided_slice() = delete;
 
   constexpr absolute_strided_slice(index_t start, index_t extent, index_t stride) noexcept
     : start{start}, extent{extent}, stride{stride}
-  {
-  }
+  {}
 
   index_t start;
   index_t extent;
   index_t stride;
 };
 
-struct absolute_slice {
+struct absolute_slice
+{
 
   absolute_slice() = delete;
 

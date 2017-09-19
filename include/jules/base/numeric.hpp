@@ -36,14 +36,16 @@ constexpr auto prod_impl(const std::array<T, N>& arr,
   return (numeric_traits<T>::multiplicative_identity() * ... * arr[I]);
 }
 
-struct forward_arithmetic {
+struct forward_arithmetic
+{
   template <typename T> decltype(auto) operator+(T&& value) { return std::forward<T>(value); }
   template <typename T> decltype(auto) operator*(T&& value) { return std::forward<T>(value); }
   template <typename T> friend decltype(auto) operator+(T&& value, forward_arithmetic) { return std::forward<T>(value); }
   template <typename T> friend decltype(auto) operator*(T&& value, forward_arithmetic) { return std::forward<T>(value); }
 };
 
-struct identity_t {
+struct identity_t
+{
   template <typename T> constexpr decltype(auto) operator()(T&& x) const noexcept { return std::forward<T>(x); }
 };
 

@@ -321,8 +321,7 @@ template <typename T, typename Mapper, typename... Indexes> class strided_ref_ar
 public:
   strided_ref_array_proxy(T* data, Mapper mapper, Indexes... indexes)
     : data_{data}, mapper_{std::move(mapper)}, indexes_(std::forward<Indexes>(indexes)...)
-  {
-  }
+  {}
 
   decltype(auto) operator[](index_t i) && { return at(i); }
 

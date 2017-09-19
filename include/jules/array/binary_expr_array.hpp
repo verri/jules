@@ -84,10 +84,12 @@ public:
 public:
   binary_expr_array(LhsIt lhs_first, LhsIt lhs_last, RhsIt rhs_first, RhsIt rhs_last, const Op& op,
                     const std::array<index_t, order>& extents)
-    : expr_array<Op, N>(std::move(op), extents), lhs_first_{lhs_first}, lhs_last_{lhs_last}, rhs_first_{rhs_first}, rhs_last_{
-                                                                                                                      rhs_last}
-  {
-  }
+    : expr_array<Op, N>(std::move(op), extents),
+      lhs_first_{lhs_first},
+      lhs_last_{lhs_last},
+      rhs_first_{rhs_first},
+      rhs_last_{rhs_last}
+  {}
 
   binary_expr_array(const binary_expr_array& source) = delete;
   binary_expr_array(binary_expr_array&& source) noexcept = delete;

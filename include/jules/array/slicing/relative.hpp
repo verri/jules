@@ -49,7 +49,8 @@ template <typename G> constexpr auto operator/(relative_index<G> index, index_t 
 
 inline static auto size = make_relative_index(+[](index_t i) constexpr { return i; });
 
-struct relative_slice {
+struct relative_slice
+{
 
   relative_slice() = delete;
 
@@ -59,15 +60,15 @@ struct relative_slice {
   std::function<index_t(index_t)> extent;
 };
 
-struct relative_strided_slice {
+struct relative_strided_slice
+{
 
   relative_strided_slice() = delete;
 
   template <typename F>
   relative_strided_slice(index_t start, relative_index<F> extent, index_t stride)
     : start{start}, extent{std::move(extent)}, stride{stride}
-  {
-  }
+  {}
 
   index_t start;
   std::function<index_t(index_t)> extent;

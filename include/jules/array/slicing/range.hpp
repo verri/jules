@@ -11,7 +11,8 @@ namespace jules
 inline namespace slicing
 {
 
-struct range_slice {
+struct range_slice
+{
   range_slice() = delete;
   constexpr range_slice(tag<range_slice>, index_t start, index_t last) noexcept : start{start}, last{last} {}
 
@@ -19,19 +20,20 @@ struct range_slice {
   index_t last;
 };
 
-struct range_strided_slice {
+struct range_strided_slice
+{
   range_strided_slice() = delete;
   constexpr range_strided_slice(tag<range_slice>, index_t start, index_t last, index_t stride) noexcept
     : start{start}, last{last}, stride{stride}
-  {
-  }
+  {}
 
   index_t start;
   index_t last;
   index_t stride;
 };
 
-struct relative_range_slice {
+struct relative_range_slice
+{
   relative_range_slice() = delete;
   relative_range_slice(tag<range_slice>, index_t start, relative_index last) : start{start}, last{std::move(last)} {}
 
@@ -39,12 +41,12 @@ struct relative_range_slice {
   relative_index last;
 };
 
-struct relative_range_strided_slice {
+struct relative_range_strided_slice
+{
   relative_range_strided_slice() = delete;
   relative_range_strided_slice(tag<range_slice>, index_t start, relative_index last, index_t stride)
     : start{start}, last{std::move(last)}, stride{stride}
-  {
-  }
+  {}
 
   index_t start;
   relative_index last;

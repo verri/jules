@@ -8,7 +8,8 @@ TEST_CASE("Proper clean-up after throwing recursive initializer", "[array]")
   static std::size_t destroyed_from_copy_count = 0u;
   static bool should_throw = false;
 
-  struct Foo {
+  struct Foo
+  {
     Foo() = default;
     Foo(Foo&&) = default;
     Foo(const Foo&) : from_copy{true}

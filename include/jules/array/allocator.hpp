@@ -14,7 +14,8 @@
 namespace jules
 {
 
-template <typename T> struct array_allocator {
+template <typename T> struct array_allocator
+{
   using value_type = T;
 
   using storage_type = std::aligned_storage_t<sizeof(value_type), alignof(value_type)>;

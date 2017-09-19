@@ -4,7 +4,8 @@
 
 TEST_CASE("Array builder", "[array]")
 {
-  struct Foo {
+  struct Foo
+  {
     Foo(int, char, double) : ptr{new int[10u]} {}
     ~Foo() { delete[] ptr; }
     int* ptr;

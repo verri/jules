@@ -29,8 +29,8 @@ private:
   using base = generate_virtual_coercions<Eraser, Coercion, I - 1>;
 
 protected:
-  using base::coerce_;
   using base::can_coerce_;
+  using base::coerce_;
 
   virtual auto coerce_(tag<type>) const -> column_interface_ptr = 0;
   virtual auto can_coerce_(tag<type>) const -> bool = 0;
@@ -87,8 +87,8 @@ public:
   template <typename T> decltype(auto) downcast() const { return dynamic_cast<const column_model<T, coercion_rules>&>(*this); }
 
 protected:
-  using base::coerce_;
   using base::can_coerce_;
+  using base::coerce_;
 
   template <typename T>[[noreturn]] auto coerce_(T) const -> column_interface_ptr { throw std::bad_cast{}; }
   template <typename T> auto can_coerce_(T) const -> bool { return false; }
@@ -150,8 +150,8 @@ private:
   using specific = specific_concrete_coercion<T, typename Coercion::template type<I>, Coercion, I>;
 
 protected:
-  using base::coerce_;
   using base::can_coerce_;
+  using base::coerce_;
   using column_interface<Coercion>::coerce_;
   using column_interface<Coercion>::can_coerce_;
 

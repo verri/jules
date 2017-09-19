@@ -17,7 +17,8 @@
 namespace jules
 {
 
-template <typename T, typename Op> struct left_operation {
+template <typename T, typename Op> struct left_operation
+{
   T lhs;
   Op op;
 
@@ -29,7 +30,8 @@ template <typename T, typename Op> struct left_operation {
   }
 };
 
-template <typename T, typename Op> struct right_operation {
+template <typename T, typename Op> struct right_operation
+{
   T rhs;
   Op op;
 

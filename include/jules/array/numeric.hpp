@@ -96,11 +96,13 @@ template <typename Rng, typename R = range::range_value_t<Rng>> auto as_vector(c
 namespace detail
 {
 
-template <typename T, typename = void> struct cat_value_type {
+template <typename T, typename = void> struct cat_value_type
+{
   using type = std::decay_t<T>;
 };
 
-template <typename T> struct cat_value_type<T, meta::requires<range::SizedRange<std::decay_t<T>>>> {
+template <typename T> struct cat_value_type<T, meta::requires<range::SizedRange<std::decay_t<T>>>>
+{
   using type = range::value_type_t<T>;
 };
 

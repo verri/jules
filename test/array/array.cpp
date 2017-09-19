@@ -122,7 +122,8 @@ TEST_CASE("Empty array operations", "[array]")
 
 TEST_CASE("Safe throwing constructor", "[array]")
 {
-  struct Foo {
+  struct Foo
+  {
     Foo(bool t = true)
     {
       if (t)

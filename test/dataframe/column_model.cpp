@@ -73,13 +73,14 @@ TEST_CASE("Column model sanity conversions", "[dataframe]")
 
   // Default types: string, numeric, integer, uinteger, index_t
 
-  struct Foo {
+  struct Foo
+  {
     operator string() const { return "foo"; }
     operator double() const { return 0.0; }
   };
 
-  struct Bar {
-  };
+  struct Bar
+  {};
 
   const auto str_column = column_ptr{new column_model<string, coercion_rules>{"1"s, "-1"s}};
   const auto num_column = column_ptr{new column_model<numeric, coercion_rules>};
@@ -172,7 +173,8 @@ TEST_CASE("Column model successful coercions", "[dataframe]")
   using namespace jules::detail;
   using column_ptr = std::unique_ptr<column_interface<coercion_rules>>;
 
-  struct Foo {
+  struct Foo
+  {
     operator string() const { return "17"; }
   };
 

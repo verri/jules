@@ -19,18 +19,22 @@ namespace detail
 template <typename T> using to_string_expr = decltype(std::to_string(std::declval<T>()));
 }
 
-template <typename T, typename = void> struct StringConvertible : std::false_type {
+template <typename T, typename = void> struct StringConvertible : std::false_type
+{
 };
 
 // TODO: Maybe move it to core/concepts.hpp
 template <typename T>
-struct StringConvertible<T, std::enable_if_t<meta::compiles<T, detail::to_string_expr>::value>> : std::true_type {
+struct StringConvertible<T, std::enable_if_t<meta::compiles<T, detail::to_string_expr>::value>> : std::true_type
+{
 };
 
-template <typename T, typename = void> struct Signed : std::false_type {
+template <typename T, typename = void> struct Signed : std::false_type
+{
 };
 
-template <typename T> struct Signed<T, std::enable_if_t<std::numeric_limits<T>::is_signed>> : std::true_type {
+template <typename T> struct Signed<T, std::enable_if_t<std::numeric_limits<T>::is_signed>> : std::true_type
+{
 };
 
 /// Standard numeric type.
@@ -60,7 +64,8 @@ using integer = int;
 /// \module Basic Types
 using distance_t = std::ptrdiff_t;
 
-template <typename T> struct default_rule {
+template <typename T> struct default_rule
+{
   using type = T;
 
   template <typename U, typename = std::enable_if_t<std::is_convertible<const U&, type>::value>>
@@ -72,7 +77,8 @@ template <typename T> struct default_rule {
 
 /// Coercion rules for [numeric type](standardese://jules::numeric/).
 /// \module Coercion Rules
-struct numeric_rule : default_rule<numeric> {
+struct numeric_rule : default_rule<numeric>
+{
   using default_rule<numeric>::type;
   using default_rule<numeric>::coerce_from;
   static auto coerce_from(const string& value) -> type { return std::stod(value); }
@@ -80,7 +86,8 @@ struct numeric_rule : default_rule<numeric> {
 
 /// Coercion rules for [string type](standardese://jules::string/).
 /// \module Coercion Rules
-struct string_rule {
+struct string_rule
+{
   using type = string;
 
   template <typename U, typename = meta::requires<StringConvertible<const U&>>> static auto coerce_from(const U& value) -> type
@@ -98,7 +105,8 @@ struct string_rule {
 
 /// Coercion rules for [index type](standardese://jules::index_t/).
 /// \module Coercion Rules
-struct index_rule {
+struct index_rule
+{
   using type = index_t;
 
   static auto coerce_from(const string& value) -> type { return std::stoul(value); }
@@ -120,7 +128,8 @@ struct index_rule {
 
 /// Coercion rules for [integer type](standardese://jules::integer/).
 /// \module Coercion Rules
-struct integer_rule : default_rule<integer> {
+struct integer_rule : default_rule<integer>
+{
   using default_rule<integer>::type;
   using default_rule<integer>::coerce_from;
   static auto coerce_from(const string& value) -> type { return std::stoi(value); }
@@ -128,7 +137,8 @@ struct integer_rule : default_rule<integer> {
 
 /// Coercion rules for [unsigned type](standardese://jules::uinteger/).
 /// \module Coercion Rules
-struct uinteger_rule {
+struct uinteger_rule
+{
   using type = uinteger;
 
   static auto coerce_from(const string& value) -> type
@@ -183,7 +193,8 @@ using coercion_rules = base_coercion_rules<numeric_rule, string_rule, index_rule
 
 // Tag type utility
 
-template <typename T> struct tag {
+template <typename T> struct tag
+{
   static_assert(std::is_same<T, std::decay_t<T>>::value, "type cannot have qualifiers");
   using untag = T;
   template <typename U> constexpr auto operator==(const tag<U>&) { return std::is_same<T, U>::value; }
@@ -191,11 +202,13 @@ template <typename T> struct tag {
 
 // Recursive initializer_list
 
-template <typename T, std::size_t N> struct recursive_initializer_list {
+template <typename T, std::size_t N> struct recursive_initializer_list
+{
   using type = std::initializer_list<typename recursive_initializer_list<T, N - 1>::type>;
 };
 
-template <typename T> struct recursive_initializer_list<T, 0> {
+template <typename T> struct recursive_initializer_list<T, 0>
+{
   using type = T;
 };
 
@@ -203,7 +216,8 @@ template <typename T, std::size_t N> using recursive_initializer_list_t = typena
 
 // In-place construction tag
 
-struct in_place_t {
+struct in_place_t
+{
   constexpr explicit in_place_t() = default;
 };
 
@@ -211,7 +225,8 @@ static constexpr auto in_place = in_place_t{};
 
 // Non-initialized construction tag
 
-struct uninitialized_t {
+struct uninitialized_t
+{
   constexpr explicit uninitialized_t() = default;
 };
 
@@ -219,7 +234,8 @@ static constexpr auto uninitialized = uninitialized_t{};
 
 // Arithmetic rules
 
-template <typename T> struct numeric_traits : std::numeric_limits<T> {
+template <typename T> struct numeric_traits : std::numeric_limits<T>
+{
   static constexpr auto additive_identity() { return static_cast<T>(0); }
   static constexpr auto multiplicative_identity() { return static_cast<T>(1); }
   static constexpr auto unbounded_min()

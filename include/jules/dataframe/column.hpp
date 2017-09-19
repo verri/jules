@@ -36,19 +36,16 @@ public:
 
   template <typename Rng, typename R = range::range_value_t<Rng>, typename = meta::requires<range::Range<Rng>>>
   base_column(const Rng& rng) : model_{std::make_unique<model_t<R>>(range::begin(rng), range::end(rng))}
-  {
-  }
+  {}
 
   template <typename Iter, typename Sent, typename R = range::iterator_value_t<Iter>,
             typename = meta::requires<range::Sentinel<Sent, Iter>>>
   base_column(Iter first, Sent last) : model_{std::make_unique<model_t<R>>(first, last)}
-  {
-  }
+  {}
 
   base_column(const base_column& source, index_t first, index_t size)
     : model_{std::move(source.model_->partial_clone(first, size))}
-  {
-  }
+  {}
 
   base_column(const base_column& source) : model_{std::move(source.model_->clone())} {}
 

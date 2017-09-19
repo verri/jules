@@ -79,8 +79,7 @@ public:
 public:
   unary_expr_array(It it_first, It it_last, Op op, const std::array<index_t, order>& extents)
     : expr_array<Op, order>(std::move(op), extents), it_first_{it_first}, it_last_{it_last}
-  {
-  }
+  {}
 
   unary_expr_array(const unary_expr_array& source) = delete;
   unary_expr_array(unary_expr_array&& source) noexcept = delete;

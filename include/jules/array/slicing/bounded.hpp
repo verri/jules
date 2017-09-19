@@ -14,8 +14,8 @@ namespace jules
 inline namespace slicing
 {
 
-struct every_index {
-};
+struct every_index
+{};
 
 static constexpr auto every = every_index{};
 
@@ -43,21 +43,22 @@ private:
 
 constexpr auto at_most(index_t maximum) noexcept -> bounded_index { return {{}, maximum}; }
 
-struct bounded_strided_slice {
+struct bounded_strided_slice
+{
 
   bounded_strided_slice() = delete;
 
   constexpr bounded_strided_slice(index_t start, bounded_index extent, index_t stride) noexcept
     : start{start}, extent{std::move(extent)}, stride{stride}
-  {
-  }
+  {}
 
   index_t start;
   bounded_index extent;
   index_t stride;
 };
 
-struct bounded_slice {
+struct bounded_slice
+{
 
   bounded_slice() = delete;
 

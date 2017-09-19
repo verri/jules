@@ -8,12 +8,14 @@
 
 constexpr double ToMB = 1.0 / 1024.0 / 1024.0;
 
-template <typename T> struct SafeAllocator : public std::allocator<T> {
+template <typename T> struct SafeAllocator : public std::allocator<T>
+{
   using pointer = typename std::allocator<T>::pointer;
   using size_type = typename std::allocator<T>::size_type;
   using value_type = typename std::allocator<T>::value_type;
 
-  template <typename U> struct rebind {
+  template <typename U> struct rebind
+  {
     using other = SafeAllocator<U>;
   };
 
@@ -33,9 +35,11 @@ template <typename T> struct SafeAllocator : public std::allocator<T> {
   void deallocate(pointer p, size_type) { std::free(p); }
 };
 
-struct Memory {
+struct Memory
+{
 public:
-  struct Alloc {
+  struct Alloc
+  {
     std::size_t size = 0, count = 0;
 
     void inc(std::size_t i)

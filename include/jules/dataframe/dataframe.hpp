@@ -26,24 +26,27 @@ template <typename Coercion> class base_dataframe
 public:
   using column_type = base_column<Coercion>;
 
-  struct named_column_type {
+  struct named_column_type
+  {
     string name;
     column_type column;
   };
 
-  struct read_options {
+  struct read_options
+  {
     read_options(std::regex line_regex = std::regex{R"(\n)"}, std::regex cell_regex = std::regex{R"(\t)"}, bool header = true)
       : line{std::move(line_regex), true, {}}, cell{std::move(cell_regex), true, {}}, header{header}
-    {
-    }
+    {}
 
-    struct {
+    struct
+    {
       std::regex regex;
       bool separator;
       std::regex_constants::match_flag_type flag;
     } line;
 
-    struct {
+    struct
+    {
       std::regex regex;
       bool separator;
       std::regex_constants::match_flag_type flag;
@@ -52,17 +55,19 @@ public:
     bool header;
   };
 
-  struct write_options {
+  struct write_options
+  {
     write_options(string line_separator = "\n", string cell_separator = "\t", bool header = true)
       : line{{std::move(line_separator)}}, cell{{std::move(cell_separator)}}, header{header}
-    {
-    }
+    {}
 
-    struct {
+    struct
+    {
       string separator;
     } line;
 
-    struct {
+    struct
+    {
       string separator;
     } cell;
 
@@ -73,29 +78,25 @@ public:
 
   base_dataframe(std::initializer_list<named_column_type> elements)
     : base_dataframe(elements.begin(), elements.end(), elements.size())
-  {
-  }
+  {}
 
   template <typename Rng, typename R = range::range_value_t<Rng>,
             typename = std::enable_if_t<std::is_convertible<R, named_column_type>::value>,
             typename = meta::requires<range::SizedRange<Rng>>>
   base_dataframe(const Rng& rng) : base_dataframe(range::begin(rng), range::end(rng), range::size(rng))
-  {
-  }
+  {}
 
   template <typename Iter, typename Sent, typename R = range::iterator_value_t<Iter>,
             typename = std::enable_if_t<std::is_convertible<R, named_column_type>::value>,
             typename = meta::requires<range::Sentinel<Sent, Iter>, std::negation<range::InputIterator<Iter>>>, int = 0>
   base_dataframe(Iter first, Sent last) : base_dataframe(first, last, 0u)
-  {
-  }
+  {}
 
   template <typename Iter, typename Sent, typename R = range::iterator_value_t<Iter>,
             typename = std::enable_if_t<std::is_convertible<R, named_column_type>::value>,
             typename = meta::requires<range::Sentinel<Sent, Iter>, range::InputIterator<Iter>>>
   base_dataframe(Iter first, Sent last) : base_dataframe(first, last, range::distance(first, last))
-  {
-  }
+  {}
 
   template <typename Iter, typename Sent, typename R = range::iterator_value_t<Iter>,
             typename = std::enable_if_t<std::is_convertible<R, named_column_type>::value>,

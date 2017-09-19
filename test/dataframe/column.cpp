@@ -13,8 +13,8 @@ TEST_CASE("Column constructor using initializer list", "[dataframe]")
   using jules::numeric;
   using jules::string;
 
-  struct Toy {
-  };
+  struct Toy
+  {};
 
   auto int_column = column{1, 2, 3, 4, 5};
   auto c_str_column = column{"hello", "world"};

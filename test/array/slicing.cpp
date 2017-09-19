@@ -10,7 +10,8 @@ using jules::tag;
 
 namespace
 {
-struct Check {
+struct Check
+{
   constexpr auto operator[](absolute_slice) const { return tag<absolute_slice>{}; };
   constexpr auto operator[](absolute_strided_slice) const { return tag<absolute_strided_slice>{}; }
   constexpr auto operator[](bounded_slice) const { return tag<bounded_slice>{}; };
@@ -20,7 +21,7 @@ struct Check {
   auto operator[](relative_slice) const { return tag<relative_slice>{}; }
   auto operator[](relative_strided_slice) const { return tag<relative_strided_slice>{}; }
 };
-}
+} // namespace
 
 TEST_CASE("Slicing functionalities", "[array]")
 {

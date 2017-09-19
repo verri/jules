@@ -15,7 +15,8 @@
 namespace jules
 {
 
-struct no_replacement_t {
+struct no_replacement_t
+{
   constexpr explicit no_replacement_t() = default;
 };
 

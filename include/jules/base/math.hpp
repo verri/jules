@@ -10,12 +10,12 @@ namespace jules
 
 template <class T> constexpr auto pi = T(3.1415926535897932385);
 
-using std::sqrt;
-using std::exp;
 using std::abs;
+using std::cos;
+using std::exp;
 using std::log;
 using std::sin;
-using std::cos;
+using std::sqrt;
 
 template <typename T> constexpr auto square(const T& value) { return value * value; }
 

@@ -105,7 +105,9 @@ TEST_CASE("Constructing a dataframe from a range of columns", "[dataframe]")
   using jules::dataframe;
 
   auto columns = std::vector<dataframe::named_column_type>{
-    {"a", {1, 2, 3}}, {"b", {'a', 'b', 'c'}}, {"c", {1.0, 2.0, 3.0}},
+    {"a", {1, 2, 3}},
+    {"b", {'a', 'b', 'c'}},
+    {"c", {1.0, 2.0, 3.0}},
   };
 
   auto df = dataframe(columns);
@@ -219,23 +221,27 @@ TEST_CASE("Reading a dataframe", "[dataframe]")
 
 TEST_CASE("Reading matrix of integers", "[dataframe]")
 {
-  struct Foo {
+  struct Foo
+  {
     operator int() const { return 0; }
   };
 
-  struct my_integer_rules : jules::default_rule<int> {
+  struct my_integer_rules : jules::default_rule<int>
+  {
     using jules::default_rule<int>::type;
     using jules::default_rule<int>::coerce_from;
     static auto coerce_from(const jules::string& value) -> type { return std::stoi(value); }
   };
 
-  struct my_string_rules : jules::default_rule<std::string> {
+  struct my_string_rules : jules::default_rule<std::string>
+  {
     using jules::default_rule<std::string>::type;
     using jules::default_rule<std::string>::coerce_from;
     static auto coerce_from(int value) -> type { return std::to_string(value); }
   };
 
-  struct my_foo_rules : jules::default_rule<Foo> {
+  struct my_foo_rules : jules::default_rule<Foo>
+  {
     using jules::default_rule<Foo>::type;
     using jules::default_rule<Foo>::coerce_from;
   };

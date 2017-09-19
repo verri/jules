@@ -38,8 +38,8 @@ template <typename T, std::size_t N> class array : public ref_array<T, N>, priva
   template <typename... Dims>
   using requires_dimensions = meta::requires<std::bool_constant<(sizeof...(Dims) == N)>, std::is_convertible<Dims, index_t>...>;
 
-  struct allocate_tag {
-  };
+  struct allocate_tag
+  {};
 
 public:
   /// \group member_types Class Types and Constants
@@ -191,8 +191,7 @@ public:
   /// \group constructors
   array(array&& source) noexcept
     : ref_array<value_type, order>{std::exchange(source.data_, nullptr), std::move(source.descriptor_)}
-  {
-  }
+  {}
 
   /// \group constructors
   /// \tparam _
@@ -342,8 +341,7 @@ private:
   /// \exclude
   template <typename... Dims, typename _ = requires_dimensions<Dims...>>
   explicit array(allocate_tag, Dims... dims) : ref_array<value_type, order>{this->allocate(prod_args(dims...)), {{{dims...}}}}
-  {
-  }
+  {}
 
   /// \exclude
   auto clear() noexcept

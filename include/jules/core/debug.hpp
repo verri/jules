@@ -30,7 +30,8 @@ constexpr auto extents_check = debug_assert::level<3u>{};
 } // namespace level
 
 #ifndef JULES_DEBUG_THROWS
-struct fatal_module_t : debug_assert::set_level<JULES_DEBUG_LEVEL> {
+struct fatal_module_t : debug_assert::set_level<JULES_DEBUG_LEVEL>
+{
   static auto handle(const debug_assert::source_location& loc, const char* expression, const char* message) noexcept
   {
     if (*expression == '\0')
@@ -41,7 +42,8 @@ struct fatal_module_t : debug_assert::set_level<JULES_DEBUG_LEVEL> {
 };
 #endif
 
-struct throwing_module_t : debug_assert::set_level<static_cast<unsigned>(-1)>, debug_assert::allow_exception {
+struct throwing_module_t : debug_assert::set_level<static_cast<unsigned>(-1)>, debug_assert::allow_exception
+{
   [[noreturn]] static auto handle(const debug_assert::source_location& loc, const char* expression, const char* message)
   {
     char buffer[512];

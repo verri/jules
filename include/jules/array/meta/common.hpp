@@ -23,7 +23,8 @@ template <typename T> using eval = decltype(eval(std::declval<const T&>()));
 } // namespace result
 } // namespace meta
 
-template <typename T, typename = void> struct CommonArray : std::false_type {
+template <typename T, typename = void> struct CommonArray : std::false_type
+{
 };
 
 template <typename T>
@@ -42,7 +43,8 @@ struct CommonArray<                                                             
                             meta::compiles_same<T, typename T::size_type, meta::result::column_count>> //
                           >,                                                                           //
        range::Range<T>                                                                                 //
-       >> : std::true_type {
+       >> : std::true_type
+{
 };
 
 template <typename Derived> class common_array_base

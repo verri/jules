@@ -11,7 +11,8 @@ namespace jules
 /// \exclude
 namespace detail
 {
-template <typename F> struct defer_helper {
+template <typename F> struct defer_helper
+{
   defer_helper(F f) : f_{std::move(f)} {}
 
   defer_helper(const defer_helper&) = default;

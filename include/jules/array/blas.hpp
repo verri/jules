@@ -15,18 +15,22 @@ namespace blas
 
 #include <cblas.h>
 
-template <typename T> struct invalid : public std::false_type {
+template <typename T> struct invalid : public std::false_type
+{
 };
 
-template <typename T> struct cblas {
+template <typename T> struct cblas
+{
   static_assert(invalid<T>::value, "the requested cblas method is not implemented for this data type");
 };
 
-template <> struct cblas<float> {
+template <> struct cblas<float>
+{
   static constexpr auto gemm = &cblas_sgemm;
 };
 
-template <> struct cblas<double> {
+template <> struct cblas<double>
+{
   static constexpr auto gemm = &cblas_dgemm;
 };
 
