@@ -93,19 +93,14 @@ private:
   auto destroy_recursive(index_t& constructed_count, value_type* to, List values, const descriptor<N>& desc,
                          Args... indexes) noexcept
   {
-    for (auto i = index_t{0u}; i < desc.extents[sizeof...(Args)]; ++i) {
+    for (auto i = index_t{0u}; constructed_count > 0 && i < desc.extents[sizeof...(Args)]; ++i)
       destroy_recursive(constructed_count, to, *(values.begin() + i), desc, indexes..., i);
-      if (constructed_count == 0)
-        return;
-    }
   }
 
   template <std::size_t N, typename... Args>
   auto destroy_recursive(index_t& constructed_count, value_type* to, const value_type&, const descriptor<N>& desc,
                          Args... indexes) noexcept
   {
-    if (constructed_count == 0)
-      return;
     (to + desc({{indexes...}}))->~value_type();
     --constructed_count;
   }

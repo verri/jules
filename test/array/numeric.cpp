@@ -19,4 +19,8 @@ TEST_CASE("Dropping dimensions", "[array]")
 
   CHECK_THROWS(drop(m));
   CHECK_THROWS(drop(m[{0, 2}][{0, 2}]));
+
+  CHECK(all(drop(m[{0, 2}][{0, 1}]) == jules::cat(1.0, 4.0)));
+  CHECK(all(drop(m[{0, 2}][{1, 1}]) == jules::cat(2.0, 5.0)));
+  CHECK(all(drop(m[{0, 1}][{0, 3}]) == jules::cat(1.0, 2.0, 3.0)));
 }

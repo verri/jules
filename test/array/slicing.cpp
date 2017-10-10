@@ -57,4 +57,8 @@ TEST_CASE("Slicing functionalities", "[array]")
   CHECK((c[slice(0u, size - 1u, 3u)] == tag<relative_strided_slice>{}));
   CHECK((c[slice(0u, size / 2u, 3u)] == tag<relative_strided_slice>{}));
   CHECK((c[slice(0u, (size - 1u) / 2u, 3u)] == tag<relative_strided_slice>{}));
+
+  CHECK(eval(slice(0u, size), 2u).start == 0u);
+  CHECK(eval(slice(0u, size), 2u).extent == 2u);
+  CHECK(eval(slice(0u, size / 2u), 2u).extent == 1u);
 }

@@ -3,6 +3,7 @@
 #ifndef JULES_ARRAY_SLICING_RELATIVE_H
 #define JULES_ARRAY_SLICING_RELATIVE_H
 
+#include <jules/array/slicing/absolute.hpp>
 #include <jules/core/type.hpp>
 
 #include <functional>
@@ -44,11 +45,11 @@ template <typename G> constexpr auto operator/(relative_index<G> index, index_t 
   return make_relative_index([ g = std::move(index), value = value ](index_t i) constexpr { return g(i) / value; });
 }
 
-inline static auto size = make_relative_index(+[](index_t i) constexpr { return i; });
+// TODO: is this the best name? wouldn't extent be better.
+constexpr auto size = make_relative_index(+[](index_t size) constexpr { return size; });
 
 struct relative_slice
 {
-
   relative_slice() = delete;
 
   template <typename F> relative_slice(index_t start, relative_index<F> extent) : start{start}, extent{std::move(extent)} {}
@@ -59,7 +60,6 @@ struct relative_slice
 
 struct relative_strided_slice
 {
-
   relative_strided_slice() = delete;
 
   template <typename F>
@@ -78,6 +78,17 @@ template <typename F> auto slice(index_t start, relative_index<F> extent, index_
 {
   return {start, std::move(extent), stride};
 }
+
+static inline auto eval(relative_slice slice, index_t size) noexcept -> absolute_slice
+{
+  return {slice.start, slice.extent(size)};
+}
+
+static inline auto eval(relative_strided_slice slice, index_t size) noexcept -> absolute_strided_slice
+{
+  return {slice.start, slice.extent(size), slice.stride};
+}
+
 } // namespace slicing
 } // namespace jules
 
