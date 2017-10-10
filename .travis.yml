@@ -4,7 +4,7 @@ dist: trusty
 
 env:
   - CXX=g++-7 COVERAGE=true CXXFLAGS="-O0 -g --coverage"
-  - CXX=g++-7 COVERAGE=false CXXFLAGS="-Og -g -fsanitize=address,leak,undefined -fno-omit-frame-pointer" LDFLAGS="-fsanitize=address,leak,undefined"
+  - CXX=g++-7 COVERAGE=false CXXFLAGS="-Og -g -fsanitize=address,leak,undefined -fno-omit-frame-pointer" LDFLAGS="-fsanitize=address,leak,undefined -fuse-ld=gold"
   - CXX=g++-7 COVERAGE=false CXXFLAGS="-O2 -DNDEBUG"
 
 addons:
@@ -14,6 +14,7 @@ addons:
     packages:
       - g++-7
       - libblas-dev
+      - binutils-gold
 
 install:
   - git clone https://github.com/ericniebler/range-v3.git third_party/range-v3
