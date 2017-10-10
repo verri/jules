@@ -18,7 +18,6 @@ AlwaysBreakTemplateDeclarations: false
 AlwaysBreakBeforeMultilineStrings: false
 BreakBeforeBinaryOperators: None
 BreakBeforeTernaryOperators: true
-BreakBeforeBraces: Attach
 BreakConstructorInitializersBeforeComma: false
 BinPackParameters: true
 BinPackArguments: true

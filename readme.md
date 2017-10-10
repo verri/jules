@@ -1,7 +1,7 @@
 Jules
 =====
 
-[![Codacy Badge](https://api.codacy.com/project/badge/Grade/dc4303cead6e462ea383989479feda6c)](https://www.codacy.com/app/verri/jules?utm_source=github.com&utm_medium=referral&utm_content=verri/jules&utm_campaign=badger)
+[![Join the chat at https://gitter.im/verri-jules/Lobby](https://badges.gitter.im/verri-jules/Lobby.svg)](https://gitter.im/verri-jules/Lobby?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 [![Build Status](https://travis-ci.org/verri/jules.svg?branch=master)](https://travis-ci.org/verri/jules)
 [![codecov](https://codecov.io/gh/verri/jules/branch/master/graph/badge.svg)](https://codecov.io/gh/verri/jules)
 [![GitHub license](https://img.shields.io/badge/license-Zlib-blue.svg)](https://raw.githubusercontent.com/verri/jules/master/license.txt)
