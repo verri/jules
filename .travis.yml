@@ -3,8 +3,9 @@ language: generic
 dist: trusty
 
 env:
-  - COMPILER_NAME=gcc CXX=g++-7 CC=gcc-7 COVERAGE=true CXXFLAGS="-O0 -g --coverage"
-  - COMPILER_NAME=gcc CXX=g++-7 CC=gcc-7 COVERAGE=false CXXFLAGS="-O2 -DNDEBUG"
+  - CXX=g++-7 COVERAGE=true CXXFLAGS="-O0 -g --coverage"
+  - CXX=g++-7 COVERAGE=false CXXFLAGS="-Og -g -fsanitize=address,leak,undefined -fno-omit-frame-pointer" LDFLAGS="-fsanitize=address,leak,undefined"
+  - CXX=g++-7 COVERAGE=false CXXFLAGS="-O2 -DNDEBUG"
 
 addons:
   apt:
@@ -12,12 +13,9 @@ addons:
       - ubuntu-toolchain-r-test
     packages:
       - g++-7
-      - valgrind
       - libblas-dev
 
 install:
-  - git submodule init
-  - git submodule update
   - git clone https://github.com/ericniebler/range-v3.git third_party/range-v3
   - git clone https://github.com/foonathan/debug_assert.git third_party/debug_assert
   - git clone https://github.com/philsquared/Catch.git third_party/Catch

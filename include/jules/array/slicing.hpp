@@ -231,6 +231,11 @@ template <typename T, typename Mapper> static decltype(auto) array_at(T* data, c
   } else {
     return strided_ref_array_proxy<T, Mapper, absolute_strided_slice>{data, mapper, slice(0u, descriptor.extents[0], 1u)};
   }
+}
+
+template <typename T, typename Mapper, typename Index>
+static decltype(auto) array_at(T* data, const Mapper& mapper, Index&& index)
+{
   if constexpr (Mapper::order == 1) {
     return detail::array_slice(data, mapper, std::forward<Index>(index));
   } else {

@@ -10,7 +10,7 @@ all: test
 test:
 	@$(MAKE) --no-print-directory -C test
 	@echo "Running test suite..."
-	@valgrind --error-exitcode=1 --leak-check=full test/test_suite -d yes
+	@test/test_suite -d yes
 
 format:
 	@echo Formatting source...
