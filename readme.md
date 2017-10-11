@@ -13,7 +13,8 @@ Jules
 Dependencies
 ------------
 
- - C++17 compiler
+ - C++1z (experimental C++17) compiler
+    - Tested on GCC 7.2 and Clang 5.0.0
  - [debug_assert](https://github.com/foonathan/debug_assert)
  - [range-v3](https://github.com/ericniebler/range-v3)
  - [CBLAS](http://www.netlib.org/blas/) (optional)
@@ -36,7 +37,7 @@ If you intend to use BLAS optimized functions, make sure CBLAS is installed.
 
 ### Compilation
 
-Enable C++14 and include the path where **Jules** is installed. Arch Linux
+Enable C++1z and include the path where **Jules** is installed. Arch Linux
 users do not need the `-isystem` option, since the library is already in the
 system path.
 
@@ -44,17 +45,13 @@ system path.
 CXXFLAGS="-std=c++17 -isystem/path/to/release/include"
 ```
 
-If using BLAS, make sure to link it.
-
-```sh
-LDFLAGS=-lblas
-```
+If using BLAS, make sure to link it using `-lblas` or `-lcblas`, depending on your system.
 
 Documentation
 -------------
 
 Generated with [standardese](https://github.com/foonathan/standardese)
-[here](https://verri.github.io/jules/).
+[here](https://verri.github.io/jules/) (not up-to-date).
 
 Acknowledgements
 ----------------
