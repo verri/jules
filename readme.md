@@ -13,7 +13,7 @@ Jules
 Dependencies
 ------------
 
- - C++14 compiler
+ - C++17 compiler
  - [debug_assert](https://github.com/foonathan/debug_assert)
  - [range-v3](https://github.com/ericniebler/range-v3)
  - [CBLAS](http://www.netlib.org/blas/) (optional)
@@ -41,7 +41,7 @@ users do not need the `-isystem` option, since the library is already in the
 system path.
 
 ```sh
-CXXFLAGS="-std=c++14 -isystem/path/to/release/include"
+CXXFLAGS="-std=c++17 -isystem/path/to/release/include"
 ```
 
 If using BLAS, make sure to link it.

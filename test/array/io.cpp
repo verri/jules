@@ -40,6 +40,10 @@ TEST_CASE("Array formatted output", "[array]")
   jass << jules::space_separated << mat;
   CHECK(ss.str() == "1 2\n3 4");
 
+  ss.str("");
+  jass << jules::tab_separated << mat;
+  CHECK(ss.str() == "1\t2\n3\t4");
+
   // Wide string
   auto wss = std::wstringstream{};
   auto jawss = jules::array_ostream(wss);
