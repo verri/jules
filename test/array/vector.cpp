@@ -1,4 +1,4 @@
-#include "jules/array/all.hpp"
+#include "jules/array/array.hpp"
 
 #include <catch.hpp>
 
@@ -8,6 +8,10 @@ TEST_CASE("Vector tutorial", "[array]")
 {
   SECTION("Constructors")
   {
+    // Non-initialized
+    auto fast = jules::vector<>(jules::uninitialized, 20u);
+    CHECK(fast.size() == 20u);
+
     // Default constructor.
     auto empty = jules::vector<>();
     CHECK(empty.size() == 0u);
@@ -24,7 +28,9 @@ TEST_CASE("Vector tutorial", "[array]")
     // Constructors with size and optional default value.
     auto all_same1 = jules::vector<long>(3l, 10u);
     auto all_same2 = jules::vector<long>(10u);
-    all_same2() = 3l;
+
+    using namespace jules::slicing;
+    all_same2[every] = 3l;
 
     CHECK(all(all_same1 == 3l));
     CHECK(all(all_same2 == 3l));
@@ -36,7 +42,7 @@ TEST_CASE("Vector tutorial", "[array]")
     auto b = jules::vector<long>(10u);
 
     jules::range::copy(values, a.begin());
-    b() = a;
+    b[every] = a;
 
     // Constructors from iterators and ranges.
     auto c = jules::vector<long>(std::begin(values), std::end(values));
@@ -57,32 +63,33 @@ TEST_CASE("Vector tutorial", "[array]")
     auto x = jules::vector<long>{0, 1, 2, 3, 4, 5, 6, 7, 8, 9};
 
     // Constructors from slicing.
-    auto even = jules::vector<long>(x(jules::slice(0u, jules::slice::all, 2u)));
+    auto even = jules::array(x[{0u, every, 2u}]);
+    CHECK(even.length() == 5u);
 
     auto odd_ix1 = jules::seq(1u, x.length() - 1u, 2u);
     auto odd_ix2 = odd_ix1;
 
-    auto odd_slow = jules::vector<long>(x(odd_ix1));
-    auto odd_smart = jules::vector<long>(x()(std::move(odd_ix1)));
-    auto odd_fast = jules::vector<long>(x(std::move(odd_ix2)));
-    auto odd_ind = jules::vector<long>(x(jules::seq(0u, x.length() - 1u))(jules::seq(1u, x.length() - 1u, 2u)));
+    auto odd_fast = jules::array(x[std::move(odd_ix1)]); // nothing is copied
+    auto odd_smart = jules::vector<long>(x[odd_ix2]);    // neither here
+    auto odd_ind = jules::vector<long>(x[jules::seq(0u, x.length() - 1u)][jules::seq(1u, x.length() - 1u, 2u)]);
 
-    CHECK(all(x == jules::as_vector(0, 1, 2, 3, 4, 5, 6, 7, 8, 9)));
+    CHECK(all(x == jules::cat(0, 1, 2, 3, 4, 5, 6, 7, 8, 9)));
     CHECK(all(x == jules::as_vector(values)));
     CHECK(all(x == jules::as_vector(jules::matrix<long>(std::begin(values), 5u, 2u))));
-    CHECK(all(even == jules::as_vector(0, 2, 4, 6, 8)));
-    CHECK(all(odd_slow == jules::as_vector(1, 3, 5, 7, 9)));
-    CHECK(all(odd_smart == jules::as_vector(1, 3, 5, 7, 9)));
-    CHECK(all(odd_fast == jules::as_vector(1, 3, 5, 7, 9)));
-    CHECK(all(odd_ind == jules::as_vector(1, 3, 5, 7, 9)));
+    CHECK(all(even == jules::cat(0, 2, 4, 6, 8)));
+    CHECK(all(odd_fast == jules::cat(1, 3, 5, 7, 9)));
+    CHECK(all(odd_smart == jules::cat(1, 3, 5, 7, 9)));
+    CHECK(all(odd_ind == jules::cat(1, 3, 5, 7, 9)));
 
     // Constructors from expression.
-    auto y = jules::vector<long>(x + x(jules::seq(x.length() - 1u, 0u, -1)));
+    auto y = jules::array(x + x[jules::seq(x.length() - 1u, 0u, -1)]);
     CHECK(all(y == 9));
   }
 
   SECTION("Assignments")
   {
+    using namespace jules::slicing;
+
     auto x = jules::vector<long>{0, 1, 2, 3, 4, 5, 6, 7, 8, 9};
     auto y = jules::vector<long>(-20l, 20u);
     auto z = jules::vector<long>(-10l, 5u);
@@ -93,24 +100,36 @@ TEST_CASE("Vector tutorial", "[array]")
     z = std::move(x);
     CHECK(all(y == z));
 
-    x = z(jules::slice(0u, jules::slice::all, 2u));
-    CHECK(all(x == jules::as_vector(0, 2, 4, 6, 8)));
+    x = z[jules::slice(0u, every, 2u)];
+    CHECK(all(x == jules::cat(0, 2, 4, 6, 8)));
 
-    x = z(jules::seq(0u, z.length() - 1u, 2u));
-    CHECK(all(x == jules::as_vector(0, 2, 4, 6, 8)));
+    x = z[jules::seq(0u, z.length() - 1u, 2u)];
+    CHECK(all(x == jules::cat(0, 2, 4, 6, 8)));
 
     z = x + x;
-    CHECK(all(z == jules::as_vector(0, 4, 8, 12, 16)));
+    CHECK(all(z == jules::cat(0, 4, 8, 12, 16)));
 
     x = eval(x + x);
-    CHECK(all(x == jules::as_vector(0, 4, 8, 12, 16)));
+    CHECK(all(x == jules::cat(0, 4, 8, 12, 16)));
+
+    x += 1;
+    CHECK(all(x == jules::cat(0, 4, 8, 12, 16) + 1));
+
+    // Can be dangerous if rhs depends on lhs.
+    x += x + x;
+    CHECK(all(x == 3 * (jules::cat(0, 4, 8, 12, 16) + 1)));
 
     // This one is tricky. We must guarantee that the Memory of x is not freed before the
     // expression is evaluated.
     x = x - x;
     CHECK(all(x == jules::as_vector(jules::repeat<5>(0))));
 
-    x.fill(1);
+    // Every-slicing do not allocate any extra memory.
+    x[every] = 10;
+    x[every] = x - x;
+    CHECK(all(x == jules::as_vector(jules::repeat<5>(0))));
+
+    x[every] = 1;
     CHECK(all(x == 1));
   }
 
@@ -139,7 +158,7 @@ TEST_CASE("Vector tutorial", "[array]")
     auto x = jules::vector<>(10u);
     CHECK(x.length() == 10u);
     CHECK(x.size() == 10u);
-    CHECK(x.extents() == x.size());
+    CHECK((x.dimensions() == std::array<jules::index_t, 1u>{{10u}}));
   }
 
   SECTION("Subvector assignment")
@@ -147,29 +166,29 @@ TEST_CASE("Vector tutorial", "[array]")
     auto x = jules::to_vector<long>(jules::seq(0u, 10u - 1u));
     const auto y = x;
 
-    x(jules::slice(0u, jules::slice::all, 2u)) = 0u;
-    CHECK(all(x == jules::as_vector(0, 1, 0, 3, 0, 5, 0, 7, 0, 9)));
+    x[jules::slice(0u, jules::every, 2u)] = 0u;
+    CHECK(all(x == jules::cat(0, 1, 0, 3, 0, 5, 0, 7, 0, 9)));
 
-    x(jules::slice(1u, jules::slice::all, 2u)) = jules::vector<long>{2, 4, 6, 8, 10};
-    CHECK(all(x == jules::as_vector(0, 2, 0, 4, 0, 6, 0, 8, 0, 10)));
+    x[jules::slice(1u, jules::every, 2u)] = jules::vector<long>{2, 4, 6, 8, 10};
+    CHECK(all(x == jules::cat(0, 2, 0, 4, 0, 6, 0, 8, 0, 10)));
 
-    x(jules::slice(0u, jules::slice::all, 2u)) = y(jules::slice(1u, jules::slice::all, 2u));
+    x[jules::slice(0u, jules::every, 2u)] = y[jules::slice(1u, jules::every, 2u)];
     CHECK(all(x == 1 + jules::to_vector<long>(jules::seq(0u, 10u - 1u))));
 
-    x() = 0;
+    x[jules::every] = 0;
     CHECK(all(x == 0));
 
     for (auto i = 0u; i < x.size(); ++i)
-      x(i) = y(y.length() - 1);
+      x[i] = y[y.length() - 1];
     CHECK(all(x == 9));
 
-    x(jules::seq(0u, x.size() - 1u)) = y();
+    x[jules::seq(0u, x.size() - 1u)] = y[jules::every];
     CHECK(all(x == y));
 
-    x(jules::seq(0u, x.size() - 1u, 2u)) = y(jules::seq(1u, y.size() - 1u, 2u));
-    CHECK(all(x == jules::as_vector(1, 1, 3, 3, 5, 5, 7, 7, 9, 9)));
+    x[jules::seq(0u, x.size() - 1u, 2u)] = y[jules::seq(1u, y.size() - 1u, 2u)];
+    CHECK(all(x == jules::cat(1, 1, 3, 3, 5, 5, 7, 7, 9, 9)));
 
-    x(jules::seq(1u, x.size() - 1u, 2u)) = jules::vector<long>{2, 4, 6, 8, 10};
-    CHECK(all(x == jules::as_vector(1, 2, 3, 4, 5, 6, 7, 8, 9, 10)));
+    x[jules::seq(1u, x.size() - 1u, 2u)] = jules::vector<long>{2, 4, 6, 8, 10};
+    CHECK(all(x == jules::cat(1, 2, 3, 4, 5, 6, 7, 8, 9, 10)));
   }
 }

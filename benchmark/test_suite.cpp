@@ -1,5 +1,5 @@
 #include "benchmark.hpp"
-#include "jules/array/all.hpp"
+#include "jules/array/array.hpp"
 
 #include <chrono>
 #include <iostream>
@@ -11,8 +11,9 @@ static volatile auto use = f;
 
 int main()
 {
-  using jules::slice;
+  using jules::every;
   using jules::seq;
+  using jules::slice;
 
   JULES_DEFER({
     std::cout << "\nExiting." << std::endl;
@@ -22,8 +23,8 @@ int main()
 
   std::cout << "\nCreating slices." << std::endl;
   Memory::Reset();
-  const auto s_even = slice(1u, 0u, 2u);
-  const auto s_odd = slice(0u, 0u, 2u);
+  const auto s_even = slice(1u, every, 2u);
+  const auto s_odd = slice(0u, every, 2u);
   const auto s_all = slice();
   Memory::Summary(std::cout);
 
@@ -40,10 +41,10 @@ int main()
   auto vector = PrintInfo([&] { return jules::vector<double>(N * N); });
 
   std::cout << "\nFilling odd lines using slice." << std::endl;
-  PrintInfo([&] { vector(s_odd) = 1.0; });
+  PrintInfo([&] { vector[s_odd] = 1.0; });
 
   std::cout << "\nFilling even lines using indirect indexing." << std::endl;
-  PrintInfo([&] { vector(v_even2) = 2.0; });
+  PrintInfo([&] { vector[v_even2] = 2.0; });
 
   if (N <= 10)
     std::cout << "\nVector: " << vector << std::endl;
@@ -54,28 +55,54 @@ int main()
   auto matrix = PrintInfo([&] { return jules::matrix<double>(N, N); });
 
   std::cout << "\nFilling odd lines using slice." << std::endl;
-  PrintInfo([&] { matrix(s_odd, s_all) = 1.0; });
+  PrintInfo([&] { matrix[s_odd][s_all] = 1.0; });
 
   std::cout << "\nFilling even lines using indirect indexing." << std::endl;
-  PrintInfo([&] { matrix(v_even, v_all) = 2.0; });
+  PrintInfo([&] { matrix[v_even][v_all] = 2.0; });
 
   if (N <= 10)
     std::cout << "\nMatrix: " << matrix << std::endl;
 
   std::cout << "\nZeroing..." << std::endl;
-  PrintInfo([&] { matrix() = 0.0; });
+  PrintInfo([&] { matrix[s_all][s_all] = 0.0; });
 
   std::cout << "\nFast zeroing..." << std::endl;
-  PrintInfo([&] { matrix.fill(0.0); });
+  PrintInfo([&] { matrix[every][every] = 0.0; });
 
   std::cout << "\nFilling matrix using mixed indexing." << std::endl;
-  PrintInfo([&] { matrix(v_odd, s_odd) = 1.0; });
-  PrintInfo([&] { matrix(s_even, v_even) = 2.0; });
+  PrintInfo([&] { matrix[v_odd][s_odd] = 1.0; });
+  PrintInfo([&] { matrix[s_even][v_even] = 2.0; });
 
   if (N <= 10)
     std::cout << "\nMatrix: " << matrix << std::endl;
 
   use(&matrix);
+
+  if (N <= 10)
+    std::cout << "\nVector: " << vector << std::endl;
+  std::cout << "\nSlicing optimization for vector." << std::endl;
+  use(&vector);
+  PrintInfo([&] { vector[{0u, every, 1u}] = 7.0; });
+  use(&vector);
+  PrintInfo([&] { vector[{0u, every}] = 8.0; });
+  use(&vector);
+  PrintInfo([&] { vector[every] = 9.0; });
+  use(&vector);
+  if (N <= 10)
+    std::cout << "\nVector: " << vector << std::endl;
+
+  if (N <= 10)
+    std::cout << "\nMatrix: " << matrix << std::endl;
+  std::cout << "\nSlicing optimization for matrix." << std::endl;
+  use(&matrix);
+  PrintInfo([&] { matrix[every][{0u, every, 1u}] = 7.0; });
+  use(&matrix);
+  PrintInfo([&] { matrix[every][{0u, every}] = 8.0; });
+  use(&matrix);
+  PrintInfo([&] { matrix[every][every] = 9.0; });
+  use(&matrix);
+  if (N <= 10)
+    std::cout << "\nMatrix: " << matrix << std::endl;
 
   Memory::Reset();
 

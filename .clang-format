@@ -48,7 +48,6 @@ Standard:        Cpp11
 IndentWidth:     2
 TabWidth:        2
 UseTab:          Never
-BreakBeforeBraces: Linux
 SpacesInParentheses: false
 SpacesInSquareBrackets: false
 SpacesInAngles:  false
@@ -63,5 +62,16 @@ SpaceBeforeParens: ControlStatements
 DisableFormat:   false
 ReflowComments: true
 SortIncludes: true
+FixNamespaceComments: true
+BreakBeforeBraces: Custom
+BraceWrapping:
+  AfterFunction: true
+  AfterNamespace: true
+  AfterStruct: true
+  AfterClass: true
+  SplitEmptyFunction: false
+  SplitEmptyRecord: false
+  SplitEmptyNamespace: false
+ConstructorInitializerAllOnOneLineOrOnePerLine: true
 ...
 

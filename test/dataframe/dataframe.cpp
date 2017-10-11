@@ -1,5 +1,4 @@
 #include "jules/dataframe/dataframe.hpp"
-#include "jules/array/all.hpp"
 
 #include <catch.hpp>
 
@@ -66,8 +65,8 @@ TEST_CASE("Dataframe colbind", "[dataframe]")
   CHECK(df.column_count() == 3u);
 
   const auto df_names = df.names();
-  REQUIRE(df_names.size() == 3u);
-  CHECK(all(df_names == jules::as_vector("c", "a", "b")));
+  CHECK(df_names.size() == 3u);
+  CHECK(all(df_names == jules::cat("c", "a", "b")));
 
   const auto d = column(0, 0);
   auto some_df = dataframe{{"A", {1, 2, 3, 4}}, {"a", {"h", " ", "w", "0"}}};
@@ -106,7 +105,9 @@ TEST_CASE("Constructing a dataframe from a range of columns", "[dataframe]")
   using jules::dataframe;
 
   auto columns = std::vector<dataframe::named_column_type>{
-    {"a", {1, 2, 3}}, {"b", {'a', 'b', 'c'}}, {"c", {1.0, 2.0, 3.0}},
+    {"a", {1, 2, 3}},
+    {"b", {'a', 'b', 'c'}},
+    {"c", {1.0, 2.0, 3.0}},
   };
 
   auto df = dataframe(columns);
@@ -168,18 +169,18 @@ TEST_CASE("Assigning a dataframe to itself", "[dataframe]")
 
 TEST_CASE("Reading an empty dataframe with header", "[dataframe]")
 {
-  std::stringstream stream("x\ty\tz\n");
+  auto stream = std::stringstream("x\ty\tz\n");
 
   auto df = jules::dataframe::read(stream);
 
   CHECK(df.row_count() == 0u);
   CHECK(df.column_count() == 3u);
-  CHECK(all(df.names() == jules::as_vector("x", "y", "z")));
+  CHECK(all(df.names() == jules::cat("x", "y", "z")));
 }
 
 TEST_CASE("Reading an empty dataframe with line-break", "[dataframe]")
 {
-  std::stringstream stream("\n");
+  auto stream = std::stringstream("\n");
 
   auto df = jules::dataframe::read(stream);
   CHECK_FALSE(df);
@@ -189,16 +190,18 @@ TEST_CASE("Reading an empty dataframe with line-break", "[dataframe]")
 
 TEST_CASE("Reading an empty dataframe from an empty string", "[dataframe]")
 {
-  std::stringstream stream("");
+  auto stream = std::stringstream("");
 
   auto df = jules::dataframe::read(stream);
   CHECK(df.row_count() == 0u);
   CHECK(df.column_count() == 0u);
   CHECK_FALSE(df);
 
-  std::stringstream null_stream;
+  auto bad_stream = std::stringstream();
+  auto tmp = 0;
+  bad_stream >> tmp;
 
-  auto df2 = jules::dataframe::read(null_stream);
+  auto df2 = jules::dataframe::read(bad_stream);
   CHECK(df2.row_count() == 0u);
   CHECK(df2.column_count() == 0u);
   CHECK_FALSE(df2);
@@ -206,46 +209,50 @@ TEST_CASE("Reading an empty dataframe from an empty string", "[dataframe]")
 
 TEST_CASE("Reading a dataframe", "[dataframe]")
 {
-  std::stringstream stream("\t\t \n1 \t 2\t  3\n");
+  auto stream = std::stringstream("\t\t \n1 \t 2\t  3\n");
 
   auto df = jules::dataframe::read(stream);
   CHECK(df.row_count() == 1u);
   CHECK(df.column_count() == 3u);
 
   auto cols = df.names();
-  CHECK(all(cols == jules::as_vector("", "", " ")));
+  CHECK(all(cols == jules::cat("", "", " ")));
 }
 
 TEST_CASE("Reading matrix of integers", "[dataframe]")
 {
-  struct Foo {
+  struct Foo
+  {
     operator int() const { return 0; }
   };
 
-  struct my_integer_rules : jules::default_rule<int> {
+  struct my_integer_rules : jules::default_rule<int>
+  {
     using jules::default_rule<int>::type;
     using jules::default_rule<int>::coerce_from;
     static auto coerce_from(const jules::string& value) -> type { return std::stoi(value); }
   };
 
-  struct my_string_rules : jules::default_rule<std::string> {
+  struct my_string_rules : jules::default_rule<std::string>
+  {
     using jules::default_rule<std::string>::type;
     using jules::default_rule<std::string>::coerce_from;
     static auto coerce_from(int value) -> type { return std::to_string(value); }
   };
 
-  struct my_foo_rules : jules::default_rule<Foo> {
+  struct my_foo_rules : jules::default_rule<Foo>
+  {
     using jules::default_rule<Foo>::type;
     using jules::default_rule<Foo>::coerce_from;
   };
 
-  using my_coercion_rules = jules::base_coercion_rules<my_integer_rules, my_string_rules>;
+  using my_coercion_rules = jules::base_coercion_rules<my_integer_rules, my_string_rules, my_foo_rules>;
   using my_dataframe = jules::base_dataframe<my_coercion_rules>;
 
   auto opts = my_dataframe::read_options();
   opts.header = false;
 
-  std::stringstream stream;
+  auto stream = std::stringstream();
   constexpr auto N = 3u;
   for (auto i = 0u; i < N; ++i) {
     for (auto j = 0u; j < N; ++j) {
@@ -255,8 +262,8 @@ TEST_CASE("Reading matrix of integers", "[dataframe]")
   }
 
   auto df = my_dataframe::read(stream, opts);
-  REQUIRE(df.column_count() == N);
-  REQUIRE(df.row_count() == N);
+  CHECK(df.column_count() == N);
+  CHECK(df.row_count() == N);
 
   // jules::string -> double: Not OK
   CHECK_FALSE(df.at(0u).column.can_coerce<double>());
@@ -267,7 +274,7 @@ TEST_CASE("Reading matrix of integers", "[dataframe]")
 
   for (auto i = 0u; i < df.column_count(); ++i) {
     idf.bind(jules::to_column<int>(df.at(i).column));
-    REQUIRE(idf.at(idf.column_count() - 1).column.elements_type() == typeid(int));
+    CHECK(idf.at(idf.column_count() - 1).column.elements_type() == typeid(int));
   }
 
   // TODO: coerce all columns
@@ -297,7 +304,7 @@ TEST_CASE("Reading matrix of integers", "[dataframe]")
 
 TEST_CASE("Reading an inconsistent dataframe", "[dataframe]")
 {
-  std::stringstream stream("\ty \t\n1 \t 2\t  3");
+  auto stream = std::stringstream("\ty \t\n1 \t 2\t  3");
 
   auto df = jules::dataframe();
   CHECK_THROWS(df = jules::dataframe::read(stream));
@@ -315,25 +322,25 @@ TEST_CASE("Reading and writing a well-formed dataframe", "[dataframe]")
   const auto data = "y\tx\tz\n" + std::to_string(0.0) + "\t" + std::to_string(1.0) + "\t" + std::to_string(2.0) + "\n" +
                     std::to_string(3.0) + "\t" + std::to_string(4.0) + "\t" + std::to_string(5.0) + "\n";
 
-  std::stringstream is(data);
+  auto is = std::stringstream(data);
 
   auto df = jules::dataframe::read(is);
   CHECK(df.row_count() == 2u);
   CHECK(df.column_count() == 3u);
   CHECK(df);
 
-  std::stringstream os1;
+  auto os1 = std::stringstream();
   os1 << df;
   CHECK(data == os1.str());
 
-  std::stringstream os2;
+  auto os2 = std::stringstream();
 
   dataframe{{"y", {0.0, 3.0}}, {"x", {1.0, 4.0}}, {"z", {2.0, 5.0}}}.write(os2);
   CHECK(data == os2.str());
 
   const auto cols = df.names();
-  REQUIRE(cols.size() == 3u);
-  CHECK(all(cols == jules::as_vector("y", "x", "z")));
+  CHECK(cols.size() == 3u);
+  CHECK(all(cols == jules::cat("y", "x", "z")));
 
   CHECK_THROWS(df.at(-1));
   CHECK_THROWS(df.at(4));
@@ -346,4 +353,8 @@ TEST_CASE("Reading and writing a well-formed dataframe", "[dataframe]")
 
   const auto& c3 = df.at(2);
   CHECK(c3.name == "z");
+
+  auto os3 = std::stringstream();
+  os3 << dataframe{};
+  CHECK(os3.str() == "");
 }

@@ -1,7 +1,7 @@
 TEMPDIR := $(shell mktemp -d -u)
 ROOTDIR := $(shell pwd)
 VERSION := $(shell git describe --long --tags | sed 's/\([^-]*\)-.*/\1/g')
-HEADERS := $(shell find jules -name \*.[ch]pp -not -name undef\*)
+HEADERS := $(shell find include -name \*.[ch]pp)
 SRC := $(shell find test benchmark -name \*.[ch]pp) $(HEADERS)
 ZIP := jules-$(VERSION).zip
 
@@ -10,7 +10,7 @@ all: test
 test:
 	@$(MAKE) --no-print-directory -C test
 	@echo "Running test suite..."
-	@valgrind --error-exitcode=1 --leak-check=full test/test_suite -d yes
+	@test/test_suite -d yes
 
 format:
 	@echo Formatting source...
@@ -18,7 +18,7 @@ format:
 
 tidy:
 	@echo Tidying source...
-	@clang-tidy $(HEADERS) -fix -fix-errors -- -std=c++14 -I.
+	@clang-tidy $(HEADERS) -fix -fix-errors -- -std=c++1z -Iinclude
 
 clean:
 	@$(MAKE) --no-print-directory -C test clean

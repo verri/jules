@@ -1,19 +1,15 @@
 SUFFIXES += .d
 
-SRC = array/slice.cpp array/ref_array.cpp array/ind_array.cpp array/array.cpp \
-			array/vector.cpp array/matrix.cpp array/blas.cpp array/math.cpp \
-			dataframe/column_model.cpp dataframe/column.cpp dataframe/dataframe.cpp \
-			dataframe/action.cpp \
-			range/range.cpp random/random.cpp \
-			numeric/numeric.cpp \
-			debug/debug.cpp \
-			const_vector/const_vector.cpp
+SRC = $(shell find . -name '*.cpp')
+OBJ := $(SRC:.cpp=.o)
+DEP := $(SRC:.cpp=.d)
 
-OBJ := $(SRC:.cpp=.o) test_suite.o
-DEP := $(SRC:.cpp=.d) test_suite.d
+ifeq ($(CBLASLIB),)
+CBLASLIB := $(shell ../util/find_blas --libs)
+endif
 
-CXXFLAGS += -DJULES_DEBUG_THROWS -std=c++14 -Wall -Wextra -Werror -pedantic -I.. -isystem../third_party/Catch/single_include
-LDFLAGS += -lblas
+CXXFLAGS += -DJULES_DEBUG_THROWS -std=c++1z -Wall -Wextra -pedantic -I../include
+LDFLAGS += $(CBLASLIB)
 
 NODEPS = clean
 

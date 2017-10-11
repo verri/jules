@@ -9,10 +9,10 @@ mkdir "$TEMPDIR"
 cd "$TEMPDIR"
 
 mkdir include
+rsync -r --include '*.hpp' --include '*/' --exclude '*' "$ROOTDIR"/include/jules include/
 cp -r "$ROOTDIR"/third_party/range-v3/include/range include/
 cp -r "$ROOTDIR"/third_party/range-v3/include/meta include/
 cp "$ROOTDIR"/third_party/debug_assert/debug_assert.hpp include/
-rsync -r --include '*.hpp' --include '*/' --exclude '*' "$ROOTDIR"/jules include/
 
 echo -e "=== jules ===\n\n" > LICENSE
 cat "$ROOTDIR"/license.txt >> LICENSE
