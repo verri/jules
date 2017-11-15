@@ -104,6 +104,19 @@ int main()
   if (N <= 10)
     std::cout << "\nMatrix: " << matrix << std::endl;
 
+  if (N <= 10)
+    std::cout << "\nMatrix: " << matrix << std::endl;
+  std::cout << "\nSlicing optimization for matrix." << std::endl;
+  use(&matrix);
+  PrintInfo([&] { matrix[{0u, every, 1u}][every] = 7.0; });
+  use(&matrix);
+  PrintInfo([&] { matrix[{0u, every}][every] = 8.0; });
+  use(&matrix);
+  PrintInfo([&] { matrix[every][every] = 9.0; });
+  use(&matrix);
+  if (N <= 10)
+    std::cout << "\nMatrix: " << matrix << std::endl;
+
   Memory::Reset();
 
   return 0;
