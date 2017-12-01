@@ -266,9 +266,11 @@ template <typename U, std::size_t M> static decltype(auto) array_at(U* data, con
 template <typename U, std::size_t M, typename Rng, typename = meta::requires<range::SizedRange<Rng>>>
 static decltype(auto) array_at(U* data, const descriptor<M>& desc, const Rng& rng)
 {
-  if constexpr (M == 1 && std::is_same_v<Rng, const_vector<index_t>>) {
+  if constexpr (M == 1 && std::is_constructible_v<index_view, const Rng&>) {
     DEBUG_ASSERT(max(rng) < desc.length(), debug::default_module, debug::level::boundary_check, "out of range");
-    return strided_ref_array<U, vector_mapper<1u>>{data, {{{rng.size()}}, rng}};
+    auto view = index_view(rng);
+    const auto size = view.size();
+    return strided_ref_array<U, vector_mapper<1u>>{data, {{{size}}, std::move(view)}};
   } else {
     return array_at(data, identity_mapper<M>{{0u, desc.extents}}, rng);
   }

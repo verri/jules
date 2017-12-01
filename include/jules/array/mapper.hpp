@@ -4,7 +4,7 @@
 #define JULES_ARRAY_DETAIL_MAPPER_H
 
 #include <jules/array/strided_descriptor.hpp>
-#include <jules/base/const_vector.hpp>
+#include <jules/base/index_view.hpp>
 #include <jules/core/debug.hpp>
 #include <jules/core/type.hpp>
 
@@ -45,9 +45,9 @@ template <std::size_t N> class vector_mapper
 {
 public:
   static constexpr auto order = N;
-  using iterator = typename const_vector<index_t>::const_iterator;
+  using iterator = typename index_view::const_iterator;
 
-  vector_mapper(const std::array<index_t, N>& extents, const_vector<index_t> indexes)
+  vector_mapper(const std::array<index_t, N>& extents, index_view indexes)
     : descriptor_{0u, extents}, indexes_{std::move(indexes)}
   {
     DEBUG_ASSERT(indexes_.size() == descriptor_.size(), debug::default_module, debug::level::invalid_argument,
@@ -60,16 +60,16 @@ public:
     return indexes_[index];
   }
 
-  auto map(const_vector<index_t>::container_type indexes) const -> const_vector<index_t>
+  auto map(std::vector<index_t> indexes) const -> index_view
   {
     for (auto& index : indexes)
       index = map(index);
     return {std::move(indexes)};
   }
 
-  auto map(const strided_descriptor<N>& indexes) const -> const_vector<index_t>
+  auto map(const strided_descriptor<N>& indexes) const -> index_view
   {
-    auto result = const_vector<index_t>::container_type();
+    auto result = std::vector<index_t>();
     result.reserve(indexes.size());
     for (const auto index : indexes)
       result.push_back(map(index));
@@ -85,7 +85,7 @@ public:
     auto dropped = descriptor_.discard_dimension();
     dropped.start = descriptor_.start + i; // strides[0] is always 1u for vector mapped.
 
-    auto new_indexes = typename const_vector<index_t>::container_type();
+    auto new_indexes = std::vector<index_t>();
 
     new_indexes.reserve(prod(dropped.extents));
     for (const auto index : dropped)
@@ -101,7 +101,7 @@ public:
 
 private:
   strided_descriptor<N> descriptor_;
-  const_vector<index_t> indexes_;
+  index_view indexes_;
 };
 
 } // namespace jules

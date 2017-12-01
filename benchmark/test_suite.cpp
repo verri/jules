@@ -36,6 +36,13 @@ int main()
   const auto v_all = seq(0u, N - 1);
   Memory::Summary(std::cout);
 
+  std::cout << "\nCreating std::vectors of indexes." << std::endl;
+  Memory::Reset();
+  auto v_even3 = std::vector<jules::index_t>();
+  v_even3.reserve(v_even2.size());
+  std::copy(v_even2.begin(), v_even2.end(), std::back_inserter(v_even3));
+  Memory::Summary(std::cout);
+
   // Vector
   std::cout << "\nCreating vector." << std::endl;
   auto vector = PrintInfo([&] { return jules::vector<double>(N * N); });
@@ -45,6 +52,9 @@ int main()
 
   std::cout << "\nFilling even lines using indirect indexing." << std::endl;
   PrintInfo([&] { vector[v_even2] = 2.0; });
+
+  std::cout << "\nFilling even lines using indirect indexing (std::vector)." << std::endl;
+  PrintInfo([&] { vector[v_even3] = 2.0; });
 
   if (N <= 10)
     std::cout << "\nVector: " << vector << std::endl;
