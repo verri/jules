@@ -11,6 +11,7 @@
 #include <jules/array/io.hpp>
 #include <jules/array/math.hpp>
 #include <jules/array/numeric.hpp>
+#include <jules/array/overlap.hpp>
 #include <jules/array/ref_array.hpp>
 #include <jules/base/async.hpp>
 #include <jules/base/numeric.hpp>
@@ -260,6 +261,12 @@ public:
   {
     DEBUG_ASSERT(this != &source, debug::default_module, debug::level::invalid_argument, "self assignment");
 
+    if (this->size() == source.size()) {
+      std::copy(source.begin(), source.end(), this->begin());
+      this->descriptor_ = source.descriptor_;
+      return *this;
+    }
+
     auto new_data = this->allocate(source.size());
     auto success = false;
 
@@ -292,6 +299,12 @@ public:
   {
     static_assert(Array::order == order, "array order mismatch");
     static_assert(std::is_assignable<value_type&, typename Array::value_type>::value, "incompatible assignment");
+
+    if (this->size() == source.size()) {
+      std::copy(source.begin(), source.end(), this->begin());
+      this->descriptor_ = source.dimensions();
+      return *this;
+    }
 
     auto new_data = this->allocate(source.size());
     auto success = false;

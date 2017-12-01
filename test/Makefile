@@ -9,6 +9,8 @@ CBLASLIB := $(shell ../util/find_blas --libs)
 endif
 
 CXXFLAGS += -DJULES_DEBUG_THROWS -std=c++1z -Wall -Wextra -pedantic -I../include
+CXXFLAGS += -Og -g -fsanitize=address,leak,undefined -fno-omit-frame-pointer
+LDFLAGS +=  -fsanitize=address,leak,undefined -fuse-ld=gold
 LDFLAGS += $(CBLASLIB)
 
 NODEPS = clean
