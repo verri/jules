@@ -17,8 +17,6 @@ addons:
       - binutils-gold
 
 install:
-  - git clone https://github.com/ericniebler/range-v3.git third_party/range-v3
-  - git clone https://github.com/foonathan/debug_assert.git third_party/debug_assert
   - git clone https://github.com/philsquared/Catch.git third_party/Catch
 
 script:
