@@ -10,7 +10,7 @@ all: test
 test:
 	@$(MAKE) --no-print-directory -C test
 	@echo "Running test suite..."
-	@test/test_suite -d yes
+	@test/test_suite
 
 format:
 	@echo Formatting source...

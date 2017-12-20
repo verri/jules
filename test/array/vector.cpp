@@ -97,6 +97,10 @@ TEST_CASE("Vector tutorial", "[array]")
     y = x;
     CHECK(all(x == y));
 
+    // No memory allocation.
+    x = y;
+    CHECK(all(x == y));
+
     z = std::move(x);
     CHECK(all(y == z));
 
