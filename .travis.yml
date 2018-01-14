@@ -19,7 +19,7 @@ addons:
 script:
   - mkdir build
   - cd build
-  - cmake -DCMAKE_BUILD_TYPE=$CMAKE_TARGET -DJULES_TEST_COVERAGE=$COVERAGE ..
+  - cmake -DCMAKE_CXX_COMPILER=g++-7 -DCMAKE_BUILD_TYPE=$CMAKE_TARGET -DJULES_TEST_COVERAGE=$COVERAGE ..
   - make
   - test/jules_test_suite
 

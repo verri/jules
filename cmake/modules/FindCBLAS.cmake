@@ -156,6 +156,19 @@ IF(NOT CBLAS_LIBRARIES)
     )
 ENDIF(NOT CBLAS_LIBRARIES)
 
+# Arch Linux CBLAS
+IF(NOT CBLAS_LIBRARIES)
+  CHECK_ALL_LIBRARIES(
+    CBLAS_LIBRARIES
+    CBLAS
+    cblas_dgemm
+    ""
+    "cblas"
+    "cblas.h"
+    TRUE
+    )
+ENDIF(NOT CBLAS_LIBRARIES)
+
 # CBLAS in intel mkl library? (shared)
 IF(NOT CBLAS_LIBRARIES)
   CHECK_ALL_LIBRARIES(
