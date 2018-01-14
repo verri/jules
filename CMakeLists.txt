@@ -62,7 +62,6 @@ target_sources(jules INTERFACE
 target_include_directories(jules INTERFACE $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include/>)
 target_include_directories(jules SYSTEM INTERFACE $<INSTALL_INTERFACE:/include>)
 
-# debug_assert
 find_package(debug_assert 1.1 QUIET)
 if(NOT ${debug_assert_FOUND})
   message("Unable to find debug_assert, using submodule...")
@@ -70,7 +69,13 @@ if(NOT ${debug_assert_FOUND})
 endif()
 target_link_libraries(jules INTERFACE debug_assert)
 
-install(DIRECTORY include/ DESTINATION include FILES_MATCHING PATTERN "*.hpp")
+set(JULES_RANGE_V3_INCLUDE_DIR "" CACHE STRING "custom path to the range-v3 library")
+if(JULES_RANGE_V3_INCLUDE_DIR)
+  target_include_directories(jules INTERFACE $<BUILD_INTERFACE:${JULES_RANGE_V3_INCLUDE_DIR}>)
+else()
+  target_include_directories(jules INTERFACE $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/third_party/range-v3/include/>)
+  target_include_directories(jules SYSTEM INTERFACE $<INSTALL_INTERFACE:/third_party/range-v3/include>)
+endif()
 
 option(JULES_BUILD_TEST "build test" ON)
 if(${JULES_BUILD_TEST})
