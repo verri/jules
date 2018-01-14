@@ -18,12 +18,6 @@ if (NOT ${CBLAS_FOUND})
   message(FATAL_ERROR "CBLAS not found.")
 endif()
 
-set(CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/third_party/sanitizers-cmake/cmake" ${CMAKE_MODULE_PATH})
-set(SANITIZE_ADDRESS ON)
-set(SANITIZE_UNDEFINED ON)
-
-find_package(Sanitizers)
-
 set(source_files
   core/debug.cpp
   core/range.cpp
@@ -50,7 +44,14 @@ set(source_files
   test_suite.cpp)
 
 add_executable(jules_test_suite ${source_files})
-add_sanitizers(jules_test_suite)
+
+option(JULES_TEST_COVERAGE "whether or not add coverage instrumentation" OFF)
+if (JULES_TEST_COVERAGE)
+  set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG}  --coverage")
+else()
+  set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -fno-omit-frame-pointer -fsanitize=address,leak,undefined")
+  set(CMAKE_LINKER_FLAGS_DEBUG "${CMAKE_STATIC_LINKER_FLAGS_DEBUG} -fsanitize=address,leak,undefined -fuse-ld=gold")
+endif()
 
 target_include_directories(jules_test_suite PUBLIC
   ${CMAKE_CURRENT_BINARY_DIR}

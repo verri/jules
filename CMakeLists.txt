@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.6)
+cmake_minimum_required(VERSION 3.2)
 project(Jules VERSION 0.4.0)
 
 configure_file("include/jules/version.hpp.in" "include/jules/version.hpp")

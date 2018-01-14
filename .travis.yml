@@ -3,9 +3,9 @@ language: generic
 dist: trusty
 
 env:
-  - CXX=g++-7 COVERAGE=true CXXFLAGS="-O0 -g --coverage"
-  - CXX=g++-7 COVERAGE=false CXXFLAGS="-Og -g -fsanitize=address,leak,undefined -fno-omit-frame-pointer" LDFLAGS="-fsanitize=address,leak,undefined -fuse-ld=gold"
-  - CXX=g++-7 COVERAGE=false CXXFLAGS="-O2 -DNDEBUG"
+  - CMAKE_TARGET=Debug COVERAGE=ON
+  - CMAKE_TARGET=Debug COVERAGE=OFF
+  - CMAKE_TARGET=Release COVERAGE=OFF
 
 addons:
   apt:
@@ -16,11 +16,12 @@ addons:
       - libblas-dev
       - binutils-gold
 
-install:
-  - git clone https://github.com/philsquared/Catch.git third_party/Catch
-
 script:
-  - CXXFLAGS="$CXXFLAGS -isystem../third_party/range-v3/include -isystem../third_party/debug_assert -isystem../third_party/Catch/single_include" CBLASLIB="-lblas" make test -j2
+  - mkdir build
+  - cd build
+  - cmake -DCMAKE_BUILD_TYPE=$CMAKE_TARGET -DJULES_TEST_COVERAGE=$COVERAGE ..
+  - make
+  - test/jules_test_suite
 
 after_success:
-  - if test "$COVERAGE" == "true"; then bash <(curl -s https://codecov.io/bash) -x $(which gcov-7); fi
+  - if test "$COVERAGE" == "ON"; then bash <(curl -s https://codecov.io/bash) -x $(which gcov-7); fi
