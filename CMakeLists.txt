@@ -3,10 +3,9 @@ project(Jules VERSION 0.4.0)
 
 configure_file("include/jules/version.hpp.in" "include/jules/version.hpp")
 
-set(CMAKE_CXX_STANDARD 17)
-set(CMAKE_CXX_EXTENSIONS OFF) # TODO: might not be needed or break
-
 add_library(jules INTERFACE)
+
+target_compile_features(jules INTERFACE cxx_std_17)
 
 set(header_files
   include/jules/core/detail/numbers.hpp
@@ -67,9 +66,6 @@ target_include_directories(jules SYSTEM INTERFACE $<INSTALL_INTERFACE:/include>)
 find_package(debug_assert 1.1 QUIET)
 if(NOT ${debug_assert_FOUND})
   message("Unable to find debug_assert, using submodule...")
-  execute_process(
-    COMMAND git submodule update --init -- third_party/debug_assert
-    WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR})
   add_subdirectory(third_party/debug_assert)
 endif()
 target_link_libraries(jules INTERFACE debug_assert)
