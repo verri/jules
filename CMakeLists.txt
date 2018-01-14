@@ -2,6 +2,7 @@ cmake_minimum_required(VERSION 3.2)
 project(Jules VERSION 0.4.0)
 
 configure_file("include/jules/version.hpp.in" "include/jules/version.hpp")
+set(CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/cmake/modules ${CMAKE_MODULE_PATH})
 
 add_library(jules INTERFACE)
 
