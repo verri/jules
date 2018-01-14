@@ -1,16 +1,11 @@
-TEMPDIR := $(shell mktemp -d -u)
 ROOTDIR := $(shell pwd)
 VERSION := $(shell git describe --long --tags | sed 's/\([^-]*\)-.*/\1/g')
 HEADERS := $(shell find include -name \*.[ch]pp)
 SRC := $(shell find test benchmark -name \*.[ch]pp) $(HEADERS)
 ZIP := jules-$(VERSION).zip
 
-all: test
-
-test:
-	@$(MAKE) --no-print-directory -C test
-	@echo "Running test suite..."
-	@test/test_suite
+all:
+	@echo Please, use CMake instead.
 
 format:
 	@echo Formatting source...
@@ -27,19 +22,9 @@ clean:
 	@find . -name '*.gcda' -exec rm {} \;
 	@find . -name '*.gcov' -exec rm {} \;
 
-get-deps: third_party/range-v3 third_party/debug_assert
-
-third_party/range-v3:
-	@echo Getting range-v3...
-	@git clone https://github.com/ericniebler/range-v3.git third_party/range-v3
-
-third_party/debug_assert:
-	@echo Getting debug_assert...
-	@git clone https://github.com/foonathan/debug_assert.git third_party/debug_assert
-
 release: $(ZIP)
 
-$(ZIP): third_party/range-v3 third_party/debug_assert
-	util/release $(ZIP) $(TEMPDIR) $(ROOTDIR)
+$(ZIP):
+	util/release $(ZIP) $(ROOTDIR)
 
-.PHONY: format test clean tidy get-deps release
+.PHONY: format clean tidy get-deps release

@@ -1,8 +1,8 @@
 #!/bin/sh
 
 ZIP=$1
-TEMPDIR=$2
-ROOTDIR=$3
+ROOTDIR=$2
+TEMPDIR=$(mktemp -d -u)
 
 echo Creating $@...
 mkdir "$TEMPDIR"

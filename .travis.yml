@@ -20,7 +20,7 @@ script:
   - mkdir build
   - cd build
   - cmake -DCMAKE_CXX_COMPILER=g++-7 -DCMAKE_BUILD_TYPE=$CMAKE_TARGET -DJULES_TEST_COVERAGE=$COVERAGE ..
-  - make
+  - make -j2 VERBOSE=1
   - test/jules_test_suite
 
 after_success:
