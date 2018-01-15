@@ -4,7 +4,7 @@ dist: trusty
 
 env:
   - CMAKE_TARGET=Debug COVERAGE=ON
-  - CMAKE_TARGET=Debug COVERAGE=OFF
+# - CMAKE_TARGET=Debug COVERAGE=OFF # TODO: see https://github.com/travis-ci/travis-ci/issues/9033
   - CMAKE_TARGET=Release COVERAGE=OFF
 
 addons:

@@ -214,7 +214,7 @@ public:
 
   /// \group constructors
   template <typename Rng, typename = meta::requires<range::SizedRange<Rng>, std::negation<CommonArray<Rng>>>>
-  array(const Rng& rng) : ref_array<value_type, order>{this->allocate(range::size(rng)), {{range::size(rng)}}}
+  array(const Rng& rng) : ref_array<value_type, order>{this->allocate(range::size(rng)), {{{range::size(rng)}}}}
   {
     static_assert(order == 1u, "Only vectors can be initialized from a range");
     static_assert(std::is_constructible<value_type, range::reference_t<range::iterator_t<Rng>>>::value,
@@ -232,7 +232,7 @@ public:
   template <typename Iter, typename Sent, typename = meta::requires<range::Sentinel<Sent, Iter>>>
   array(Iter begin, Sent end)
     : ref_array<value_type, order>{this->allocate(range::distance(begin, end)),
-                                   {{static_cast<size_type>(range::distance(begin, end))}}}
+                                   {{{static_cast<size_type>(range::distance(begin, end))}}}}
   {
     static_assert(order == 1u, "Only vectors can be initialized from a pair of iterators");
     static_assert(std::is_constructible<value_type, range::reference_t<Iter>>::value, "incompatible value types");

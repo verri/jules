@@ -281,7 +281,7 @@ template <typename U, std::size_t M> static decltype(auto) array_at(U* data, con
   if constexpr (M == 1) {
     DEBUG_ASSERT(slice.start + slice.extent - 1u < desc.extents[0], debug::default_module, debug::level::boundary_check,
                  "out of range");
-    return ref_array<U, 1u>{data + slice.start, {{slice.extent}}};
+    return ref_array<U, 1u>{data + slice.start, {{{slice.extent}}}};
   } else {
     return array_at(data, identity_mapper<M>{{0u, desc.extents}}, std::move(slice));
   }
