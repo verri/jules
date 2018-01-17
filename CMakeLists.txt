@@ -8,7 +8,7 @@ add_library(jules INTERFACE)
 
 target_compile_features(jules INTERFACE cxx_std_17)
 
-set(header_files
+set(jules_header_files
   include/jules/core/detail/numbers.hpp
   include/jules/core/debug.hpp
   include/jules/core/meta.hpp
@@ -57,7 +57,7 @@ set(header_files
   include/jules/dataframe/numeric.hpp)
 
 target_sources(jules INTERFACE
-  $<INSTALL_INTERFACE:${header_files}>
+  $<INSTALL_INTERFACE:${jules_header_files}>
   $<INSTALL_INTERFACE:include/jules/version.hpp>)
 
 target_include_directories(jules INTERFACE $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include/>)
