@@ -70,7 +70,7 @@ if(NOT ${debug_assert_FOUND})
 endif()
 target_link_libraries(jules INTERFACE debug_assert)
 
-find_package(range-v3 0.3 QUIET)
+find_package(range-v3 0.3.0 QUIET)
 if(NOT ${range-v3_FOUND})
   message("Unable to find range-v3, using submodule...")
   set(RANGES_CXX_STD 17 CACHE STRING "")
