@@ -4,7 +4,7 @@ dist: trusty
 
 env:
   - CMAKE_TARGET=Debug COVERAGE=ON
-# - CMAKE_TARGET=Debug COVERAGE=OFF # TODO: see https://github.com/travis-ci/travis-ci/issues/9033
+# - CMAKE_TARGET=Debug COVERAGE=OFF # XXX: see https://github.com/travis-ci/travis-ci/issues/9033
   - CMAKE_TARGET=Release COVERAGE=OFF
 
 addons:
@@ -21,7 +21,7 @@ script:
   - cd build
   - cmake -DJULES_BUILD_TEST=ON -DCMAKE_CXX_COMPILER=g++-7 -DCMAKE_BUILD_TYPE=$CMAKE_TARGET -DJULES_TEST_COVERAGE=$COVERAGE ..
   - make -j2 VERBOSE=1
-  - test/jules_test_suite
+  - ctest -j2 -VV
 
 after_success:
   - if test "$COVERAGE" == "ON"; then bash <(curl -s https://codecov.io/bash) -x $(which gcov-7); fi

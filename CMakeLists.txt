@@ -83,7 +83,7 @@ endif()
 target_link_libraries(jules INTERFACE range-v3)
 
 option(JULES_BUILD_TEST "whether or not to build the test" OFF)
-if(${JULES_BUILD_TEST})
+if(JULES_BUILD_TEST)
   enable_testing()
   add_subdirectory(test)
 endif()

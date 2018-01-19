@@ -79,4 +79,4 @@ elseif(CMAKE_COMPILER_IS_GNUCC OR CMAKE_COMPILER_IS_GNUCXX)
   target_compile_options(jules_test_suite PRIVATE -Wall -Wextra -pedantic)
 endif()
 
-add_test(NAME test COMMAND jules_test_suite)
+add_test(NAME test.jules COMMAND jules_test_suite)
