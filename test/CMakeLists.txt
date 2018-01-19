@@ -41,7 +41,8 @@ set(source_files
   dataframe/column_model.cpp
   dataframe/dataframe.cpp
   dataframe/action.cpp
-  test_suite.cpp)
+  test_suite.cpp
+  version.cpp)
 
 add_executable(jules_test_suite ${source_files})
 set_target_properties(jules_test_suite PROPERTIES CXX_STANDARD_REQUIRED ON CXX_EXTENSIONS OFF)
@@ -76,7 +77,7 @@ if(MSVC)
     target_compile_options(jules_test_suite PRIVATE "/W4")
   endif()
 elseif(CMAKE_COMPILER_IS_GNUCC OR CMAKE_COMPILER_IS_GNUCXX)
-  target_compile_options(jules_test_suite PRIVATE -Wall -Wextra -pedantic)
+  target_compile_options(jules_test_suite PRIVATE -Wall -Wextra -Werror -pedantic)
 endif()
 
 add_test(NAME test.jules COMMAND jules_test_suite)

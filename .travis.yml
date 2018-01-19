@@ -3,9 +3,9 @@ language: generic
 dist: trusty
 
 env:
-  - CMAKE_TARGET=Debug COVERAGE=ON
-# - CMAKE_TARGET=Debug COVERAGE=OFF # XXX: see https://github.com/travis-ci/travis-ci/issues/9033
-  - CMAKE_TARGET=Release COVERAGE=OFF
+  - BUILD_TYPE=Debug COVERAGE=ON
+# - BUILD_TYPE=Debug COVERAGE=OFF # XXX: see https://github.com/travis-ci/travis-ci/issues/9033
+  - BUILD_TYPE=Release COVERAGE=OFF
 
 addons:
   apt:
@@ -19,7 +19,7 @@ addons:
 script:
   - mkdir build
   - cd build
-  - cmake -DJULES_BUILD_TEST=ON -DCMAKE_CXX_COMPILER=g++-7 -DCMAKE_BUILD_TYPE=$CMAKE_TARGET -DJULES_TEST_COVERAGE=$COVERAGE ..
+  - cmake -DJULES_BUILD_TEST=ON -DCMAKE_CXX_COMPILER=g++-7 -DCMAKE_BUILD_TYPE=$BUILD_TYPE -DJULES_TEST_COVERAGE=$COVERAGE ..
   - make -j2 VERBOSE=1
   - ctest -j2 -VV
 

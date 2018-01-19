@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.2)
+cmake_minimum_required(VERSION 3.0)
 project(Jules VERSION 0.4.0)
 
 configure_file("include/jules/version.hpp.in" "include/jules/version.hpp")
@@ -60,7 +60,9 @@ target_sources(jules INTERFACE
   $<INSTALL_INTERFACE:${jules_header_files}>
   $<INSTALL_INTERFACE:include/jules/version.hpp>)
 
-target_include_directories(jules INTERFACE $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include/>)
+target_include_directories(jules INTERFACE
+  $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include/>
+  $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}/include/>)
 target_include_directories(jules SYSTEM INTERFACE $<INSTALL_INTERFACE:/include>)
 
 find_package(debug_assert 1.1 QUIET)
