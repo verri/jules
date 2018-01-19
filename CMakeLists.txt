@@ -87,3 +87,16 @@ if(${JULES_BUILD_TEST})
   enable_testing()
   add_subdirectory(test)
 endif()
+
+include(CMakePackageConfigHelpers)
+write_basic_package_version_file(
+  ${CMAKE_CURRENT_BINARY_DIR}/jules-config-version.cmake
+  VERSION ${JULES_VERSION}
+  COMPATIBILITY ExactVersion
+)
+
+install(TARGETS jules EXPORT jules-targets DESTINATION lib)
+install(EXPORT jules-targets FILE jules-config.cmake DESTINATION lib/cmake/jules)
+install(FILES ${CMAKE_CURRENT_BINARY_DIR}/jules-config-version.cmake DESTINATION lib/cmake/jules)
+install(DIRECTORY include/ DESTINATION include FILES_MATCHING PATTERN "*.hpp")
+install(DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/include/ DESTINATION include FILES_MATCHING PATTERN "*.hpp")
