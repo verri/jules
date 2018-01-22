@@ -1,0 +1,23 @@
+language: c
+
+compiler:
+  - gcc
+
+branches:
+  only:
+    - shippable
+
+env:
+  - BUILD_TYPE=Debug COVERAGE=ON
+  - BUILD_TYPE=Debug COVERAGE=OFF
+  - BUILD_TYPE=Release COVERAGE=OFF
+
+build:
+  ci:
+    - sudo apt-get install libblas-dev
+    - git submodule update --init
+    - mkdir build
+    - cd build
+    - cmake -DJULES_BUILD_TEST=ON -DCMAKE_CXX_COMPILER=g++-7 -DCMAKE_BUILD_TYPE=$BUILD_TYPE -DJULES_TEST_COVERAGE=$COVERAGE ..
+    - make -j2 VERBOSE=1
+    - ctest -j2 -VV
