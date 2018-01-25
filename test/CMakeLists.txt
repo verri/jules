@@ -1,6 +1,6 @@
 if(NOT EXISTS ${CMAKE_CURRENT_BINARY_DIR}/catch.hpp)
   file(DOWNLOAD
-    https://raw.githubusercontent.com/philsquared/Catch/master/single_include/catch.hpp
+    https://github.com/catchorg/Catch2/releases/download/v2.1.0/catch.hpp
     ${CMAKE_CURRENT_BINARY_DIR}/catch.hpp
     STATUS status
     LOG log)
