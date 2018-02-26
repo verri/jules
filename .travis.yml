@@ -1,10 +1,10 @@
-sudo: false
+sudo: true # XXX: see https://github.com/travis-ci/travis-ci/issues/9033
 language: generic
 dist: trusty
 
 env:
   - BUILD_TYPE=Debug COVERAGE=ON
-# - BUILD_TYPE=Debug COVERAGE=OFF # XXX: see https://github.com/travis-ci/travis-ci/issues/9033
+  - BUILD_TYPE=Debug COVERAGE=OFF
   - BUILD_TYPE=Release COVERAGE=OFF
 
 addons:
