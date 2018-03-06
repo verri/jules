@@ -142,7 +142,7 @@ static auto do_slice(std::array<index_t, N>& extents, std::vector<index_t>& inde
   constexpr auto I = N - D - 1;
   static_assert(I == sizeof...(args), "invalid number of arguments");
 
-  CHECK_BOUNDS(i, descriptor.extents[D]);
+  CHECK_BOUNDS(i, descriptor.extents[I]);
 
   extents[I] = 1u;
 
