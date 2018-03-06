@@ -92,6 +92,36 @@ auto max(const Rng& rng, T start = numeric_traits<T>::unbounded_min())
   return ::jules::max(range::begin(rng), range::end(rng), std::move(start));
 }
 
+/// \group WhichMax
+///
+/// Returns the position of the maximum element either in a `Range` or in the sequence [`first`, `last`).
+///
+/// \module Arithmetic
+/// \notes [jules::numeric_traits<T>]() must implement `unbounded_min`.
+/// \notes If empty, returns [jules::numeric_traits<T>::unbounded_min]().
+template <typename Iter, typename Sent, typename T = range::iterator_value_t<Iter>,
+          typename = meta::requires<range::Sentinel<Sent, Iter>>>
+auto which_max(Iter first, Sent last, T start = numeric_traits<T>::unbounded_min())
+{
+  std::size_t pos = 0u, best_pos = 0;
+
+  for (; first != last; ++first, ++pos) {
+    if (start < *first) {
+      start = *first;
+      best_pos = pos;
+    }
+  }
+
+  return best_pos;
+}
+
+/// \group WhichMax
+template <typename Rng, typename T = range::range_value_t<Rng>, typename = meta::requires<range::Range<Rng>>>
+auto which_max(const Rng& rng, T start = numeric_traits<T>::unbounded_min())
+{
+  return ::jules::which_max(range::begin(rng), range::end(rng), std::move(start));
+}
+
 /// \group Min
 ///
 /// Returns the minimum element either in a `Range` or in the sequence [`first`, `last`).
@@ -114,6 +144,36 @@ template <typename Rng, typename T = range::range_value_t<Rng>, typename = meta:
 auto min(const Rng& rng, T start = numeric_traits<T>::unbounded_max())
 {
   return ::jules::min(range::begin(rng), range::end(rng), std::move(start));
+}
+
+/// \group Min
+///
+/// Returns the position of the minimum element either in a `Range` or in the sequence [`first`, `last`).
+///
+/// \module Arithmetic
+/// \notes [jules::numeric_traits<T>]() must implement `unbounded_max`.
+/// \notes If empty, returns [jules::numeric_traits<T>::unbounded_max]().
+template <typename Iter, typename Sent, typename T = range::iterator_value_t<Iter>,
+          typename = meta::requires<range::Sentinel<Sent, Iter>>>
+auto which_min(Iter first, Sent last, T start = numeric_traits<T>::unbounded_max())
+{
+  std::size_t pos = 0u, best_pos = 0;
+
+  for (; first != last; ++first, ++pos) {
+    if (start > *first) {
+      start = *first;
+      best_pos = pos;
+    }
+  }
+
+  return best_pos;
+}
+
+/// \group WhichMin
+template <typename Rng, typename T = range::range_value_t<Rng>, typename = meta::requires<range::Range<Rng>>>
+auto which_min(const Rng& rng, T start = numeric_traits<T>::unbounded_max())
+{
+  return ::jules::which_min(range::begin(rng), range::end(rng), std::move(start));
 }
 
 /// \group Prod
