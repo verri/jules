@@ -48,6 +48,7 @@ namespace range
 using namespace ranges::v3;
 } // namespace range
 using ranges::v3::view::indices;
+using ranges::v3::view::closed_indices;
 } // namespace jules
 
 #endif // JULES_CORE_RANGE_H
