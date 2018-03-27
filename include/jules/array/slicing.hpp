@@ -200,7 +200,7 @@ template <typename T, typename Mapper, typename... Args> static auto array_slice
       return strided_ref_array<T, Mapper>{data, {new_descriptor.extents, std::move(indexes)}};
     }
   } else {
-    auto[extents, positions] = detail::indirect_slicing(mapper.descriptor(), std::forward<Args>(args)...);
+    auto [extents, positions] = detail::indirect_slicing(mapper.descriptor(), std::forward<Args>(args)...);
     if constexpr (std::is_same_v<Mapper, identity_mapper<order>>) {
       return strided_ref_array<T, vector_mapper<order>>{data, {extents, {std::move(positions)}}};
     } else {

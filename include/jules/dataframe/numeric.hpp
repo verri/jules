@@ -72,7 +72,7 @@ template <typename T, typename C> auto to_matrix(const base_dataframe<C>& df) ->
 
   data_vector.reserve(ncol);
 
-  for (const auto & [ name, column ] : df) {
+  for (const auto& [name, column] : df) {
     (void)name;
     if (column.elements_type() == typeid(T)) {
       data_vector.push_back({false, column.template data<T>()});
@@ -84,7 +84,7 @@ template <typename T, typename C> auto to_matrix(const base_dataframe<C>& df) ->
 
   auto builder = array_builder<T, 2u>{{{nrow, ncol}}};
 
-  for (const auto[should_move, data] : data_vector)
+  for (const auto [should_move, data] : data_vector)
     for (const auto i : indices(nrow))
       if (should_move)
         builder.push_back(std::move(data[i]));

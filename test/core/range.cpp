@@ -12,8 +12,8 @@ TEST_CASE("Basic range::view usage", "[range]")
   using vector = jules::vector<>;
   using jules::as_vector;
   using jules::cat;
-  using jules::indices;
   using jules::closed_indices;
+  using jules::indices;
 
   static_assert(std::is_same<range_value_type_t<vector>, typename std::iterator_traits<vector::iterator>::value_type>::value, "");
 

@@ -60,7 +60,7 @@ public:
       return *this;
     }
 
-    constexpr auto operator++(int)noexcept -> iterator
+    constexpr auto operator++(int) noexcept -> iterator
     {
       auto copy = *this;
       ++(*this);
@@ -223,7 +223,7 @@ public:
       return *this;
     }
 
-    constexpr auto operator++(int)noexcept -> iterator
+    constexpr auto operator++(int) noexcept -> iterator
     {
       auto copy = *this;
       ++(*this);

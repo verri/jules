@@ -11,8 +11,7 @@ namespace jules
 {
 
 template <typename T, typename = void> struct ExpressionArray : std::false_type
-{
-};
+{};
 
 template <typename T>
 struct ExpressionArray<                        //
@@ -25,8 +24,7 @@ struct ExpressionArray<                        //
        range::InputRange<T>,                   //
        CommonArray<T>                          //
        >> : std::true_type
-{
-};
+{};
 
 } // namespace jules
 

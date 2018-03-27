@@ -98,7 +98,7 @@ class relative_to_index
 public:
   friend auto to(relative_index last) -> relative_to_index { return {{}, std::move(last)}; }
 
-  auto operator()() const & { return last_; }
+  auto operator()() const& { return last_; }
   auto operator()() && -> relative_index&& { return std::move(last_); }
 
   relative_to_index(const relative_to_index&) = default;

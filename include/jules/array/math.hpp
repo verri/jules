@@ -14,7 +14,7 @@ namespace jules
 template <typename Array>
 auto normal_pdf(const common_array_base<Array>& array, typename Array::value_type mu, typename Array::value_type sigma)
 {
-  return apply(array, [ mu = std::move(mu), sigma = std::move(sigma) ](const auto& x) { return normal_pdf(x, mu, sigma); });
+  return apply(array, [mu = std::move(mu), sigma = std::move(sigma)](const auto& x) { return normal_pdf(x, mu, sigma); });
 }
 
 template <typename Array> auto abs(const common_array_base<Array>& array)

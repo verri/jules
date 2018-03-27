@@ -24,8 +24,7 @@ template <typename T> using eval = decltype(eval(std::declval<const T&>()));
 } // namespace meta
 
 template <typename T, typename = void> struct CommonArray : std::false_type
-{
-};
+{};
 
 template <typename T>
 struct CommonArray<                                                                                    //
@@ -44,8 +43,7 @@ struct CommonArray<                                                             
                           >,                                                                           //
        range::Range<T>                                                                                 //
        >> : std::true_type
-{
-};
+{};
 
 template <typename Derived> class common_array_base
 {

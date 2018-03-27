@@ -25,8 +25,7 @@ template <typename T> using public_data = decltype(std::declval<T&>().data());
 } // namespace meta
 
 template <typename T, typename = void> struct ReferenceArray : std::false_type
-{
-};
+{};
 
 // TODO: bidirectional in the future
 template <typename T>
@@ -40,8 +39,7 @@ struct ReferenceArray<                                             //
        meta::compiles<T, meta::result::indirect_indexing>,         //
        std::negation<meta::compiles<T, meta::result::public_data>> //
        >> : std::true_type
-{
-};
+{};
 
 } // namespace jules
 

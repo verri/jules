@@ -16,8 +16,7 @@ namespace blas
 #include <cblas.h>
 
 template <typename T> struct invalid : public std::false_type
-{
-};
+{};
 
 template <typename T> struct cblas
 {

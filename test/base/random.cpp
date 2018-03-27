@@ -28,7 +28,7 @@ TEST_CASE("Basic random operations", "[random]")
     auto answer = std::array<index_t, 10>{{}};
     std::iota(begin(answer), end(answer), 0u);
 
-    const auto[ita, itb] = std::mismatch(ix.begin(), ix.end(), begin(answer));
+    const auto [ita, itb] = std::mismatch(ix.begin(), ix.end(), begin(answer));
     CHECK(ita == ix.end());
   }
 }

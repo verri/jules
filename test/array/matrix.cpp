@@ -203,7 +203,7 @@ TEST_CASE("Matrix tutorial", "[array]")
     CHECK(x.dimensions()[0] == 5u);
     CHECK(x.dimensions()[1] == 20u);
 
-    auto[nrow, ncol] = x.dimensions();
+    auto [nrow, ncol] = x.dimensions();
     CHECK(nrow == 5u);
     CHECK(ncol == 20u);
   }

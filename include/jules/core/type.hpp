@@ -20,22 +20,18 @@ template <typename T> using to_string_expr = decltype(std::to_string(std::declva
 }
 
 template <typename T, typename = void> struct StringConvertible : std::false_type
-{
-};
+{};
 
 // TODO: Maybe move it to core/concepts.hpp
 template <typename T>
 struct StringConvertible<T, std::enable_if_t<meta::compiles<T, detail::to_string_expr>::value>> : std::true_type
-{
-};
+{};
 
 template <typename T, typename = void> struct Signed : std::false_type
-{
-};
+{};
 
 template <typename T> struct Signed<T, std::enable_if_t<std::numeric_limits<T>::is_signed>> : std::true_type
-{
-};
+{};
 
 /// Standard numeric type.
 /// \module Basic Types
