@@ -17,11 +17,9 @@ addons:
       - binutils-gold
 
 script:
-  - mkdir build
-  - cd build
-  - cmake -DJULES_BUILD_TEST=ON -DCMAKE_CXX_COMPILER=g++-7 -DCMAKE_BUILD_TYPE=$BUILD_TYPE -DJULES_TEST_COVERAGE=$COVERAGE ..
-  - make -j2 VERBOSE=1
-  - ctest -j2 -VV
+  - cmake -DJULES_BUILD_TEST=ON -DCMAKE_CXX_COMPILER=g++-7 -DCMAKE_BUILD_TYPE=$BUILD_TYPE -DJULES_TEST_COVERAGE=$COVERAGE -H. -Bbuild
+  - cmake --build build/ -- -j2 VERBOSE=1
+  - cmake --build build/ --target test -- ARGS="-j2 -VV"
 
 after_success:
   - if test "$COVERAGE" == "ON"; then bash <(curl -s https://codecov.io/bash) -x $(which gcov-7); fi

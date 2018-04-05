@@ -13,7 +13,7 @@ Jules
 Dependencies
 ------------
 
- - C++1z (experimental C++17) compiler
+ - C++17 compiler
     - Tested on GCC 7.2 and Clang 5.0.0
  - [debug_assert](https://github.com/foonathan/debug_assert)
  - [range-v3](https://github.com/ericniebler/range-v3)

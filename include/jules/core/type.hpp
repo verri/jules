@@ -37,6 +37,10 @@ template <typename T> struct Signed<T, std::enable_if_t<std::numeric_limits<T>::
 /// \module Basic Types
 using numeric = double;
 
+/// Infinity value.
+/// \module Basic Types
+constexpr auto infinity = std::numeric_limits<numeric>::infinity();
+
 /// Standard string type.
 ///
 /// It is the C++ standard [std::string]().
@@ -51,6 +55,10 @@ using uinteger = unsigned;
 /// Standard index type.
 /// \module Basic Types
 using index_t = std::size_t;
+
+/// Standard size type.
+/// \module Basic Types
+using size_t = std::size_t;
 
 /// Standard signed type.
 /// \module Basic Types
