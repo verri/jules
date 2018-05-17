@@ -13,6 +13,7 @@ BASE_FLAGS = [
         '-Iinclude',
         '-Ithird_party/range-v3/include',
         '-Ithird_party/debug_assert',
+        '-Ibuild/test/'
         ]
 
 SOURCE_EXTENSIONS = [
