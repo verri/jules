@@ -6,6 +6,7 @@
 
 #include <jules/array/descriptor.hpp>
 #include <jules/array/detail/common.hpp>
+#include <jules/array/drop.hpp>
 #include <jules/array/meta/common.hpp>
 #include <jules/array/strided_ref_array.hpp>
 #include <jules/core/type.hpp>
@@ -190,9 +191,13 @@ protected:
 
 template <typename T, std::size_t N> auto eval(ref_array<T, N> source) -> ref_array<T, N> { return source; }
 
-template <std::size_t D, typename T, std::size_t N> auto drop_to(ref_array<T, N> source) -> ref_array<T, D>
+template <std::size_t D, typename T, std::size_t N> decltype(auto) drop_to(ref_array<T, N> source)
 {
-  return {source.begin(), {detail::template drop_one_level_extents<D>(source.dimensions())}};
+  if constexpr (D == 0) {
+    DEBUG_ASSERT(source.size() == 1, debug::default_module, debug::level::invalid_argument, "array cannot be coerced to scalar");
+    return *source.data();
+  } else
+    return ref_array<T, D>{source.begin(), {detail::template drop_one_level_extents<D>(source.dimensions())}};
 }
 
 template <typename T, std::size_t N> decltype(auto) drop(ref_array<T, N> source) { return drop_to<1>(source); }

@@ -21,6 +21,7 @@ endif()
 set(source_files
   core/debug.cpp
   core/range.cpp
+  array/axis.cpp
   array/functional.cpp
   array/strided_ref_array.cpp
   array/numeric.cpp

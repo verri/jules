@@ -3,6 +3,7 @@
 #ifndef JULES_ARRAY_AXIS_H
 #define JULES_ARRAY_AXIS_H
 
+#include <jules/array/drop.hpp>
 #include <jules/array/meta/reference.hpp>
 #include <jules/array/slicing/bounded.hpp>
 #include <jules/core/type.hpp>
@@ -17,20 +18,20 @@ template <size_t Order, size_t Axis, size_t I, typename ArrayLike>
 constexpr decltype(auto) axis_at_impl(ArrayLike&& arr, [[maybe_unused]] index_t i)
 {
   if constexpr (I == Order)
-    return std::forward<ArrayLike>(arr);
+    return static_cast<ArrayLike>(arr);
   else if constexpr (I == Axis)
-    return axis_at_impl<Order, Axis, I+1>(std::forward<ArrayLike>(arr)[i]);
+    return axis_at_impl<Order, Axis, I + 1>(std::forward<ArrayLike>(arr).operator[](i), i);
   else
-    return axis_at_impl<Order, Axis, I+1>(std::forward<ArrayLike>(arr)[every]);
+    return axis_at_impl<Order, Axis, I + 1>(std::forward<ArrayLike>(arr).operator[](every), i);
 }
 
-} // detail
+} // namespace detail
 
 template <size_t Axis, typename RefArray, typename = meta::requires<ReferenceArray<RefArray>>>
 constexpr decltype(auto) axis_at(RefArray arr, index_t i)
 {
   static_assert(Axis < RefArray::order);
-  return detail::axis_at_impl<RefArray::order, Axis, 0>(arr, i);
+  return drop_to<RefArray::order - 1>(detail::axis_at_impl<RefArray::order, Axis, 0>(arr, i));
 }
 
 template <size_t Axis, typename RefArray> class axis_iterator
