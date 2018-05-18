@@ -1,4 +1,4 @@
-// Copyright (c) 2017 Filipe Verri <filipeverri@gmail.com>
+// Copyright (c) 2017-2018 Filipe Verri <filipeverri@gmail.com>
 
 #ifndef JULES_ARRAY_REF_ARRAY_H
 /// \exclude

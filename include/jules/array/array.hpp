@@ -1,10 +1,11 @@
-// Copyright (c) 2017 Filipe Verri <filipeverri@gmail.com>
+// Copyright (c) 2017-2018 Filipe Verri <filipeverri@gmail.com>
 
 #ifndef JULES_ARRAY_ARRAY_H
 /// \exclude
 #define JULES_ARRAY_ARRAY_H
 
 #include <jules/array/allocator.hpp>
+#include <jules/array/axis.hpp>
 #include <jules/array/blas.hpp>
 #include <jules/array/builder.hpp>
 #include <jules/array/functional.hpp>

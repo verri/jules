@@ -18,6 +18,18 @@ TEST_CASE("Basic axis functionalities", "[array]")
   CHECK(all(drop_to<decltype(m)::order - 1>(m[0][every]) == axis_at<0>(ref(m), 0)));
   CHECK(all(drop_to<decltype(m)::order - 1>(m[every][0]) == axis_at<1>(ref(m), 0)));
 
+  size_t r = 0;
+  for (auto row : axis<0>(m))
+    CHECK(all(row == drop(m[r++][every])));
+
+  r = 0;
+  for (auto row : rows(m))
+    CHECK(all(row == drop(m[r++][every])));
+
+  size_t c = 0;
+  for (auto column : columns(m))
+    CHECK(all(column == drop(m[every][c++])));
+
   vector<> v(indices(3 * 4));
   CHECK(v.size() == 3 * 4);
 
