@@ -41,10 +41,13 @@ template <size_t Axis, typename RefArray> class axis_iterator
 
 public:
   using iterator_category = std::random_access_iterator_tag;
-  using value_type = decltype(axis_at<Axis>(std::declval<RefArray>(), 0u));
+  using reference = decltype(axis_at<Axis>(std::declval<RefArray>(), 0u));
+  using value_type = std::decay_t<reference>;
   using difference_type = distance_t;
-  using pointer = value_type;
-  using reference = value_type;
+  using pointer = void;
+
+  // XXX: Investigate why `axis_iterator() = default` deletes the default constructor.
+  axis_iterator() {}
 
   constexpr axis_iterator(RefArray arr, index_t pos) noexcept : arr_{std::move(arr)}, pos_{pos} {}
 
@@ -78,16 +81,39 @@ public:
 
   constexpr auto operator-(difference_type n) const -> axis_iterator { return {arr_, pos_ - n}; }
 
+  friend constexpr auto operator+(difference_type n, const axis_iterator& it) -> axis_iterator { return it + n; }
+
+  friend constexpr auto operator-(difference_type n, const axis_iterator& it) -> axis_iterator { return it - n; }
+
+  constexpr auto operator+=(difference_type n) -> axis_iterator&
+  {
+    pos_ += n;
+    return *this;
+  }
+
+  constexpr auto operator-=(difference_type n) -> axis_iterator&
+  {
+    pos_ -= n;
+    return *this;
+  }
+
   constexpr auto operator==(const axis_iterator& other) const { return pos_ == other.pos_; }
 
   constexpr auto operator!=(const axis_iterator& other) const { return !(*this == other); }
 
-  constexpr auto operator-(const axis_iterator& other) const
+  constexpr auto operator-(const axis_iterator& other) const -> difference_type
   {
     return static_cast<difference_type>(other.pos_) - static_cast<difference_type>(pos_);
   }
 
   constexpr auto operator*() -> reference { return axis_at<Axis>(arr_, pos_); }
+
+  constexpr auto operator[](difference_type n) const -> reference { return axis_at<Axis>(arr_, pos_ + n); }
+
+  constexpr auto operator<(const axis_iterator& other) const -> bool { return pos_ < other.pos_; }
+  constexpr auto operator<=(const axis_iterator& other) const -> bool { return pos_ <= other.pos_; }
+  constexpr auto operator>(const axis_iterator& other) const -> bool { return pos_ > other.pos_; }
+  constexpr auto operator>=(const axis_iterator& other) const -> bool { return pos_ >= other.pos_; }
 
 private:
   RefArray arr_;
