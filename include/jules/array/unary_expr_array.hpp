@@ -43,10 +43,10 @@ public:
     constexpr iterator() = default;
 
     constexpr iterator(const iterator& source) = default;
-    constexpr iterator(iterator&& source) noexcept = default;
+    constexpr iterator(iterator&& source) noexcept(std::is_nothrow_move_constructible_v<It>) = default;
 
     constexpr iterator& operator=(const iterator& source) = default;
-    constexpr iterator& operator=(iterator&& source) noexcept = default;
+    constexpr iterator& operator=(iterator&& source) noexcept(std::is_nothrow_move_assignable_v<It>) = default;
 
     constexpr auto operator++() -> iterator&
     {

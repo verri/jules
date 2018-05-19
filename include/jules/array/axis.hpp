@@ -141,17 +141,17 @@ public:
 
   auto length() const noexcept { return this->size(); }
 
-  auto begin() noexcept -> iterator { return {arr_, 0u}; }
+  auto begin() noexcept -> iterator { return this->cbegin(); }
 
-  auto end() noexcept -> iterator { return {arr_, this->size()}; }
+  auto end() noexcept -> iterator { return this->cend(); }
 
-  auto begin() const noexcept -> const_iterator { return this->begin(); }
+  auto begin() const noexcept -> const_iterator { return this->cbegin(); }
 
-  auto end() const noexcept -> const_iterator { return this->end(); }
+  auto end() const noexcept -> const_iterator { return this->cend(); }
 
-  auto cbegin() const noexcept { return this->begin(); }
+  auto cbegin() const noexcept -> const_iterator { return {arr_, 0u}; }
 
-  auto cend() const noexcept { return this->end(); }
+  auto cend() const noexcept -> const_iterator { return {arr_, this->size()}; }
 
 private:
   RefArray arr_;
