@@ -53,8 +53,7 @@ TEST_CASE("Assigning constant vectors", "[const_vector]")
   auto c = const_vector<index_t>();
 
   b = a;
-  c = [d = a]()->const_vector<index_t> { return std::move(d); }
-  ();
+  c = [d = a]() -> const_vector<index_t> { return std::move(d); }();
   a = std::vector<index_t>{1u, 2u, 3u, 4u, 5u};
 
   CHECK(a == seq(1u, 5u));

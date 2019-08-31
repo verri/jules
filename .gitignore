@@ -6,5 +6,5 @@
 *.gcov
 wiki
 git_stats
-third_party/range-v3
-third_party/debug_assert
+build
+include/jules/version.hpp

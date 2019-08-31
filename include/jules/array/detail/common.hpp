@@ -64,7 +64,7 @@ constexpr auto drop_one_level_extents(const std::array<index_t, N>& extents) -> 
     debug::default_module, debug::level::invalid_argument, "array dimensions cannot be dropped");
 
   auto new_extents = repeat<D, index_t>(1u);
-  std::copy_if(begin(extents), end(extents), begin(new_extents), [dropped_count = index_t{0u}](auto d) mutable->bool {
+  std::copy_if(begin(extents), end(extents), begin(new_extents), [dropped_count = index_t{0u}](auto d) mutable -> bool {
     if (dropped_count == N - D || d != 1)
       return true;
     ++dropped_count;

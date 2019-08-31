@@ -26,7 +26,7 @@ template <typename T, typename C> auto to_view(base_column<C>& column) -> ref_ar
 {
   if (column.elements_type() != typeid(T))
     column.template coerce<T>();
-  return {column.template data<T>(), {{column.size()}}};
+  return {column.template data<T>(), {{{column.size()}}}};
 }
 
 template <typename T, typename C> auto to_view(const base_column<C>& column) -> ref_array<const T, 1u>
@@ -72,7 +72,7 @@ template <typename T, typename C> auto to_matrix(const base_dataframe<C>& df) ->
 
   data_vector.reserve(ncol);
 
-  for (const auto & [ name, column ] : df) {
+  for (const auto& [name, column] : df) {
     (void)name;
     if (column.elements_type() == typeid(T)) {
       data_vector.push_back({false, column.template data<T>()});
@@ -82,9 +82,9 @@ template <typename T, typename C> auto to_matrix(const base_dataframe<C>& df) ->
     }
   }
 
-  auto builder = array_builder<T, 2u>{{nrow, ncol}};
+  auto builder = array_builder<T, 2u>{{{nrow, ncol}}};
 
-  for (const auto[should_move, data] : data_vector)
+  for (const auto [should_move, data] : data_vector)
     for (const auto i : indices(nrow))
       if (should_move)
         builder.push_back(std::move(data[i]));

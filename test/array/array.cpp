@@ -43,8 +43,9 @@ TEST_CASE("Basic array functionalities", "[array]")
   }
 
   REQUIRE(matrix1.dimensions() == matrix2.dimensions());
-  auto expr0 = jules::binary_expr_array(matrix1.begin(), matrix1.end(), matrix2.begin(), matrix2.end(),
-                                        [](const int& a, const int& b) { return a + b; }, matrix1.dimensions());
+  auto expr0 = jules::binary_expr_array(
+    matrix1.begin(), matrix1.end(), matrix2.begin(), matrix2.end(), [](const int& a, const int& b) { return a + b; },
+    matrix1.dimensions());
 
   static_assert(jules::ExpressionArray<decltype(expr0)>::value);
 

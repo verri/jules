@@ -1,16 +1,18 @@
-// Copyright (c) 2017 Filipe Verri <filipeverri@gmail.com>
+// Copyright (c) 2017-2018 Filipe Verri <filipeverri@gmail.com>
 
 #ifndef JULES_ARRAY_ARRAY_H
 /// \exclude
 #define JULES_ARRAY_ARRAY_H
 
 #include <jules/array/allocator.hpp>
+#include <jules/array/axis.hpp>
 #include <jules/array/blas.hpp>
 #include <jules/array/builder.hpp>
 #include <jules/array/functional.hpp>
 #include <jules/array/io.hpp>
 #include <jules/array/math.hpp>
 #include <jules/array/numeric.hpp>
+#include <jules/array/overlap.hpp>
 #include <jules/array/ref_array.hpp>
 #include <jules/base/async.hpp>
 #include <jules/base/numeric.hpp>
@@ -213,7 +215,7 @@ public:
 
   /// \group constructors
   template <typename Rng, typename = meta::requires<range::SizedRange<Rng>, std::negation<CommonArray<Rng>>>>
-  array(const Rng& rng) : ref_array<value_type, order>{this->allocate(range::size(rng)), {{range::size(rng)}}}
+  array(const Rng& rng) : ref_array<value_type, order>{this->allocate(range::size(rng)), {{{range::size(rng)}}}}
   {
     static_assert(order == 1u, "Only vectors can be initialized from a range");
     static_assert(std::is_constructible<value_type, range::reference_t<range::iterator_t<Rng>>>::value,
@@ -231,7 +233,7 @@ public:
   template <typename Iter, typename Sent, typename = meta::requires<range::Sentinel<Sent, Iter>>>
   array(Iter begin, Sent end)
     : ref_array<value_type, order>{this->allocate(range::distance(begin, end)),
-                                   {{static_cast<size_type>(range::distance(begin, end))}}}
+                                   {{{static_cast<size_type>(range::distance(begin, end))}}}}
   {
     static_assert(order == 1u, "Only vectors can be initialized from a pair of iterators");
     static_assert(std::is_constructible<value_type, range::reference_t<Iter>>::value, "incompatible value types");
@@ -259,6 +261,12 @@ public:
   auto operator=(const array& source) -> array&
   {
     DEBUG_ASSERT(this != &source, debug::default_module, debug::level::invalid_argument, "self assignment");
+
+    if (this->size() == source.size()) {
+      std::copy(source.begin(), source.end(), this->begin());
+      this->descriptor_ = source.descriptor_;
+      return *this;
+    }
 
     auto new_data = this->allocate(source.size());
     auto success = false;
@@ -292,6 +300,12 @@ public:
   {
     static_assert(Array::order == order, "array order mismatch");
     static_assert(std::is_assignable<value_type&, typename Array::value_type>::value, "incompatible assignment");
+
+    if (this->size() == source.size()) {
+      std::copy(source.begin(), source.end(), this->begin());
+      this->descriptor_ = source.dimensions();
+      return *this;
+    }
 
     auto new_data = this->allocate(source.size());
     auto success = false;

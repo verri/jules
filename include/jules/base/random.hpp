@@ -74,7 +74,7 @@ auto uniform_index_sample(no_replacement_t, index_t n, index_t end, G& g = rando
   result.reserve(n);
 
   while (m < n) {
-    if ((end - n) * canon_sample(g) < n - m) {
+    if ((end - t) * canon_sample(g) < n - m) {
       result.push_back(t);
       ++m;
     }

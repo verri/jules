@@ -142,7 +142,7 @@ static auto do_slice(std::array<index_t, N>& extents, std::vector<index_t>& inde
   constexpr auto I = N - D - 1;
   static_assert(I == sizeof...(args), "invalid number of arguments");
 
-  CHECK_BOUNDS(i, descriptor.extents[D]);
+  CHECK_BOUNDS(i, descriptor.extents[I]);
 
   extents[I] = 1u;
 
@@ -200,7 +200,7 @@ template <typename T, typename Mapper, typename... Args> static auto array_slice
       return strided_ref_array<T, Mapper>{data, {new_descriptor.extents, std::move(indexes)}};
     }
   } else {
-    auto[extents, positions] = detail::indirect_slicing(mapper.descriptor(), std::forward<Args>(args)...);
+    auto [extents, positions] = detail::indirect_slicing(mapper.descriptor(), std::forward<Args>(args)...);
     if constexpr (std::is_same_v<Mapper, identity_mapper<order>>) {
       return strided_ref_array<T, vector_mapper<order>>{data, {extents, {std::move(positions)}}};
     } else {
@@ -266,9 +266,11 @@ template <typename U, std::size_t M> static decltype(auto) array_at(U* data, con
 template <typename U, std::size_t M, typename Rng, typename = meta::requires<range::SizedRange<Rng>>>
 static decltype(auto) array_at(U* data, const descriptor<M>& desc, const Rng& rng)
 {
-  if constexpr (M == 1 && std::is_same_v<Rng, const_vector<index_t>>) {
+  if constexpr (M == 1 && std::is_constructible_v<index_view, const Rng&>) {
     DEBUG_ASSERT(max(rng) < desc.length(), debug::default_module, debug::level::boundary_check, "out of range");
-    return strided_ref_array<U, vector_mapper<1u>>{data, {{{rng.size()}}, rng}};
+    auto view = index_view(rng);
+    const auto size = view.size();
+    return strided_ref_array<U, vector_mapper<1u>>{data, {{{size}}, std::move(view)}};
   } else {
     return array_at(data, identity_mapper<M>{{0u, desc.extents}}, rng);
   }
@@ -279,7 +281,7 @@ template <typename U, std::size_t M> static decltype(auto) array_at(U* data, con
   if constexpr (M == 1) {
     DEBUG_ASSERT(slice.start + slice.extent - 1u < desc.extents[0], debug::default_module, debug::level::boundary_check,
                  "out of range");
-    return ref_array<U, 1u>{data + slice.start, {{slice.extent}}};
+    return ref_array<U, 1u>{data + slice.start, {{{slice.extent}}}};
   } else {
     return array_at(data, identity_mapper<M>{{0u, desc.extents}}, std::move(slice));
   }

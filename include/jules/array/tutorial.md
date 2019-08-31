@@ -19,26 +19,25 @@ The simplest way to use all array facilities in `jules` is including the whole
 array module:
 
 ``` cpp
-#include <jules/array/all.hpp>
+#include <jules/array/array.hpp>
 ```
 
 This will expose the basic types `jules::vector<T>` for 1-dimensional arrays,
-`jules::matrix<T>` for 2-dimensional arrays, and `jules::ndarray<N, T>` for
-higher orders.  If the type `T` is not specified,
+`jules::matrix<T>` for 2-dimensional arrays, and `jules::array<N, T>` for
+arbitrary orders.  If the type `T` is not specified,
 [jules::numeric](standardese://jules::numeric/) is used by default.
 
 # Constructors
 
 There are several ways to create a vector, see [the
-reference](standardese://jules::base_array<T, 1>::base_array/) for more details.
+reference](standardese://jules::array<T, N>::array/) for more details.
 
 ``` cpp
 // An empty vector.
 auto a = jules::vector<>();
 
 // A vector with 10 elements.
-// If elements types are trivial, they are non-initialized.
-// Otherwise, they are default initialized.
+// The elements are default initialized.
 auto b = jules::vector<>(10u);
 
 // A vector with 10 elements containing copies of 3.14.
@@ -64,7 +63,7 @@ auto h = std::move(b);
 auto i = jules::vector<>(d + e);
 ```
 
-The function `jules::as_vector` can be used to construct a vector whose
+Functions `jules::as_vector` and `jules::cat` can be used to construct a vector whose
 elements type is inferred.
 
 ``` cpp
@@ -72,11 +71,11 @@ elements type is inferred.
 auto j = jules::as_vector(values);
 
 // A vector with elements whose type is the common type of the arguments.
-auto k = jules::as_vector(1, 2u, 3l);
+auto k = jules::cat(1, 2u, 3l);
 ```
 
 For higher dimensional arrays, the constructors are basically the same.
-Consult [the reference](standardese://jules::base_array<T, N>::base_array/) for
+Consult [the reference](standardese://jules::array<T, N>::array/) for
 a comprehensive list.
 
 ``` cpp
@@ -127,17 +126,10 @@ matrix[1u][1u] = vector[0u];
 // matrix == { {0.0, 0.0, 0.0}, {0.0, 1.0, 0.0}, {0.0, 0.0, 0.0} }
 ```
 
-Alternatively (and potentially faster), one can use the `operator()` notation.
-
-```cpp
-matrix(2u, 2u) = vector(0u);
-// matrix == { {0.0, 0.0, 0.0}, {0.0, 1.0, 0.0}, {0.0, 0.0, 1.0} }
-```
-
 Unlike C-arrays, one can assign entire sub-arrays if they have same
-dimensions.
+dimensions using the `jules::every` utility.
 
 ```cpp
-matrix[0u] = vector;
+matrix[0u][jules::every] = vector;
 // matrix == { {1.0, 0.0, 0.0}, {0.0, 1.0, 0.0}, {0.0, 0.0, 1.0} }
 ```

@@ -97,6 +97,10 @@ TEST_CASE("Vector tutorial", "[array]")
     y = x;
     CHECK(all(x == y));
 
+    // No memory allocation.
+    x = y;
+    CHECK(all(x == y));
+
     z = std::move(x);
     CHECK(all(y == z));
 
@@ -119,15 +123,20 @@ TEST_CASE("Vector tutorial", "[array]")
     x += x + x;
     CHECK(all(x == 3 * (jules::cat(0, 4, 8, 12, 16) + 1)));
 
+    // To solve aliasing, eval is not enough.
+    // Use overlap instead.
+    overlap(x) = x[jules::seq(x.length() - 1, 0u, -1)];
+    CHECK(all(x == 3 * (jules::cat(16, 12, 8, 4, 0) + 1)));
+
     // This one is tricky. We must guarantee that the Memory of x is not freed before the
     // expression is evaluated.
-    x = x - x;
-    CHECK(all(x == jules::as_vector(jules::repeat<5>(0))));
+    x = x[{0, 4}] - x[{0, 4}];
+    CHECK(all(x == jules::as_vector(jules::repeat<4>(0))));
 
     // Every-slicing do not allocate any extra memory.
     x[every] = 10;
     x[every] = x - x;
-    CHECK(all(x == jules::as_vector(jules::repeat<5>(0))));
+    CHECK(all(x == jules::as_vector(jules::repeat<4>(0))));
 
     x[every] = 1;
     CHECK(all(x == 1));

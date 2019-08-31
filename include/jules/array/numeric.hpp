@@ -52,7 +52,7 @@ auto product_impl(const RefArrayA lhs, const RefArrayB& rhs)
   const auto m = lhs.row_count();
   const auto p = rhs.column_count();
 
-  auto builder = array_builder<R, 2u>{{m, p}};
+  auto builder = array_builder<R, 2u>{{{m, p}}};
 
   for (const auto j : indices(p))
     for (const auto i : indices(m))
@@ -138,7 +138,7 @@ template <typename... Args> auto cat(Args&&... args)
   using R = std::common_type_t<detail::cat_value_type_t<Args>...>;
   const auto size = (index_t{} + ... + detail::cat_size(args));
 
-  auto builder = array_builder<R, 1u>{{size}};
+  auto builder = array_builder<R, 1u>{{{size}}};
 
   (detail::cat_push(builder, std::forward<Args>(args)), ...);
 

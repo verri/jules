@@ -20,26 +20,26 @@ template <typename T> using to_string_expr = decltype(std::to_string(std::declva
 }
 
 template <typename T, typename = void> struct StringConvertible : std::false_type
-{
-};
+{};
 
 // TODO: Maybe move it to core/concepts.hpp
 template <typename T>
 struct StringConvertible<T, std::enable_if_t<meta::compiles<T, detail::to_string_expr>::value>> : std::true_type
-{
-};
+{};
 
 template <typename T, typename = void> struct Signed : std::false_type
-{
-};
+{};
 
 template <typename T> struct Signed<T, std::enable_if_t<std::numeric_limits<T>::is_signed>> : std::true_type
-{
-};
+{};
 
 /// Standard numeric type.
 /// \module Basic Types
 using numeric = double;
+
+/// Infinity value.
+/// \module Basic Types
+constexpr auto infinity = std::numeric_limits<numeric>::infinity();
 
 /// Standard string type.
 ///
@@ -55,6 +55,10 @@ using uinteger = unsigned;
 /// Standard index type.
 /// \module Basic Types
 using index_t = std::size_t;
+
+/// Standard size type.
+/// \module Basic Types
+using size_t = std::size_t;
 
 /// Standard signed type.
 /// \module Basic Types

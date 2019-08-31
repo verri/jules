@@ -54,9 +54,17 @@ TEST_CASE("Base numeric utilities", "[numeric]")
     CHECK(jules::min(b) == 1);
     CHECK(min(c) == 1);
 
+    CHECK(jules::which_min(a.begin(), a.end()) == 0u);
+    CHECK(jules::which_min(b) == 0u);
+    CHECK(which_min(c) == 0u);
+
     CHECK(jules::max(a.begin(), a.end()) == 4);
     CHECK(jules::max(b) == 4);
     CHECK(max(c) == 4);
+
+    CHECK(jules::which_max(a.begin(), a.end()) == 3u);
+    CHECK(jules::which_max(b) == 3u);
+    CHECK(which_max(c) == 3u);
 
     CHECK(jules::nth(a.begin(), a.end(), 1) == 2);
     CHECK(jules::nth(b, 1) == 2);

@@ -1,4 +1,4 @@
-// Copyright (c) 2017 Filipe Verri <filipeverri@gmail.com>
+// Copyright (c) 2017-2018 Filipe Verri <filipeverri@gmail.com>
 
 #ifndef JULES_ARRAY_STRIDED_REF_ARRAY_H
 /// \exclude
@@ -6,6 +6,7 @@
 
 #include <jules/array/detail/common.hpp>
 #include <jules/array/detail/iterator.hpp>
+#include <jules/array/drop.hpp>
 #include <jules/array/mapper.hpp>
 #include <jules/array/meta/common.hpp>
 #include <jules/array/meta/reference.hpp>
@@ -18,9 +19,6 @@
 
 namespace jules
 {
-
-template <std::size_t D, typename U, template <std::size_t> typename MapType, std::size_t M>
-auto drop_to(strided_ref_array<U, MapType<M>> source) -> strided_ref_array<U, MapType<D>>;
 
 /// Array with non-owned, non-continuous data.
 ///
@@ -176,8 +174,15 @@ public:
 
   auto dimensions() const noexcept -> std::array<size_type, order> { return this->descriptor().extents; }
 
-  template <std::size_t D, typename U, template <std::size_t> typename MapType, std::size_t M>
-  friend auto drop_to(strided_ref_array<U, MapType<M>> source) -> strided_ref_array<U, MapType<D>>;
+  template <std::size_t D> decltype(auto) drop_to()
+  {
+    if constexpr (D == 0) {
+      DEBUG_ASSERT(this->size() == 1, debug::default_module, debug::level::invalid_argument, "array cannot be coerced to scalar");
+      return *this->data();
+    } else
+      return strided_ref_array<T, decltype(this->mapper().template drop_one_level_dimensions<D>())>{
+        this->data(), this->mapper().template drop_one_level_dimensions<D>()};
+  }
 
 protected:
   auto mapper() const -> const Mapper& { return *this; }
@@ -196,9 +201,9 @@ template <typename T, typename Mapper> auto eval(strided_ref_array<T, Mapper> so
 }
 
 template <std::size_t D, typename U, template <std::size_t> typename MapType, std::size_t M>
-auto drop_to(strided_ref_array<U, MapType<M>> source) -> strided_ref_array<U, MapType<D>>
+decltype(auto) drop_to(strided_ref_array<U, MapType<M>> source)
 {
-  return {source.data(), source.mapper().template drop_one_level_dimensions<D>()};
+  return source.template drop_to<D>();
 }
 
 template <typename U, template <std::size_t> typename MapType, std::size_t M>

@@ -1,0 +1,6 @@
+[submodule "third_party/debug_assert"]
+	path = third_party/debug_assert
+	url = https://github.com/foonathan/debug_assert.git
+[submodule "third_party/range-v3"]
+	path = third_party/range-v3
+	url = https://github.com/ericniebler/range-v3.git

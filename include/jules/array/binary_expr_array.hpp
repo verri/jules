@@ -46,10 +46,12 @@ public:
     constexpr iterator() = default;
 
     constexpr iterator(const iterator& source) = default;
-    constexpr iterator(iterator&& source) noexcept = default;
+    constexpr iterator(iterator&& source) noexcept(
+      std::is_nothrow_move_constructible_v<LhsIt>&& std::is_nothrow_move_constructible_v<RhsIt>) = default;
 
     constexpr iterator& operator=(const iterator& source) = default;
-    constexpr iterator& operator=(iterator&& source) noexcept = default;
+    constexpr iterator& operator=(iterator&& source) noexcept(
+      std::is_nothrow_move_assignable_v<LhsIt>&& std::is_nothrow_move_assignable_v<RhsIt>) = default;
 
     constexpr auto operator++() -> iterator&
     {
