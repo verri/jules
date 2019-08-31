@@ -20,6 +20,7 @@ endif()
 
 set(source_files
   core/debug.cpp
+  core/type.cpp
   core/range.cpp
   array/axis.cpp
   array/functional.cpp

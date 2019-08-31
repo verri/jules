@@ -1,4 +1,4 @@
-// Copyright (c) 2017 Filipe Verri <filipeverri@gmail.com>
+// Copyright (c) 2017-2019 Filipe Verri <filipeverri@gmail.com>
 
 #ifndef JULES_CORE_TYPE_H
 #define JULES_CORE_TYPE_H
@@ -242,14 +242,28 @@ template <typename T> struct numeric_traits : std::numeric_limits<T>
 {
   static constexpr auto additive_identity() { return static_cast<T>(0); }
   static constexpr auto multiplicative_identity() { return static_cast<T>(1); }
+
   static constexpr auto unbounded_min()
   {
-    return std::numeric_limits<T>::has_infinity ? -std::numeric_limits<T>::infinity() : std::numeric_limits<T>::min();
+    if constexpr (std::numeric_limits<T>::has_infinity)
+      return -std::numeric_limits<T>::infinity();
+    else
+      return std::numeric_limits<T>::min();
   }
+
   static constexpr auto unbounded_max()
   {
-    return std::numeric_limits<T>::has_infinity ? std::numeric_limits<T>::infinity() : std::numeric_limits<T>::max();
+    if constexpr (std::numeric_limits<T>::has_infinity)
+      return std::numeric_limits<T>::infinity();
+    else
+      return std::numeric_limits<T>::max();
   }
+};
+
+template <typename... Fs> struct overloaded : Fs...
+{
+  constexpr explicit overloaded(Fs... fs) : Fs(std::move(fs))... {}
+  using Fs::operator()...;
 };
 
 } // namespace jules
