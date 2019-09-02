@@ -1,11 +1,11 @@
-// Copyright (c) 2017 Filipe Verri <filipeverri@gmail.com>
+// Copyright (c) 2017-2019 Filipe Verri <filipeverri@gmail.com>
 
 #ifndef JULES_ARRAY_META_COMMON_H
 /// \exclude
 #define JULES_ARRAY_META_COMMON_H
 
 #include <jules/core/meta.hpp>
-#include <jules/core/range.hpp>
+#include <jules/core/ranges.hpp>
 #include <jules/core/type.hpp>
 
 namespace jules
@@ -41,7 +41,7 @@ struct CommonArray<                                                             
                             meta::compiles_same<T, typename T::size_type, meta::result::row_count>,    //
                             meta::compiles_same<T, typename T::size_type, meta::result::column_count>> //
                           >,                                                                           //
-       range::Range<T>                                                                                 //
+       std::bool_constant<ranges::range<T>>                                                                                //
        >> : std::true_type
 {};
 

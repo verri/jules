@@ -42,7 +42,7 @@ TEST_CASE("Matrix tutorial", "[array]")
     auto a = jules::matrix<long>(4u, 4u);
     auto b = jules::matrix<long>(4u, 4u);
 
-    jules::range::copy(values, a.begin());
+    jules::ranges::copy(values, a.begin());
     b[every][every] = a;
 
     // Constructors from iterators.

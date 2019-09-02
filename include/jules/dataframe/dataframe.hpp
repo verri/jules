@@ -1,4 +1,4 @@
-// Copyright (c) 2016-2017 Filipe Verri <filipeverri@gmail.com>
+// Copyright (c) 2016-2019 Filipe Verri <filipeverri@gmail.com>
 
 #ifndef JULES_DATAFRAME_DATAFRAME_H
 #define JULES_DATAFRAME_DATAFRAME_H
@@ -6,7 +6,7 @@
 #include <jules/array/array.hpp>
 #include <jules/core/debug.hpp>
 #include <jules/core/meta.hpp>
-#include <jules/core/range.hpp>
+#include <jules/core/ranges.hpp>
 #include <jules/core/type.hpp>
 #include <jules/dataframe/action.hpp>
 #include <jules/dataframe/column.hpp>
@@ -80,27 +80,27 @@ public:
     : base_dataframe(elements.begin(), elements.end(), elements.size())
   {}
 
-  template <typename Rng, typename R = range::range_value_t<Rng>,
+  template <typename Rng, typename R = ranges::range_value_t<Rng>,
             typename = std::enable_if_t<std::is_convertible<R, named_column_type>::value>,
-            typename = meta::requires<range::SizedRange<Rng>>>
-  base_dataframe(const Rng& rng) : base_dataframe(range::begin(rng), range::end(rng), range::size(rng))
+            typename = meta::requires_concept<ranges::sized_range<Rng>>>
+  base_dataframe(const Rng& rng) : base_dataframe(ranges::begin(rng), ranges::end(rng), ranges::size(rng))
   {}
 
-  template <typename Iter, typename Sent, typename R = range::iterator_value_t<Iter>,
+  template <typename Iter, typename Sent, typename R = ranges::iter_value_t<Iter>,
             typename = std::enable_if_t<std::is_convertible<R, named_column_type>::value>,
-            typename = meta::requires<range::Sentinel<Sent, Iter>, std::negation<range::InputIterator<Iter>>>, int = 0>
+            typename = meta::requires_concept<ranges::sentinel_for<Sent, Iter>, !ranges::input_iterator<Iter>>, int = 0>
   base_dataframe(Iter first, Sent last) : base_dataframe(first, last, 0u)
   {}
 
-  template <typename Iter, typename Sent, typename R = range::iterator_value_t<Iter>,
+  template <typename Iter, typename Sent, typename R = ranges::iter_value_t<Iter>,
             typename = std::enable_if_t<std::is_convertible<R, named_column_type>::value>,
-            typename = meta::requires<range::Sentinel<Sent, Iter>, range::InputIterator<Iter>>>
-  base_dataframe(Iter first, Sent last) : base_dataframe(first, last, range::distance(first, last))
+            typename = meta::requires_concept<ranges::sentinel_for<Sent, Iter>, ranges::input_iterator<Iter>>>
+  base_dataframe(Iter first, Sent last) : base_dataframe(first, last, ranges::distance(first, last))
   {}
 
-  template <typename Iter, typename Sent, typename R = range::iterator_value_t<Iter>,
+  template <typename Iter, typename Sent, typename R = ranges::iter_value_t<Iter>,
             typename = std::enable_if_t<std::is_convertible<R, named_column_type>::value>,
-            typename = meta::requires<range::Sentinel<Sent, Iter>>>
+            typename = meta::requires_concept<ranges::sentinel_for<Sent, Iter>>>
   base_dataframe(Iter first, Sent last, index_t size_hint)
   {
     elements_.reserve(size_hint);
@@ -138,12 +138,12 @@ public:
 
   static auto read(std::istream& is, read_options opt = {}) -> base_dataframe
   {
-    namespace view = ::jules::range::view;
+    namespace view = ::jules::ranges::views;
 
     if (!is)
       return {};
 
-    const auto as_range = [](auto&& match) { return range::make_iterator_range(match.first, match.second); };
+    const auto as_range = [](auto&& match) { return ranges::make_subrange(match.first, match.second); };
 
     auto raw_data = string();
     raw_data.assign(std::istreambuf_iterator<char>(is), std::istreambuf_iterator<char>());
@@ -159,7 +159,7 @@ public:
         continue;
 
       const auto cells = as_range(line) | view::tokenize(opt.cell.regex, opt.cell.separator ? -1 : 0, opt.cell.flag);
-      range::copy(cells, range::back_inserter(data));
+      ranges::copy(cells, ranges::back_inserter(data));
 
       if (ncol == 0u)
         ncol = data.size() - last_size;
@@ -184,7 +184,7 @@ public:
 
     // optional header and data
     for (auto j : indices(ncol)) {
-      auto col_data = range::make_iterator_range(data.begin() + j + (opt.header ? ncol : 0), data.end()) | view::stride(ncol) |
+      auto col_data = ranges::make_subrange(data.begin() + j + (opt.header ? ncol : 0), data.end()) | view::stride(ncol) |
                       view::transform([](auto&& match) -> string {
                         return {match.first, match.second};
                       });
@@ -197,7 +197,7 @@ public:
 
   auto write(std::ostream& os, write_options opt = {}) const -> std::ostream&
   {
-    namespace view = ::jules::range::view;
+    namespace view = ::jules::ranges::view;
 
     if (!(*this))
       return os;
@@ -279,14 +279,14 @@ public:
 
   auto column_types() const -> vector<std::type_index>
   {
-    namespace view = ::jules::range::view;
+    namespace view = ::jules::ranges::view;
     return to_vector<std::type_index>(elements_ |
                                       view::transform([](const auto& element) { return element.column.elements_type(); }));
   }
 
   auto names() const -> vector<string>
   {
-    namespace view = ::jules::range::view;
+    namespace view = ::jules::ranges::view;
     return to_vector<string>(elements_ | view::transform([](const auto& element) { return element.name; }));
   }
 

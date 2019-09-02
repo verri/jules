@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2018 Filipe Verri <filipeverri@gmail.com>
+// Copyright (c) 2017-2019 Filipe Verri <filipeverri@gmail.com>
 
 #ifndef JULES_ARRAY_REF_ARRAY_H
 /// \exclude
@@ -145,13 +145,13 @@ public:
   }
 
   /// \group Indexing
-  template <typename Rng, typename = meta::requires<range::SizedRange<Rng>>> decltype(auto) operator[](const Rng& rng)
+  template <typename Rng, typename = meta::requires_concept<ranges::sized_range<Rng>>> decltype(auto) operator[](const Rng& rng)
   {
     return detail::array_at(data(), descriptor_, rng);
   }
 
   /// \group Indexing
-  template <typename Rng, typename = meta::requires<range::SizedRange<Rng>>> decltype(auto) operator[](const Rng& rng) const
+  template <typename Rng, typename = meta::requires_concept<ranges::sized_range<Rng>>> decltype(auto) operator[](const Rng& rng) const
   {
     return detail::array_at(data(), descriptor_, rng);
   }

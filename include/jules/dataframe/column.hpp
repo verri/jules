@@ -1,11 +1,11 @@
-// Copyright (c) 2016-2017 Filipe Verri <filipeverri@gmail.com>
+// Copyright (c) 2016-2019 Filipe Verri <filipeverri@gmail.com>
 
 #ifndef JULES_DATAFRAME_COLUMN_H
 #define JULES_DATAFRAME_COLUMN_H
 
 #include <jules/core/debug.hpp>
 #include <jules/core/meta.hpp>
-#include <jules/core/range.hpp>
+#include <jules/core/ranges.hpp>
 #include <jules/core/type.hpp>
 #include <jules/dataframe/detail/column_model.hpp>
 
@@ -34,12 +34,12 @@ public:
 
   template <typename T> base_column(const T& value, index_t size) : model_{std::make_unique<model_t<T>>(size, value)} {}
 
-  template <typename Rng, typename R = range::range_value_t<Rng>, typename = meta::requires<range::Range<Rng>>>
-  base_column(const Rng& rng) : model_{std::make_unique<model_t<R>>(range::begin(rng), range::end(rng))}
+  template <typename Rng, typename R = ranges::range_value_t<Rng>, typename = meta::requires_concept<ranges::range<Rng>>>
+  base_column(const Rng& rng) : model_{std::make_unique<model_t<R>>(ranges::begin(rng), ranges::end(rng))}
   {}
 
-  template <typename Iter, typename Sent, typename R = range::iterator_value_t<Iter>,
-            typename = meta::requires<range::Sentinel<Sent, Iter>>>
+  template <typename Iter, typename Sent, typename R = ranges::iter_value_t<Iter>,
+            typename = meta::requires_concept<ranges::sentinel_for<Sent, Iter>>>
   base_column(Iter first, Sent last) : model_{std::make_unique<model_t<R>>(first, last)}
   {}
 

@@ -41,7 +41,7 @@ TEST_CASE("Vector tutorial", "[array]")
     auto a = jules::vector<long>(10u);
     auto b = jules::vector<long>(10u);
 
-    jules::range::copy(values, a.begin());
+    jules::ranges::copy(values, a.begin());
     b[every] = a;
 
     // Constructors from iterators and ranges.

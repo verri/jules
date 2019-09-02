@@ -36,6 +36,6 @@ TEST_CASE("Basic axis functionalities", "[array]")
   static_assert(std::is_same_v<decltype(v[0]), decltype(axis_at<0>(ref(v), 0))>);
   CHECK(v[0] == axis_at<0>(ref(v), 0));
 
-  static_assert(range::RandomAccessRange<decltype(rows(m))>());
-  static_assert(range::RandomAccessRange<decltype(columns(m))>());
+  static_assert(::jules::ranges::random_access_range<decltype(rows(m))>);
+  static_assert(::jules::ranges::random_access_range<decltype(columns(m))>);
 }

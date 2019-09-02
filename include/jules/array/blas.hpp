@@ -1,4 +1,4 @@
-// Copyright (c) 2017 Filipe Verri <filipeverri@gmail.com>
+// Copyright (c) 2017-2019 Filipe Verri <filipeverri@gmail.com>
 
 #if __has_include(<cblas.h>)
 #ifndef JULES_ARRAY_BLAS_H
@@ -35,7 +35,7 @@ template <> struct cblas<double>
 
 template <typename T> static inline auto safe_int_cast(T value)
 {
-  DEBUG_ASSERT(value <= numeric_traits<int>::max(), debug::default_module, debug::level::invalid_argument,
+  DEBUG_ASSERT(value <= static_cast<T>(numeric_traits<int>::max()), debug::default_module, debug::level::invalid_argument,
                "blas doesn't handle arrays this big");
   return static_cast<int>(value);
 }

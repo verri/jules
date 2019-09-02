@@ -1,11 +1,11 @@
-// Copyright (c) 2017 Filipe Verri <filipeverri@gmail.com>
+// Copyright (c) 2017-2019 Filipe Verri <filipeverri@gmail.com>
 
 #ifndef JULES_BASE_INDEX_VIEW_H
 /// \exclude
 #define JULES_BASE_INDEX_VIEW_H
 
 #include <jules/base/const_vector.hpp>
-#include <jules/core/range.hpp>
+#include <jules/core/ranges.hpp>
 #include <jules/core/type.hpp>
 
 #include <optional>
@@ -38,15 +38,15 @@ public:
 
   index_view(std::vector<index_t>&& data) : data_{std::move(data)}, begin_(data_->data()), end_(data_->data() + data_->size()) {}
 
-  template <typename Rng, typename = meta::requires<range::Range<Rng>>> index_view(const Rng& rng)
+  template <typename Rng, typename = meta::requires_concept<ranges::range<Rng>>> index_view(const Rng& rng)
   {
-    using iterator_type = range::iterator_t<Rng>;
+    using iterator_type = ranges::iterator_t<Rng>;
     if constexpr (std::is_same_v<iterator_type, index_t*> || std::is_same_v<iterator_type, const index_t*>) {
-      begin_ = range::begin(rng);
-      end_ = range::end(rng);
+      begin_ = ranges::begin(rng);
+      end_ = ranges::end(rng);
     } else {
-      static_assert(std::is_constructible_v<index_t, range::reference_t<iterator_type>>);
-      data_ = const_vector<index_t>(range::begin(rng), range::end(rng));
+      static_assert(std::is_constructible_v<index_t, ranges::iter_reference_t<iterator_type>>);
+      data_ = const_vector<index_t>(ranges::begin(rng), ranges::end(rng));
       begin_ = data_->data();
       end_ = data_->data() + data_->size();
     }

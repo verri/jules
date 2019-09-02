@@ -1,4 +1,4 @@
-// Copyright (c) 2017 Filipe Verri <filipeverri@gmail.com>
+// Copyright (c) 2017-2019 Filipe Verri <filipeverri@gmail.com>
 
 #ifndef JULES_BASE_RANDOM_H
 #define JULES_BASE_RANDOM_H
@@ -6,7 +6,7 @@
 #include <jules/base/const_vector.hpp>
 #include <jules/base/numeric.hpp>
 #include <jules/core/meta.hpp>
-#include <jules/core/range.hpp>
+#include <jules/core/ranges.hpp>
 
 #include <cmath>
 #include <random>
@@ -35,8 +35,8 @@ template <typename Dist, typename G = decltype(random_engine)> auto sample(Dist&
 
 template <typename Dist, typename G = decltype(random_engine)> auto sample(index_t n, Dist& dist, G& g = random_engine)
 {
-  auto rng = range::view::generate_n([&] { return dist(g); }, n) | range::view::bounded;
-  return const_vector<decltype(dist(g))>(range::begin(rng), range::end(rng));
+  auto rng = ranges::views::generate_n([&] { return dist(g); }, n) | ranges::views::common;
+  return const_vector<decltype(dist(g))>(ranges::begin(rng), ranges::end(rng));
 }
 
 template <typename G = decltype(random_engine)> auto bernoulli_sample(index_t n, numeric p, G& g = random_engine)
@@ -84,21 +84,21 @@ auto uniform_index_sample(no_replacement_t, index_t n, index_t end, G& g = rando
   return {std::move(result)};
 }
 
-template <typename Rng, typename G = decltype(random_engine), typename U = range::range_value_t<Rng>,
-          typename = meta::requires<range::Range<Rng>>>
+template <typename Rng, typename G = decltype(random_engine), typename U = ranges::range_value_t<Rng>,
+          typename = meta::requires_concept<ranges::range<Rng>>>
 auto discrete_index_sample(index_t n, const Rng& rng, G& g = random_engine)
 {
   static_assert(std::is_convertible<U, double>::value, "weights must be convertible to double");
-  auto dist = std::discrete_distribution<index_t>(range::begin(rng), range::end(rng));
+  auto dist = std::discrete_distribution<index_t>(ranges::begin(rng), ranges::end(rng));
   return sample(n, dist, g);
 }
 
-template <typename Rng, typename G = decltype(random_engine), typename U = range::range_value_t<Rng>,
-          typename = meta::requires<range::Range<Rng>>>
+template <typename Rng, typename G = decltype(random_engine), typename U = ranges::range_value_t<Rng>,
+          typename = meta::requires_concept<ranges::range<Rng>>>
 auto discrete_index_sample(const Rng& rng, G& g = random_engine)
 {
   static_assert(std::is_convertible<U, double>::value, "weights must be convertible to double");
-  auto dist = std::discrete_distribution<index_t>(range::begin(rng), range::end(rng));
+  auto dist = std::discrete_distribution<index_t>(ranges::begin(rng), ranges::end(rng));
   return sample(dist, g);
 }
 

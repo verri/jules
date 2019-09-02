@@ -1,9 +1,9 @@
-// Copyright (c) 2016-2017 Filipe Verri <filipeverri@gmail.com>
+// Copyright (c) 2016-2019 Filipe Verri <filipeverri@gmail.com>
 
 #ifndef JULES_DATAFRAME_ACTIONS_HPP
 #define JULES_DATAFRAME_ACTIONS_HPP
 
-#include <jules/core/range.hpp>
+#include <jules/core/ranges.hpp>
 #include <jules/core/type.hpp>
 #include <jules/dataframe/detail/common.hpp>
 
@@ -45,7 +45,7 @@ static inline auto head(index_t n)
     if (n > df.row_count())
       throw std::out_of_range{"not enough rows"};
 
-    namespace view = ::jules::range::view;
+    namespace view = ::jules::ranges::view;
     return decltype(df)(view::all(df) | view::transform([n](const auto& named_column) {
                           return decltype(named_column){named_column.name, {named_column.column, 0u, n}};
                         }));

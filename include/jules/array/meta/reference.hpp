@@ -1,4 +1,4 @@
-// Copyright (c) 2017 Filipe Verri <filipeverri@gmail.com>
+// Copyright (c) 2017-2019 Filipe Verri <filipeverri@gmail.com>
 
 #ifndef JULES_ARRAY_META_REFERENCE_H
 /// \exclude
@@ -8,7 +8,7 @@
 #include <jules/array/slicing/absolute.hpp>
 #include <jules/base/index_view.hpp>
 #include <jules/core/meta.hpp>
-#include <jules/core/range.hpp>
+#include <jules/core/ranges.hpp>
 
 namespace jules
 {
@@ -31,7 +31,7 @@ template <typename T, typename = void> struct ReferenceArray : std::false_type
 template <typename T>
 struct ReferenceArray<                                             //
   T, meta::requires<                                               //
-       range::ForwardRange<T>,                                     //
+       std::bool_constant<ranges::forward_range<T>>,                                     //
        CommonArray<T>,                                             //
        meta::compiles<T, meta::result::indexing>,                  //
        meta::compiles<T, meta::result::slice_indexing>,            //

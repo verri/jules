@@ -1,10 +1,11 @@
-// Copyright (c) 2017 Filipe Verri <filipeverri@gmail.com>
+// Copyright (c) 2017-2019 Filipe Verri <filipeverri@gmail.com>
 // Inspired by https://foonathan.github.io/blog/2016/09/09/cpp14-concepts.html
 
 #ifndef JULES_CORE_META_H
 #define JULES_CORE_META_H
 
-#include <range/v3/utility/concepts.hpp>
+#include <concepts/concepts.hpp>
+#include <range/v3/range/concepts.hpp>
 
 #include <type_traits>
 
@@ -38,7 +39,11 @@ struct compiles_models<T, R, Expression, std::void_t<std::enable_if_t<R<Expressi
 
 template <typename... Checks> using requires = std::enable_if_t<std::conjunction<Checks...>::value>;
 
+template <bool... Checks> using requires_concept = std::enable_if_t<std::conjunction<std::bool_constant<Checks>...>::value>;
+
 template <typename... Checks> using fallback = std::enable_if_t<std::conjunction<std::negation<Checks...>>::value>;
+
+template <bool... Checks> using fallback_concept = std::enable_if_t<std::conjunction<std::bool_constant<!Checks>...>::value>;
 
 template <typename R, typename... Checks> using requires_t = std::enable_if_t<std::conjunction<Checks...>::value, R>;
 
@@ -53,11 +58,11 @@ template <typename...> struct always_true : std::true_type
 
 } // namespace meta
 
-using ranges::v3::Copyable;
-using ranges::v3::CopyConstructible;
-using ranges::v3::DefaultConstructible;
-using ranges::v3::Movable;
-using ranges::v3::MoveConstructible;
+using concepts::copyable;
+using concepts::copy_constructible;
+using concepts::default_constructible;
+using concepts::movable;
+using concepts::move_constructible;
 
 } // namespace jules
 

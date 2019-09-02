@@ -1,4 +1,4 @@
-// Copyright (c) 2017 Filipe Verri <filipeverri@gmail.com>
+// Copyright (c) 2017-2019 Filipe Verri <filipeverri@gmail.com>
 
 #ifndef JULES_ARRAY_NUMERIC_H
 #define JULES_ARRAY_NUMERIC_H
@@ -75,7 +75,7 @@ template <typename T, typename Array> auto to_vector(const common_array_base<Arr
   return {source.begin(), source.end()};
 }
 
-template <typename T, typename Rng, typename = meta::requires<range::SizedRange<Rng>, std::negation<CommonArray<Rng>>>>
+template <typename T, typename Rng, typename = meta::requires<std::bool_constant<ranges::sized_range<Rng>>, std::negation<CommonArray<Rng>>>>
 auto to_vector(const Rng& rng)
 {
   return array<T, 1u>(rng);
@@ -88,7 +88,7 @@ template <typename Array> auto as_vector(const common_array_base<Array>& source)
   return {source.begin(), source.end()};
 }
 
-template <typename Rng, typename R = range::range_value_t<Rng>> auto as_vector(const Rng& rng) -> array<R, 1u>
+template <typename Rng, typename R = ranges::range_value_t<Rng>> auto as_vector(const Rng& rng) -> array<R, 1u>
 {
   return to_vector<R>(rng);
 }
@@ -101,32 +101,38 @@ template <typename T, typename = void> struct cat_value_type
   using type = std::decay_t<T>;
 };
 
-template <typename T> struct cat_value_type<T, meta::requires<range::SizedRange<std::decay_t<T>>>>
+template <typename T> struct cat_value_type<T, meta::requires_concept<ranges::sized_range<std::decay_t<T>>>>
 {
-  using type = range::value_type_t<T>;
+  using type = ranges::value_type_t<T>;
 };
 
 template <typename T> using cat_value_type_t = typename cat_value_type<T>::type;
 
 template <typename T>
-constexpr auto cat_size(const T& rng) noexcept -> meta::requires_t<index_t, range::SizedRange<std::decay_t<T>>>
+constexpr auto cat_size(const T& rng) noexcept -> meta::requires_t<index_t, std::bool_constant<ranges::sized_range<std::decay_t<T>>>>
 {
-  return range::size(rng);
+  return ranges::size(rng);
 }
 
-template <typename T> constexpr auto cat_size(const T&) noexcept -> meta::fallback_t<index_t, range::SizedRange<std::decay_t<T>>>
+template <typename T> constexpr auto cat_size(const T&) noexcept -> meta::fallback_t<index_t, std::bool_constant<ranges::sized_range<std::decay_t<T>>>>
 {
   return 1u;
 }
 
-template <typename T, typename Rng>
-auto cat_push(array_builder<T, 1u>& builder, const Rng& rng) -> meta::requires<range::SizedRange<std::decay_t<Rng>>>
+template <typename T>
+auto cat_push(array_builder<T, 1u>& builder, T value)
 {
-  range::copy(rng, range::back_inserter(builder));
+  builder.push_back(std::move(value));
+}
+
+template <typename T, typename Rng>
+auto cat_push(array_builder<T, 1u>& builder, const Rng& rng) -> meta::requires_concept<ranges::sized_range<Rng>>
+{
+  ranges::copy(rng, ranges::back_inserter(builder));
 }
 
 template <typename T, typename U>
-auto cat_push(array_builder<T, 1u>& builder, U&& value) -> meta::fallback<range::SizedRange<std::decay_t<U>>>
+auto cat_push(array_builder<T, 1u>& builder, U&& value) -> meta::fallback_concept<ranges::sized_range<std::decay_t<U>>>
 {
   builder.push_back(std::forward<U>(value));
 }

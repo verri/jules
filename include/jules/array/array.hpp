@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2018 Filipe Verri <filipeverri@gmail.com>
+// Copyright (c) 2017-2019 Filipe Verri <filipeverri@gmail.com>
 
 #ifndef JULES_ARRAY_ARRAY_H
 /// \exclude
@@ -151,7 +151,7 @@ public:
   ///   \exclude
   /// \tparam _
   ///   \exclude
-  template <typename It, typename... Dims, typename R = range::iterator_value_t<It>, typename _ = requires_dimensions<Dims...>>
+  template <typename It, typename... Dims, typename R = ranges::iter_value_t<It>, typename _ = requires_dimensions<Dims...>>
   array(It it, Dims... dims) : array(allocate_tag{}, dims...)
   {
     try {
@@ -214,14 +214,14 @@ public:
   }
 
   /// \group constructors
-  template <typename Rng, typename = meta::requires<range::SizedRange<Rng>, std::negation<CommonArray<Rng>>>>
-  array(const Rng& rng) : ref_array<value_type, order>{this->allocate(range::size(rng)), {{{range::size(rng)}}}}
+  template <typename Rng, typename = meta::requires<std::bool_constant<ranges::sized_range<Rng>>, std::negation<CommonArray<Rng>>>>
+  array(const Rng& rng) : ref_array<value_type, order>{this->allocate(ranges::size(rng)), {{{ranges::size(rng)}}}}
   {
     static_assert(order == 1u, "Only vectors can be initialized from a range");
-    static_assert(std::is_constructible<value_type, range::reference_t<range::iterator_t<Rng>>>::value,
+    static_assert(std::is_constructible<value_type, ranges::iter_reference_t<ranges::iterator_t<Rng>>>::value,
                   "incompatible value types");
     try {
-      this->construct(this->data(), range::begin(rng), this->size());
+      this->construct(this->data(), ranges::begin(rng), this->size());
     } catch (...) {
       this->deallocate(this->data(), this->size());
       this->data_ = nullptr;
@@ -230,13 +230,13 @@ public:
   }
 
   /// \group constructors
-  template <typename Iter, typename Sent, typename = meta::requires<range::Sentinel<Sent, Iter>>>
+  template <typename Iter, typename Sent, typename = meta::requires_concept<ranges::sentinel_for<Sent, Iter>>>
   array(Iter begin, Sent end)
-    : ref_array<value_type, order>{this->allocate(range::distance(begin, end)),
-                                   {{{static_cast<size_type>(range::distance(begin, end))}}}}
+    : ref_array<value_type, order>{this->allocate(ranges::distance(begin, end)),
+                                   {{{static_cast<size_type>(ranges::distance(begin, end))}}}}
   {
     static_assert(order == 1u, "Only vectors can be initialized from a pair of iterators");
-    static_assert(std::is_constructible<value_type, range::reference_t<Iter>>::value, "incompatible value types");
+    static_assert(std::is_constructible<value_type, ranges::iter_reference_t<Iter>>::value, "incompatible value types");
     try {
       this->construct(this->data(), begin, this->size());
     } catch (...) {

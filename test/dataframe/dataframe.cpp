@@ -120,7 +120,7 @@ TEST_CASE("Constructing a dataframe from a range of columns", "[dataframe]")
   CHECK(df2.row_count() == 3u);
   CHECK(df2.column_count() == 2u);
 
-  namespace view = jules::range::view;
+  namespace view = jules::ranges::views;
 
   auto types = jules::as_vector(columns | view::transform([](const auto& elem) { return elem.column.elements_type(); }));
   CHECK(all(df.column_types() == types));

@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2018 Filipe Verri <filipeverri@gmail.com>
+// Copyright (c) 2017-2019 Filipe Verri <filipeverri@gmail.com>
 
 #ifndef JULES_ARRAY_STRIDED_REF_ARRAY_H
 /// \exclude
@@ -81,7 +81,7 @@ public:
   template <typename U, typename = meta::fallback<CommonArray<U>>> auto operator=(const U& source) -> strided_ref_array&
   {
     static_assert(std::is_assignable<value_type&, U>::value, "incompatible assignment");
-    range::fill(*this, source);
+    ranges::fill(*this, source);
     return *this;
   }
 
@@ -144,13 +144,13 @@ public:
   }
 
   /// \group Indexing
-  template <typename Rng, typename = meta::requires<range::SizedRange<Rng>>> decltype(auto) operator[](const Rng& rng)
+  template <typename Rng, typename = meta::requires_concept<ranges::sized_range<Rng>>> decltype(auto) operator[](const Rng& rng)
   {
     return detail::array_at(data(), mapper(), rng);
   }
 
   /// \group Indexing
-  template <typename Rng, typename = meta::requires<range::SizedRange<Rng>>> decltype(auto) operator[](const Rng& rng) const
+  template <typename Rng, typename = meta::requires_concept<ranges::sized_range<Rng>>> decltype(auto) operator[](const Rng& rng) const
   {
     return detail::array_at(data(), mapper(), rng);
   }
