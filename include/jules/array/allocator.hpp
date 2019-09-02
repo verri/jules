@@ -30,7 +30,7 @@ template <typename T> struct array_allocator
     std::uninitialized_value_construct_n(data, size);
   }
 
-  template <typename U, typename = meta::requires<std::is_constructible<value_type, const U&>>>
+  template <typename U, typename = meta::requires_<std::is_constructible<value_type, const U&>>>
   static auto construct(value_type* to, index_t size,
                         const U& value) noexcept(std::is_nothrow_constructible_v<value_type, const U&>)
   {

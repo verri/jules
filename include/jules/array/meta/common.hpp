@@ -28,7 +28,7 @@ template <typename T, typename = void> struct CommonArray : std::false_type
 
 template <typename T>
 struct CommonArray<                                                                                    //
-  T, meta::requires<                                                                                   //
+  T, meta::requires_<                                                                                  //
        meta::always_true<typename T::value_type>,                                                      //
        std::is_same<decltype(T::order), const std::size_t>,                                            //
        std::bool_constant<(T::order > 0u)>,                                                            //

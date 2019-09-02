@@ -18,7 +18,7 @@ is also intended, but it will probably require many features to come to C++ in t
 ## Dependencies
 
  - C++17 compiler
-    - Tested on GCC 7.2 and Clang 5.0.0
+    - Tested on GCC 7.4.0 and Clang 7.0.0
  - [debug_assert](https://github.com/foonathan/debug_assert)
  - [range-v3](https://github.com/ericniebler/range-v3) (soon to be superseded by C++20 Ranges)
  - [CBLAS](http://www.netlib.org/blas/) (optional)

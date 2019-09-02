@@ -27,7 +27,7 @@ constexpr decltype(auto) axis_at_impl(ArrayLike&& arr, [[maybe_unused]] index_t 
 
 } // namespace detail
 
-template <size_t Axis, typename RefArray, typename = meta::requires<ReferenceArray<RefArray>>>
+template <size_t Axis, typename RefArray, typename = meta::requires_<ReferenceArray<RefArray>>>
 constexpr decltype(auto) axis_at(RefArray arr, index_t i)
 {
   static_assert(Axis < RefArray::order);
@@ -157,7 +157,7 @@ private:
   RefArray arr_;
 };
 
-template <size_t Axis, typename RefArray, typename meta::requires<ReferenceArray<RefArray>>>
+template <size_t Axis, typename RefArray, typename meta::requires_<ReferenceArray<RefArray>>>
 auto axis(RefArray arr) -> axis_array<Axis, RefArray>
 {
   return {std::move(arr)};
@@ -173,7 +173,8 @@ template <size_t Axis, typename T, size_t N> auto axis(const array<T, N>& arr) -
   return {ref(arr)};
 }
 
-template <typename RefArray, typename meta::requires<ReferenceArray<RefArray>>> auto rows(RefArray arr) -> axis_array<0, RefArray>
+template <typename RefArray, typename meta::requires_<ReferenceArray<RefArray>>>
+auto rows(RefArray arr) -> axis_array<0, RefArray>
 {
   return {std::move(arr)};
 }
@@ -182,7 +183,7 @@ template <typename T, size_t N> auto rows(array<T, N>& arr) -> axis_array<0, dec
 
 template <typename T, size_t N> auto rows(const array<T, N>& arr) -> axis_array<0, decltype(ref(arr))> { return {ref(arr)}; }
 
-template <typename RefArray, typename meta::requires<ReferenceArray<RefArray>>>
+template <typename RefArray, typename meta::requires_<ReferenceArray<RefArray>>>
 auto columns(RefArray arr) -> axis_array<1, RefArray>
 {
   return {std::move(arr)};

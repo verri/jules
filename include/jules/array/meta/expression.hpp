@@ -15,7 +15,7 @@ template <typename T, typename = void> struct ExpressionArray : std::false_type
 
 template <typename T>
 struct ExpressionArray<                               //
-  T, meta::requires<                                  //
+  T, meta::requires_<                                 //
        std::bool_constant<!default_constructible<T>>, //
        std::bool_constant<!copy_constructible<T>>,    //
        std::bool_constant<!move_constructible<T>>,    //

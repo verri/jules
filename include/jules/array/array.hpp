@@ -38,7 +38,7 @@ template <typename T, std::size_t N> class array : public ref_array<T, N>, priva
   template <typename, std::size_t> friend class array;
 
   template <typename... Dims>
-  using requires_dimensions = meta::requires<std::bool_constant<(sizeof...(Dims) == N)>, std::is_convertible<Dims, index_t>...>;
+  using requires_dimensions = meta::requires_<std::bool_constant<(sizeof...(Dims) == N)>, std::is_convertible<Dims, index_t>...>;
 
   struct allocate_tag
   {};
@@ -215,7 +215,7 @@ public:
 
   /// \group constructors
   template <typename Rng,
-            typename = meta::requires<std::bool_constant<ranges::sized_range<Rng>>, std::negation<CommonArray<Rng>>>>
+            typename = meta::requires_<std::bool_constant<ranges::sized_range<Rng>>, std::negation<CommonArray<Rng>>>>
   array(const Rng& rng) : ref_array<value_type, order>{this->allocate(ranges::size(rng)), {{{ranges::size(rng)}}}}
   {
     static_assert(order == 1u, "Only vectors can be initialized from a range");

@@ -76,7 +76,7 @@ template <typename T, typename Array> auto to_vector(const common_array_base<Arr
 }
 
 template <typename T, typename Rng,
-          typename = meta::requires<std::bool_constant<ranges::sized_range<Rng>>, std::negation<CommonArray<Rng>>>>
+          typename = meta::requires_<std::bool_constant<ranges::sized_range<Rng>>, std::negation<CommonArray<Rng>>>>
 auto to_vector(const Rng& rng)
 {
   return array<T, 1u>(rng);

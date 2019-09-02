@@ -54,7 +54,7 @@ template <typename T, std::size_t N, typename Op> static auto apply(in_place_t, 
   return operand;
 }
 
-template <typename RefArray, typename Op, typename = meta::requires<ReferenceArray<RefArray>>>
+template <typename RefArray, typename Op, typename = meta::requires_<ReferenceArray<RefArray>>>
 static auto apply(in_place_t, RefArray operand, Op op)
 {
   for (auto& value : operand)
@@ -77,7 +77,7 @@ static auto apply(in_place_t, array<T, N>& lhs, const common_array_base<ArrayB>&
   return lhs;
 }
 
-template <typename RefArrayA, typename ArrayB, typename Op, typename = meta::requires<ReferenceArray<RefArrayA>>>
+template <typename RefArrayA, typename ArrayB, typename Op, typename = meta::requires_<ReferenceArray<RefArrayA>>>
 static auto apply(in_place_t, RefArrayA lhs, const common_array_base<ArrayB>& rhs, Op op)
 {
   static_assert(RefArrayA::order == ArrayB::order);
@@ -137,7 +137,7 @@ static auto apply(in_place_t, RefArrayA lhs, const common_array_base<ArrayB>& rh
   }
 
 #define BINARY_INPLACE_REF_OPERATION(OP__)                                                                                       \
-  template <typename RefArrayA, typename ArrayB, typename = meta::requires<ReferenceArray<RefArrayA>>,                           \
+  template <typename RefArrayA, typename ArrayB, typename = meta::requires_<ReferenceArray<RefArrayA>>,                          \
             typename = decltype(std::declval<typename RefArrayA::value_type&>() OP__## =                                         \
                                   std::declval<const typename ArrayB::value_type&>())>                                           \
   auto operator OP__##=(RefArrayA lhs, const common_array_base<ArrayB>& rhs)                                                     \
@@ -171,7 +171,7 @@ static auto apply(in_place_t, RefArrayA lhs, const common_array_base<ArrayB>& rh
 
 #define BINARY_INPLACE_REF_TYPE_OPERATION(OP__)                                                                                  \
   template <typename RefArray, typename T, typename = meta::fallback<CommonArray<T>>,                                            \
-            typename = meta::requires<ReferenceArray<RefArray>>,                                                                 \
+            typename = meta::requires_<ReferenceArray<RefArray>>,                                                                \
             typename = decltype(std::declval<typename RefArray::value_type&>() OP__## = std::declval<const T&>())>               \
   auto operator OP__##=(RefArray lhs, const T& rhs)                                                                              \
   {                                                                                                                              \

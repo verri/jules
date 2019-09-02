@@ -94,7 +94,7 @@ struct string_rule
 {
   using type = string;
 
-  template <typename U, typename = meta::requires<StringConvertible<const U&>>> static auto coerce_from(const U& value) -> type
+  template <typename U, typename = meta::requires_<StringConvertible<const U&>>> static auto coerce_from(const U& value) -> type
   {
     return std::to_string(value);
   }
@@ -115,7 +115,7 @@ struct index_rule
 
   static auto coerce_from(const string& value) -> type { return std::stoul(value); }
 
-  template <typename U, typename = meta::requires<Signed<U>>> static auto coerce_from(const U& value) -> type
+  template <typename U, typename = meta::requires_<Signed<U>>> static auto coerce_from(const U& value) -> type
   {
     if (value < 0)
       throw std::invalid_argument{"index cannot be initialized by a negative value"};
@@ -153,7 +153,7 @@ struct uinteger_rule
     return result;
   }
 
-  template <typename U, typename = meta::requires<Signed<U>>> static auto coerce_from(const U& value) -> type
+  template <typename U, typename = meta::requires_<Signed<U>>> static auto coerce_from(const U& value) -> type
   {
     if (value < 0)
       throw std::invalid_argument{"unsigned cannot be initialized by a negative value"};

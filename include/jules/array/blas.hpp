@@ -65,7 +65,7 @@ auto product(const ref_array<T, 2u>& lhs, const ref_array<U, 2u>& rhs, R alpha =
 }
 
 template <typename T, typename U, typename V, typename R = std::remove_const_t<T>,
-          typename = meta::requires<std::is_same<std::remove_const_t<T>, std::remove_const_t<U>>, std::is_convertible<V, R>>>
+          typename = meta::requires_<std::is_same<std::remove_const_t<T>, std::remove_const_t<U>>, std::is_convertible<V, R>>>
 auto product(const unary_expr_array<T*, left_operation<V, std::multiplies<>>, 2u>& lhs, const ref_array<U, 2u>& rhs)
 {
   const auto new_lhs = ref_array<T, 2u>{lhs.first(), {lhs.dimensions()}};

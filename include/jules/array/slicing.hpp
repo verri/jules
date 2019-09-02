@@ -34,7 +34,7 @@ static auto slicing_size(const Rng& rng) -> index_t
   return ranges::size(rng);
 }
 
-template <typename... Args, typename = meta::requires<std::bool_constant<(sizeof...(Args) >= 2u)>>>
+template <typename... Args, typename = meta::requires_<std::bool_constant<(sizeof...(Args) >= 2u)>>>
 static auto slicing_size(Args&&... args) -> index_t
 {
   return (1u * ... * slicing_size(args));

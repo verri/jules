@@ -30,7 +30,7 @@ template <typename T, typename = void> struct ReferenceArray : std::false_type
 // TODO: bidirectional in the future
 template <typename T>
 struct ReferenceArray<                                             //
-  T, meta::requires<                                               //
+  T, meta::requires_<                                              //
        std::bool_constant<ranges::forward_range<T>>,               //
        CommonArray<T>,                                             //
        meta::compiles<T, meta::result::indexing>,                  //

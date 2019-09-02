@@ -75,7 +75,7 @@ template <typename T> auto repeat(index_t N, const T& value) { return std::vecto
 /// \module Arithmetic
 /// \notes [jules::numeric_traits<T>]() must implement `unbounded_min`.
 /// \notes If empty, returns [jules::numeric_traits<T>::unbounded_min]().
-template <typename Iter, typename Sent, typename T = ranges::iter_value_t<Iter>, typename = meta::requires<>>
+template <typename Iter, typename Sent, typename T = ranges::iter_value_t<Iter>, typename = meta::requires_<>>
 auto max(Iter first, Sent last, T start = numeric_traits<T>::unbounded_min())
 {
   for (; first != last; ++first)

@@ -37,7 +37,7 @@ template <typename T, template <typename...> typename R, template <typename> typ
 struct compiles_models<T, R, Expression, std::void_t<std::enable_if_t<R<Expression<T>>::value>>> : std::true_type
 {};
 
-template <typename... Checks> using requires = std::enable_if_t<std::conjunction<Checks...>::value>;
+template <typename... Checks> using requires_ = std::enable_if_t<std::conjunction<Checks...>::value>;
 
 template <bool... Checks> using requires_concept = std::enable_if_t<std::conjunction<std::bool_constant<Checks>...>::value>;
 
