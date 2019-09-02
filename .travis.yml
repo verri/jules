@@ -1,25 +1,26 @@
 sudo: true # XXX: see https://github.com/travis-ci/travis-ci/issues/9033
 language: generic
-dist: trusty
+dist: bionic
 
 env:
-  - BUILD_TYPE=Debug COVERAGE=ON
-  - BUILD_TYPE=Debug COVERAGE=OFF
-  - BUILD_TYPE=Release COVERAGE=OFF
+  - COMPILER=g++ BUILD_TYPE=Debug COVERAGE=ON
+  - COMPILER=g++ BUILD_TYPE=Debug COVERAGE=OFF
+  - COMPILER=g++ BUILD_TYPE=Release COVERAGE=OFF
+  - COMPILER=clang++ BUILD_TYPE=Debug COVERAGE=OFF
+  - COMPILER=clang++ BUILD_TYPE=Release COVERAGE=OFF
 
 addons:
   apt:
     sources:
       - ubuntu-toolchain-r-test
     packages:
-      - g++-7
       - libblas-dev
       - binutils-gold
 
 script:
-  - cmake -DJULES_BUILD_TEST=ON -DCMAKE_CXX_COMPILER=g++-7 -DCMAKE_BUILD_TYPE=$BUILD_TYPE -DJULES_TEST_COVERAGE=$COVERAGE -H. -Bbuild
+  - cmake -DJULES_BUILD_TEST=ON -DCMAKE_CXX_COMPILER=$COMPILER -DCMAKE_BUILD_TYPE=$BUILD_TYPE -DJULES_TEST_COVERAGE=$COVERAGE -H. -Bbuild
   - cmake --build build/ -- -j2 VERBOSE=1
   - cmake --build build/ --target test -- ARGS="-j2 -VV"
 
 after_success:
-  - if test "$COVERAGE" == "ON"; then bash <(curl -s https://codecov.io/bash) -x $(which gcov-7); fi
+  - if test "$COVERAGE" == "ON"; then bash <(curl -s https://codecov.io/bash) -x $(which gcov); fi
