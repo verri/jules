@@ -197,7 +197,7 @@ public:
 
   auto write(std::ostream& os, write_options opt = {}) const -> std::ostream&
   {
-    namespace view = ::jules::ranges::view;
+    namespace view = ::jules::ranges::views;
 
     if (!(*this))
       return os;
@@ -279,14 +279,14 @@ public:
 
   auto column_types() const -> vector<std::type_index>
   {
-    namespace view = ::jules::ranges::view;
+    namespace view = ::jules::ranges::views;
     return to_vector<std::type_index>(elements_ |
                                       view::transform([](const auto& element) { return element.column.elements_type(); }));
   }
 
   auto names() const -> vector<string>
   {
-    namespace view = ::jules::ranges::view;
+    namespace view = ::jules::ranges::views;
     return to_vector<string>(elements_ | view::transform([](const auto& element) { return element.name; }));
   }
 
