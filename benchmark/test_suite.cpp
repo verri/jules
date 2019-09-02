@@ -67,8 +67,14 @@ int main()
   std::cout << "\nFilling odd lines using slice." << std::endl;
   PrintInfo([&] { matrix[s_odd][s_all] = 1.0; });
 
+  std::cout << "\nFilling odd columns using slice." << std::endl;
+  PrintInfo([&] { matrix[s_all][s_odd] = 1.0; });
+
   std::cout << "\nFilling even lines using indirect indexing." << std::endl;
   PrintInfo([&] { matrix[v_even][v_all] = 2.0; });
+
+  std::cout << "\nFilling even columns using indirect indexing." << std::endl;
+  PrintInfo([&] { matrix[v_all][v_even] = 3.0; });
 
   if (N <= 10)
     std::cout << "\nMatrix: " << matrix << std::endl;
