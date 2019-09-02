@@ -31,7 +31,7 @@ template <typename T, typename = void> struct ReferenceArray : std::false_type
 template <typename T>
 struct ReferenceArray<                                             //
   T, meta::requires<                                               //
-       std::bool_constant<ranges::forward_range<T>>,                                     //
+       std::bool_constant<ranges::forward_range<T>>,               //
        CommonArray<T>,                                             //
        meta::compiles<T, meta::result::indexing>,                  //
        meta::compiles<T, meta::result::slice_indexing>,            //

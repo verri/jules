@@ -75,8 +75,7 @@ template <typename T> auto repeat(index_t N, const T& value) { return std::vecto
 /// \module Arithmetic
 /// \notes [jules::numeric_traits<T>]() must implement `unbounded_min`.
 /// \notes If empty, returns [jules::numeric_traits<T>::unbounded_min]().
-template <typename Iter, typename Sent, typename T = ranges::iter_value_t<Iter>,
-          typename = meta::requires<>>
+template <typename Iter, typename Sent, typename T = ranges::iter_value_t<Iter>, typename = meta::requires<>>
 auto max(Iter first, Sent last, T start = numeric_traits<T>::unbounded_min())
 {
   for (; first != last; ++first)
@@ -361,7 +360,8 @@ auto nth(const Rng& rng, index_t n, Compare cmp = {})
 /// Returns the number of true elements in a `range` or in the sequence [`first`, `last`).
 ///
 /// \module Logical
-template <typename Iter, typename Sent, typename = meta::requires_concept<ranges::sentinel_for<Sent, Iter>>> auto count(Iter first, Sent last)
+template <typename Iter, typename Sent, typename = meta::requires_concept<ranges::sentinel_for<Sent, Iter>>>
+auto count(Iter first, Sent last)
 {
   auto n = index_t{0u};
   for (; first != last; ++first)
@@ -381,7 +381,8 @@ template <typename Rng, typename = meta::requires_concept<ranges::range<Rng>>> a
 /// Returns the frequency of true elements in a `range` or in the sequence [`first`, `last`).
 ///
 /// \module Logical
-template <typename Iter, typename Sent, typename = meta::requires_concept<ranges::sentinel_for<Sent, Iter>>> auto freq(Iter first, Sent last)
+template <typename Iter, typename Sent, typename = meta::requires_concept<ranges::sentinel_for<Sent, Iter>>>
+auto freq(Iter first, Sent last)
 {
   return static_cast<numeric>(::jules::count(first, last)) / ranges::distance(first, last);
 }
@@ -420,7 +421,8 @@ template <typename Rng, typename = meta::requires_concept<ranges::range<Rng>>> a
 ///
 /// \module Logical
 /// \notes If empty, returns true.
-template <typename Iter, typename Sent, typename = meta::requires_concept<ranges::sentinel_for<Sent, Iter>>> auto all(Iter first, Sent last)
+template <typename Iter, typename Sent, typename = meta::requires_concept<ranges::sentinel_for<Sent, Iter>>>
+auto all(Iter first, Sent last)
 {
   for (; first != last; ++first)
     if (!static_cast<bool>(*first))
@@ -440,7 +442,8 @@ template <typename Rng, typename = meta::requires_concept<ranges::range<Rng>>> a
 ///
 /// \module Logical
 /// \notes If empty, returns true.
-template <typename Iter, typename Sent, typename = meta::requires_concept<ranges::sentinel_for<Sent, Iter>>> auto none(Iter first, Sent last)
+template <typename Iter, typename Sent, typename = meta::requires_concept<ranges::sentinel_for<Sent, Iter>>>
+auto none(Iter first, Sent last)
 {
   for (; first != last; ++first)
     if (static_cast<bool>(*first))
@@ -460,7 +463,8 @@ template <typename Rng, typename = meta::requires_concept<ranges::range<Rng>>> a
 ///
 /// \module Logical
 /// \notes If empty, returns false.
-template <typename Iter, typename Sent, typename = meta::requires_concept<ranges::sentinel_for<Sent, Iter>>> auto any(Iter first, Sent last)
+template <typename Iter, typename Sent, typename = meta::requires_concept<ranges::sentinel_for<Sent, Iter>>>
+auto any(Iter first, Sent last)
 {
   for (; first != last; ++first)
     if (static_cast<bool>(*first))

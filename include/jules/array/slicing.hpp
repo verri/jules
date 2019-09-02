@@ -28,7 +28,8 @@ static inline constexpr auto slicing_size(index_t) noexcept -> index_t { return 
 
 static inline constexpr auto slicing_size(const absolute_strided_slice& slice) noexcept -> index_t { return slice.extent; }
 
-template <typename Rng, typename = meta::requires_concept<ranges::sized_range<Rng>>> static auto slicing_size(const Rng& rng) -> index_t
+template <typename Rng, typename = meta::requires_concept<ranges::sized_range<Rng>>>
+static auto slicing_size(const Rng& rng) -> index_t
 {
   return ranges::size(rng);
 }
@@ -325,7 +326,8 @@ public:
     return at(eval(slice, mapper_.descriptor().extents[sizeof...(Indexes)]));
   }
 
-  template <typename Rng, typename = meta::requires_concept<ranges::sized_range<Rng>>> decltype(auto) operator[](const Rng& rng) &&
+  template <typename Rng, typename = meta::requires_concept<ranges::sized_range<Rng>>>
+  decltype(auto) operator[](const Rng& rng) &&
   {
     return at(rng);
   }
@@ -406,7 +408,8 @@ public:
 
   decltype(auto) operator[](bounded_strided_slice slice) && { return at(eval(slice, descriptor_.extents[M])); }
 
-  template <typename Rng, typename = meta::requires_concept<ranges::sized_range<Rng>>> decltype(auto) operator[](const Rng& rng) &&
+  template <typename Rng, typename = meta::requires_concept<ranges::sized_range<Rng>>>
+  decltype(auto) operator[](const Rng& rng) &&
   {
     return at(rng);
   }

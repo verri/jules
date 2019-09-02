@@ -214,7 +214,8 @@ public:
   }
 
   /// \group constructors
-  template <typename Rng, typename = meta::requires<std::bool_constant<ranges::sized_range<Rng>>, std::negation<CommonArray<Rng>>>>
+  template <typename Rng,
+            typename = meta::requires<std::bool_constant<ranges::sized_range<Rng>>, std::negation<CommonArray<Rng>>>>
   array(const Rng& rng) : ref_array<value_type, order>{this->allocate(ranges::size(rng)), {{{ranges::size(rng)}}}}
   {
     static_assert(order == 1u, "Only vectors can be initialized from a range");

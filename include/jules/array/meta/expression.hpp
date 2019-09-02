@@ -14,15 +14,15 @@ template <typename T, typename = void> struct ExpressionArray : std::false_type
 {};
 
 template <typename T>
-struct ExpressionArray<                        //
-  T, meta::requires<                           //
+struct ExpressionArray<                               //
+  T, meta::requires<                                  //
        std::bool_constant<!default_constructible<T>>, //
        std::bool_constant<!copy_constructible<T>>,    //
        std::bool_constant<!move_constructible<T>>,    //
-       std::bool_constant<!copyable<T>>,             //
-       std::bool_constant<!movable<T>>,              //
-       std::bool_constant<ranges::input_range<T>>,                   //
-       CommonArray<T>                          //
+       std::bool_constant<!copyable<T>>,              //
+       std::bool_constant<!movable<T>>,               //
+       std::bool_constant<ranges::input_range<T>>,    //
+       CommonArray<T>                                 //
        >> : std::true_type
 {};
 

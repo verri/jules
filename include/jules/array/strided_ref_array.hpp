@@ -150,7 +150,8 @@ public:
   }
 
   /// \group Indexing
-  template <typename Rng, typename = meta::requires_concept<ranges::sized_range<Rng>>> decltype(auto) operator[](const Rng& rng) const
+  template <typename Rng, typename = meta::requires_concept<ranges::sized_range<Rng>>>
+  decltype(auto) operator[](const Rng& rng) const
   {
     return detail::array_at(data(), mapper(), rng);
   }

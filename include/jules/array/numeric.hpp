@@ -75,7 +75,8 @@ template <typename T, typename Array> auto to_vector(const common_array_base<Arr
   return {source.begin(), source.end()};
 }
 
-template <typename T, typename Rng, typename = meta::requires<std::bool_constant<ranges::sized_range<Rng>>, std::negation<CommonArray<Rng>>>>
+template <typename T, typename Rng,
+          typename = meta::requires<std::bool_constant<ranges::sized_range<Rng>>, std::negation<CommonArray<Rng>>>>
 auto to_vector(const Rng& rng)
 {
   return array<T, 1u>(rng);
@@ -109,21 +110,19 @@ template <typename T> struct cat_value_type<T, meta::requires_concept<ranges::si
 template <typename T> using cat_value_type_t = typename cat_value_type<T>::type;
 
 template <typename T>
-constexpr auto cat_size(const T& rng) noexcept -> meta::requires_t<index_t, std::bool_constant<ranges::sized_range<std::decay_t<T>>>>
+constexpr auto cat_size(const T& rng) noexcept
+  -> meta::requires_t<index_t, std::bool_constant<ranges::sized_range<std::decay_t<T>>>>
 {
   return ranges::size(rng);
 }
 
-template <typename T> constexpr auto cat_size(const T&) noexcept -> meta::fallback_t<index_t, std::bool_constant<ranges::sized_range<std::decay_t<T>>>>
+template <typename T>
+constexpr auto cat_size(const T&) noexcept -> meta::fallback_t<index_t, std::bool_constant<ranges::sized_range<std::decay_t<T>>>>
 {
   return 1u;
 }
 
-template <typename T>
-auto cat_push(array_builder<T, 1u>& builder, T value)
-{
-  builder.push_back(std::move(value));
-}
+template <typename T> auto cat_push(array_builder<T, 1u>& builder, T value) { builder.push_back(std::move(value)); }
 
 template <typename T, typename Rng>
 auto cat_push(array_builder<T, 1u>& builder, const Rng& rng) -> meta::requires_concept<ranges::sized_range<Rng>>

@@ -41,7 +41,7 @@ struct CommonArray<                                                             
                             meta::compiles_same<T, typename T::size_type, meta::result::row_count>,    //
                             meta::compiles_same<T, typename T::size_type, meta::result::column_count>> //
                           >,                                                                           //
-       std::bool_constant<ranges::range<T>>                                                                                //
+       std::bool_constant<ranges::range<T>>                                                            //
        >> : std::true_type
 {};
 

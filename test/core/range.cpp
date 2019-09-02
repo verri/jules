@@ -1,5 +1,5 @@
-#include "jules/core/ranges.hpp"
 #include "jules/array/array.hpp"
+#include "jules/core/ranges.hpp"
 
 #include <catch.hpp>
 

@@ -58,8 +58,8 @@ template <typename...> struct always_true : std::true_type
 
 } // namespace meta
 
-using concepts::copyable;
 using concepts::copy_constructible;
+using concepts::copyable;
 using concepts::default_constructible;
 using concepts::movable;
 using concepts::move_constructible;
