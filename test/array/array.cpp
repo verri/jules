@@ -24,6 +24,8 @@ TEST_CASE("Basic array functionalities", "[array]")
   copy(indices(0, 20), x);
   array<int, 2> matrix3(x, 4u, 5u); // matrix 4x5 with values 0..19
 
+  CHECK(all(flatten(matrix3) == as_vector(indices(0, 20))));
+
   {
     auto result = std::mismatch(begin(x), end(x), matrix3.data());
     CHECK(result.first == end(x));

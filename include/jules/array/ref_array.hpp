@@ -203,6 +203,11 @@ template <std::size_t D, typename T, std::size_t N> decltype(auto) drop_to(ref_a
 
 template <typename T, std::size_t N> decltype(auto) drop(ref_array<T, N> source) { return drop_to<1>(source); }
 
+template <typename T, std::size_t N> decltype(auto) flatten(ref_array<T, N> source)
+{
+  return ref_array<T, 1>(source.begin(), {{source.size()}});
+}
+
 } // namespace jules
 
 #endif // JULES_ARRAY_REF_ARRAY_H
