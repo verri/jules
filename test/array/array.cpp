@@ -4,8 +4,8 @@
 
 TEST_CASE("Basic array functionalities", "[array]")
 {
-  using jules::array;
-  using jules::ref_array;
+  using namespace jules;
+  using namespace jules::ranges;
 
   array<int, 2> matrix1(4u, 5u); // matrix 4x5
   CHECK(matrix1.row_count() == 4u);
@@ -21,35 +21,36 @@ TEST_CASE("Basic array functionalities", "[array]")
   CHECK(all(matrix2 == 3));
 
   int x[20];
-  std::iota(std::begin(x), std::end(x), 0);
+  copy(indices(0, 20), x);
   array<int, 2> matrix3(x, 4u, 5u); // matrix 4x5 with values 0..19
 
   {
-    auto result = std::mismatch(std::begin(x), std::end(x), matrix3.data());
-    CHECK(result.first == std::end(x));
+    auto result = std::mismatch(begin(x), end(x), matrix3.data());
+    CHECK(result.first == end(x));
     CHECK(result.second == matrix3.data() + matrix3.size());
   }
 
   // array<int, 2> matrix10(3, 4u, 5u, 4u); // shouldn't not compile
 
-  auto vector1 = matrix3[3]; // last line
-  vector1 = 0;
+  array vector1 = matrix3[3]; // copy last line
+  CHECK(all(vector1 == matrix3[3]));
 
+  matrix3[3] = 0;
   x[3] = x[7] = x[11] = x[15] = x[19] = 0;
   {
-    auto result = std::mismatch(std::begin(x), std::end(x), matrix3.data());
-    CHECK(result.first == std::end(x));
+    auto result = std::mismatch(begin(x), end(x), matrix3.data());
+    CHECK(result.first == end(x));
     CHECK(result.second == matrix3.end());
   }
 
   REQUIRE(matrix1.dimensions() == matrix2.dimensions());
-  auto expr0 = jules::binary_expr_array(
+  auto expr0 = binary_expr_array(
     matrix1.begin(), matrix1.end(), matrix2.begin(), matrix2.end(), [](const int& a, const int& b) { return a + b; },
     matrix1.dimensions());
 
-  static_assert(jules::ExpressionArray<decltype(expr0)>::value);
+  static_assert(ExpressionArray<decltype(expr0)>::value);
 
-  auto expr1 = jules::apply(matrix1, matrix2, [](int a, int b) { return a + b; });
+  auto expr1 = apply(matrix1, matrix2, [](int a, int b) { return a + b; });
   auto expr2 = matrix1 + matrix2;
 
   array from_expr = expr2;
@@ -62,7 +63,7 @@ TEST_CASE("Basic array functionalities", "[array]")
     CHECK(result.second == expr2.end());
   }
 
-  auto expr3 = jules::apply(matrix1, [](int a) { return -a; });
+  auto expr3 = apply(matrix1, [](int a) { return -a; });
   auto expr4 = -matrix1;
 
   CHECK(expr3.row_count() == matrix1.row_count());
@@ -76,23 +77,25 @@ TEST_CASE("Basic array functionalities", "[array]")
   }
 
   auto vector2 = eval(matrix1[0] + matrix2[1]);
-  static_assert(std::is_same<decltype(vector2), jules::vector<int>>::value, "it should be a vector");
+  static_assert(std::is_same<decltype(vector2), vector<int>>::value);
 
   auto expr5 = -vector2;
   CHECK(expr5.length() == vector2.length());
 
-  static_assert(jules::ExpressionArray<decltype(expr5)>::value);
+  static_assert(ExpressionArray<decltype(expr5)>::value);
 }
 
 TEST_CASE("Type inference for as_vector", "[array]")
 {
-  auto array = std::array<jules::integer, 5>{{1, 2, 3, 4, 5}};
-  auto vector1 = jules::to_vector<jules::integer>(array);
-  auto vector2 = jules::as_vector(array);
-  auto vector3 = jules::cat(jules::integer{1}, 2, 3, 4, 5);
+  using namespace jules;
 
-  static_assert(std::is_same<decltype(vector1), decltype(vector2)>::value, "should be the same type");
-  static_assert(std::is_same<decltype(vector2), decltype(vector3)>::value, "should be the same type");
+  auto array = std::array<integer, 5>{{1, 2, 3, 4, 5}};
+  auto vector1 = to_vector<integer>(array);
+  auto vector2 = as_vector(array);
+  auto vector3 = cat(integer{1}, 2, 3, 4, 5);
+
+  static_assert(std::is_same<decltype(vector1), decltype(vector2)>::value);
+  static_assert(std::is_same<decltype(vector2), decltype(vector3)>::value);
 
   CHECK(vector1.length() == vector2.length());
   {
@@ -111,14 +114,16 @@ TEST_CASE("Type inference for as_vector", "[array]")
 
 TEST_CASE("Empty array operations", "[array]")
 {
-  auto empty = jules::vector<>();
+  using namespace jules;
+
+  auto empty = vector<>();
 
   CHECK(empty.size() == 0u);
   CHECK(empty.begin() == empty.end());
 
-  CHECK(sum(empty) == 0.0);
-  CHECK(prod(empty) == 1.0);
-  CHECK(max(empty) == -std::numeric_limits<jules::numeric>::infinity());
+  CHECK(sum(empty) == numeric_traits<numeric>::additive_identity());
+  CHECK(prod(empty) == numeric_traits<numeric>::multiplicative_identity());
+  CHECK(max(empty) == numeric_traits<numeric>::unbounded_min());
 }
 
 TEST_CASE("Safe throwing constructor", "[array]")
@@ -134,16 +139,18 @@ TEST_CASE("Safe throwing constructor", "[array]")
     Foo(Foo&&) = default;
   };
 
+  using namespace jules;
+
   auto foos = std::vector<Foo>();
-  for (const auto i : jules::indices(10))
+  for (const auto i : indices(10))
     foos.emplace_back(false);
 
   auto foo = Foo{false};
 
-  CHECK_NOTHROW(jules::vector<Foo>{});
-  CHECK_THROWS(jules::vector<Foo>(10u));
-  CHECK_THROWS(jules::vector<Foo>(foo, 10u));
-  CHECK_THROWS(jules::vector<Foo>(foos.data(), foos.size()));
-  CHECK_THROWS(jules::vector<Foo>(foos.begin(), foos.end()));
-  CHECK_THROWS(jules::vector<Foo>(foos));
+  CHECK_NOTHROW(vector<Foo>{});
+  CHECK_THROWS(vector<Foo>(10u));
+  CHECK_THROWS(vector<Foo>(foo, 10u));
+  CHECK_THROWS(vector<Foo>(foos.data(), foos.size()));
+  CHECK_THROWS(vector<Foo>(foos.begin(), foos.end()));
+  CHECK_THROWS(vector<Foo>(foos));
 }

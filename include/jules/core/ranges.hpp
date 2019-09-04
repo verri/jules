@@ -9,10 +9,7 @@
 
 namespace jules
 {
-namespace ranges
-{
-using namespace ::ranges;
-} // namespace ranges
+namespace ranges = ::ranges;
 using ::ranges::views::closed_indices;
 using ::ranges::views::indices;
 } // namespace jules

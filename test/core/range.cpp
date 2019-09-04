@@ -8,7 +8,7 @@
 
 TEST_CASE("Basic ranges::view usage", "[range]")
 {
-  using namespace jules::ranges;
+  using namespace ranges;
   using vector = jules::vector<>;
   using jules::as_vector;
   using jules::cat;
