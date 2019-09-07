@@ -31,7 +31,7 @@ TEST_CASE("Matrix tutorial", "[array]")
     // Constructors with size and optional default value.
     auto all_same1 = jules::matrix<long>(3l, 4u, 4u);
     auto all_same2 = jules::matrix<long>(4u, 4u);
-    all_same2[every][every] = 3l; // TODO: implement optimization here
+    all_same2[every][every] = 3l; // very fast!
 
     CHECK(all(all_same1 == 3l));
     CHECK(all(all_same2 == 3l));

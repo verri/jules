@@ -8,14 +8,10 @@
 
 TEST_CASE("Basic ranges::view usage", "[range]")
 {
-  using namespace ranges;
-  using vector = jules::vector<>;
-  using jules::as_vector;
-  using jules::cat;
-  using jules::closed_indices;
-  using jules::indices;
+  using namespace jules;
+  using namespace jules::ranges;
 
-  static_assert(std::is_same<range_value_t<vector>, typename std::iterator_traits<vector::iterator>::value_type>::value, "");
+  static_assert(std::is_same<range_value_t<vector<>>, typename std::iterator_traits<vector<>::iterator>::value_type>::value, "");
 
   const auto ints_vector = as_vector(views::iota(0, unreachable) | views::take(10u));
   REQUIRE(ints_vector.size() == 10u);

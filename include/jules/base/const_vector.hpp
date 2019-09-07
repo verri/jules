@@ -1,4 +1,4 @@
-// Copyright (c) 2017 Filipe Verri <filipeverri@gmail.com>
+// Copyright (c) 2017-2019 Filipe Verri <filipeverri@gmail.com>
 
 // My soul melts away for sorrow;
 //   strengthen me according to your word!
@@ -189,6 +189,7 @@ public:
   auto operator>=(const const_vector& other) const -> bool { return *data_ >= *other.data_; }
 
 private:
+  // TODO: In C++20, do not use container_type.
   std::shared_ptr<container_type> data_;
 };
 } // namespace jules
