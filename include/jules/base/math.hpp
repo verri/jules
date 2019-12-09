@@ -1,4 +1,4 @@
-// Copyright (c) 2017 Filipe Verri <filipeverri@gmail.com>
+// Copyright (c) 2017-2019 Filipe Verri <filipeverri@gmail.com>
 
 #ifndef JULES_BASE_MATH_H
 #define JULES_BASE_MATH_H
@@ -16,6 +16,7 @@ using std::exp;
 using std::log;
 using std::sin;
 using std::sqrt;
+using std::tanh;
 
 template <typename T> constexpr auto square(const T& value) { return value * value; }
 

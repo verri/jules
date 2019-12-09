@@ -1,4 +1,4 @@
-// Copyright (c) 2017 Filipe Verri <filipeverri@gmail.com>
+// Copyright (c) 2017-2019 Filipe Verri <filipeverri@gmail.com>
 
 #ifndef JULES_ARRAY_MATH_H
 #define JULES_ARRAY_MATH_H
@@ -40,6 +40,11 @@ template <typename Array> auto sin(const common_array_base<Array>& array)
 template <typename Array> auto cos(const common_array_base<Array>& array)
 {
   return apply(array, [](const auto& v) { return cos(v); });
+}
+
+template <typename Array> auto tanh(const common_array_base<Array>& array)
+{
+  return apply(array, [](const auto& v) { return tanh(v); });
 }
 
 } // namespace jules
