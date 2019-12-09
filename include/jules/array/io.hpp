@@ -1,4 +1,4 @@
-// Copyright (c) 2017 Filipe Verri <filipeverri@gmail.com>
+// Copyright (c) 2017-2019 Filipe Verri <filipeverri@gmail.com>
 
 #ifndef JULES_ARRAY_IO_H
 #define JULES_ARRAY_IO_H
@@ -32,7 +32,7 @@ public:
       fmts_.emplace_back();
   }
 
-  const auto& dimensions_format() const { return fmts_; }
+  auto dimensions_format() const -> const auto& { return fmts_; }
 
   auto dimensions_format(std::vector<dim_fmt_type> fmts) { return std::exchange(fmts_, std::move(fmts)); }
 
@@ -94,7 +94,7 @@ template <typename CharT, typename Traits> struct dimensions_format
 };
 
 template <typename CharT, typename Traits>
-auto& operator<<(array_ostream<CharT, Traits>& os, dimensions_format<CharT, Traits> setter)
+auto operator<<(array_ostream<CharT, Traits>& os, dimensions_format<CharT, Traits> setter) -> auto&
 {
   auto fmts = os.dimensions_format();
 
@@ -112,19 +112,19 @@ auto& operator<<(array_ostream<CharT, Traits>& os, dimensions_format<CharT, Trai
   return os;
 }
 
-template <typename CharT, typename Traits> auto& operator<<(array_ostream<CharT, Traits>& os, manip::comma_separated_t)
+template <typename CharT, typename Traits> auto operator<<(array_ostream<CharT, Traits>& os, manip::comma_separated_t) -> auto&
 {
   os.dimensions_format({{{}, {CharT('\n')}, {}}, {{}, {CharT(',')}, {}}});
   return os;
 }
 
-template <typename CharT, typename Traits> auto& operator<<(array_ostream<CharT, Traits>& os, manip::space_separated_t)
+template <typename CharT, typename Traits> auto operator<<(array_ostream<CharT, Traits>& os, manip::space_separated_t) -> auto&
 {
   os.dimensions_format({{{}, {CharT('\n')}, {}}, {{}, {CharT(' ')}, {}}});
   return os;
 }
 
-template <typename CharT, typename Traits> auto& operator<<(array_ostream<CharT, Traits>& os, manip::tab_separated_t)
+template <typename CharT, typename Traits> auto operator<<(array_ostream<CharT, Traits>& os, manip::tab_separated_t) -> auto&
 {
   os.dimensions_format({{{}, {CharT('\n')}, {}}, {{}, {CharT('\t')}, {}}});
   return os;
