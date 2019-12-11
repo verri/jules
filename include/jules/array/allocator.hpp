@@ -37,7 +37,7 @@ template <typename T> struct array_allocator
     std::uninitialized_fill_n(to, size, value);
   }
 
-  template <typename It, typename U = typename std::iterator_traits<It>::reference>
+  template <typename It, typename U = typename ranges::iter_reference_t<It>>
   static auto construct(value_type* to, It from, index_t size) noexcept(std::is_nothrow_constructible_v<value_type, U>)
   {
     std::uninitialized_copy_n(from, size, to);

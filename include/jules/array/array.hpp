@@ -169,7 +169,7 @@ public:
   array(generated_t, F f, Dims... dims) : array(allocate_tag{}, dims...)
   {
     try {
-      auto generator = ranges::generate(std::move(f));
+      auto generator = ranges::views::generate(std::move(f)) | ranges::views::common;
       this->construct(this->data(), ranges::begin(generator), this->size());
     } catch (...) {
       this->deallocate(this->data(), this->size());
