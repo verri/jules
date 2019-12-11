@@ -17,6 +17,8 @@
 #include <jules/base/async.hpp>
 #include <jules/base/numeric.hpp>
 
+#include <type_traits>
+
 namespace jules
 {
 
@@ -156,6 +158,19 @@ public:
   {
     try {
       this->construct(this->data(), it, this->size());
+    } catch (...) {
+      this->deallocate(this->data(), this->size());
+      this->data_ = nullptr;
+      throw;
+    }
+  }
+
+  template <typename F, typename... Dims, typename R = std::invoke_result<F>, typename _ = requires_dimensions<Dims...>>
+  array(generated_t, F f, Dims... dims) : array(allocate_tag{}, dims...)
+  {
+    try {
+      auto generator = ranges::generate(std::move(f));
+      this->construct(this->data(), ranges::begin(generator), this->size());
     } catch (...) {
       this->deallocate(this->data(), this->size());
       this->data_ = nullptr;

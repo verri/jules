@@ -234,7 +234,14 @@ struct uninitialized_t
   constexpr explicit uninitialized_t() = default;
 };
 
-static constexpr auto uninitialized = uninitialized_t{};
+constexpr auto uninitialized = uninitialized_t{};
+
+struct generated_t
+{
+  constexpr explicit generated_t() = default;
+};
+
+constexpr auto generated = generated_t{};
 
 // Arithmetic rules
 
