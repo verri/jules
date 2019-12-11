@@ -12,17 +12,14 @@
 
 namespace jules
 {
-namespace meta
-{
-namespace result
+namespace meta::result
 {
 template <typename T> using indexing = decltype(std::declval<T&>()[index_t()]);
 template <typename T> using slice_indexing = decltype(std::declval<T&>()[std::declval<absolute_slice>()]);
 template <typename T> using strided_indexing = decltype(std::declval<T&>()[std::declval<absolute_strided_slice>()]);
 template <typename T> using indirect_indexing = decltype(std::declval<T&>()[std::declval<index_view>()]);
 template <typename T> using public_data = decltype(std::declval<T&>().data());
-} // namespace result
-} // namespace meta
+} // namespace meta::result
 
 template <typename T, typename = void> struct ReferenceArray : std::false_type
 {};

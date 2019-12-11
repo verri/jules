@@ -38,13 +38,13 @@ public:
     using pointer = void;
     using reference = index_t&&;
 
-    constexpr iterator() noexcept {};
+    constexpr iterator() noexcept = default;
 
     constexpr iterator(const iterator& source) noexcept = default;
     constexpr iterator(iterator&& source) noexcept = default;
 
-    constexpr iterator& operator=(const iterator& source) noexcept = default;
-    constexpr iterator& operator=(iterator&& source) noexcept = default;
+    constexpr auto operator=(const iterator& source) noexcept -> iterator& = default;
+    constexpr auto operator=(iterator&& source) noexcept -> iterator& = default;
 
     constexpr auto operator++() noexcept -> iterator&
     {
@@ -107,7 +107,7 @@ public:
   }
 
   /// \group Constructor
-  constexpr strided_descriptor() noexcept {};
+  constexpr strided_descriptor() noexcept = default;
 
   constexpr strided_descriptor(const strided_descriptor& source) noexcept = default;
   constexpr strided_descriptor(strided_descriptor&& source) noexcept = default;
@@ -209,13 +209,13 @@ public:
     using pointer = void;
     using reference = index_t&&;
 
-    constexpr iterator() noexcept {};
+    constexpr iterator() noexcept = default;
 
     constexpr iterator(const iterator& source) noexcept = default;
     constexpr iterator(iterator&& source) noexcept = default;
 
-    constexpr iterator& operator=(const iterator& source) noexcept = default;
-    constexpr iterator& operator=(iterator&& source) noexcept = default;
+    constexpr auto operator=(const iterator& source) noexcept -> iterator& = default;
+    constexpr auto operator=(iterator&& source) noexcept -> iterator& = default;
 
     constexpr auto operator++() noexcept -> iterator&
     {
@@ -258,7 +258,7 @@ public:
   constexpr strided_descriptor(index_t start, const std::array<index_t, 1>& extents) noexcept : start{start}, extents{extents} {}
 
   /// \group Constructor
-  constexpr strided_descriptor() noexcept {};
+  constexpr strided_descriptor() noexcept = default;
 
   constexpr strided_descriptor(const strided_descriptor& source) noexcept = default;
   constexpr strided_descriptor(strided_descriptor&& source) noexcept = default;
@@ -267,9 +267,9 @@ public:
   constexpr auto operator=(strided_descriptor&& source) noexcept -> strided_descriptor& = default;
 
   /// Effectively the product of the extents.
-  constexpr auto size() const noexcept { return extents[0]; }
+  [[nodiscard]] constexpr auto size() const noexcept { return extents[0]; }
 
-  constexpr auto length() const noexcept { return extents[0]; }
+  [[nodiscard]] constexpr auto length() const noexcept { return extents[0]; }
 
   /// \group Index
   /// Returns the memory position of the `index`.
@@ -278,11 +278,11 @@ public:
   /// \group Index
   constexpr auto operator()(index_t index) const noexcept -> index_t { return start + index * strides[0]; }
 
-  constexpr auto begin() const noexcept -> iterator { return cbegin(); }
-  constexpr auto end() const noexcept -> iterator { return cend(); }
+  [[nodiscard]] constexpr auto begin() const noexcept -> iterator { return cbegin(); }
+  [[nodiscard]] constexpr auto end() const noexcept -> iterator { return cend(); }
 
-  constexpr auto cbegin() const noexcept -> iterator { return {start, strides[0]}; }
-  constexpr auto cend() const noexcept -> iterator { return {start + strides[0] * extents[0], strides[0]}; }
+  [[nodiscard]] constexpr auto cbegin() const noexcept -> iterator { return {start, strides[0]}; }
+  [[nodiscard]] constexpr auto cend() const noexcept -> iterator { return {start + strides[0] * extents[0], strides[0]}; }
 
   template <std::size_t D> constexpr auto drop_one_level_dimensions() const noexcept -> strided_descriptor<D>
   {

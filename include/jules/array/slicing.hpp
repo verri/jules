@@ -24,39 +24,37 @@ namespace jules::detail
 
 // Slicing size
 
-static inline constexpr auto slicing_size(index_t) noexcept -> index_t { return 1u; }
+constexpr auto slicing_size(index_t) noexcept -> index_t { return 1u; }
 
-static inline constexpr auto slicing_size(const absolute_strided_slice& slice) noexcept -> index_t { return slice.extent; }
+constexpr auto slicing_size(const absolute_strided_slice& slice) noexcept -> index_t { return slice.extent; }
 
-template <typename Rng, typename = meta::requires_concept<ranges::sized_range<Rng>>>
-static auto slicing_size(const Rng& rng) -> index_t
+template <typename Rng, typename = meta::requires_concept<ranges::sized_range<Rng>>> auto slicing_size(const Rng& rng) -> index_t
 {
   return ranges::size(rng);
 }
 
 template <typename... Args, typename = meta::requires_<std::bool_constant<(sizeof...(Args) >= 2u)>>>
-static auto slicing_size(Args&&... args) -> index_t
+auto slicing_size(Args&&... args) -> index_t
 {
   return (1u * ... * slicing_size(args));
 }
 
 // Default slicing Helpers
 
-template <std::size_t D, std::size_t N> static auto do_slice(strided_descriptor<N>&) -> void;
+template <std::size_t D, std::size_t N> auto do_slice(strided_descriptor<N>&) -> void;
 
 template <std::size_t D, std::size_t N, typename... Args>
-static auto do_slice(strided_descriptor<N>&, const absolute_strided_slice&, Args&&...) -> void;
+auto do_slice(strided_descriptor<N>&, const absolute_strided_slice&, Args&&...) -> void;
 
-template <std::size_t D, std::size_t N, typename... Args>
-static auto do_slice(strided_descriptor<N>&, index_t, Args&&...) -> void;
+template <std::size_t D, std::size_t N, typename... Args> auto do_slice(strided_descriptor<N>&, index_t, Args&&...) -> void;
 
-template <std::size_t D, std::size_t N> static auto do_slice(strided_descriptor<N>&) -> void
+template <std::size_t D, std::size_t N> auto do_slice(strided_descriptor<N>&) -> void
 {
   static_assert(N == D, "invalid number of arguments");
 }
 
 template <std::size_t D, std::size_t N, typename... Args>
-static auto do_slice(strided_descriptor<N>& result, const absolute_strided_slice& slice, Args&&... args) -> void
+auto do_slice(strided_descriptor<N>& result, const absolute_strided_slice& slice, Args&&... args) -> void
 {
   static_assert(N - D - 1 == sizeof...(args), "invalid number of arguments");
 
@@ -72,7 +70,7 @@ static auto do_slice(strided_descriptor<N>& result, const absolute_strided_slice
 }
 
 template <std::size_t D, std::size_t N, typename... Args>
-static auto do_slice(strided_descriptor<N>& result, index_t i, Args&&... args) -> void
+auto do_slice(strided_descriptor<N>& result, index_t i, Args&&... args) -> void
 {
   static_assert(N - D - 1 == sizeof...(args), "invalid number of arguments");
 
@@ -86,7 +84,7 @@ static auto do_slice(strided_descriptor<N>& result, index_t i, Args&&... args) -
 }
 
 template <std::size_t N, typename... Args>
-static auto default_slicing(const strided_descriptor<N>& source, Args&&... args) -> strided_descriptor<N>
+auto default_slicing(const strided_descriptor<N>& source, Args&&... args) -> strided_descriptor<N>
 {
   static_assert(sizeof...(args) == N, "invalid number of arguments");
 
@@ -99,21 +97,20 @@ static auto default_slicing(const strided_descriptor<N>& source, Args&&... args)
 // Indirect Slicing Helpers
 
 template <std::size_t D, std::size_t N>
-static auto do_slice(const std::array<index_t, N>&, std::vector<index_t>&, const strided_descriptor<N>&, std::array<index_t, D>)
-  -> void;
+auto do_slice(const std::array<index_t, N>&, std::vector<index_t>&, const strided_descriptor<N>&, std::array<index_t, D>) -> void;
 
 template <std::size_t D, std::size_t N, typename... Args>
-static auto do_slice(std::array<index_t, N>&, std::vector<index_t>&, const strided_descriptor<N>&, std::array<index_t, D>,
-                     index_t, Args&&...) -> void;
+auto do_slice(std::array<index_t, N>&, std::vector<index_t>&, const strided_descriptor<N>&, std::array<index_t, D>, index_t,
+              Args&&...) -> void;
 
 template <std::size_t D, std::size_t N, typename... Args>
-static auto do_slice(std::array<index_t, N>&, std::vector<index_t>&, const strided_descriptor<N>&, std::array<index_t, D>,
-                     const absolute_strided_slice&, Args&&...) -> void;
+auto do_slice(std::array<index_t, N>&, std::vector<index_t>&, const strided_descriptor<N>&, std::array<index_t, D>,
+              const absolute_strided_slice&, Args&&...) -> void;
 
 template <std::size_t D, std::size_t N, typename Rng, typename... Args, typename T = ranges::range_value_t<Rng>,
           typename = meta::requires_concept<ranges::sized_range<Rng>>>
-static auto do_slice(std::array<index_t, N>& extents, std::vector<index_t>& indexes, const strided_descriptor<N>& descriptor,
-                     std::array<index_t, D> ix, const Rng& rng, Args&&... args) -> void
+auto do_slice(std::array<index_t, N>& extents, std::vector<index_t>& indexes, const strided_descriptor<N>& descriptor,
+              std::array<index_t, D> ix, const Rng& rng, Args&&... args) -> void
 {
   constexpr auto I = N - D - 1;
 
@@ -129,16 +126,16 @@ static auto do_slice(std::array<index_t, N>& extents, std::vector<index_t>& inde
 }
 
 template <std::size_t D, std::size_t N>
-static auto do_slice(const std::array<index_t, N>&, std::vector<index_t>& indexes, const strided_descriptor<N>& descriptor,
-                     std::array<index_t, D> ix) -> void
+auto do_slice(const std::array<index_t, N>&, std::vector<index_t>& indexes, const strided_descriptor<N>& descriptor,
+              std::array<index_t, D> ix) -> void
 {
   static_assert(D == N, "invalid number of arguments");
   indexes.push_back(descriptor(ix));
 }
 
 template <std::size_t D, std::size_t N, typename... Args>
-static auto do_slice(std::array<index_t, N>& extents, std::vector<index_t>& indexes, const strided_descriptor<N>& descriptor,
-                     std::array<index_t, D> ix, index_t i, Args&&... args) -> void
+auto do_slice(std::array<index_t, N>& extents, std::vector<index_t>& indexes, const strided_descriptor<N>& descriptor,
+              std::array<index_t, D> ix, index_t i, Args&&... args) -> void
 {
   constexpr auto I = N - D - 1;
   static_assert(I == sizeof...(args), "invalid number of arguments");
@@ -151,8 +148,8 @@ static auto do_slice(std::array<index_t, N>& extents, std::vector<index_t>& inde
 }
 
 template <std::size_t D, std::size_t N, typename... Args>
-static auto do_slice(std::array<index_t, N>& extents, std::vector<index_t>& indexes, const strided_descriptor<N>& descriptor,
-                     std::array<index_t, D> ix, const absolute_strided_slice& slice, Args&&... args) -> void
+auto do_slice(std::array<index_t, N>& extents, std::vector<index_t>& indexes, const strided_descriptor<N>& descriptor,
+              std::array<index_t, D> ix, const absolute_strided_slice& slice, Args&&... args) -> void
 {
   constexpr auto I = N - D - 1;
   static_assert(I == sizeof...(args), "invalid number of arguments");
@@ -168,7 +165,7 @@ static auto do_slice(std::array<index_t, N>& extents, std::vector<index_t>& inde
 }
 
 template <std::size_t N, typename Tuple, std::size_t... I>
-static auto indirect_slicing_impl(const strided_descriptor<N>& descriptor, const Tuple& args, std::index_sequence<I...>)
+auto indirect_slicing_impl(const strided_descriptor<N>& descriptor, const Tuple& args, std::index_sequence<I...>)
 {
   auto extents = std::array<index_t, N>{};
   auto indexes = std::vector<index_t>();
@@ -180,7 +177,7 @@ static auto indirect_slicing_impl(const strided_descriptor<N>& descriptor, const
   return std::make_pair(std::move(extents), std::move(indexes));
 }
 
-template <std::size_t N, typename... Args> static auto indirect_slicing(const strided_descriptor<N>& descriptor, Args&&... args)
+template <std::size_t N, typename... Args> auto indirect_slicing(const strided_descriptor<N>& descriptor, Args&&... args)
 {
   static_assert(sizeof...(args) == N, "invalid number of arguments");
   return indirect_slicing_impl(descriptor, std::forward_as_tuple(args...), std::make_index_sequence<N>());
@@ -188,7 +185,7 @@ template <std::size_t N, typename... Args> static auto indirect_slicing(const st
 
 // General slicing utilities
 
-template <typename T, typename Mapper, typename... Args> static auto array_slice(T* data, Mapper mapper, Args&&... args)
+template <typename T, typename Mapper, typename... Args> auto array_slice(T* data, Mapper mapper, Args&&... args)
 {
   constexpr auto order = Mapper::order;
   static_assert(sizeof...(Args) > 0u);
@@ -211,7 +208,7 @@ template <typename T, typename Mapper, typename... Args> static auto array_slice
   }
 }
 
-template <typename T, typename Mapper> static decltype(auto) array_at(T* data, const Mapper& mapper, index_t i)
+template <typename T, typename Mapper> decltype(auto) array_at(T* data, const Mapper& mapper, index_t i)
 {
   const auto& descriptor = mapper.descriptor();
   DEBUG_ASSERT(i < descriptor.extents[0], debug::default_module, debug::level::boundary_check, "out of range");
@@ -224,7 +221,7 @@ template <typename T, typename Mapper> static decltype(auto) array_at(T* data, c
   }
 }
 
-template <typename T, typename Mapper> static decltype(auto) array_at(T* data, const Mapper& mapper, every_index)
+template <typename T, typename Mapper> decltype(auto) array_at(T* data, const Mapper& mapper, every_index)
 {
   const auto& descriptor = mapper.descriptor();
   if constexpr (Mapper::order == 1) {
@@ -234,8 +231,7 @@ template <typename T, typename Mapper> static decltype(auto) array_at(T* data, c
   }
 }
 
-template <typename T, typename Mapper, typename Index>
-static decltype(auto) array_at(T* data, const Mapper& mapper, Index&& index)
+template <typename T, typename Mapper, typename Index> decltype(auto) array_at(T* data, const Mapper& mapper, Index&& index)
 {
   if constexpr (Mapper::order == 1) {
     return detail::array_slice(data, mapper, std::forward<Index>(index));
@@ -245,7 +241,7 @@ static decltype(auto) array_at(T* data, const Mapper& mapper, Index&& index)
   }
 }
 
-template <typename U, std::size_t M> static decltype(auto) array_at(U* data, const descriptor<M>& desc, index_t i)
+template <typename U, std::size_t M> decltype(auto) array_at(U* data, const descriptor<M>& desc, index_t i)
 {
   DEBUG_ASSERT(i < desc.extents[0], debug::default_module, debug::level::boundary_check, "out of range");
   if constexpr (M == 1) {
@@ -256,7 +252,7 @@ template <typename U, std::size_t M> static decltype(auto) array_at(U* data, con
   }
 }
 
-template <typename U, std::size_t M> static decltype(auto) array_at(U* data, const descriptor<M>& desc, every_index)
+template <typename U, std::size_t M> decltype(auto) array_at(U* data, const descriptor<M>& desc, every_index)
 {
   if constexpr (M == 1)
     return ref_array<U, M>{data, desc};
@@ -265,7 +261,7 @@ template <typename U, std::size_t M> static decltype(auto) array_at(U* data, con
 }
 
 template <typename U, std::size_t M, typename Rng, typename = meta::requires_concept<ranges::sized_range<Rng>>>
-static decltype(auto) array_at(U* data, const descriptor<M>& desc, const Rng& rng)
+decltype(auto) array_at(U* data, const descriptor<M>& desc, const Rng& rng)
 {
   if constexpr (M == 1 && std::is_constructible_v<index_view, const Rng&>) {
     DEBUG_ASSERT(max(rng) < desc.length(), debug::default_module, debug::level::boundary_check, "out of range");
@@ -277,7 +273,7 @@ static decltype(auto) array_at(U* data, const descriptor<M>& desc, const Rng& rn
   }
 }
 
-template <typename U, std::size_t M> static decltype(auto) array_at(U* data, const descriptor<M>& desc, absolute_slice slice)
+template <typename U, std::size_t M> decltype(auto) array_at(U* data, const descriptor<M>& desc, absolute_slice slice)
 {
   if constexpr (M == 1) {
     DEBUG_ASSERT(slice.start + slice.extent - 1u < desc.extents[0], debug::default_module, debug::level::boundary_check,
@@ -288,8 +284,7 @@ template <typename U, std::size_t M> static decltype(auto) array_at(U* data, con
   }
 }
 
-template <typename U, std::size_t M, typename Index>
-static decltype(auto) array_at(U* data, const descriptor<M>& desc, Index&& index)
+template <typename U, std::size_t M, typename Index> decltype(auto) array_at(U* data, const descriptor<M>& desc, Index&& index)
 {
   return array_at(data, identity_mapper<M>{{0u, desc.extents}}, std::forward<Index>(index));
 }

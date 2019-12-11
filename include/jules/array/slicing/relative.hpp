@@ -79,12 +79,9 @@ template <typename F> auto slice(index_t start, relative_index<F> extent, index_
   return {start, std::move(extent), stride};
 }
 
-static inline auto eval(relative_slice slice, index_t size) noexcept -> absolute_slice
-{
-  return {slice.start, slice.extent(size)};
-}
+inline auto eval(relative_slice slice, index_t size) noexcept -> absolute_slice { return {slice.start, slice.extent(size)}; }
 
-static inline auto eval(relative_strided_slice slice, index_t size) noexcept -> absolute_strided_slice
+inline auto eval(relative_strided_slice slice, index_t size) noexcept -> absolute_strided_slice
 {
   return {slice.start, slice.extent(size), slice.stride};
 }

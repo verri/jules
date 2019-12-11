@@ -46,8 +46,7 @@ public:
   using difference_type = distance_t;
   using pointer = void;
 
-  // XXX: Investigate why `axis_iterator() = default` deletes the default constructor.
-  axis_iterator() {}
+  constexpr axis_iterator() noexcept = default;
 
   constexpr axis_iterator(RefArray arr, index_t pos) noexcept : arr_{std::move(arr)}, pos_{pos} {}
 
@@ -135,23 +134,23 @@ public:
 
   constexpr axis_array(RefArray arr) : arr_{std::move(arr)} {}
 
-  auto size() const noexcept { return arr_.dimensions()[Axis]; }
+  [[nodiscard]] auto size() const noexcept { return arr_.dimensions()[Axis]; }
 
-  auto dimensions() const noexcept -> std::array<size_t, 1u> { return {{this->size()}}; }
+  [[nodiscard]] auto dimensions() const noexcept -> std::array<size_t, 1u> { return {{this->size()}}; }
 
-  auto length() const noexcept { return this->size(); }
+  [[nodiscard]] auto length() const noexcept { return this->size(); }
 
-  auto begin() noexcept -> iterator { return this->cbegin(); }
+  [[nodiscard]] auto begin() noexcept -> iterator { return this->cbegin(); }
 
-  auto end() noexcept -> iterator { return this->cend(); }
+  [[nodiscard]] auto end() noexcept -> iterator { return this->cend(); }
 
-  auto begin() const noexcept -> const_iterator { return this->cbegin(); }
+  [[nodiscard]] auto begin() const noexcept -> const_iterator { return this->cbegin(); }
 
-  auto end() const noexcept -> const_iterator { return this->cend(); }
+  [[nodiscard]] auto end() const noexcept -> const_iterator { return this->cend(); }
 
-  auto cbegin() const noexcept -> const_iterator { return {arr_, 0u}; }
+  [[nodiscard]] auto cbegin() const noexcept -> const_iterator { return {arr_, 0u}; }
 
-  auto cend() const noexcept -> const_iterator { return {arr_, this->size()}; }
+  [[nodiscard]] auto cend() const noexcept -> const_iterator { return {arr_, this->size()}; }
 
 private:
   RefArray arr_;

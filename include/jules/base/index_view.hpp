@@ -52,13 +52,13 @@ public:
     }
   }
 
-  auto begin() const -> const_iterator { return begin_; }
-  auto end() const -> const_iterator { return end_; }
+  [[nodiscard]] auto begin() const -> const_iterator { return begin_; }
+  [[nodiscard]] auto end() const -> const_iterator { return end_; }
 
-  auto cbegin() const -> const_iterator { return begin_; }
-  auto cend() const -> const_iterator { return end_; }
+  [[nodiscard]] auto cbegin() const -> const_iterator { return begin_; }
+  [[nodiscard]] auto cend() const -> const_iterator { return end_; }
 
-  auto size() const -> size_type { return end_ - begin_; }
+  [[nodiscard]] auto size() const -> size_type { return end_ - begin_; }
 
   auto operator[](index_t i) const -> const_reference { return *(begin_ + i); }
 

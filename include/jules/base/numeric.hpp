@@ -60,7 +60,7 @@ constexpr static auto identity = detail::identity_t{};
 /// \module Arithmetic
 /// \returns [std::array]() and [std::vector]() containing the repeated value if `N`
 ///   is a template argument or not, respectively.
-template <std::size_t N, typename T> constexpr auto repeat(const T& value)
+template <std::size_t N, typename T> constexpr auto repeat(const T& value) noexcept(std::is_nothrow_copy_constructible_v<T>)
 {
   return detail::repeat_impl(value, std::make_index_sequence<N>());
 }

@@ -30,8 +30,8 @@ public:
   constexpr number_iterator(const number_iterator& source) = default;
   constexpr number_iterator(number_iterator&& source) noexcept = default;
 
-  constexpr number_iterator& operator=(const number_iterator& source) = default;
-  constexpr number_iterator& operator=(number_iterator&& source) noexcept = default;
+  constexpr auto operator=(const number_iterator& source) -> number_iterator& = default;
+  constexpr auto operator=(number_iterator&& source) noexcept -> number_iterator& = default;
 
   constexpr auto operator==(const number_iterator& other) const { return current_ == other.current_; }
   constexpr auto operator!=(const number_iterator& other) const { return current_ != other.current_; }

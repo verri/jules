@@ -27,8 +27,8 @@ public:
   constexpr iterator_from_indexes(const iterator_from_indexes& source) = default;
   constexpr iterator_from_indexes(iterator_from_indexes&& source) noexcept = default;
 
-  constexpr iterator_from_indexes& operator=(const iterator_from_indexes& source) = default;
-  constexpr iterator_from_indexes& operator=(iterator_from_indexes&& source) noexcept = default;
+  constexpr auto operator=(const iterator_from_indexes& source) -> iterator_from_indexes& = default;
+  constexpr auto operator=(iterator_from_indexes&& source) noexcept -> iterator_from_indexes& = default;
 
   constexpr auto operator++() -> iterator_from_indexes&
   {

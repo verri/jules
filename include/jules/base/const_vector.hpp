@@ -164,7 +164,7 @@ public:
   /// (1) checks whether the container is empty.
   ///
   /// (2) returns the number of elements.
-  auto empty() const -> bool { return data_->empty(); }
+  [[nodiscard]] auto empty() const -> bool { return data_->empty(); }
 
   /// \group capacity
   auto size() const -> size_type { return data_->size(); }

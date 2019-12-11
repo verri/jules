@@ -60,7 +60,7 @@ public:
     return indexes_[index];
   }
 
-  auto map(std::vector<index_t> indexes) const -> index_view
+  [[nodiscard]] auto map(std::vector<index_t> indexes) const -> index_view
   {
     for (auto& index : indexes)
       index = map(index);
@@ -76,9 +76,9 @@ public:
     return {std::move(result)};
   }
 
-  auto descriptor() const noexcept -> const strided_descriptor<N>& { return descriptor_; }
-  auto index_begin() const noexcept -> iterator { return indexes_.begin(); }
-  auto index_end() const noexcept -> iterator { return indexes_.end(); }
+  [[nodiscard]] auto descriptor() const noexcept -> const strided_descriptor<N>& { return descriptor_; }
+  [[nodiscard]] auto index_begin() const noexcept -> iterator { return indexes_.begin(); }
+  [[nodiscard]] auto index_end() const noexcept -> iterator { return indexes_.end(); }
 
   auto drop_first_dimension(index_t i) const noexcept -> vector_mapper<N - 1>
   {

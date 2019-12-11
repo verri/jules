@@ -17,9 +17,9 @@ inline namespace slicing
 struct every_index
 {};
 
-static constexpr auto every = every_index{};
+constexpr auto every = every_index{};
 
-static inline constexpr auto slice() noexcept { return every; }
+constexpr auto slice() noexcept { return every; }
 
 class bounded_index
 {
@@ -49,7 +49,7 @@ struct bounded_strided_slice
   bounded_strided_slice() = delete;
 
   constexpr bounded_strided_slice(index_t start, bounded_index extent, index_t stride) noexcept
-    : start{start}, extent{std::move(extent)}, stride{stride}
+    : start{start}, extent{extent}, stride{stride}
   {}
 
   index_t start;
@@ -62,7 +62,7 @@ struct bounded_slice
 
   bounded_slice() = delete;
 
-  constexpr bounded_slice(index_t start, bounded_index extent) noexcept : start{start}, extent{std::move(extent)} {}
+  constexpr bounded_slice(index_t start, bounded_index extent) noexcept : start{start}, extent{extent} {}
 
   constexpr operator bounded_strided_slice() const noexcept { return {start, extent, 1u}; }
 
@@ -70,22 +70,19 @@ struct bounded_slice
   bounded_index extent;
 };
 
-static inline constexpr auto slice(index_t start, bounded_index extent) noexcept -> bounded_slice
+constexpr auto slice(index_t start, bounded_index extent) noexcept -> bounded_slice { return {start, extent}; }
+
+constexpr auto slice(index_t start, bounded_index extent, index_t stride) noexcept -> bounded_strided_slice
 {
-  return {start, std::move(extent)};
+  return {start, extent, stride};
 }
 
-static inline constexpr auto slice(index_t start, bounded_index extent, index_t stride) noexcept -> bounded_strided_slice
-{
-  return {start, std::move(extent), stride};
-}
-
-static inline constexpr auto eval(bounded_slice slice, index_t dim) noexcept -> absolute_slice
+constexpr auto eval(bounded_slice slice, index_t dim) noexcept -> absolute_slice
 {
   return {slice.start, slice.extent(slice.start < dim ? dim - slice.start : 0u)};
 }
 
-static inline constexpr auto eval(bounded_strided_slice slice, index_t dim) noexcept -> absolute_strided_slice
+constexpr auto eval(bounded_strided_slice slice, index_t dim) noexcept -> absolute_strided_slice
 {
   const auto size = slice.start < dim ? detail::seq_size(slice.start, dim, slice.stride) : 0u;
   return {slice.start, slice.extent(size), slice.stride};

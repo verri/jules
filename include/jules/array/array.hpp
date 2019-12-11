@@ -261,7 +261,8 @@ public:
   /// \requires `A` shall be `Array`
   auto operator=(const array& source) -> array&
   {
-    DEBUG_ASSERT(this != &source, debug::default_module, debug::level::invalid_argument, "self assignment");
+    if (this == &source)
+      return *this;
 
     if (this->size() == source.size()) {
       std::copy(source.begin(), source.end(), this->begin());

@@ -6,10 +6,7 @@
 #include <type_traits>
 #include <utility>
 
-namespace jules
-{
-/// \exclude
-namespace detail
+namespace jules::detail
 {
 template <typename F> struct defer_helper
 {
@@ -27,13 +24,11 @@ template <typename F> struct defer_helper
 };
 
 template <typename F> auto defer(F&& f) { return defer_helper<F>{std::forward<F>(f)}; }
-} // namespace detail
+} // namespace jules::detail
 
 #define JULES_TOKEN_CONCAT(X, Y) X##Y
 #define JULES_TOKEN_PASTE(X, Y) JULES_TOKEN_CONCAT(X, Y)
 
 #define JULES_DEFER(...) auto JULES_TOKEN_PASTE(_deferred, __LINE__) = ::jules::detail::defer([&] { __VA_ARGS__; })
-
-} // namespace jules
 
 #endif // JULES_BASE_ASYNC_H

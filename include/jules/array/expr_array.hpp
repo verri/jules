@@ -27,15 +27,15 @@ public:
   constexpr auto operator=(const expr_array& source) -> expr_array& = delete;
   constexpr auto operator=(expr_array&& source) noexcept -> expr_array& = delete;
 
-  constexpr auto dimensions() const noexcept { return descriptor_.extents; }
+  [[nodiscard]] constexpr auto dimensions() const noexcept { return descriptor_.extents; }
 
-  constexpr auto size() const noexcept { return descriptor_.size(); }
+  [[nodiscard]] constexpr auto size() const noexcept { return descriptor_.size(); }
 
-  constexpr auto length() const noexcept { return descriptor_.length(); }
+  [[nodiscard]] constexpr auto length() const noexcept { return descriptor_.length(); }
 
-  constexpr auto row_count() const noexcept { return descriptor_.row_count(); }
+  [[nodiscard]] constexpr auto row_count() const noexcept { return descriptor_.row_count(); }
 
-  constexpr auto column_count() const noexcept { return descriptor_.column_count(); }
+  [[nodiscard]] constexpr auto column_count() const noexcept { return descriptor_.column_count(); }
 
   /// \exclude
   auto op() const -> const Op& { return op_; }

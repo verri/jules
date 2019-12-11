@@ -36,16 +36,16 @@ struct absolute_slice
   index_t extent;
 };
 
-static inline constexpr auto slice(index_t start, index_t extent) noexcept -> absolute_slice { return {start, extent}; }
+constexpr auto slice(index_t start, index_t extent) noexcept -> absolute_slice { return {start, extent}; }
 
-static inline constexpr auto slice(index_t start, index_t extent, index_t stride) noexcept -> absolute_strided_slice
+constexpr auto slice(index_t start, index_t extent, index_t stride) noexcept -> absolute_strided_slice
 {
   return {start, extent, stride};
 }
 
-static inline constexpr auto eval(absolute_slice slice, index_t) noexcept -> absolute_slice { return slice; }
+constexpr auto eval(absolute_slice slice, index_t) noexcept -> absolute_slice { return slice; }
 
-static inline constexpr auto eval(absolute_strided_slice slice, index_t) noexcept -> absolute_strided_slice { return slice; }
+constexpr auto eval(absolute_strided_slice slice, index_t) noexcept -> absolute_strided_slice { return slice; }
 
 } // namespace slicing
 } // namespace jules

@@ -64,11 +64,13 @@ public:
   /// \group member_types Class Types and Constants
   using difference_type = distance_t;
 
+  constexpr strided_ref_array() noexcept = default;
+
   strided_ref_array(value_type* data, Mapper mapper) : Mapper{std::move(mapper)}, data_{data} {}
   strided_ref_array(const strided_ref_array& source) = default;
   strided_ref_array(strided_ref_array&& source) noexcept = default;
 
-  ~strided_ref_array(){}; // not default to disable default copy, move, assignment, ...
+  ~strided_ref_array() = default;
 
   /// \group Assignment
   template <typename Array> auto operator=(const common_array_base<Array>& source) -> strided_ref_array&
@@ -193,7 +195,7 @@ protected:
   auto data() const -> const value_type* { return data_; }
 
   /// \exclude
-  value_type* const data_;
+  value_type* const data_ = nullptr;
 };
 
 template <typename T, typename Mapper> auto eval(strided_ref_array<T, Mapper> source) -> strided_ref_array<T, Mapper>

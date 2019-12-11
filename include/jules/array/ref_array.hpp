@@ -57,11 +57,13 @@ public:
   /// \group member_types Class Types and Constants
   using difference_type = distance_t;
 
+  constexpr ref_array() noexcept = default;
+
   ref_array(value_type* data, descriptor<order> descriptor) : data_{data}, descriptor_{descriptor} {}
   ref_array(const ref_array& source) = default;
   ref_array(ref_array&& source) noexcept = default;
 
-  ~ref_array(){};
+  ~ref_array() = default;
 
   /// \group Assignment
   template <typename Array> auto operator=(const common_array_base<Array>& source) -> ref_array&
@@ -181,13 +183,11 @@ protected:
 
   auto data() const -> const value_type* { return data_; }
 
-  ref_array() : data_{nullptr}, descriptor_{{{}}} {}
+  /// \exclude
+  value_type* data_ = nullptr;
 
   /// \exclude
-  value_type* data_;
-
-  /// \exclude
-  descriptor<order> descriptor_;
+  descriptor<order> descriptor_ = {};
 };
 
 template <typename T, std::size_t N> auto eval(ref_array<T, N> source) -> ref_array<T, N> { return source; }

@@ -10,9 +10,7 @@
 
 namespace jules
 {
-namespace meta
-{
-namespace result
+namespace meta::result
 {
 template <typename T> using size = decltype(std::declval<const T&>().size());
 template <typename T> using dimensions = decltype(std::declval<const T&>().dimensions());
@@ -20,8 +18,7 @@ template <typename T> using length = decltype(std::declval<const T&>().length())
 template <typename T> using row_count = decltype(std::declval<const T&>().row_count());
 template <typename T> using column_count = decltype(std::declval<const T&>().column_count());
 template <typename T> using eval = decltype(eval(std::declval<const T&>()));
-} // namespace result
-} // namespace meta
+} // namespace meta::result
 
 template <typename T, typename = void> struct CommonArray : std::false_type
 {};
@@ -48,27 +45,27 @@ struct CommonArray<                                                             
 template <typename Derived> class common_array_base
 {
 public:
-  auto size() const noexcept { return self().size(); }
+  [[nodiscard]] auto size() const noexcept { return self().size(); }
 
-  auto dimensions() const noexcept { return self().dimensions(); }
+  [[nodiscard]] auto dimensions() const noexcept { return self().dimensions(); }
 
-  auto length() const noexcept { return self().length(); }
+  [[nodiscard]] auto length() const noexcept { return self().length(); }
 
-  auto row_count() const noexcept { return self().row_count(); }
+  [[nodiscard]] auto row_count() const noexcept { return self().row_count(); }
 
-  auto column_count() const noexcept { return self().column_count(); }
+  [[nodiscard]] auto column_count() const noexcept { return self().column_count(); }
 
-  auto begin() noexcept { return self().begin(); }
+  [[nodiscard]] auto begin() noexcept { return self().begin(); }
 
-  auto end() noexcept { return self().end(); }
+  [[nodiscard]] auto end() noexcept { return self().end(); }
 
-  auto begin() const noexcept { return self().begin(); }
+  [[nodiscard]] auto begin() const noexcept { return self().begin(); }
 
-  auto end() const noexcept { return self().end(); }
+  [[nodiscard]] auto end() const noexcept { return self().end(); }
 
-  auto cbegin() const noexcept { return self().cbegin(); }
+  [[nodiscard]] auto cbegin() const noexcept { return self().cbegin(); }
 
-  auto cend() const noexcept { return self().cend(); }
+  [[nodiscard]] auto cend() const noexcept { return self().cend(); }
 
   operator const Derived&() const { return self(); }
 

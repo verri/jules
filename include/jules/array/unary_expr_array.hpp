@@ -1,4 +1,4 @@
-// Copyright (c) 2017 Filipe Verri <filipeverri@gmail.com>
+// Copyright (c) 2017-2019 Filipe Verri <filipeverri@gmail.com>
 
 #ifndef JULES_ARRAY_UNARY_EXPR_ARRAY_H
 /// \exclude
@@ -40,13 +40,13 @@ public:
     using reference = value_type&&;
     using pointer = void;
 
-    constexpr iterator() = default;
+    constexpr iterator() noexcept = default;
 
     constexpr iterator(const iterator& source) = default;
     constexpr iterator(iterator&& source) noexcept(std::is_nothrow_move_constructible_v<It>) = default;
 
-    constexpr iterator& operator=(const iterator& source) = default;
-    constexpr iterator& operator=(iterator&& source) noexcept(std::is_nothrow_move_assignable_v<It>) = default;
+    constexpr auto operator=(const iterator& source) -> iterator& = default;
+    constexpr auto operator=(iterator&& source) noexcept(std::is_nothrow_move_assignable_v<It>) -> iterator& = default;
 
     constexpr auto operator++() -> iterator&
     {
@@ -77,6 +77,8 @@ public:
   using const_iterator = iterator;
 
 public:
+  constexpr unary_expr_array() noexcept = default;
+
   unary_expr_array(It it_first, It it_last, Op op, const std::array<index_t, order>& extents)
     : expr_array<Op, order>(std::move(op), extents), it_first_{it_first}, it_last_{it_last}
   {}

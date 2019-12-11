@@ -28,7 +28,7 @@ public:
   constexpr descriptor(const std::array<index_t, N>& extents) noexcept : extents{extents} {}
 
   /// \group Constructor
-  constexpr descriptor() noexcept {};
+  constexpr descriptor() noexcept = default;
 
   constexpr descriptor(const descriptor& source) noexcept = default;
   constexpr descriptor(descriptor&& source) noexcept = default;
@@ -39,19 +39,19 @@ public:
   /// Effectively the product of the extents.
   constexpr auto size() const noexcept { return prod(extents); }
 
-  constexpr auto length() const noexcept -> index_t
+  [[nodiscard]] constexpr auto length() const noexcept -> index_t
   {
     static_assert(N == 1u);
     return extents[0];
   }
 
-  constexpr auto row_count() const noexcept -> index_t
+  [[nodiscard]] constexpr auto row_count() const noexcept -> index_t
   {
     static_assert(N > 1u);
     return extents[0];
   }
 
-  constexpr auto column_count() const noexcept -> index_t
+  [[nodiscard]] constexpr auto column_count() const noexcept -> index_t
   {
     static_assert(N > 1u);
     return extents[1];

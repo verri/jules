@@ -14,9 +14,7 @@
 #define JULES_DEBUG_LEVEL 0 // No debug assertions
 #endif
 
-namespace jules
-{
-namespace debug
+namespace jules::debug
 {
 
 /// Debug level for each kind of checking.
@@ -67,7 +65,6 @@ static const auto default_module = throwing_module_t{};
 
 static const auto throwing_module = throwing_module_t{};
 
-} // namespace debug
-} // namespace jules
+} // namespace jules::debug
 
 #endif // JULES_CORE_DEBUG_H
