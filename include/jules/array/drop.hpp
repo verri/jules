@@ -14,7 +14,7 @@ template <std::size_t D, typename T> decltype(auto) drop_to(T&& value)
   return static_cast<T>(value);
 }
 
-template <typename, size_t> class ref_array;
+template <typename, std::size_t> class ref_array;
 template <typename, typename> class strided_ref_array;
 
 template <std::size_t D, typename T, std::size_t N> decltype(auto) drop_to(ref_array<T, N> source);

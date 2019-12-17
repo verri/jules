@@ -14,10 +14,12 @@
 #include <jules/array/numeric.hpp>
 #include <jules/array/overlap.hpp>
 #include <jules/array/ref_array.hpp>
+#include <jules/array/reshape.hpp>
 #include <jules/base/async.hpp>
 #include <jules/base/numeric.hpp>
 
 #include <type_traits>
+#include <utility>
 
 namespace jules
 {
@@ -368,10 +370,13 @@ public:
   /// \group Data
   auto data() const -> const value_type* { return this->data_; }
 
+  auto release() && -> T* { return std::exchange(this->data_, nullptr); }
+
 private:
   /// \exclude
   template <typename... Dims, typename _ = requires_dimensions<Dims...>>
-  explicit array(allocate_tag, Dims... dims) : ref_array<value_type, order>{this->allocate(prod_args(dims...)), {{{dims...}}}}
+  explicit array(allocate_tag, Dims... dims)
+    : ref_array<value_type, order>{this->allocate(prod_args(dims...)), {{{static_cast<index_t>(dims)...}}}}
   {}
 
   /// \exclude
@@ -431,6 +436,14 @@ template <typename T, std::size_t N> auto ref(array<T, N>& a) -> ref_array<T, N>
 template <typename T, std::size_t N> auto ref(const array<T, N>& a) -> ref_array<const T, N>
 {
   return {a.data(), {a.dimensions()}};
+}
+
+template <std::size_t D, typename T, std::size_t N>
+auto reshape_to(array<T, N>&& source, std::array<index_t, D> extents) noexcept -> array<T, D>
+{
+  DEBUG_ASSERT(prod(source.dimensions()) == prod(extents), debug::default_module, debug::level::invalid_argument,
+               "invalid dimensions");
+  return array_builder(std::move(source).release(), extents);
 }
 
 /// \group array_alias Array Aliasing

@@ -26,6 +26,14 @@ TEST_CASE("Basic array functionalities", "[array]")
 
   CHECK(all(flatten(matrix3) == as_vector(indices(0, 20))));
 
+  CHECK(all(reshape(matrix3, matrix3.size()) == as_vector(indices(0, 20))));
+  CHECK(all(reshape_to<1>(matrix3, {{matrix3.size()}}) == as_vector(indices(0, 20))));
+  CHECK(all(reshape_as(matrix3, flatten(matrix3)) == as_vector(indices(0, 20))));
+
+  CHECK(all(matrix3 == reshape_to(as_vector(indices(0, 20)), matrix3.dimensions())));
+  CHECK(all(matrix3 == reshape(as_vector(indices(0, 20)), matrix3.row_count(), matrix3.column_count())));
+  CHECK(all(matrix3 == reshape_as(as_vector(indices(0, 20)), matrix3)));
+
   {
     auto result = std::mismatch(begin(x), end(x), matrix3.data());
     CHECK(result.first == end(x));

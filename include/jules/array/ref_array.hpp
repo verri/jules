@@ -8,6 +8,7 @@
 #include <jules/array/detail/common.hpp>
 #include <jules/array/drop.hpp>
 #include <jules/array/meta/common.hpp>
+#include <jules/array/reshape.hpp>
 #include <jules/array/strided_ref_array.hpp>
 #include <jules/core/type.hpp>
 
@@ -203,9 +204,16 @@ template <std::size_t D, typename T, std::size_t N> decltype(auto) drop_to(ref_a
 
 template <typename T, std::size_t N> decltype(auto) drop(ref_array<T, N> source) { return drop_to<1>(source); }
 
-template <typename T, std::size_t N> decltype(auto) flatten(ref_array<T, N> source)
+template <typename T, std::size_t N> auto flatten(ref_array<T, N> source) noexcept
 {
   return ref_array<T, 1>(source.begin(), {{source.size()}});
+}
+
+template <std::size_t D, typename T, std::size_t N>
+auto reshape_to(ref_array<T, N> source, descriptor<D> descriptor) noexcept -> ref_array<T, D>
+{
+  DEBUG_ASSERT(source.size() == descriptor.size(), debug::default_module, debug::level::invalid_argument, "invalid dimensions");
+  return ref_array<T, D>(source.begin(), descriptor);
 }
 
 } // namespace jules

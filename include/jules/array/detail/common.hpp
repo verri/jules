@@ -47,7 +47,7 @@ template <typename T, std::size_t N> static auto array_cat(const T& head, const 
 }
 
 // [start, stop)
-constexpr auto seq_size(index_t start, index_t stop, index_t step) -> index_t
+constexpr auto seq_size(index_t start, index_t stop, index_t step) noexcept -> index_t
 {
   auto size = (start < stop ? stop - start : start - stop);
   size += size % step == 0u ? 0u : 1u;

@@ -19,6 +19,8 @@ public:
 
   explicit array_builder(const std::array<index_t, N>& extents) : data_{this->allocate(prod(extents))}, extents_{extents} {}
 
+  array_builder(T* data, const std::array<index_t, N>& extents) : data_{data}, extents_{extents}, count_{prod(extents_)} {}
+
   ~array_builder()
   {
     if (data_) {
