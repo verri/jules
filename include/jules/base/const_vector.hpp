@@ -167,7 +167,7 @@ public:
   [[nodiscard]] auto empty() const -> bool { return data_->empty(); }
 
   /// \group capacity
-  auto size() const -> size_type { return data_->size(); }
+  [[nodiscard]] auto size() const -> size_type { return data_->size(); }
 
   /// \group comparison Comparison
   /// Lexicographically compares the values in the vector.
