@@ -3,9 +3,9 @@
 #ifndef JULES_BASE_SEQUENCE_H
 #define JULES_BASE_SEQUENCE_H
 
-#include <jules/core/type.hpp>
-#include <jules/core/debug.hpp>
 #include <jules/base/const_vector.hpp>
+#include <jules/core/debug.hpp>
+#include <jules/core/type.hpp>
 
 namespace jules
 {

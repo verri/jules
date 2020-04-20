@@ -8,4 +8,5 @@ wiki
 git_stats
 build
 include/jules/version.hpp
+compile_commands.json
 .clangd

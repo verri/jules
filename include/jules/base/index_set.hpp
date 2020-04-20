@@ -11,11 +11,11 @@
 #include "range/v3/range/traits.hpp"
 #include <algorithm>
 #include <iterator>
-#include <jules/core/debug.hpp>
-#include <jules/core/type.hpp>
-#include <jules/core/ranges.hpp>
 #include <jules/base/const_vector.hpp>
 #include <jules/base/sequence.hpp>
+#include <jules/core/debug.hpp>
+#include <jules/core/ranges.hpp>
+#include <jules/core/type.hpp>
 #include <type_traits>
 #include <utility>
 

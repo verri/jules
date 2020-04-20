@@ -1,12 +1,12 @@
-cmake_minimum_required(VERSION 3.0)
-project(Jules VERSION 0.4.0)
+cmake_minimum_required(VERSION 3.17)
+project(Jules VERSION 0.5.0)
 
 configure_file("include/jules/version.hpp.in" "include/jules/version.hpp")
 set(CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/cmake/modules ${CMAKE_MODULE_PATH})
 
 add_library(jules INTERFACE)
 
-target_compile_features(jules INTERFACE cxx_std_17)
+target_compile_features(jules INTERFACE cxx_std_20)
 
 target_include_directories(jules INTERFACE
   $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include/>
@@ -20,7 +20,7 @@ if(NOT ${debug_assert_FOUND})
 endif()
 target_link_libraries(jules INTERFACE debug_assert)
 
-find_package(range-v3 0.3.0 QUIET)
+find_package(range-v3 0.10.0 QUIET)
 if(NOT ${range-v3_FOUND})
   message("Unable to find range-v3, using submodule...")
   set(RANGES_CXX_STD 17 CACHE STRING "")
@@ -41,7 +41,7 @@ endif()
 include(CMakePackageConfigHelpers)
 
 file(WRITE ${CMAKE_CURRENT_BINARY_DIR}/jules-config.cmake "
-find_package(range-v3 0.3.0 REQUIRED)
+find_package(range-v3 0.10.0 REQUIRED)
 find_package(debug_assert 1.1 REQUIRED)
 include(\${CMAKE_CURRENT_LIST_DIR}/jules-targets.cmake)
 ")
