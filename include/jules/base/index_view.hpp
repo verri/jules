@@ -38,7 +38,7 @@ public:
 
   index_view(std::vector<index_t>&& data) : data_{std::move(data)}, begin_(data_->data()), end_(data_->data() + data_->size()) {}
 
-  template <typename Rng, typename = meta::requires_concept<ranges::range<Rng>>> index_view(const Rng& rng)
+  template <ranges::range Rng> index_view(const Rng& rng)
   {
     using iterator_type = ranges::iterator_t<Rng>;
     if constexpr (std::is_same_v<iterator_type, index_t*> || std::is_same_v<iterator_type, const index_t*>) {

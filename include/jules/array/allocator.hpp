@@ -1,4 +1,4 @@
-// Copyright (c) 2017 Filipe Verri <filipeverri@gmail.com>
+// Copyright (c) 2017-2020 Filipe Verri <filipeverri@gmail.com>
 
 #ifndef JULES_ARRAY_ALLOCATOR_H
 #define JULES_ARRAY_ALLOCATOR_H
@@ -30,9 +30,9 @@ template <typename T> struct array_allocator
     std::uninitialized_value_construct_n(data, size);
   }
 
-  template <typename U, typename = meta::requires_<std::is_constructible<value_type, const U&>>>
-  static auto construct(value_type* to, index_t size,
-                        const U& value) noexcept(std::is_nothrow_constructible_v<value_type, const U&>)
+  template <typename U>
+  requires constructible_from<value_type, const U&> static auto
+  construct(value_type* to, index_t size, const U& value) noexcept(std::is_nothrow_constructible_v<value_type, const U&>)
   {
     std::uninitialized_fill_n(to, size, value);
   }

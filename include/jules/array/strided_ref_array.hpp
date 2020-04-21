@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2019 Filipe Verri <filipeverri@gmail.com>
+// Copyright (c) 2017-2020 Filipe Verri <filipeverri@gmail.com>
 
 #ifndef JULES_ARRAY_STRIDED_REF_ARRAY_H
 /// \exclude
@@ -26,8 +26,7 @@ namespace jules
 ///
 /// \module Array Types
 /// \notes This class is not meant to be used in user code.
-template <typename T, typename Mapper>
-class strided_ref_array : public common_array_base<strided_ref_array<T, Mapper>>, private Mapper
+template <typename T, typename Mapper> class strided_ref_array : private Mapper
 {
   static_assert(Mapper::order > 0u, "invalid array dimension");
 
@@ -73,14 +72,14 @@ public:
   ~strided_ref_array() = default;
 
   /// \group Assignment
-  template <typename Array> auto operator=(const common_array_base<Array>& source) -> strided_ref_array&
+  auto operator=(const common_array auto& source) -> strided_ref_array&
   {
     detail::array_assign(*this, source);
     return *this;
   }
 
   /// \group Assignment
-  template <typename U, typename = meta::fallback<CommonArray<U>>> auto operator=(const U& source) -> strided_ref_array&
+  template <typename U> requires(!common_array<U>) auto operator=(const U& source) -> strided_ref_array&
   {
     static_assert(std::is_assignable<value_type&, U>::value, "incompatible assignment");
     ranges::fill(*this, source);
@@ -104,16 +103,16 @@ public:
   decltype(auto) operator[](size_type i) const { return detail::array_at(data(), mapper(), i); }
 
   /// \group Indexing
-  decltype(auto) operator[](absolute_slice slice) { return detail::array_at(data(), mapper(), std::move(slice)); }
+  decltype(auto) operator[](absolute_slice slice) { return detail::array_at(data(), mapper(), slice); }
 
   /// \group Indexing
-  decltype(auto) operator[](absolute_slice slice) const { return detail::array_at(data(), mapper(), std::move(slice)); }
+  decltype(auto) operator[](absolute_slice slice) const { return detail::array_at(data(), mapper(), slice); }
 
   /// \group Indexing
-  decltype(auto) operator[](absolute_strided_slice slice) { return detail::array_at(data(), mapper(), std::move(slice)); }
+  decltype(auto) operator[](absolute_strided_slice slice) { return detail::array_at(data(), mapper(), slice); }
 
   /// \group Indexing
-  decltype(auto) operator[](absolute_strided_slice slice) const { return detail::array_at(data(), mapper(), std::move(slice)); }
+  decltype(auto) operator[](absolute_strided_slice slice) const { return detail::array_at(data(), mapper(), slice); }
 
   /// \group Indexing
   decltype(auto) operator[](every_index index) { return detail::array_at(data(), mapper(), index); }
@@ -146,17 +145,10 @@ public:
   }
 
   /// \group Indexing
-  template <typename Rng, typename = meta::requires_concept<ranges::sized_range<Rng>>> decltype(auto) operator[](const Rng& rng)
-  {
-    return detail::array_at(data(), mapper(), rng);
-  }
+  template <ranges::range Rng> decltype(auto) operator[](const Rng& rng) { return detail::array_at(data(), mapper(), rng); }
 
   /// \group Indexing
-  template <typename Rng, typename = meta::requires_concept<ranges::sized_range<Rng>>>
-  decltype(auto) operator[](const Rng& rng) const
-  {
-    return detail::array_at(data(), mapper(), rng);
-  }
+  template <ranges::range Rng> decltype(auto) operator[](const Rng& rng) const { return detail::array_at(data(), mapper(), rng); }
 
   auto begin() noexcept -> iterator { return {data(), this->index_begin()}; }
   auto end() noexcept -> iterator { return {data(), this->index_end()}; }

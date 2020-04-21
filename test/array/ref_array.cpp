@@ -1,5 +1,6 @@
 #include "jules/array/ref_array.hpp"
 #include "jules/array/meta/reference.hpp"
+#include "jules/array/slicing.hpp"
 
 #include <catch.hpp>
 
@@ -13,16 +14,16 @@ TEST_CASE("Basic reference array functionalities", "[array]")
 
   auto vector = jules::ref_array<double, 1u>(values.data(), {{{values.size()}}});
 
-  static_assert(jules::CommonArray<decltype(vector)>::value);
-  static_assert(jules::ReferenceArray<decltype(vector)>::value);
+  static_assert(jules::common_array<decltype(vector)>);
+  static_assert(jules::reference_array<decltype(vector)>);
 
   vector = 1.0;
   CHECK((std::find_if(values.begin(), values.end(), [](auto value) { return value != 1.0; }) == values.end()));
 
   auto matrix = jules::ref_array<double, 2u>(values.data(), {{{2u, 5u}}});
 
-  static_assert(jules::CommonArray<decltype(matrix)>::value);
-  static_assert(jules::ReferenceArray<decltype(matrix)>::value);
+  static_assert(jules::common_array<decltype(matrix)>);
+  static_assert(jules::reference_array<decltype(matrix)>);
 
   matrix = 2.0;
   CHECK((std::find_if(values.begin(), values.end(), [](auto value) { return value != 2.0; }) == values.end()));

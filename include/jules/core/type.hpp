@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2019 Filipe Verri <filipeverri@gmail.com>
+// Copyright (c) 2017-2020 Filipe Verri <filipeverri@gmail.com>
 
 #ifndef JULES_CORE_TYPE_H
 #define JULES_CORE_TYPE_H
@@ -9,29 +9,11 @@
 #include <limits>
 #include <stdexcept>
 #include <string>
+#include <type_traits>
 #include <utility>
 
 namespace jules
 {
-
-namespace detail
-{
-template <typename T> using to_string_expr = decltype(std::to_string(std::declval<T>()));
-}
-
-template <typename T, typename = void> struct StringConvertible : std::false_type
-{};
-
-// TODO: Maybe move it to core/concepts.hpp
-template <typename T>
-struct StringConvertible<T, std::enable_if_t<meta::compiles<T, detail::to_string_expr>::value>> : std::true_type
-{};
-
-template <typename T, typename = void> struct Signed : std::false_type
-{};
-
-template <typename T> struct Signed<T, std::enable_if_t<std::numeric_limits<T>::is_signed>> : std::true_type
-{};
 
 /// Standard numeric type.
 /// \module Basic Types
@@ -85,7 +67,7 @@ struct numeric_rule : default_rule<numeric>
 {
   using default_rule<numeric>::type;
   using default_rule<numeric>::coerce_from;
-  static auto coerce_from(const string& value) -> type { return std::stod(value); }
+  static auto coerce_from(const string& value) noexcept -> type { return std::stod(value); }
 };
 
 /// Coercion rules for [string type](standardese://jules::string/).
@@ -94,17 +76,13 @@ struct string_rule
 {
   using type = string;
 
-  template <typename U, typename = meta::requires_<StringConvertible<const U&>>> static auto coerce_from(const U& value) -> type
+  template <to_string_convertible U> requires(!convertible_to<U, type>) static auto coerce_from(const U& value) -> type
   {
-    return std::to_string(value);
+    using namespace std;
+    return to_string(value);
   }
 
-  template <typename U, typename = meta::fallback<StringConvertible<const U&>>,
-            typename = std::enable_if_t<std::is_convertible<const U&, type>::value>>
-  static auto coerce_from(const U& value) -> type
-  {
-    return value;
-  }
+  template <convertible_to<type> U> static auto coerce_from(const U& value) -> type { return value; }
 };
 
 /// Coercion rules for [index type](standardese://jules::index_t/).
@@ -115,17 +93,21 @@ struct index_rule
 
   static auto coerce_from(const string& value) -> type { return std::stoul(value); }
 
-  template <typename U, typename = meta::requires_<Signed<U>>> static auto coerce_from(const U& value) -> type
+  template <integral U> static auto coerce_from(const U& value) -> type
   {
-    if (value < 0)
-      throw std::invalid_argument{"index cannot be initialized by a negative value"};
+    if constexpr (signed_integral<U>) {
+      if (value < 0)
+        throw std::invalid_argument{"index cannot be initialized by a negative value"};
+    }
     return value;
   }
 
-  template <typename U, typename = meta::fallback<Signed<U>>,
-            typename = std::enable_if_t<std::is_convertible<const U&, type>::value>>
-  static auto coerce_from(const U& value) -> type
+  template <convertible_to<type> U> requires(!integral<U>) static auto coerce_from(const U& value) -> type
   {
+    if constexpr (std::is_floating_point_v<U>) {
+      if (value < 0)
+        throw std::invalid_argument{"index cannot be initialized by a negative value"};
+    }
     return value;
   }
 };
@@ -153,16 +135,14 @@ struct uinteger_rule
     return result;
   }
 
-  template <typename U, typename = meta::requires_<Signed<U>>> static auto coerce_from(const U& value) -> type
+  template <signed_integral U> static auto coerce_from(const U& value) -> type
   {
     if (value < 0)
       throw std::invalid_argument{"unsigned cannot be initialized by a negative value"};
     return value;
   }
 
-  template <typename U, typename = meta::fallback<Signed<U>>,
-            typename = std::enable_if_t<std::is_convertible<const U&, type>::value>>
-  static auto coerce_from(const U& value) -> type
+  template <convertible_to<type> U> requires(!signed_integral<U>) static auto coerce_from(const U& value) -> type
   {
     return value;
   }
@@ -201,8 +181,12 @@ template <typename T> struct tag
 {
   static_assert(std::is_same<T, std::decay_t<T>>::value, "type cannot have qualifiers");
   using untag = T;
-  template <typename U> constexpr auto operator==(const tag<U>&) { return std::is_same<T, U>::value; }
 };
+
+template <typename T, typename U> constexpr auto operator==(const tag<T>&, const tag<U>&) noexcept
+{
+  return std::is_same<T, U>::value;
+}
 
 // Recursive initializer_list
 
@@ -267,9 +251,11 @@ template <typename T> struct numeric_traits : std::numeric_limits<T>
   }
 };
 
+template <typename T> concept common_numeric = requires { typename numeric_traits<T>; };
+
 template <typename... Fs> struct overloaded : Fs...
 {
-  constexpr explicit overloaded(Fs... fs) : Fs(std::move(fs))... {}
+  constexpr explicit overloaded(Fs... fs) noexcept : Fs(std::move(fs))... {}
   using Fs::operator()...;
 };
 

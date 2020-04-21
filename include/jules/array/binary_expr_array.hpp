@@ -1,4 +1,4 @@
-// Copyright (c) 2017 Filipe Verri <filipeverri@gmail.com>
+// Copyright (c) 2017-2020 Filipe Verri <filipeverri@gmail.com>
 
 #ifndef JULES_ARRAY_BINARY_EXPR_ARRAY_H
 /// \exclude
@@ -14,8 +14,7 @@
 namespace jules
 {
 
-template <typename LhsIt, typename RhsIt, typename Op, size_t N>
-class binary_expr_array : public expr_array<Op, N>, public common_array_base<binary_expr_array<LhsIt, RhsIt, Op, N>>
+template <typename LhsIt, typename RhsIt, typename Op, size_t N> class binary_expr_array : public expr_array<Op, N>
 {
   /// \exclude
   using lhs_result = decltype(*std::declval<LhsIt&>());
@@ -72,7 +71,7 @@ public:
 
     constexpr auto operator!=(const iterator& other) const { return !(*this == other); }
 
-    constexpr auto operator*() -> value_type { return source_->operate(*lhs_, *rhs_); }
+    constexpr auto operator*() const -> value_type { return source_->operate(*lhs_, *rhs_); }
 
   private:
     constexpr iterator(LhsIt lhs, RhsIt rhs, const binary_expr_array* source) : lhs_{lhs}, rhs_{rhs}, source_{source} {}
@@ -118,7 +117,7 @@ private:
 };
 
 template <typename LhsIt, typename RhsIt, typename Op, std::size_t N>
-binary_expr_array(LhsIt, LhsIt, RhsIt, RhsIt, Op, const std::array<index_t, N>&)->binary_expr_array<LhsIt, RhsIt, Op, N>;
+binary_expr_array(LhsIt, LhsIt, RhsIt, RhsIt, Op, const std::array<index_t, N>&) -> binary_expr_array<LhsIt, RhsIt, Op, N>;
 
 template <typename LhsIt, typename RhsIt, typename Op, std::size_t N>
 auto eval(const binary_expr_array<LhsIt, RhsIt, Op, N>& source)

@@ -17,8 +17,8 @@ TEST_CASE("1-D strided reference array view", "[array]")
 
   auto v = jules::strided_ref_array<double, identity_mapper<1>>(x.data(), {{0u, {{x.size()}}}});
 
-  static_assert(jules::CommonArray<decltype(v)>::value);
-  static_assert(jules::ReferenceArray<decltype(v)>::value);
+  static_assert(jules::common_array<decltype(v)>);
+  static_assert(jules::reference_array<decltype(v)>);
 
   CHECK(v.size() == x.size());
   CHECK(v.length() == x.size());
@@ -29,8 +29,8 @@ TEST_CASE("1-D strided reference array view", "[array]")
 
   auto w = jules::strided_ref_array<const double, identity_mapper<1>>(x.data(), {{0u, {{x.size() / 2u}}, {{2u}}}});
 
-  static_assert(jules::CommonArray<decltype(w)>::value);
-  static_assert(jules::ReferenceArray<decltype(w)>::value);
+  static_assert(jules::common_array<decltype(w)>);
+  static_assert(jules::reference_array<decltype(w)>);
 
   CHECK(w.size() == x.size() / 2u);
   CHECK(w.length() == x.size() / 2u);

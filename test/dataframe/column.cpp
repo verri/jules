@@ -52,16 +52,17 @@ TEST_CASE("Column constructor using initializer list", "[dataframe]")
   auto range_column = column(tmp);
   CHECK(range_column.elements_type() == typeid(numeric));
 
-  static_assert(std::is_same<decltype(make_value(std::vector<numeric>{})), numeric>::value, "");
-  static_assert(std::is_same<decltype(make_value(v)), numeric>::value, "");
+  static_assert(std::is_same<decltype(make_value(std::vector<numeric>{})), numeric>::value);
+  static_assert(std::is_same<decltype(make_value(v)), numeric>::value);
 }
 
-template <typename T> using _to_view = decltype(jules::to_view<int>(std::declval<T>()));
-static_assert(jules::meta::compiles<jules::column&, _to_view>::value);
-static_assert(jules::meta::compiles<const jules::column&, _to_view>::value);
-static_assert(!jules::meta::compiles<jules::column, _to_view>::value);
-static_assert(!jules::meta::compiles<jules::column&&, _to_view>::value);
-static_assert(!jules::meta::compiles<const jules::column&&, _to_view>::value);
+template <typename T, typename U> concept convertible_to_view = requires(T&& t) { {jules::to_view<U>(std::forward<T>(t))}; };
+
+static_assert(convertible_to_view<jules::column&, int>);
+static_assert(convertible_to_view<const jules::column&, int>);
+static_assert(!convertible_to_view<jules::column, int>);
+static_assert(!convertible_to_view<jules::column&&, int>);
+static_assert(!convertible_to_view<const jules::column&&, int>);
 
 TEST_CASE("Column constructor inference", "[dataframe]")
 {

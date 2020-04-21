@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2019 Filipe Verri <filipeverri@gmail.com>
+// Copyright (c) 2017-2020 Filipe Verri <filipeverri@gmail.com>
 
 #ifndef JULES_ARRAY_META_EXPRESSION_H
 /// \exclude
@@ -10,21 +10,9 @@
 namespace jules
 {
 
-template <typename T, typename = void> struct ExpressionArray : std::false_type
-{};
-
 template <typename T>
-struct ExpressionArray<                               //
-  T, meta::requires_<                                 //
-       std::bool_constant<!default_constructible<T>>, //
-       std::bool_constant<!copy_constructible<T>>,    //
-       std::bool_constant<!move_constructible<T>>,    //
-       std::bool_constant<!copyable<T>>,              //
-       std::bool_constant<!movable<T>>,               //
-       std::bool_constant<ranges::input_range<T>>,    //
-       CommonArray<T>                                 //
-       >> : std::true_type
-{};
+concept expression_array = !default_constructible<T> && !copy_constructible<T> && !move_constructible<T> && !copyable<T> &&
+                           !movable<T> && ranges::input_range<T> && common_array<T>;
 
 } // namespace jules
 

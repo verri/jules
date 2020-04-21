@@ -1,4 +1,4 @@
-// Copyright (c) 2016-2019 Filipe Verri <filipeverri@gmail.com>
+// Copyright (c) 2016-2020 Filipe Verri <filipeverri@gmail.com>
 
 #ifndef JULES_DATAFRAME_DATAFRAME_H
 #define JULES_DATAFRAME_DATAFRAME_H
@@ -80,28 +80,23 @@ public:
     : base_dataframe(elements.begin(), elements.end(), elements.size())
   {}
 
-  template <typename Rng, typename R = ranges::range_value_t<Rng>,
-            typename = std::enable_if_t<std::is_convertible<R, named_column_type>::value>,
-            typename = meta::requires_concept<ranges::sized_range<Rng>>>
-  base_dataframe(const Rng& rng) : base_dataframe(ranges::begin(rng), ranges::end(rng), ranges::size(rng))
+  template <ranges::range Rng, typename R = ranges::range_value_t<Rng>>
+  requires convertible_to<R, named_column_type> base_dataframe(const Rng& rng)
+    : base_dataframe(ranges::begin(rng), ranges::end(rng), ranges::size(rng))
   {}
 
-  template <typename Iter, typename Sent, typename R = ranges::iter_value_t<Iter>,
-            typename = std::enable_if_t<std::is_convertible<R, named_column_type>::value>,
-            typename = meta::requires_concept<ranges::sentinel_for<Sent, Iter>, !ranges::input_iterator<Iter>>, int = 0>
-  base_dataframe(Iter first, Sent last) : base_dataframe(first, last, 0u)
+  template <ranges::input_iterator Iter, ranges::sentinel_for<Iter> Sent, typename R = ranges::iter_value_t<Iter>>
+    requires convertible_to<R, named_column_type> && (!ranges::forward_iterator<Iter>)base_dataframe(Iter first, Sent last)
+    : base_dataframe(first, last, 0u)
   {}
 
-  template <typename Iter, typename Sent, typename R = ranges::iter_value_t<Iter>,
-            typename = std::enable_if_t<std::is_convertible<R, named_column_type>::value>,
-            typename = meta::requires_concept<ranges::sentinel_for<Sent, Iter>, ranges::input_iterator<Iter>>>
-  base_dataframe(Iter first, Sent last) : base_dataframe(first, last, ranges::distance(first, last))
+  template <ranges::forward_iterator Iter, ranges::sentinel_for<Iter> Sent, typename R = ranges::iter_value_t<Iter>>
+  requires convertible_to<R, named_column_type> base_dataframe(Iter first, Sent last)
+    : base_dataframe(first, last, ranges::distance(first, last))
   {}
 
-  template <typename Iter, typename Sent, typename R = ranges::iter_value_t<Iter>,
-            typename = std::enable_if_t<std::is_convertible<R, named_column_type>::value>,
-            typename = meta::requires_concept<ranges::sentinel_for<Sent, Iter>>>
-  base_dataframe(Iter first, Sent last, index_t size_hint)
+  template <ranges::input_iterator Iter, ranges::sentinel_for<Iter> Sent, typename R = ranges::iter_value_t<Iter>>
+  requires convertible_to<R, named_column_type> base_dataframe(Iter first, Sent last, index_t size_hint)
   {
     elements_.reserve(size_hint);
 
@@ -274,8 +269,8 @@ public:
 
   operator bool() const { return column_count() > 0u; }
 
-  auto row_count() const { return row_count_; }
-  auto column_count() const { return elements_.size(); }
+  auto row_count() const noexcept { return row_count_; }
+  auto column_count() const noexcept { return elements_.size(); }
 
   auto column_types() const -> vector<std::type_index>
   {

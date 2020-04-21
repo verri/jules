@@ -8,9 +8,7 @@
 #include <iterator>
 #include <type_traits>
 
-namespace jules
-{
-namespace detail
+namespace jules::detail
 {
 
 template <typename T> class number_iterator
@@ -41,7 +39,7 @@ public:
   constexpr auto operator<=(const number_iterator& other) const { return current_ <= other.current_; }
 
   constexpr auto operator*() const -> reference { return current_; }
-  constexpr auto operator-> () const -> pointer { return &current_; }
+  constexpr auto operator->() const -> pointer { return &current_; }
   constexpr auto operator[](difference_type i) const { return current_ + i * step_; }
 
   constexpr auto operator++() -> number_iterator&
@@ -92,7 +90,6 @@ private:
   T step_;
 };
 
-} // namespace detail
-} // namespace jules
+} // namespace jules::detail
 
 #endif // JULES_CORE_DETAIL_NUMBERS_H

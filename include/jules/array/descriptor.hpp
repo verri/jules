@@ -1,4 +1,4 @@
-// Copyright (c) 2017 Filipe Verri <filipeverri@gmail.com>
+// Copyright (c) 2017-2020 Filipe Verri <filipeverri@gmail.com>
 
 #ifndef JULES_ARRAY_DESCRIPTOR_H
 /// \exclude
@@ -39,22 +39,16 @@ public:
   /// Effectively the product of the extents.
   constexpr auto size() const noexcept { return prod(extents); }
 
-  [[nodiscard]] constexpr auto length() const noexcept -> index_t
-  {
-    static_assert(N == 1u);
-    return extents[0];
-  }
+  [[nodiscard]] constexpr auto length() const noexcept -> index_t { return extents[0]; }
 
-  [[nodiscard]] constexpr auto row_count() const noexcept -> index_t
-  {
-    static_assert(N > 1u);
-    return extents[0];
-  }
+  [[nodiscard]] constexpr auto row_count() const noexcept -> index_t { return extents[0]; }
 
   [[nodiscard]] constexpr auto column_count() const noexcept -> index_t
   {
-    static_assert(N > 1u);
-    return extents[1];
+    if constexpr (N > 1u)
+      return extents[1];
+    else
+      return 1u;
   }
 
   /// \group Index

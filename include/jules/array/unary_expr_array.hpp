@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2019 Filipe Verri <filipeverri@gmail.com>
+// Copyright (c) 2017-2020 Filipe Verri <filipeverri@gmail.com>
 
 #ifndef JULES_ARRAY_UNARY_EXPR_ARRAY_H
 /// \exclude
@@ -14,8 +14,7 @@
 namespace jules
 {
 
-template <typename It, typename Op, std::size_t N>
-class unary_expr_array : public expr_array<Op, N>, public common_array_base<unary_expr_array<It, Op, N>>
+template <typename It, typename Op, std::size_t N> class unary_expr_array : public expr_array<Op, N>
 {
   /// \exclude
   using iterator_result = decltype(*std::declval<It&>());
@@ -65,7 +64,7 @@ public:
 
     constexpr auto operator!=(const iterator& other) const { return !(*this == other); }
 
-    constexpr auto operator*() -> value_type { return source_->operate(*it_); }
+    constexpr auto operator*() const -> value_type { return source_->operate(*it_); }
 
   private:
     constexpr iterator(It it, const unary_expr_array* source) : it_{it}, source_{source} {}
@@ -109,7 +108,7 @@ private:
 };
 
 template <typename It, typename Op, std::size_t N>
-unary_expr_array(It, It, Op, const std::array<index_t, N>&)->unary_expr_array<It, Op, N>;
+unary_expr_array(It, It, Op, const std::array<index_t, N>&) -> unary_expr_array<It, Op, N>;
 
 template <typename It, typename Op, std::size_t N>
 auto eval(const unary_expr_array<It, Op, N>& source) -> array<typename unary_expr_array<It, Op, N>::value_type, N>

@@ -3,6 +3,7 @@
 #ifndef JULES_BASE_NUMERIC_H
 #define JULES_BASE_NUMERIC_H
 
+#include "range/v3/iterator/traits.hpp"
 #include <jules/base/const_vector.hpp>
 #include <jules/base/math.hpp>
 #include <jules/core/meta.hpp>
@@ -75,7 +76,7 @@ template <typename T> auto repeat(index_t N, const T& value) { return std::vecto
 /// \module Arithmetic
 /// \notes [jules::numeric_traits<T>]() must implement `unbounded_min`.
 /// \notes If empty, returns [jules::numeric_traits<T>::unbounded_min]().
-template <typename Iter, typename Sent, typename T = ranges::iter_value_t<Iter>, typename = meta::requires_<>>
+template <ranges::input_iterator Iter, ranges::sentinel_for<Iter> Sent, common_numeric T = ranges::iter_value_t<Iter>>
 auto max(Iter first, Sent last, T start = numeric_traits<T>::unbounded_min())
 {
   for (; first != last; ++first)
@@ -85,7 +86,7 @@ auto max(Iter first, Sent last, T start = numeric_traits<T>::unbounded_min())
 }
 
 /// \group Max
-template <typename Rng, typename T = ranges::range_value_t<Rng>, typename = meta::requires_concept<ranges::range<Rng>>>
+template <ranges::range Rng, common_numeric T = ranges::range_value_t<Rng>>
 auto max(const Rng& rng, T start = numeric_traits<T>::unbounded_min())
 {
   return ::jules::max(ranges::begin(rng), ranges::end(rng), std::move(start));
@@ -98,8 +99,7 @@ auto max(const Rng& rng, T start = numeric_traits<T>::unbounded_min())
 /// \module Arithmetic
 /// \notes [jules::numeric_traits<T>]() must implement `unbounded_min`.
 /// \notes If empty, returns [jules::numeric_traits<T>::unbounded_min]().
-template <typename Iter, typename Sent, typename T = ranges::iter_value_t<Iter>,
-          typename = meta::requires_concept<ranges::sentinel_for<Sent, Iter>>>
+template <ranges::input_iterator Iter, ranges::sentinel_for<Iter> Sent, common_numeric T = ranges::iter_value_t<Iter>>
 auto which_max(Iter first, Sent last, T start = numeric_traits<T>::unbounded_min())
 {
   std::size_t pos = 0u, best_pos = 0;
@@ -115,7 +115,7 @@ auto which_max(Iter first, Sent last, T start = numeric_traits<T>::unbounded_min
 }
 
 /// \group WhichMax
-template <typename Rng, typename T = ranges::range_value_t<Rng>, typename = meta::requires_concept<ranges::range<Rng>>>
+template <ranges::range Rng, common_numeric T = ranges::range_value_t<Rng>>
 auto which_max(const Rng& rng, T start = numeric_traits<T>::unbounded_min())
 {
   return ::jules::which_max(ranges::begin(rng), ranges::end(rng), std::move(start));
@@ -128,8 +128,7 @@ auto which_max(const Rng& rng, T start = numeric_traits<T>::unbounded_min())
 /// \module Arithmetic
 /// \notes [jules::numeric_traits<T>]() must implement `unbounded_max`.
 /// \notes If empty, returns [jules::numeric_traits<T>::unbounded_max]().
-template <typename Iter, typename Sent, typename T = ranges::iter_value_t<Iter>,
-          typename = meta::requires_concept<ranges::sentinel_for<Sent, Iter>>>
+template <ranges::input_iterator Iter, ranges::sentinel_for<Iter> Sent, common_numeric T = ranges::iter_value_t<Iter>>
 auto min(Iter first, Sent last, T start = numeric_traits<T>::unbounded_max())
 {
   for (; first != last; ++first)
@@ -139,7 +138,7 @@ auto min(Iter first, Sent last, T start = numeric_traits<T>::unbounded_max())
 }
 
 /// \group Min
-template <typename Rng, typename T = ranges::range_value_t<Rng>, typename = meta::requires_concept<ranges::range<Rng>>>
+template <ranges::range Rng, common_numeric T = ranges::range_value_t<Rng>>
 auto min(const Rng& rng, T start = numeric_traits<T>::unbounded_max())
 {
   return ::jules::min(ranges::begin(rng), ranges::end(rng), std::move(start));
@@ -152,8 +151,7 @@ auto min(const Rng& rng, T start = numeric_traits<T>::unbounded_max())
 /// \module Arithmetic
 /// \notes [jules::numeric_traits<T>]() must implement `unbounded_max`.
 /// \notes If empty, returns [jules::numeric_traits<T>::unbounded_max]().
-template <typename Iter, typename Sent, typename T = ranges::iter_value_t<Iter>,
-          typename = meta::requires_concept<ranges::sentinel_for<Sent, Iter>>>
+template <ranges::input_iterator Iter, ranges::sentinel_for<Iter> Sent, common_numeric T = ranges::iter_value_t<Iter>>
 auto which_min(Iter first, Sent last, T start = numeric_traits<T>::unbounded_max())
 {
   std::size_t pos = 0u, best_pos = 0;
@@ -169,7 +167,7 @@ auto which_min(Iter first, Sent last, T start = numeric_traits<T>::unbounded_max
 }
 
 /// \group WhichMin
-template <typename Rng, typename T = ranges::range_value_t<Rng>, typename = meta::requires_concept<ranges::range<Rng>>>
+template <ranges::range Rng, common_numeric T = ranges::range_value_t<Rng>>
 auto which_min(const Rng& rng, T start = numeric_traits<T>::unbounded_max())
 {
   return ::jules::which_min(ranges::begin(rng), ranges::end(rng), std::move(start));
@@ -182,8 +180,7 @@ auto which_min(const Rng& rng, T start = numeric_traits<T>::unbounded_max())
 /// \module Arithmetic
 /// \notes [jules::numeric_traits<T>]() must implement `multiplicative_identity`.
 /// \notes If empty, returns [jules::numeric_traits<T>::multiplicative_identity]().
-template <typename Iter, typename Sent, typename T = ranges::iter_value_t<Iter>,
-          typename = meta::requires_concept<ranges::sentinel_for<Sent, Iter>>>
+template <ranges::input_iterator Iter, ranges::sentinel_for<Iter> Sent, common_numeric T = ranges::iter_value_t<Iter>>
 auto prod(Iter first, Sent last, T start = numeric_traits<T>::multiplicative_identity())
 {
   for (; first != last; ++first)
@@ -192,7 +189,7 @@ auto prod(Iter first, Sent last, T start = numeric_traits<T>::multiplicative_ide
 }
 
 /// \group Prod
-template <typename Rng, typename T = ranges::range_value_t<Rng>, typename = meta::requires_concept<ranges::range<Rng>>>
+template <ranges::range Rng, common_numeric T = ranges::range_value_t<Rng>>
 auto prod(const Rng& rng, T start = numeric_traits<T>::multiplicative_identity())
 {
   return ::jules::prod(ranges::begin(rng), ranges::end(rng), std::move(start));
@@ -211,8 +208,7 @@ constexpr auto prod(const std::array<T, N>& arr) noexcept(noexcept(detail::prod_
 /// \module Arithmetic
 /// \notes [jules::numeric_traits<T>]() must implement `additive_identity`.
 /// \notes If empty, returns [jules::numeric_traits<T>::additive_identity]().
-template <typename Iter, typename Sent, typename T = ranges::iter_value_t<Iter>,
-          typename = meta::requires_concept<ranges::sentinel_for<Sent, Iter>>>
+template <ranges::input_iterator Iter, ranges::sentinel_for<Iter> Sent, common_numeric T = ranges::iter_value_t<Iter>>
 auto sum(Iter first, Sent last, T start = numeric_traits<T>::additive_identity())
 {
   for (; first != last; ++first)
@@ -221,7 +217,7 @@ auto sum(Iter first, Sent last, T start = numeric_traits<T>::additive_identity()
 }
 
 /// \group Sum
-template <typename Rng, typename T = ranges::range_value_t<Rng>, typename = meta::requires_concept<ranges::range<Rng>>>
+template <ranges::range Rng, common_numeric T = ranges::range_value_t<Rng>>
 auto sum(const Rng& rng, T start = numeric_traits<T>::additive_identity())
 {
   return ::jules::sum(ranges::begin(rng), ranges::end(rng), std::move(start));
@@ -233,15 +229,14 @@ auto sum(const Rng& rng, T start = numeric_traits<T>::additive_identity())
 ///
 /// \module Arithmetic
 /// \notes [jules::numeric_traits<T>]() must implement `additive_identity`.
-template <typename Iter, typename Sent, typename T = ranges::iter_value_t<Iter>,
-          typename = meta::requires_concept<ranges::sentinel_for<Sent, Iter>>>
+template <ranges::input_iterator Iter, ranges::sentinel_for<Iter> Sent, common_numeric T = ranges::iter_value_t<Iter>>
 auto mean(Iter first, Sent last, T start = numeric_traits<T>::additive_identity())
 {
   return ::jules::sum(first, last, std::move(start)) / ranges::distance(first, last);
 }
 
 /// \group Mean
-template <typename Rng, typename T = ranges::range_value_t<Rng>, typename = meta::requires_concept<ranges::range<Rng>>>
+template <ranges::range Rng, common_numeric T = ranges::range_value_t<Rng>>
 auto mean(const Rng& rng, T start = numeric_traits<T>::additive_identity())
 {
   return ::jules::sum(rng, std::move(start)) / ranges::size(rng);
@@ -254,8 +249,7 @@ auto mean(const Rng& rng, T start = numeric_traits<T>::additive_identity())
 ///
 /// \module Arithmetic
 /// \notes [jules::numeric_traits<T>]() must implement `additive_identity`.
-template <typename Iter, typename Sent, typename T = ranges::iter_value_t<Iter>,
-          typename = meta::requires_concept<ranges::sentinel_for<Sent, Iter>>>
+template <ranges::input_iterator Iter, ranges::sentinel_for<Iter> Sent, common_numeric T = ranges::iter_value_t<Iter>>
 auto var(Iter first, Sent last, T start = numeric_traits<T>::additive_identity())
 {
   const auto N = ranges::distance(first, last);
@@ -267,7 +261,7 @@ auto var(Iter first, Sent last, T start = numeric_traits<T>::additive_identity()
 }
 
 /// \group Var
-template <typename Rng, typename T = ranges::range_value_t<Rng>, typename = meta::requires_concept<ranges::range<Rng>>>
+template <ranges::range Rng, common_numeric T = ranges::range_value_t<Rng>>
 auto var(const Rng& rng, T start = numeric_traits<T>::additive_identity())
 {
   return ::jules::var(ranges::begin(rng), ranges::end(rng), std::move(start));
@@ -281,15 +275,14 @@ auto var(const Rng& rng, T start = numeric_traits<T>::additive_identity())
 /// \module Arithmetic
 /// \notes [jules::numeric_traits<T>]() must implement `additive_identity`.
 /// \notes It might promote the result type since it calls sqrt.
-template <typename Iter, typename Sent, typename T = ranges::iter_value_t<Iter>,
-          typename = meta::requires_concept<ranges::sentinel_for<Sent, Iter>>>
+template <ranges::input_iterator Iter, ranges::sentinel_for<Iter> Sent, common_numeric T = ranges::iter_value_t<Iter>>
 auto sd(Iter first, Sent last, T start = numeric_traits<T>::additive_identity())
 {
   return sqrt(::jules::var(first, last, std::move(start)));
 }
 
 /// \group Sd
-template <typename Rng, typename T = ranges::range_value_t<Rng>, typename = meta::requires_concept<ranges::range<Rng>>>
+template <ranges::range Rng, common_numeric T = ranges::range_value_t<Rng>>
 auto sd(const Rng& rng, T start = numeric_traits<T>::additive_identity())
 {
   return sqrt(::jules::var(rng, std::move(start)));
@@ -303,8 +296,7 @@ auto sd(const Rng& rng, T start = numeric_traits<T>::additive_identity())
 /// \module Arithmetic
 /// \notes [jules::numeric_traits<T>]() must implement `additive_identity`.
 /// \notes It might promote the result type since it calls sqrt.
-template <typename Iter, typename Sent, typename T = ranges::iter_value_t<Iter>,
-          typename = meta::requires_concept<ranges::sentinel_for<Sent, Iter>>>
+template <ranges::input_iterator Iter, ranges::sentinel_for<Iter> Sent, common_numeric T = ranges::iter_value_t<Iter>>
 auto meansd(Iter first, Sent last, T start = numeric_traits<T>::additive_identity())
 {
   const auto n = ranges::distance(first, last);
@@ -318,41 +310,10 @@ auto meansd(Iter first, Sent last, T start = numeric_traits<T>::additive_identit
 }
 
 /// \group MeanSd
-template <typename Rng, typename T = ranges::range_value_t<Rng>, typename = meta::requires_concept<ranges::range<Rng>>>
+template <ranges::range Rng, common_numeric T = ranges::range_value_t<Rng>>
 auto meansd(const Rng& rng, T start = numeric_traits<T>::additive_identity())
 {
   return ::jules::meansd(ranges::begin(rng), ranges::end(rng), std::move(start));
-}
-
-/// \group Nth
-///
-/// Returns the nth lesser of the elements either in a `range` or in the sequence [`first`, `last`).
-///
-/// \module Arithmetic
-/// \notes Memory complexity is O(size(rng)) or O(distance(first, last)).
-template <typename Iter, typename Sent, typename Compare = std::less<>, typename T = ranges::iter_value_t<Iter>,
-          typename = meta::requires_concept<ranges::sentinel_for<Sent, Iter>>>
-auto nth(Iter first, Sent last, index_t n, Compare cmp = {})
-{
-  auto values = std::vector<T>{};
-  values.reserve(ranges::distance(first, last));
-  ranges::copy(first, last, ranges::back_inserter(values));
-
-  std::nth_element(values.begin(), values.begin() + n, values.end(), cmp);
-  return T{std::move(values[n])};
-}
-
-/// \group Nth
-template <typename Rng, typename Compare = std::less<>, typename T = ranges::range_value_t<Rng>,
-          typename = meta::requires_concept<ranges::range<Rng>>>
-auto nth(const Rng& rng, index_t n, Compare cmp = {})
-{
-  auto values = std::vector<T>{};
-  values.reserve(ranges::size(rng));
-  ranges::copy(rng, ranges::back_inserter(values));
-
-  std::nth_element(values.begin(), values.begin() + n, values.end(), cmp);
-  return T{std::move(values[n])};
 }
 
 /// \group Count
@@ -360,7 +321,7 @@ auto nth(const Rng& rng, index_t n, Compare cmp = {})
 /// Returns the number of true elements in a `range` or in the sequence [`first`, `last`).
 ///
 /// \module Logical
-template <typename Iter, typename Sent, typename = meta::requires_concept<ranges::sentinel_for<Sent, Iter>>>
+template <ranges::input_iterator Iter, ranges::sentinel_for<Iter> Sent, convertible_to<bool> T = ranges::iter_value_t<Iter>>
 auto count(Iter first, Sent last)
 {
   auto n = index_t{0u};
@@ -371,7 +332,7 @@ auto count(Iter first, Sent last)
 }
 
 /// \group Count
-template <typename Rng, typename = meta::requires_concept<ranges::range<Rng>>> auto count(const Rng& rng)
+template <ranges::range Rng, convertible_to<bool> T = ranges::range_value_t<Rng>> auto count(const Rng& rng)
 {
   return ::jules::count(ranges::begin(rng), ranges::end(rng));
 }
@@ -381,14 +342,14 @@ template <typename Rng, typename = meta::requires_concept<ranges::range<Rng>>> a
 /// Returns the frequency of true elements in a `range` or in the sequence [`first`, `last`).
 ///
 /// \module Logical
-template <typename Iter, typename Sent, typename = meta::requires_concept<ranges::sentinel_for<Sent, Iter>>>
+template <ranges::input_iterator Iter, ranges::sentinel_for<Iter> Sent, convertible_to<bool> T = ranges::iter_value_t<Iter>>
 auto freq(Iter first, Sent last)
 {
   return static_cast<numeric>(::jules::count(first, last)) / ranges::distance(first, last);
 }
 
 /// \group Freq
-template <typename Rng, typename = meta::requires_concept<ranges::range<Rng>>> auto freq(const Rng& rng)
+template <ranges::range Rng, convertible_to<bool> T = ranges::range_value_t<Rng>> auto freq(const Rng& rng)
 {
   return static_cast<numeric>(::jules::count(rng)) / ranges::size(rng);
 }
@@ -398,7 +359,7 @@ template <typename Rng, typename = meta::requires_concept<ranges::range<Rng>>> a
 /// Returns a const_vector with the indexes of the true elements in a `range` or in the sequence [`first`, `last`).
 ///
 /// \module Logical
-template <typename Iter, typename Sent, typename = meta::requires_concept<ranges::sentinel_for<Sent, Iter>>>
+template <ranges::input_iterator Iter, ranges::sentinel_for<Iter> Sent, convertible_to<bool> T = ranges::iter_value_t<Iter>>
 auto which(Iter first, Sent last) -> const_vector<index_t>
 {
   auto indexes = std::vector<index_t>();
@@ -410,7 +371,7 @@ auto which(Iter first, Sent last) -> const_vector<index_t>
 }
 
 /// \group Which
-template <typename Rng, typename = meta::requires_concept<ranges::range<Rng>>> auto which(const Rng& rng)
+template <ranges::range Rng, convertible_to<bool> T = ranges::range_value_t<Rng>> auto which(const Rng& rng)
 {
   return ::jules::which(ranges::begin(rng), ranges::end(rng));
 }
@@ -421,7 +382,7 @@ template <typename Rng, typename = meta::requires_concept<ranges::range<Rng>>> a
 ///
 /// \module Logical
 /// \notes If empty, returns true.
-template <typename Iter, typename Sent, typename = meta::requires_concept<ranges::sentinel_for<Sent, Iter>>>
+template <ranges::input_iterator Iter, ranges::sentinel_for<Iter> Sent, convertible_to<bool> T = ranges::iter_value_t<Iter>>
 auto all(Iter first, Sent last)
 {
   for (; first != last; ++first)
@@ -431,7 +392,7 @@ auto all(Iter first, Sent last)
 }
 
 /// \group All
-template <typename Rng, typename = meta::requires_concept<ranges::range<Rng>>> auto all(const Rng& rng)
+template <ranges::range Rng, convertible_to<bool> T = ranges::range_value_t<Rng>> auto all(const Rng& rng)
 {
   return all(ranges::begin(rng), ranges::end(rng));
 }
@@ -442,7 +403,7 @@ template <typename Rng, typename = meta::requires_concept<ranges::range<Rng>>> a
 ///
 /// \module Logical
 /// \notes If empty, returns true.
-template <typename Iter, typename Sent, typename = meta::requires_concept<ranges::sentinel_for<Sent, Iter>>>
+template <ranges::input_iterator Iter, ranges::sentinel_for<Iter> Sent, convertible_to<bool> T = ranges::iter_value_t<Iter>>
 auto none(Iter first, Sent last)
 {
   for (; first != last; ++first)
@@ -452,7 +413,7 @@ auto none(Iter first, Sent last)
 }
 
 /// \group None
-template <typename Rng, typename = meta::requires_concept<ranges::range<Rng>>> auto none(const Rng& rng)
+template <ranges::range Rng, convertible_to<bool> T = ranges::range_value_t<Rng>> auto none(const Rng& rng)
 {
   return none(ranges::begin(rng), ranges::end(rng));
 }
@@ -463,7 +424,7 @@ template <typename Rng, typename = meta::requires_concept<ranges::range<Rng>>> a
 ///
 /// \module Logical
 /// \notes If empty, returns false.
-template <typename Iter, typename Sent, typename = meta::requires_concept<ranges::sentinel_for<Sent, Iter>>>
+template <ranges::input_iterator Iter, ranges::sentinel_for<Iter> Sent, convertible_to<bool> T = ranges::iter_value_t<Iter>>
 auto any(Iter first, Sent last)
 {
   for (; first != last; ++first)
@@ -473,7 +434,7 @@ auto any(Iter first, Sent last)
 }
 
 /// \group Any
-template <typename Rng, typename = meta::requires_concept<ranges::range<Rng>>> auto any(const Rng& rng)
+template <ranges::range Rng, convertible_to<bool> T = ranges::range_value_t<Rng>> auto any(const Rng& rng)
 {
   return any(ranges::begin(rng), ranges::end(rng));
 }

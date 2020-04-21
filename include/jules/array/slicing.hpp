@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2019 Filipe Verri <filipeverri@gmail.com>
+// Copyright (c) 2017-2020 Filipe Verri <filipeverri@gmail.com>
 
 #ifndef JULES_ARRAY_SLICING_H
 #define JULES_ARRAY_SLICING_H
@@ -28,13 +28,9 @@ constexpr auto slicing_size(index_t) noexcept -> index_t { return 1u; }
 
 constexpr auto slicing_size(const absolute_strided_slice& slice) noexcept -> index_t { return slice.extent; }
 
-template <typename Rng, typename = meta::requires_concept<ranges::sized_range<Rng>>> auto slicing_size(const Rng& rng) -> index_t
-{
-  return ranges::size(rng);
-}
+template <ranges::range Rng> auto slicing_size(const Rng& rng) -> index_t { return ranges::size(rng); }
 
-template <typename... Args, typename = meta::requires_<std::bool_constant<(sizeof...(Args) >= 2u)>>>
-auto slicing_size(Args&&... args) -> index_t
+template <typename... Args> requires(sizeof...(Args) >= 2u) auto slicing_size(Args&&... args) -> index_t
 {
   return (1u * ... * slicing_size(args));
 }
@@ -107,8 +103,7 @@ template <std::size_t D, std::size_t N, typename... Args>
 auto do_slice(std::array<index_t, N>&, std::vector<index_t>&, const strided_descriptor<N>&, std::array<index_t, D>,
               const absolute_strided_slice&, Args&&...) -> void;
 
-template <std::size_t D, std::size_t N, typename Rng, typename... Args, typename T = ranges::range_value_t<Rng>,
-          typename = meta::requires_concept<ranges::sized_range<Rng>>>
+template <std::size_t D, std::size_t N, ranges::range Rng, typename... Args, typename T = ranges::range_value_t<Rng>>
 auto do_slice(std::array<index_t, N>& extents, std::vector<index_t>& indexes, const strided_descriptor<N>& descriptor,
               std::array<index_t, D> ix, const Rng& rng, Args&&... args) -> void
 {
@@ -260,7 +255,7 @@ template <typename U, std::size_t M> decltype(auto) array_at(U* data, const desc
     return ref_array_every_proxy<U, M, 1u>{data, desc};
 }
 
-template <typename U, std::size_t M, typename Rng, typename = meta::requires_concept<ranges::sized_range<Rng>>>
+template <typename U, std::size_t M, ranges::range Rng>
 decltype(auto) array_at(U* data, const descriptor<M>& desc, const Rng& rng)
 {
   if constexpr (M == 1 && std::is_constructible_v<index_view, const Rng&>) {
@@ -280,7 +275,7 @@ template <typename U, std::size_t M> decltype(auto) array_at(U* data, const desc
                  "out of range");
     return ref_array<U, 1u>{data + slice.start, {{{slice.extent}}}};
   } else {
-    return array_at(data, identity_mapper<M>{{0u, desc.extents}}, std::move(slice));
+    return array_at(data, identity_mapper<M>{{0u, desc.extents}}, slice);
   }
 }
 
@@ -321,11 +316,7 @@ public:
     return at(eval(slice, mapper_.descriptor().extents[sizeof...(Indexes)]));
   }
 
-  template <typename Rng, typename = meta::requires_concept<ranges::sized_range<Rng>>>
-  decltype(auto) operator[](const Rng& rng) &&
-  {
-    return at(rng);
-  }
+  template <ranges::range Rng> decltype(auto) operator[](const Rng& rng) && { return at(rng); }
 
 private:
   template <typename Index> decltype(auto) at(Index&& index)
@@ -403,11 +394,7 @@ public:
 
   decltype(auto) operator[](bounded_strided_slice slice) && { return at(eval(slice, descriptor_.extents[M])); }
 
-  template <typename Rng, typename = meta::requires_concept<ranges::sized_range<Rng>>>
-  decltype(auto) operator[](const Rng& rng) &&
-  {
-    return at(rng);
-  }
+  template <ranges::range Rng> decltype(auto) operator[](const Rng& rng) && { return at(rng); }
 
 private:
   template <typename Index> decltype(auto) at(Index&& index)

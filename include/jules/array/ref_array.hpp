@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2019 Filipe Verri <filipeverri@gmail.com>
+// Copyright (c) 2017-2020 Filipe Verri <filipeverri@gmail.com>
 
 #ifndef JULES_ARRAY_REF_ARRAY_H
 /// \exclude
@@ -21,7 +21,7 @@ namespace jules
 ///
 /// \module Array Types
 /// \notes This class is not meant to be used in user code.
-template <typename T, std::size_t N> class ref_array : public common_array_base<ref_array<T, N>>
+template <typename T, std::size_t N> class ref_array
 {
   static_assert(N > 0u, "invalid array dimension");
 
@@ -67,14 +67,14 @@ public:
   ~ref_array() = default;
 
   /// \group Assignment
-  template <typename Array> auto operator=(const common_array_base<Array>& source) -> ref_array&
+  auto operator=(const common_array auto& source) -> ref_array&
   {
     detail::array_assign(*this, source);
     return *this;
   }
 
   /// \group Assignment
-  template <typename U, typename = meta::fallback<CommonArray<U>>> auto operator=(const U& source) -> ref_array&
+  template <typename U> requires(!common_array<U>) auto operator=(const U& source) -> ref_array&
   {
     static_assert(std::is_assignable<value_type&, U>::value, "incompatible assignment");
     for (auto& elem : *this)
@@ -85,7 +85,8 @@ public:
   /// \group Assignment
   auto operator=(const ref_array& source) -> ref_array&
   {
-    detail::array_assign(*this, source);
+    if (this != &source)
+      detail::array_assign(*this, source);
     return *this;
   }
 
@@ -148,14 +149,10 @@ public:
   }
 
   /// \group Indexing
-  template <typename Rng, typename = meta::requires_concept<ranges::sized_range<Rng>>> decltype(auto) operator[](const Rng& rng)
-  {
-    return detail::array_at(data(), descriptor_, rng);
-  }
+  template <ranges::range Rng> decltype(auto) operator[](const Rng& rng) { return detail::array_at(data(), descriptor_, rng); }
 
   /// \group Indexing
-  template <typename Rng, typename = meta::requires_concept<ranges::sized_range<Rng>>>
-  decltype(auto) operator[](const Rng& rng) const
+  template <ranges::range Rng> decltype(auto) operator[](const Rng& rng) const
   {
     return detail::array_at(data(), descriptor_, rng);
   }

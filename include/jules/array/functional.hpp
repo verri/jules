@@ -1,4 +1,4 @@
-// Copyright (c) 2017 Filipe Verri <filipeverri@gmail.com>
+// Copyright (c) 2017-2020 Filipe Verri <filipeverri@gmail.com>
 
 #ifndef JULES_ARRAY_FUNCTIONAL_H
 #define JULES_ARRAY_FUNCTIONAL_H
@@ -43,7 +43,7 @@ template <typename T, typename Op> struct right_operation
   }
 };
 
-template <typename Array, typename Op> static auto apply(const common_array_base<Array>& operand, Op op)
+template <typename Op> static auto apply(const common_array auto& operand, Op op)
 {
   return unary_expr_array(operand.begin(), operand.end(), std::move(op), operand.dimensions());
 }
@@ -54,8 +54,7 @@ template <typename T, std::size_t N, typename Op> static auto apply(in_place_t, 
   return operand;
 }
 
-template <typename RefArray, typename Op, typename = meta::requires_<ReferenceArray<RefArray>>>
-static auto apply(in_place_t, RefArray operand, Op op)
+template <typename Op> static auto apply(in_place_t, reference_array auto operand, Op op)
 {
   for (auto& value : operand)
     op(value);
@@ -63,22 +62,22 @@ static auto apply(in_place_t, RefArray operand, Op op)
 }
 
 template <typename ArrayA, typename ArrayB, typename Op>
-static auto apply(const common_array_base<ArrayA>& lhs, const common_array_base<ArrayB>& rhs, Op op)
+requires common_array<ArrayA>&& common_array<ArrayB> static auto apply(const ArrayA& lhs, const ArrayB& rhs, Op op)
 {
   static_assert(ArrayA::order == ArrayB::order);
   DEBUG_ASSERT(lhs.dimensions() == rhs.dimensions(), debug::default_module, debug::level::extents_check, "extents mismatch");
   return binary_expr_array(lhs.begin(), lhs.end(), rhs.begin(), rhs.end(), std::move(op), lhs.dimensions());
 }
 
-template <typename T, std::size_t N, typename ArrayB, typename Op>
-static auto apply(in_place_t, array<T, N>& lhs, const common_array_base<ArrayB>& rhs, Op op) -> array<T, N>&
+template <typename T, std::size_t N, typename Op>
+static auto apply(in_place_t, array<T, N>& lhs, const common_array auto& rhs, Op op) -> array<T, N>&
 {
   apply(in_place, ref(lhs), rhs, std::move(op));
   return lhs;
 }
 
-template <typename RefArrayA, typename ArrayB, typename Op, typename = meta::requires_<ReferenceArray<RefArrayA>>>
-static auto apply(in_place_t, RefArrayA lhs, const common_array_base<ArrayB>& rhs, Op op)
+template <reference_array RefArrayA, common_array ArrayB, typename Op>
+static auto apply(in_place_t, RefArrayA lhs, const ArrayB& rhs, Op op)
 {
   static_assert(RefArrayA::order == ArrayB::order);
   DEBUG_ASSERT(lhs.dimensions() == rhs.dimensions(), debug::default_module, debug::level::extents_check, "extents mismatch");
@@ -131,57 +130,55 @@ static auto apply(in_place_t, RefArrayA lhs, const common_array_base<ArrayB>& rh
 #define BINARY_OPERATION(OP__, FUNCTOR__)                                                                                        \
   template <typename ArrayA, typename ArrayB,                                                                                    \
             typename R = std::result_of_t<FUNCTOR__(const typename ArrayA::value_type&, const typename ArrayB::value_type&)>>    \
-  auto operator OP__(const common_array_base<ArrayA>& lhs, const common_array_base<ArrayB>& rhs)                                 \
+  requires common_array<ArrayA>&& common_array<ArrayB> auto operator OP__(const ArrayA& lhs, const ArrayB& rhs)                  \
   {                                                                                                                              \
     return apply(lhs, rhs, FUNCTOR__{});                                                                                         \
   }
 
 #define BINARY_INPLACE_REF_OPERATION(OP__)                                                                                       \
-  template <typename RefArrayA, typename ArrayB, typename = meta::requires_<ReferenceArray<RefArrayA>>,                          \
+  template <reference_array RefArrayA, common_array ArrayB,                                                                      \
             typename = decltype(std::declval<typename RefArrayA::value_type&>() OP__## =                                         \
                                   std::declval<const typename ArrayB::value_type&>())>                                           \
-  auto operator OP__##=(RefArrayA lhs, const common_array_base<ArrayB>& rhs)                                                     \
+  auto operator OP__##=(RefArrayA lhs, const ArrayB& rhs)                                                                        \
   {                                                                                                                              \
     return apply(in_place, lhs, rhs, [](auto& x, const auto& y) { x OP__## = y; });                                              \
   }
 
 #define BINARY_INPLACE_OPERATION(OP__)                                                                                           \
-  template <typename T, std::size_t N, typename ArrayB,                                                                          \
+  template <typename T, std::size_t N, common_array ArrayB,                                                                      \
             typename = decltype(std::declval<T&>() OP__## = std::declval<const typename ArrayB::value_type&>())>                 \
-  auto operator OP__##=(array<T, N>& lhs, const common_array_base<ArrayB>& rhs)->array<T, N>&                                    \
+  auto operator OP__##=(array<T, N>& lhs, const ArrayB& rhs)->array<T, N>&                                                       \
   {                                                                                                                              \
     return apply(in_place, lhs, rhs, [](auto& x, const auto& y) { x OP__## = y; });                                              \
   }
 
 #define BINARY_RIGHT_TYPE_OPERATION(OP__, FUNCTOR__)                                                                             \
-  template <typename Array, typename T, typename = meta::fallback<CommonArray<T>>,                                               \
+  template <common_array Array, typename T,                                                                                      \
             typename R = std::result_of_t<FUNCTOR__(const typename Array::value_type&, const T&)>>                               \
-  auto operator OP__(const common_array_base<Array>& lhs, T rhs)                                                                 \
+  requires(!common_array<T>) auto operator OP__(const Array& lhs, T rhs)                                                         \
   {                                                                                                                              \
     return apply(lhs, right_operation<T, FUNCTOR__>{std::move(rhs), {}});                                                        \
   }
 
 #define BINARY_LEFT_TYPE_OPERATION(OP__, FUNCTOR__)                                                                              \
-  template <typename T, typename Array, typename = meta::fallback<CommonArray<T>>,                                               \
+  template <typename T, common_array Array,                                                                                      \
             typename R = std::result_of_t<FUNCTOR__(const T&, const typename Array::value_type&)>>                               \
-  auto operator OP__(T lhs, const common_array_base<Array>& rhs)                                                                 \
+  requires(!common_array<T>) auto operator OP__(T lhs, const Array& rhs)                                                         \
   {                                                                                                                              \
     return apply(rhs, left_operation<T, FUNCTOR__>{std::move(lhs), {}});                                                         \
   }
 
 #define BINARY_INPLACE_REF_TYPE_OPERATION(OP__)                                                                                  \
-  template <typename RefArray, typename T, typename = meta::fallback<CommonArray<T>>,                                            \
-            typename = meta::requires_<ReferenceArray<RefArray>>,                                                                \
+  template <reference_array RefArray, typename T,                                                                                \
             typename = decltype(std::declval<typename RefArray::value_type&>() OP__## = std::declval<const T&>())>               \
-  auto operator OP__##=(RefArray lhs, const T& rhs)                                                                              \
+  requires(!common_array<T>) auto operator OP__##=(RefArray lhs, const T& rhs)                                                   \
   {                                                                                                                              \
     return apply(in_place, lhs, [&rhs](auto& x) { x OP__## = rhs; });                                                            \
   }
 
 #define BINARY_INPLACE_TYPE_OPERATION(OP__)                                                                                      \
-  template <typename T, std::size_t N, typename U, typename = meta::fallback<CommonArray<U>>,                                    \
-            typename = decltype(std::declval<T&>() OP__## = std::declval<const U&>())>                                           \
-  auto operator OP__##=(array<T, N>& lhs, const U& rhs)->array<T, N>&                                                            \
+  template <typename T, std::size_t N, typename U, typename = decltype(std::declval<T&>() OP__## = std::declval<const U&>())>    \
+  requires(!common_array<U>) auto operator OP__##=(array<T, N>& lhs, const U& rhs)->array<T, N>&                                 \
   {                                                                                                                              \
     return apply(in_place, lhs, [&rhs](auto& x) { x OP__## = rhs; });                                                            \
   }
@@ -191,7 +188,7 @@ static auto apply(in_place_t, RefArrayA lhs, const common_array_base<ArrayB>& rh
   UNARY_OPERATION(!, std::logical_not<>)
 
 #define UNARY_OPERATION(OP__, FUNCTOR__)                                                                                         \
-  template <typename Array> auto operator OP__(const common_array_base<Array>& operand) { return apply(operand, FUNCTOR__{}); }
+  template <common_array Array> auto operator OP__(const Array& operand) { return apply(operand, FUNCTOR__{}); }
 
 OPERATIONS_LIST
 

@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2019 Filipe Verri <filipeverri@gmail.com>
+// Copyright (c) 2017-2020 Filipe Verri <filipeverri@gmail.com>
 
 #ifndef JULES_BASE_RANDOM_H
 #define JULES_BASE_RANDOM_H
@@ -84,8 +84,7 @@ auto uniform_index_sample(no_replacement_t, index_t n, index_t end, G& g = rando
   return {std::move(result)};
 }
 
-template <typename Rng, typename G = decltype(random_engine), typename U = ranges::range_value_t<Rng>,
-          typename = meta::requires_concept<ranges::range<Rng>>>
+template <ranges::range Rng, typename G = decltype(random_engine), typename U = ranges::range_value_t<Rng>>
 auto discrete_index_sample(index_t n, const Rng& rng, G& g = random_engine)
 {
   static_assert(std::is_convertible<U, double>::value, "weights must be convertible to double");
@@ -93,8 +92,7 @@ auto discrete_index_sample(index_t n, const Rng& rng, G& g = random_engine)
   return sample(n, dist, g);
 }
 
-template <typename Rng, typename G = decltype(random_engine), typename U = ranges::range_value_t<Rng>,
-          typename = meta::requires_concept<ranges::range<Rng>>>
+template <ranges::range Rng, typename G = decltype(random_engine), typename U = ranges::range_value_t<Rng>>
 auto discrete_index_sample(const Rng& rng, G& g = random_engine)
 {
   static_assert(std::is_convertible<U, double>::value, "weights must be convertible to double");

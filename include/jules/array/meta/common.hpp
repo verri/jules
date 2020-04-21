@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2019 Filipe Verri <filipeverri@gmail.com>
+// Copyright (c) 2017-2020 Filipe Verri <filipeverri@gmail.com>
 
 #ifndef JULES_ARRAY_META_COMMON_H
 /// \exclude
@@ -10,74 +10,31 @@
 
 namespace jules
 {
-namespace meta::result
+
+template <std::size_t N, typename... Dims>
+concept common_dimensions = (sizeof...(Dims) == N) && (convertible_to<Dims, index_t> && ...);
+
+// clang-format off
+template <typename T> concept common_array = requires(const T& t)
 {
-template <typename T> using size = decltype(std::declval<const T&>().size());
-template <typename T> using dimensions = decltype(std::declval<const T&>().dimensions());
-template <typename T> using length = decltype(std::declval<const T&>().length());
-template <typename T> using row_count = decltype(std::declval<const T&>().row_count());
-template <typename T> using column_count = decltype(std::declval<const T&>().column_count());
-template <typename T> using eval = decltype(eval(std::declval<const T&>()));
-} // namespace meta::result
+  ranges::range<T>;
 
-template <typename T, typename = void> struct CommonArray : std::false_type
-{};
+  typename T::value_type;
+  typename T::size_type;
 
-template <typename T>
-struct CommonArray<                                                                                    //
-  T, meta::requires_<                                                                                  //
-       meta::always_true<typename T::value_type>,                                                      //
-       std::is_same<decltype(T::order), const std::size_t>,                                            //
-       std::bool_constant<(T::order > 0u)>,                                                            //
-       meta::compiles_same<T, typename T::size_type, meta::result::size>,                              //
-       meta::compiles_same<T, std::array<typename T::size_type, T::order>, meta::result::dimensions>,  //
-       meta::compiles<T, meta::result::eval>,                                                          //
-       std::conditional_t<(T::order == 1u),                                                            //
-                          meta::compiles_same<T, typename T::size_type, meta::result::length>,         //
-                          std::conjunction<                                                            //
-                            meta::compiles_same<T, typename T::size_type, meta::result::row_count>,    //
-                            meta::compiles_same<T, typename T::size_type, meta::result::column_count>> //
-                          >,                                                                           //
-       std::bool_constant<ranges::range<T>>                                                            //
-       >> : std::true_type
-{};
+  T::order > 0u;
 
-template <typename Derived> class common_array_base
-{
-public:
-  [[nodiscard]] auto size() const noexcept { return self().size(); }
+  { T::order } -> same_as<const std::size_t>;
 
-  [[nodiscard]] auto dimensions() const noexcept { return self().dimensions(); }
+  { t.length() } -> same_as<typename T::size_type>;
+  { t.row_count() } -> same_as<typename T::size_type>;
+  { t.column_count() } -> same_as<typename T::size_type>;
 
-  [[nodiscard]] auto length() const noexcept { return self().length(); }
-
-  [[nodiscard]] auto row_count() const noexcept { return self().row_count(); }
-
-  [[nodiscard]] auto column_count() const noexcept { return self().column_count(); }
-
-  [[nodiscard]] auto begin() noexcept { return self().begin(); }
-
-  [[nodiscard]] auto end() noexcept { return self().end(); }
-
-  [[nodiscard]] auto begin() const noexcept { return self().begin(); }
-
-  [[nodiscard]] auto end() const noexcept { return self().end(); }
-
-  [[nodiscard]] auto cbegin() const noexcept { return self().cbegin(); }
-
-  [[nodiscard]] auto cend() const noexcept { return self().cend(); }
-
-  operator const Derived&() const { return self(); }
-
-  operator Derived&() { return self(); }
-
-protected:
-  constexpr common_array_base() noexcept = default;
-
-private:
-  constexpr auto self() const noexcept -> const Derived& { return static_cast<const Derived&>(*this); }
-  constexpr auto self() noexcept -> Derived& { return static_cast<Derived&>(*this); }
+  { t.size() } -> same_as<typename T::size_type>;
+  { t.dimensions() } -> same_as<std::array<typename T::size_type, T::order>>;
+  { eval(t) };
 };
+// clang-format on
 
 } // namespace jules
 

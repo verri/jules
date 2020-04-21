@@ -118,6 +118,8 @@ public:
   /// Effectively the product of the extents.
   constexpr auto size() const noexcept { return prod(extents); }
 
+  constexpr auto length() const noexcept { return extents[0u]; }
+
   constexpr auto row_count() const noexcept { return extents[0u]; }
 
   constexpr auto column_count() const noexcept { return extents[1u]; }
@@ -270,6 +272,10 @@ public:
   [[nodiscard]] constexpr auto size() const noexcept { return extents[0]; }
 
   [[nodiscard]] constexpr auto length() const noexcept { return extents[0]; }
+
+  [[nodiscard]] constexpr auto row_count() const noexcept { return extents[0]; }
+
+  [[nodiscard]] constexpr auto column_count() const noexcept -> index_t { return 1; }
 
   /// \group Index
   /// Returns the memory position of the `index`.

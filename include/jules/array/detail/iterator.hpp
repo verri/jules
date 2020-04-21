@@ -66,9 +66,9 @@ public:
 
   constexpr auto operator-(const iterator_from_indexes& other) const { return std::distance(other.it_, it_); }
 
-  constexpr auto operator*() -> reference { return data_[*it_]; }
+  constexpr auto operator*() const -> reference { return data_[*it_]; }
 
-  constexpr auto operator-> () -> pointer { return data_ + *it_; }
+  constexpr auto operator->() const -> pointer { return data_ + *it_; }
 
 private:
   T* data_ = nullptr;

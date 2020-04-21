@@ -1,4 +1,4 @@
-// Copyright (c) 2019 Filipe Verri <filipeverri@gmail.com>
+// Copyright (c) 2019-2020 Filipe Verri <filipeverri@gmail.com>
 
 // Oh how I love your law!
 //    It is my meditation all the day.
@@ -50,8 +50,7 @@ public:
 
 constexpr auto is_index_set(const index_set&) -> bool { return true; }
 
-template <typename Rng, typename = meta::requires_concept<ranges::sized_range<Rng>>>
-auto set_select(const index_set& set, const Rng& ix) -> index_set
+template <ranges::range Rng> auto set_select(const index_set& set, const Rng& ix) -> index_set
 {
   static_assert(std::is_convertible_v<ranges::range_value_t<Rng>, index_t>);
 

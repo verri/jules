@@ -70,10 +70,6 @@ TEST_CASE("Base numeric utilities", "[numeric]")
     CHECK(which_max(b) == 3u);
     CHECK(which_max(c) == 3u);
 
-    CHECK(nth(a.begin(), a.end(), 1) == 2);
-    CHECK(nth(b, 1) == 2);
-    CHECK(nth(c, 1) == 2);
-
     // Limits
     CHECK(sum(std::array<unsigned, 0>{}) == 0u);
     CHECK(prod(std::array<unsigned, 0>{}) == 1u);

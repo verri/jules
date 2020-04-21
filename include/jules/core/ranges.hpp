@@ -9,9 +9,12 @@
 
 namespace jules
 {
-namespace ranges = ::ranges;
-using ::ranges::views::closed_indices;
-using ::ranges::views::indices;
+namespace ranges
+{
+using namespace ::ranges;
+}
+constexpr auto closed_indices = ::ranges::views::closed_indices;
+constexpr auto indices = ::ranges::views::indices;
 } // namespace jules
 
 #endif // JULES_CORE_RANGE_H

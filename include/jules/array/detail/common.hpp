@@ -1,4 +1,4 @@
-// Copyright (c) 2017 Filipe Verri <filipeverri@gmail.com>
+// Copyright (c) 2017-2020 Filipe Verri <filipeverri@gmail.com>
 
 // Whoever pursues righteousness and kindness will find life, righteousness, and honor.
 // Proverbs 21:21 (ESV)
@@ -19,8 +19,7 @@
 namespace jules::detail
 {
 
-template <typename Dest, typename Source>
-static auto array_assign(common_array_base<Dest>& destination, const common_array_base<Source>& source)
+template <common_array Dest, common_array Source> static auto array_assign(Dest& destination, Source& source)
 {
   static_assert(Source::order == Dest::order, "array order mismatch");
   static_assert(std::is_assignable_v<typename Dest::value_type&, const typename Source::value_type&>, "incompatible assignment");

@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2019 Filipe Verri <filipeverri@gmail.com>
+// Copyright (c) 2017-2020 Filipe Verri <filipeverri@gmail.com>
 
 #ifndef JULES_ARRAY_NUMERIC_H
 #define JULES_ARRAY_NUMERIC_H
@@ -25,8 +25,8 @@ namespace jules
 namespace detail
 {
 template <typename R, typename RefArrayA, typename RefArrayB>
-auto product_impl(const RefArrayA lhs, const RefArrayB& rhs)
-  -> meta::requires_t<array<R, 2u>, ReferenceArray<RefArrayA>, ReferenceArray<RefArrayB>>
+requires reference_array<RefArrayA>&& reference_array<RefArrayB> auto product_impl(const RefArrayA lhs, const RefArrayB& rhs)
+  -> array<R, 2u>
 {
   static_assert(RefArrayA::order == 2u && RefArrayB::order == 2u);
 
@@ -48,26 +48,21 @@ auto product_impl(const RefArrayA lhs, const RefArrayB& rhs)
 
 template <typename ArrayA, typename ArrayB,
           typename R = decltype(std::declval<typename ArrayA::value_type>() * std::declval<typename ArrayB::value_type>())>
-auto product(const common_array_base<ArrayA>& lhs, const common_array_base<ArrayB>& rhs) -> array<R, 2u>
+requires common_array<ArrayA>&& common_array<ArrayB> auto product(const ArrayA& lhs, const ArrayB& rhs) -> array<R, 2u>
 {
   return detail::product_impl<R>(eval(static_cast<const ArrayA&>(lhs)), eval(static_cast<const ArrayB&>(rhs)));
 }
 
-template <typename T, typename Array> auto to_vector(const common_array_base<Array>& source) -> array<T, 1u>
+template <typename T> auto to_vector(const common_array auto& source) -> array<T, 1u>
 {
   // TODO: Optimize if A is a temporary.
   return {source.begin(), source.end()};
 }
 
-template <typename T, typename Rng,
-          typename = meta::requires_<std::bool_constant<ranges::sized_range<Rng>>, std::negation<CommonArray<Rng>>>>
-auto to_vector(const Rng& rng)
-{
-  return array<T, 1u>(rng);
-}
+template <typename T, ranges::range Rng> requires(!common_array<Rng>) auto to_vector(const Rng& rng) { return array<T, 1u>(rng); }
 
 // If higher order, copy elements column-wise.
-template <typename Array> auto as_vector(const common_array_base<Array>& source) -> array<typename Array::value_type, 1u>
+auto as_vector(const common_array auto& source) -> array<typename decltype(source)::value_type, 1u>
 {
   // TODO: Optimize if A is a temporary.
   return {source.begin(), source.end()};
@@ -81,50 +76,45 @@ template <typename Rng, typename R = ranges::range_value_t<Rng>> auto as_vector(
 namespace detail
 {
 
-template <typename T, typename = void> struct cat_value_type
+template <typename T> struct cat_value_type
 {
-  using type = std::decay_t<T>;
+  using type = T;
 };
 
-template <typename T> struct cat_value_type<T, meta::requires_concept<ranges::sized_range<std::decay_t<T>>>>
+template <ranges::range T> struct cat_value_type<T>
 {
   using type = ranges::value_type_t<T>;
 };
 
 template <typename T> using cat_value_type_t = typename cat_value_type<T>::type;
 
-template <typename T>
-constexpr auto cat_size(const T& rng) noexcept
-  -> meta::requires_t<index_t, std::bool_constant<ranges::sized_range<std::decay_t<T>>>>
+template <typename T> constexpr auto cat_size(const T& value) noexcept -> index_t
 {
-  return ranges::size(rng);
-}
-
-template <typename T>
-constexpr auto cat_size(const T&) noexcept -> meta::fallback_t<index_t, std::bool_constant<ranges::sized_range<std::decay_t<T>>>>
-{
-  return 1u;
+  if constexpr (ranges::range<T>)
+    return ranges::size(value);
+  else
+    return 1u;
 }
 
 template <typename T> auto cat_push(array_builder<T, 1u>& builder, T value) { builder.push_back(std::move(value)); }
 
-template <typename T, typename Rng>
-auto cat_push(array_builder<T, 1u>& builder, const Rng& rng) -> meta::requires_concept<ranges::sized_range<Rng>>
+template <typename T, ranges::range Rng> auto cat_push(array_builder<T, 1u>& builder, const Rng& rng) -> void
 {
   ranges::copy(rng, ranges::back_inserter(builder));
 }
 
 template <typename T, typename U>
-auto cat_push(array_builder<T, 1u>& builder, U&& value) -> meta::fallback_concept<ranges::sized_range<std::decay_t<U>>>
+requires(!ranges::range<std::decay_t<U>>) auto cat_push(array_builder<T, 1u>& builder, U&& value) -> void
 {
   builder.push_back(std::forward<U>(value));
 }
 
 } // namespace detail
 
+// XXX: does not work for strings
 template <typename... Args> auto cat(Args&&... args)
 {
-  using R = std::common_type_t<detail::cat_value_type_t<Args>...>;
+  using R = std::common_type_t<detail::cat_value_type_t<std::decay_t<Args>>...>;
   const auto size = (index_t{} + ... + detail::cat_size(args));
 
   auto builder = array_builder<R, 1u>{{{size}}};

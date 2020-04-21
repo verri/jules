@@ -1,4 +1,4 @@
-// Copyright (c) 2016-2019 Filipe Verri <filipeverri@gmail.com>
+// Copyright (c) 2016-2020 Filipe Verri <filipeverri@gmail.com>
 
 #ifndef JULES_DATAFRAME_COLUMN_H
 #define JULES_DATAFRAME_COLUMN_H
@@ -28,18 +28,17 @@ template <typename Coercion> class base_column
   template <typename T, typename C> friend auto to_column(base_column<C>&& column) -> base_column<C>;
 
 public:
-  base_column() : model_{nullptr} {}
+  base_column() = default;
 
   template <typename T> base_column(std::initializer_list<T> values) : model_{std::make_unique<model_t<T>>(values)} {}
 
   template <typename T> base_column(const T& value, index_t size) : model_{std::make_unique<model_t<T>>(size, value)} {}
 
-  template <typename Rng, typename R = ranges::range_value_t<Rng>, typename = meta::requires_concept<ranges::range<Rng>>>
+  template <ranges::range Rng, typename R = ranges::range_value_t<Rng>>
   base_column(const Rng& rng) : model_{std::make_unique<model_t<R>>(ranges::begin(rng), ranges::end(rng))}
   {}
 
-  template <typename Iter, typename Sent, typename R = ranges::iter_value_t<Iter>,
-            typename = meta::requires_concept<ranges::sentinel_for<Sent, Iter>>>
+  template <ranges::forward_iterator Iter, ranges::sentinel_for<Iter> Sent, typename R = ranges::iter_value_t<Iter>>
   base_column(Iter first, Sent last) : model_{std::make_unique<model_t<R>>(first, last)}
   {}
 
@@ -98,7 +97,7 @@ public:
 private:
   base_column(model_type&& model) : model_{std::move(model)} {}
 
-  model_type model_;
+  model_type model_ = nullptr;
 };
 
 using column = base_column<coercion_rules>;

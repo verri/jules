@@ -66,7 +66,7 @@ TEST_CASE("Dataframe colbind", "[dataframe]")
 
   const auto df_names = df.names();
   CHECK(df_names.size() == 3u);
-  CHECK(all(df_names == jules::cat("c", "a", "b")));
+  CHECK(all(df_names == jules::vector<std::string>{"c", "a", "b"}));
 
   const auto d = column(0, 0);
   auto some_df = dataframe{{"A", {1, 2, 3, 4}}, {"a", {"h", " ", "w", "0"}}};
@@ -175,7 +175,7 @@ TEST_CASE("Reading an empty dataframe with header", "[dataframe]")
 
   CHECK(df.row_count() == 0u);
   CHECK(df.column_count() == 3u);
-  CHECK(all(df.names() == jules::cat("x", "y", "z")));
+  CHECK(all(df.names() == jules::vector<std::string>{"x", "y", "z"}));
 }
 
 TEST_CASE("Reading an empty dataframe with line-break", "[dataframe]")
@@ -216,7 +216,7 @@ TEST_CASE("Reading a dataframe", "[dataframe]")
   CHECK(df.column_count() == 3u);
 
   auto cols = df.names();
-  CHECK(all(cols == jules::cat("", "", " ")));
+  CHECK(all(cols == jules::vector<std::string>{"", "", " "}));
 }
 
 TEST_CASE("Reading matrix of integers", "[dataframe]")
@@ -340,7 +340,7 @@ TEST_CASE("Reading and writing a well-formed dataframe", "[dataframe]")
 
   const auto cols = df.names();
   CHECK(cols.size() == 3u);
-  CHECK(all(cols == jules::cat("y", "x", "z")));
+  CHECK(all(cols == jules::vector<std::string>{"y", "x", "z"}));
 
   CHECK_THROWS(df.at(-1));
   CHECK_THROWS(df.at(4));
