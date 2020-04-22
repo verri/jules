@@ -11,6 +11,8 @@ namespace jules::detail
 {
 template <typename F> struct defer_helper
 {
+  static_assert(std::is_nothrow_invocable_r_v<void, std::invoke_result_t<F>>);
+
   defer_helper(F f) : f_{std::move(f)} {}
 
   defer_helper(const defer_helper&) = delete;

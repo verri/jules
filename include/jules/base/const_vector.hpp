@@ -64,7 +64,7 @@ public:
   /// (5) from a initializer list.
   ///
   /// (6-7) from another vector.
-  const_vector()  = default;
+  const_vector() = default;
 
   /// \group constructors
   template <typename... Args, typename = std::enable_if_t<(sizeof...(Args) > 1)>>

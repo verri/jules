@@ -22,28 +22,29 @@ set(source_files
   core/debug.cpp
   core/type.cpp
   core/range.cpp
-  array/axis.cpp
-  array/functional.cpp
-  array/strided_ref_array.cpp
-  array/numeric.cpp
-  array/math.cpp
-  array/io.cpp
-  array/ref_array.cpp
-  array/builder.cpp
-  array/slicing.cpp
-  array/vector.cpp
-  array/allocator.cpp
-  array/matrix.cpp
-  array/blas.cpp
-  array/array.cpp
-  base/const_vector.cpp
-  base/random.cpp
-  base/math.cpp
-  base/numeric.cpp
-  dataframe/column.cpp
-  dataframe/column_model.cpp
-  dataframe/dataframe.cpp
-  dataframe/action.cpp
+  core/string.cpp
+  # array/axis.cpp
+  # array/functional.cpp
+  # array/strided_ref_array.cpp
+  # array/numeric.cpp
+  # array/math.cpp
+  # array/io.cpp
+  # array/ref_array.cpp
+  # array/builder.cpp
+  # array/slicing.cpp
+  # array/vector.cpp
+  # array/allocator.cpp
+  # array/matrix.cpp
+  # array/blas.cpp
+  # array/array.cpp
+  # base/const_vector.cpp
+  # base/random.cpp
+  # base/math.cpp
+  # base/numeric.cpp
+  # dataframe/column.cpp
+  # dataframe/column_model.cpp
+  # dataframe/dataframe.cpp
+  # dataframe/action.cpp
   test_suite.cpp
   version.cpp)
 

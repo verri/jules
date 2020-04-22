@@ -5,11 +5,11 @@
 #define JULES_CORE_TYPE_H
 
 #include <jules/core/concepts.hpp>
+#include <jules/core/string.hpp>
 
 #include <initializer_list>
 #include <limits>
 #include <stdexcept>
-#include <string>
 #include <type_traits>
 #include <utility>
 
@@ -26,10 +26,16 @@ constexpr auto infinity = std::numeric_limits<numeric>::infinity();
 
 /// Standard string type.
 ///
-/// It is the C++ standard [std::string]().
+/// Small-string optimized type that do not behave as a range.
 ///
 /// \module Basic Types
-using string = std::string;
+
+using string = sso_string<16>;
+
+namespace literals
+{
+constexpr auto operator""_s(const char* p, std::size_t n) -> string { return std::string_view(p, n); }
+} // namespace literals
 
 /// Standard unsigned type.
 /// \module Basic Types
@@ -64,7 +70,7 @@ struct numeric_rule : public default_rule<numeric>
 {
   using default_rule<numeric>::type;
   using default_rule<numeric>::coerce_from;
-  static auto coerce_from(const string& value) -> type { return std::stod(value); }
+  static auto coerce_from(const string& value) -> type { return std::stod(std::string(value.view())); }
 };
 
 /// Coercion rules for [string type](standardese://jules::string/).
@@ -87,14 +93,15 @@ struct index_rule
 {
   using type = index_t;
 
-  static auto coerce_from(const string& value) -> type
+  static auto coerce_from(const string& ovalue) -> type
   {
+    const auto value = ovalue.view();
     auto it = value.begin();
     while (it != value.end() && std::isspace(*it))
       ++it;
     if (it != value.end() && *it == '-')
       throw std::invalid_argument{"index cannot be initialized by a negative value"};
-    return std::stoul(value);
+    return std::stoul(std::string(value));
   }
 
   template <typename U> requires std::is_arithmetic_v<U> static auto coerce_from(const U& value) -> type
@@ -118,7 +125,7 @@ struct integer_rule : default_rule<integer>
 {
   using default_rule<integer>::type;
   using default_rule<integer>::coerce_from;
-  static auto coerce_from(const string& value) -> type { return std::stoi(value); }
+  static auto coerce_from(const string& value) -> type { return std::stoi(std::string(value.view())); }
 };
 
 /// Coercion rules for [unsigned type](standardese://jules::uinteger/).
@@ -129,7 +136,7 @@ struct uinteger_rule
 
   static auto coerce_from(const string& value) -> type
   {
-    auto result = std::stoul(value);
+    auto result = std::stoul(std::string(value.view()));
     if (result > std::numeric_limits<uinteger>::max())
       throw std::invalid_argument{"value too big to initialize an unsigned value"};
     return result;
