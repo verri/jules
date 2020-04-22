@@ -4,7 +4,7 @@
 /// \exclude
 #define JULES_ARRAY_META_COMMON_H
 
-#include <jules/core/meta.hpp>
+#include <jules/core/concepts.hpp>
 #include <jules/core/ranges.hpp>
 #include <jules/core/type.hpp>
 

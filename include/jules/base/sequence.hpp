@@ -1,6 +1,7 @@
 // Copyright (c) 2019 Filipe Verri <filipeverri@gmail.com>
 
 #ifndef JULES_BASE_SEQUENCE_H
+/// \exclude
 #define JULES_BASE_SEQUENCE_H
 
 #include <jules/base/const_vector.hpp>

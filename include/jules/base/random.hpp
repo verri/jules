@@ -1,11 +1,12 @@
 // Copyright (c) 2017-2020 Filipe Verri <filipeverri@gmail.com>
 
 #ifndef JULES_BASE_RANDOM_H
+/// \exclude
 #define JULES_BASE_RANDOM_H
 
 #include <jules/base/const_vector.hpp>
 #include <jules/base/numeric.hpp>
-#include <jules/core/meta.hpp>
+#include <jules/core/concepts.hpp>
 #include <jules/core/ranges.hpp>
 
 #include <cmath>

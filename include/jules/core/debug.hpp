@@ -1,8 +1,10 @@
-// Copyright (c) 2017 Filipe Verri <filipeverri@gmail.com>
+// Copyright (c) 2017-2020 Filipe Verri <filipeverri@gmail.com>
 
 #ifndef JULES_CORE_DEBUG_H
+/// \exclude
 #define JULES_CORE_DEBUG_H
 
+#include <array>
 #include <debug_assert.hpp>
 #include <stdexcept>
 
@@ -44,16 +46,16 @@ struct throwing_module_t : debug_assert::set_level<static_cast<unsigned>(-1)>, d
 {
   [[noreturn]] static auto handle(const debug_assert::source_location& loc, const char* expression, const char* message)
   {
-    char buffer[512];
+    std::array<char, 512> buffer;
 
     if (*expression == '\0')
-      std::snprintf(buffer, sizeof(buffer), "[jules] %s:%u: Unreachable code reached - %s.\n", loc.file_name, loc.line_number,
-                    message);
+      std::snprintf(buffer.data(), buffer.size(), "[jules] %s:%u: Unreachable code reached - %s.\n", loc.file_name,
+                    loc.line_number, message);
     else
-      std::snprintf(buffer, sizeof(buffer), "[jules] %s:%u: Assertion '%s' failed - %s.\n", loc.file_name, loc.line_number,
+      std::snprintf(buffer.data(), buffer.size(), "[jules] %s:%u: Assertion '%s' failed - %s.\n", loc.file_name, loc.line_number,
                     expression, message);
 
-    throw std::logic_error{buffer};
+    throw std::logic_error{buffer.data()};
   }
 };
 

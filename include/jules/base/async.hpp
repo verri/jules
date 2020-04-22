@@ -1,6 +1,7 @@
-// Copyright (c) 2017 Filipe Verri <filipeverri@gmail.com>
+// Copyright (c) 2017-2020 Filipe Verri <filipeverri@gmail.com>
 
 #ifndef JULES_BASE_ASYNC_H
+/// \exclude
 #define JULES_BASE_ASYNC_H
 
 #include <type_traits>
@@ -12,14 +13,15 @@ template <typename F> struct defer_helper
 {
   defer_helper(F f) : f_{std::move(f)} {}
 
-  defer_helper(const defer_helper&) = default;
-  defer_helper(defer_helper&&) noexcept = default;
+  defer_helper(const defer_helper&) = delete;
+  defer_helper(defer_helper&&) noexcept = delete;
 
-  auto operator=(const defer_helper&) -> defer_helper& = default;
-  auto operator=(defer_helper&&) noexcept -> defer_helper& = default;
+  auto operator=(const defer_helper&) -> defer_helper& = delete;
+  auto operator=(defer_helper&&) noexcept -> defer_helper& = delete;
 
-  ~defer_helper() { f_(); }
+  ~defer_helper() noexcept { f_(); }
 
+private:
   F f_;
 };
 

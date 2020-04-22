@@ -1,12 +1,12 @@
-// Copyright (c) 2017-2019 Filipe Verri <filipeverri@gmail.com>
+// Copyright (c) 2017-2020 Filipe Verri <filipeverri@gmail.com>
 
 #ifndef JULES_BASE_NUMERIC_H
+/// \exclude
 #define JULES_BASE_NUMERIC_H
 
-#include "range/v3/iterator/traits.hpp"
 #include <jules/base/const_vector.hpp>
 #include <jules/base/math.hpp>
-#include <jules/core/meta.hpp>
+#include <jules/core/concepts.hpp>
 #include <jules/core/ranges.hpp>
 
 #include <algorithm>
@@ -45,14 +45,7 @@ struct forward_arithmetic
   template <typename T> friend decltype(auto) operator*(T&& value, forward_arithmetic) { return std::forward<T>(value); }
 };
 
-struct identity_t
-{
-  template <typename T> constexpr decltype(auto) operator()(T&& x) const noexcept { return std::forward<T>(x); }
-};
-
 } // namespace detail
-
-constexpr static auto identity = detail::identity_t{};
 
 /// \group Repeat
 ///

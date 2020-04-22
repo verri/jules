@@ -3,8 +3,8 @@
 #ifndef JULES_DATAFRAME_COLUMN_H
 #define JULES_DATAFRAME_COLUMN_H
 
+#include <jules/core/concepts.hpp>
 #include <jules/core/debug.hpp>
-#include <jules/core/meta.hpp>
 #include <jules/core/ranges.hpp>
 #include <jules/core/type.hpp>
 #include <jules/dataframe/detail/column_model.hpp>

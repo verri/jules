@@ -10,8 +10,8 @@
 #include <jules/array/slicing.hpp>
 #include <jules/base/const_vector.hpp>
 #include <jules/base/sequence.hpp>
+#include <jules/core/concepts.hpp>
 #include <jules/core/debug.hpp>
-#include <jules/core/meta.hpp>
 #include <jules/core/type.hpp>
 
 #include <algorithm>

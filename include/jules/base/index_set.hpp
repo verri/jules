@@ -5,17 +5,18 @@
 // Psalm 119:97 (ESV)
 
 #ifndef JULES_BASE_INDEX_SET_H
+/// \exclude
 #define JULES_BASE_INDEX_SET_H
 
-#include "jules/core/meta.hpp"
-#include "range/v3/range/traits.hpp"
-#include <algorithm>
-#include <iterator>
 #include <jules/base/const_vector.hpp>
 #include <jules/base/sequence.hpp>
+#include <jules/core/concepts.hpp>
 #include <jules/core/debug.hpp>
 #include <jules/core/ranges.hpp>
 #include <jules/core/type.hpp>
+
+#include <algorithm>
+#include <iterator>
 #include <type_traits>
 #include <utility>
 

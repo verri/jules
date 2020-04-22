@@ -4,8 +4,8 @@
 #define JULES_DATAFRAME_DATAFRAME_H
 
 #include <jules/array/array.hpp>
+#include <jules/core/concepts.hpp>
 #include <jules/core/debug.hpp>
-#include <jules/core/meta.hpp>
 #include <jules/core/ranges.hpp>
 #include <jules/core/type.hpp>
 #include <jules/dataframe/action.hpp>

@@ -7,7 +7,7 @@
 #include <jules/array/meta/common.hpp>
 #include <jules/array/slicing/absolute.hpp>
 #include <jules/base/index_view.hpp>
-#include <jules/core/meta.hpp>
+#include <jules/core/concepts.hpp>
 #include <jules/core/ranges.hpp>
 
 namespace jules

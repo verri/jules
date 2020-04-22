@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2019 Filipe Verri <filipeverri@gmail.com>
+// Copyright (c) 2017-2020 Filipe Verri <filipeverri@gmail.com>
 
 // My soul melts away for sorrow;
 //   strengthen me according to your word!
@@ -64,7 +64,7 @@ public:
   /// (5) from a initializer list.
   ///
   /// (6-7) from another vector.
-  const_vector() : data_{std::make_shared<container_type>()} {}
+  const_vector()  = default;
 
   /// \group constructors
   template <typename... Args, typename = std::enable_if_t<(sizeof...(Args) > 1)>>
@@ -190,7 +190,7 @@ public:
 
 private:
   // TODO: In C++20, do not use container_type.
-  std::shared_ptr<container_type> data_;
+  std::shared_ptr<container_type> data_ = std::make_shared<container_type>();
 };
 } // namespace jules
 

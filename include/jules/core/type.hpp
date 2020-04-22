@@ -1,9 +1,10 @@
 // Copyright (c) 2017-2020 Filipe Verri <filipeverri@gmail.com>
 
 #ifndef JULES_CORE_TYPE_H
+/// \exclude
 #define JULES_CORE_TYPE_H
 
-#include <jules/core/meta.hpp>
+#include <jules/core/concepts.hpp>
 
 #include <initializer_list>
 #include <limits>
@@ -54,35 +55,30 @@ template <typename T> struct default_rule
 {
   using type = T;
 
-  template <typename U, typename = std::enable_if_t<std::is_convertible<const U&, type>::value>>
-  static auto coerce_from(const U& value) -> type
-  {
-    return value;
-  }
+  template <typename U> requires convertible_to<const U&, type> static auto coerce_from(const U& value) -> type { return value; }
 };
 
 /// Coercion rules for [numeric type](standardese://jules::numeric/).
 /// \module Coercion Rules
-struct numeric_rule : default_rule<numeric>
+struct numeric_rule : public default_rule<numeric>
 {
   using default_rule<numeric>::type;
   using default_rule<numeric>::coerce_from;
-  static auto coerce_from(const string& value) noexcept -> type { return std::stod(value); }
+  static auto coerce_from(const string& value) -> type { return std::stod(value); }
 };
 
 /// Coercion rules for [string type](standardese://jules::string/).
 /// \module Coercion Rules
-struct string_rule
+struct string_rule : public default_rule<string>
 {
-  using type = string;
+  using default_rule<string>::type;
+  using default_rule<string>::coerce_from;
 
-  template <to_string_convertible U> requires(!convertible_to<U, type>) static auto coerce_from(const U& value) -> type
+  template <convertible_to_string U> static auto coerce_from(const U& value) -> type
   {
-    using namespace std;
+    using std::to_string;
     return to_string(value);
   }
-
-  template <convertible_to<type> U> static auto coerce_from(const U& value) -> type { return value; }
 };
 
 /// Coercion rules for [index type](standardese://jules::index_t/).
@@ -91,23 +87,27 @@ struct index_rule
 {
   using type = index_t;
 
-  static auto coerce_from(const string& value) -> type { return std::stoul(value); }
-
-  template <integral U> static auto coerce_from(const U& value) -> type
+  static auto coerce_from(const string& value) -> type
   {
-    if constexpr (signed_integral<U>) {
+    auto it = value.begin();
+    while (it != value.end() && std::isspace(*it))
+      ++it;
+    if (it != value.end() && *it == '-')
+      throw std::invalid_argument{"index cannot be initialized by a negative value"};
+    return std::stoul(value);
+  }
+
+  template <typename U> requires std::is_arithmetic_v<U> static auto coerce_from(const U& value) -> type
+  {
+    if constexpr (signed_integral<U> || std::is_floating_point_v<U>) {
       if (value < 0)
         throw std::invalid_argument{"index cannot be initialized by a negative value"};
     }
     return value;
   }
 
-  template <convertible_to<type> U> requires(!integral<U>) static auto coerce_from(const U& value) -> type
+  template <convertible_to<type> U> requires(!std::is_arithmetic_v<U>) static auto coerce_from(const U& value) -> type
   {
-    if constexpr (std::is_floating_point_v<U>) {
-      if (value < 0)
-        throw std::invalid_argument{"index cannot be initialized by a negative value"};
-    }
     return value;
   }
 };
@@ -204,12 +204,11 @@ template <typename T, std::size_t N> using recursive_initializer_list_t = typena
 
 // In-place construction tag
 
-struct in_place_t
-{
-  constexpr explicit in_place_t() = default;
-};
+using in_place_t = std::in_place_t;
+constexpr auto in_place = std::in_place;
 
-static constexpr auto in_place = in_place_t{};
+template <typename T> using in_place_type_t = std::in_place_type_t<T>;
+template <typename T> constexpr auto in_place_type = std::in_place_type<T>;
 
 // Non-initialized construction tag
 
@@ -251,9 +250,9 @@ template <typename T> struct numeric_traits : std::numeric_limits<T>
   }
 };
 
-template <typename T> concept common_numeric = requires { typename numeric_traits<T>; };
+template <typename T> concept common_numeric = std::is_arithmetic_v<T>&& requires { typename numeric_traits<T>; };
 
-template <typename... Fs> struct overloaded : Fs...
+template <typename... Fs> struct overloaded : public Fs...
 {
   constexpr explicit overloaded(Fs... fs) noexcept : Fs(std::move(fs))... {}
   using Fs::operator()...;

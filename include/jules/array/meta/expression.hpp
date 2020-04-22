@@ -5,7 +5,7 @@
 #define JULES_ARRAY_META_EXPRESSION_H
 
 #include <jules/array/meta/common.hpp>
-#include <jules/core/meta.hpp>
+#include <jules/core/concepts.hpp>
 
 namespace jules
 {
