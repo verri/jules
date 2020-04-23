@@ -15,10 +15,10 @@ TEST_CASE("Basic random operations", "[random]")
   CHECK(canon_sample(rd) < 1);
   CHECK(canon_sample(rd) >= 0);
 
-  CHECK(bernoulli_sample(0.0) == false);
-  CHECK(bernoulli_sample(1.0) == true);
+  CHECK(sample(bernoulli_dist{0.0}) == 0);
+  CHECK(sample(bernoulli_dist{1.0}) == 1);
 
-  const auto samples = bernoulli_sample(10u, 0.5);
+  const auto samples = sample(10u, bernoulli_dist{0.5});
   CHECK(samples.size() == 10u);
 
   {

@@ -4,7 +4,7 @@
 /// \exclude
 #define JULES_BASE_MATH_H
 
-#include <jules/core/ranges.hpp>
+#include <jules/base/concepts.hpp>
 #include <jules/core/type.hpp>
 
 #include <cmath>
@@ -12,26 +12,6 @@
 
 namespace jules
 {
-
-constexpr auto identity = []<typename T>(const T& value) -> T { return value; };
-constexpr auto lhs = []<typename T>(const T& value, const T&) -> T { return value; };
-constexpr auto rhs = []<typename T>(const T&, const T& value) -> T { return value; };
-
-template <typename T> struct apply_traits
-{
-  using apply_t = void;
-};
-
-template <typename T, typename Vector> concept apply_for = requires { typename Vector::value_type; }
-&&requires(const T& apply, const Vector& vec, const typename Vector::value_type& value)
-{
-  {apply(vec, identity)};
-  {apply(vec, vec, lhs)};
-  {apply(value, vec, lhs)};
-  {apply(vec, value, lhs)};
-};
-
-template <typename T> concept common_vector = ranges::range<T>&& apply_for<typename apply_traits<T>::apply_t, T>;
 
 template <class T> constexpr auto pi = T(3.14159265358979323846264338327950288419716939937510);
 
@@ -92,48 +72,60 @@ template <typename T> auto tanh_fn(const T& value)
 }
 } // namespace detail
 
-// TODO: better names?
+constexpr auto vabs = unary_operator([]<common_numeric T>(const T& value) { return detail::abs_fn(value); });
 
-constexpr auto absv = unary_operator([]<common_numeric T>(const T& value) { return detail::abs_fn(value); });
+constexpr auto vexp = unary_operator([]<common_numeric T>(const T& value) { return detail::exp_fn(value); });
 
-constexpr auto expv = unary_operator([]<common_numeric T>(const T& value) { return detail::exp_fn(value); });
+constexpr auto vlog = unary_operator([]<common_numeric T>(const T& value) { return detail::log_fn(value); });
 
-constexpr auto logv = unary_operator([]<common_numeric T>(const T& value) { return detail::log_fn(value); });
+constexpr auto vsin = unary_operator([]<common_numeric T>(const T& value) { return detail::sin_fn(value); });
 
-constexpr auto sinv = unary_operator([]<common_numeric T>(const T& value) { return detail::sin_fn(value); });
+constexpr auto vcos = unary_operator([]<common_numeric T>(const T& value) { return detail::cos_fn(value); });
 
-constexpr auto cosv = unary_operator([]<common_numeric T>(const T& value) { return detail::cos_fn(value); });
+constexpr auto vsqrt = unary_operator([]<common_numeric T>(const T& value) { return detail::sqrt_fn(value); });
 
-constexpr auto sqrtv = unary_operator([]<common_numeric T>(const T& value) { return detail::sqrt_fn(value); });
+constexpr auto vtanh = unary_operator([]<common_numeric T>(const T& value) { return detail::tanh_fn(value); });
 
-constexpr auto tanhv = unary_operator([]<common_numeric T>(const T& value) { return detail::tanh_fn(value); });
+constexpr auto vsq = unary_operator([]<common_numeric T>(const T& value) { return value * value; });
 
-constexpr auto sqv = unary_operator([]<common_numeric T>(const T& value) { return value * value; });
-
-template <common_numeric T = numeric> struct normal_distribution
+template <common_numeric T = numeric> struct normal_dist
 {
   T mu = numeric_traits<T>::additive_identity();
   T sigma = numeric_traits<T>::multiplicative_identity();
 };
 
-template <common_numeric T = numeric> struct uniform_distribution
+template <typename T> normal_dist(T, T) -> normal_dist<T>;
+
+template <common_numeric T = numeric> struct uniform_dist
 {
   T alpha = numeric_traits<T>::additive_identity();
   T beta = numeric_traits<T>::additive_identity() + 1;
 };
 
-constexpr auto pdf = overloaded{
-  []<typename T>(normal_distribution<T> dist) {
+template <typename T> uniform_dist(T, T) -> uniform_dist<T>;
+
+template <common_numeric T = numeric> struct bernoulli_dist
+{
+  T p = 0.5;
+};
+
+template <typename T> bernoulli_dist(T) -> bernoulli_dist<T>;
+
+constexpr auto vpdf = overloaded{
+  []<typename T>(normal_dist<T> dist) {
     return unary_operator([dist](const T& x) -> T {
-      const auto sigma2 = 2 * sqv(dist.sigma);
-      return exp(-sqv(x - dist.mu) / sigma2) / sqrt(sigma2 * pi<T>);
+      const auto sigma2 = 2 * vsq(dist.sigma);
+      return exp(-vsq(x - dist.mu) / sigma2) / sqrt(sigma2 * pi<T>);
     });
   },
-  []<typename T>(uniform_distribution<T> dist) {
+  []<typename T>(uniform_dist<T> dist) {
     return unary_operator(
       [dist](const T& x) -> T { return (x > dist.alpha && x < dist.beta) ? 1 / (dist.beta - dist.alpha) : 0; });
   },
 };
+
+// TODO: constexpr auto pmax =
+// TODO: constexpr auto pmin =
 
 } // namespace jules
 

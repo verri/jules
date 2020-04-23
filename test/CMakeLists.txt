@@ -37,10 +37,9 @@ set(source_files
   # array/matrix.cpp
   # array/blas.cpp
   # array/array.cpp
-  # base/const_vector.cpp
-  # base/random.cpp
-  # base/math.cpp
-  # base/numeric.cpp
+  base/random.cpp
+  base/math.cpp
+  base/numeric.cpp
   # dataframe/column.cpp
   # dataframe/column_model.cpp
   # dataframe/dataframe.cpp

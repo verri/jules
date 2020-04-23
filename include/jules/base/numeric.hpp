@@ -4,7 +4,6 @@
 /// \exclude
 #define JULES_BASE_NUMERIC_H
 
-#include <jules/base/const_vector.hpp>
 #include <jules/base/math.hpp>
 #include <jules/core/concepts.hpp>
 #include <jules/core/ranges.hpp>
@@ -249,7 +248,7 @@ auto var(Iter first, Sent last, T start = numeric_traits<T>::additive_identity()
   const auto mu = ::jules::mean(first, last, start);
   auto result = std::move(start);
   for (auto it = first; it != last; ++it)
-    result += square(*it - mu);
+    result += vsq(*it - mu);
   return result / (N - 1);
 }
 
@@ -297,7 +296,7 @@ auto meansd(Iter first, Sent last, T start = numeric_traits<T>::additive_identit
   auto result = std::move(start);
 
   for (auto it = first; it != last; ++it)
-    result += square(*it - mu);
+    result += vsq(*it - mu);
 
   return std::tuple(mu, sqrt(result / (n - 1)));
 }
@@ -352,21 +351,22 @@ template <ranges::range Rng, convertible_to<bool> T = ranges::range_value_t<Rng>
 /// Returns a const_vector with the indexes of the true elements in a `range` or in the sequence [`first`, `last`).
 ///
 /// \module Logical
-template <ranges::input_iterator Iter, ranges::sentinel_for<Iter> Sent, convertible_to<bool> T = ranges::iter_value_t<Iter>>
-auto which(Iter first, Sent last) -> const_vector<index_t>
+template <ranges::input_iterator Iter, ranges::sentinel_for<Iter> Sent, convertible_to<bool> T = ranges::iter_value_t<Iter>,
+          container_for<index_t> C = container<index_t>>
+auto which(Iter first, Sent last, C indexes = container<index_t>{}) -> C
 {
-  auto indexes = std::vector<index_t>();
   auto it = first;
   for (auto index = index_t{0u}; it != last; ++index)
     if (*it++)
       indexes.push_back(index);
-  return {std::move(indexes)};
+  return indexes;
 }
 
 /// \group Which
-template <ranges::range Rng, convertible_to<bool> T = ranges::range_value_t<Rng>> auto which(const Rng& rng)
+template <ranges::range Rng, convertible_to<bool> T = ranges::range_value_t<Rng>, container_for<index_t> C = container<index_t>>
+auto which(const Rng& rng, C indexes = container<index_t>{}) -> C
 {
-  return ::jules::which(ranges::begin(rng), ranges::end(rng));
+  return ::jules::which(ranges::begin(rng), ranges::end(rng), std::move(indexes));
 }
 
 /// \group All

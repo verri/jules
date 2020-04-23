@@ -12,6 +12,7 @@
 #include <stdexcept>
 #include <type_traits>
 #include <utility>
+#include <vector>
 
 namespace jules
 {
@@ -26,7 +27,7 @@ constexpr auto infinity = std::numeric_limits<numeric>::infinity();
 
 /// Standard string type.
 ///
-/// Small-string optimized type that do not behave as a range.
+/// Small-string optimized tyeiG6dec6pe that do not behave as a range.
 ///
 /// \module Basic Types
 
@@ -56,6 +57,8 @@ using integer = int;
 /// Standard distance type.
 /// \module Basic Types
 using distance_t = std::ptrdiff_t;
+
+template <typename T> using container = std::vector<T>;
 
 template <typename T> struct default_rule
 {
