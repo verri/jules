@@ -6,7 +6,7 @@
 
 #include <jules/array/meta/common.hpp>
 #include <jules/array/slicing/absolute.hpp>
-#include <jules/base/index_view.hpp>
+#include <jules/base/index_span.hpp>
 #include <jules/core/concepts.hpp>
 #include <jules/core/ranges.hpp>
 
@@ -20,16 +20,17 @@ template <typename T> concept exposes_data = requires(T t)
 };
 
 template <typename T>
-concept reference_array = requires(T t, index_t i, absolute_slice ai, absolute_strided_slice asi, index_view iv)
+concept reference_array = requires(T t, index_t i, absolute_slice ai, absolute_strided_slice asi, index_span ix)
 {
   ranges::forward_range<T>;
   common_array<T>;
+
   !exposes_data<T>;
 
   { t[i] };
   { t[ai] };
   { t[asi] };
-  { t[iv] };
+  { t[ix] };
 };
 // clang-format on
 

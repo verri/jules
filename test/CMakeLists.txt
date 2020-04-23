@@ -31,7 +31,7 @@ set(source_files
   # array/io.cpp
   # array/ref_array.cpp
   # array/builder.cpp
-  # array/slicing.cpp
+  array/slicing.cpp
   # array/vector.cpp
   # array/allocator.cpp
   # array/matrix.cpp

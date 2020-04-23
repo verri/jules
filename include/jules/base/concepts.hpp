@@ -15,7 +15,7 @@ constexpr auto rhs = []<typename T>(const T&, const T& value) -> T { return valu
 
 template <typename T> struct apply_traits
 {
-  using apply_t = void;
+  using apply_type = void;
 };
 
 // clang-format off
@@ -28,7 +28,7 @@ template <typename T, typename Vector> concept apply_for =
     { apply(vec, value, lhs) };
   };
 
-template <typename T> concept common_vector = ranges::range<T> && apply_for<typename apply_traits<T>::apply_t, T>;
+template <typename T> concept common_vector = ranges::range<T> && apply_for<typename apply_traits<T>::apply_type, T>;
 // clang-format on
 
 } // namespace jules

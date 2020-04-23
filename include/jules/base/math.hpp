@@ -19,7 +19,7 @@ template <typename Op> constexpr auto unary_operator(Op op) noexcept
 {
   return [op]<typename T>(T&& value) {
     if constexpr (common_vector<std::decay_t<T>>) {
-      constexpr typename apply_traits<std::decay_t<T>>::apply_t apply{};
+      constexpr typename apply_traits<std::decay_t<T>>::apply_type apply{};
       return apply(std::forward<T>(value), op);
     } else {
       return op(std::as_const(value));
