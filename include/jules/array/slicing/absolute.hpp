@@ -57,7 +57,7 @@ constexpr auto slice(index_t start, index_t extent, index_t stride) noexcept -> 
 template <> struct slice_traits<absolute_slice>
 {
   using absolute_type = absolute_slice;
-  struct eval_type
+  struct absolutize_type
   {
     constexpr auto operator()(absolute_slice slice, index_t) const noexcept -> absolute_type { return slice; }
   };
@@ -66,7 +66,7 @@ template <> struct slice_traits<absolute_slice>
 template <> struct slice_traits<absolute_strided_slice>
 {
   using absolute_type = absolute_strided_slice;
-  struct eval_type
+  struct absolutize_type
   {
     constexpr auto operator()(absolute_strided_slice slice, index_t) const noexcept -> absolute_type { return slice; }
   };

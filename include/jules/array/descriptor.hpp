@@ -36,20 +36,9 @@ public:
   constexpr auto operator=(const descriptor& source) noexcept -> descriptor& = default;
   constexpr auto operator=(descriptor&& source) noexcept -> descriptor& = default;
 
-  /// Effectively the product of the extents.
   constexpr auto size() const noexcept { return prod(extents); }
 
-  [[nodiscard]] constexpr auto length() const noexcept -> index_t { return extents[0]; }
-
-  [[nodiscard]] constexpr auto row_count() const noexcept -> index_t { return extents[0]; }
-
-  [[nodiscard]] constexpr auto column_count() const noexcept -> index_t
-  {
-    if constexpr (N > 1u)
-      return extents[1];
-    else
-      return 1u;
-  }
+  constexpr auto dimensions() const noexcept { return extents; }
 
   /// \group Index
   /// Returns the memory position of the index.
@@ -77,9 +66,14 @@ public:
     return index;
   }
 
-  constexpr auto discard_dimension() const noexcept -> descriptor<N - 1>
+  constexpr auto discard_head_dimension() const noexcept -> descriptor<N - 1>
   {
-    return discard_dimension_impl(std::make_index_sequence<N - 1>{});
+    return discard_head_dimension_impl(std::make_index_sequence<N - 1>{});
+  }
+
+  constexpr auto discard_tail_dimension() const noexcept -> descriptor<N - 1>
+  {
+    return discard_tail_dimension_impl(std::make_index_sequence<N - 1>{});
   }
 
   template <std::size_t D> constexpr auto drop_one_level_dimensions() const -> descriptor<D>
@@ -87,13 +81,20 @@ public:
     return {detail::template drop_one_level_extents<D>(extents)};
   }
 
-  std::array<index_t, N> extents = repeat<N, index_t>(0u); //< Size in each dimension.
-
 private:
-  template <std::size_t... I> constexpr auto discard_dimension_impl(std::index_sequence<I...>) const noexcept -> descriptor<N - 1>
+  template <std::size_t... I>
+  constexpr auto discard_head_dimension_impl(std::index_sequence<I...>) const noexcept -> descriptor<N - 1>
   {
     return {{{extents[I + 1]...}}};
   }
+
+  template <std::size_t... I>
+  constexpr auto discard_tail_dimension_impl(std::index_sequence<I...>) const noexcept -> descriptor<N - 1>
+  {
+    return {{{extents[I]...}}};
+  }
+
+  std::array<index_t, N> extents = repeat<N, index_t>(0u); //< Size in each dimension.
 };
 
 } // namespace jules

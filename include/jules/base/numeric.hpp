@@ -12,6 +12,7 @@
 #include <array>
 #include <cmath>
 #include <functional>
+#include <tuple>
 #include <type_traits>
 #include <utility>
 #include <vector>
@@ -442,9 +443,29 @@ template <typename... Args> constexpr decltype(auto) sum_args(Args&&... args)
   return (std::forward<Args>(args) + ... + detail::forward_arithmetic{});
 }
 
+template <typename... Args> constexpr decltype(auto) count_args(Args&&... args)
+{
+  return sum_args((std::forward<Args>(args) ? 1 : 0)...);
+}
+
 template <typename... Args> constexpr decltype(auto) all_args(Args&&... args) { return (std::forward<Args>(args) && ...); }
 
 template <typename... Args> constexpr decltype(auto) any_args(Args&&... args) { return (std::forward<Args>(args) || ...); }
+
+template <typename Arg, typename... Args> constexpr decltype(auto) first_arg(Arg&& arg, Args&&...)
+{
+  return std::forward<Arg>(arg);
+}
+
+template <typename Arg> constexpr decltype(auto) last_arg(Arg&& arg) { return std::forward<Arg>(arg); }
+
+template <typename Arg, typename... Args> requires(sizeof...(Args) > 0) constexpr decltype(auto) last_arg(Arg&&, Args&&... args)
+{
+  return last_arg(std::forward<Args>(args)...);
+}
+
+template <typename Head, typename...> using first_element = Head;
+template <typename... Ts> using last_element = std::tuple_element_t<sizeof...(Ts) - 1, std::tuple<Ts...>>;
 
 } // namespace jules
 

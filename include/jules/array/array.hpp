@@ -4,22 +4,19 @@
 /// \exclude
 #define JULES_ARRAY_ARRAY_H
 
-#include <jules/array/allocator.hpp>
-#include <jules/array/axis.hpp>
-#include <jules/array/blas.hpp>
-#include <jules/array/builder.hpp>
-#include <jules/array/functional.hpp>
-#include <jules/array/io.hpp>
-#include <jules/array/math.hpp>
-#include <jules/array/numeric.hpp>
-#include <jules/array/overlap.hpp>
+// #include <jules/array/allocator.hpp>
+// #include <jules/array/axis.hpp>
+// #include <jules/array/blas.hpp>
+// #include <jules/array/builder.hpp>
+// #include <jules/array/functional.hpp>
+// #include <jules/array/io.hpp>
+// #include <jules/array/math.hpp>
+// #include <jules/array/numeric.hpp>
+// #include <jules/array/overlap.hpp>
 #include <jules/array/ref_array.hpp>
-#include <jules/array/reshape.hpp>
-#include <jules/base/async.hpp>
-#include <jules/base/numeric.hpp>
-
-#include <type_traits>
-#include <utility>
+// #include <jules/array/reshape.hpp>
+// #include <jules/base/async.hpp>
+// #include <jules/base/numeric.hpp>
 
 namespace jules
 {

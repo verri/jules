@@ -4,12 +4,14 @@
 /// \exclude
 #define JULES_ARRAY_REF_ARRAY_H
 
+#include "range/v3/range/traits.hpp"
 #include <jules/array/descriptor.hpp>
-#include <jules/array/detail/common.hpp>
-#include <jules/array/drop.hpp>
+#include <jules/array/slicing.hpp>
+// #include <jules/array/detail/common.hpp>
+// #include <jules/array/drop.hpp>
 #include <jules/array/meta/common.hpp>
-#include <jules/array/reshape.hpp>
-#include <jules/array/strided_ref_array.hpp>
+// #include <jules/array/reshape.hpp>
+// #include <jules/array/strided_ref_array.hpp>
 #include <jules/core/type.hpp>
 
 namespace jules
@@ -93,69 +95,33 @@ public:
   /// Implicitly convertable to hold const values.
   operator ref_array<const value_type, order>() const { return {data(), descriptor_}; }
 
-  operator strided_ref_array<value_type, identity_mapper<order>>() { return {data(), {{0u, dimensions()}}}; }
+  // operator strided_ref_array<value_type, identity_mapper<order>>() { return {data(), {{0u, dimensions()}}}; }
 
-  operator strided_ref_array<const value_type, identity_mapper<order>>() const { return {data(), {{0u, dimensions()}}}; }
-
-  /// \group Indexing
-  decltype(auto) operator[](size_type i) { return detail::array_at(data(), descriptor_, i); }
+  // operator strided_ref_array<const value_type, identity_mapper<order>>() const { return {data(), {{0u, dimensions()}}}; }
 
   /// \group Indexing
-  decltype(auto) operator[](size_type i) const { return detail::array_at(data(), descriptor_, i); }
+  decltype(auto) operator[](index_t index) { return detail::forward_indexing<N>(data(), descriptor_, index); }
 
   /// \group Indexing
-  decltype(auto) operator[](absolute_slice slice) { return detail::array_at(data(), descriptor_, std::move(slice)); }
+  decltype(auto) operator[](index_t index) const { return detail::forward_indexing<N>(data(), descriptor_, index); }
 
   /// \group Indexing
-  decltype(auto) operator[](absolute_slice slice) const { return detail::array_at(data(), descriptor_, std::move(slice)); }
+  decltype(auto) operator[](valid_slice auto index) { return detail::forward_indexing<N>(data(), descriptor_, index); }
 
   /// \group Indexing
-  decltype(auto) operator[](absolute_strided_slice slice) { return detail::array_at(data(), descriptor_, std::move(slice)); }
+  decltype(auto) operator[](valid_slice auto index) const { return detail::forward_indexing<N>(data(), descriptor_, index); }
 
   /// \group Indexing
-  decltype(auto) operator[](absolute_strided_slice slice) const
-  {
-    return detail::array_at(data(), descriptor_, std::move(slice));
-  }
+  decltype(auto) operator[](every_index index) { return detail::forward_indexing<N>(data(), descriptor_, index); }
 
   /// \group Indexing
-  decltype(auto) operator[](every_index index) { return detail::array_at(data(), descriptor_, index); }
+  decltype(auto) operator[](every_index index) const { return detail::forward_indexing<N>(data(), descriptor_, index); }
 
   /// \group Indexing
-  decltype(auto) operator[](every_index index) const { return detail::array_at(data(), descriptor_, index); }
+  decltype(auto) operator[](index_span index) { return detail::forward_indexing<N>(data(), descriptor_, index); }
 
   /// \group Indexing
-  decltype(auto) operator[](bounded_slice slice)
-  {
-    return detail::array_at(data(), descriptor_, eval(slice, descriptor_.extents[0u]));
-  }
-
-  /// \group Indexing
-  decltype(auto) operator[](bounded_slice slice) const
-  {
-    return detail::array_at(data(), descriptor_, eval(slice, descriptor_.extents[0u]));
-  }
-
-  /// \group Indexing
-  decltype(auto) operator[](bounded_strided_slice slice)
-  {
-    return detail::array_at(data(), descriptor_, eval(slice, descriptor_.extents[0u]));
-  }
-
-  /// \group Indexing
-  decltype(auto) operator[](bounded_strided_slice slice) const
-  {
-    return detail::array_at(data(), descriptor_, eval(slice, descriptor_.extents[0u]));
-  }
-
-  /// \group Indexing
-  template <ranges::range Rng> decltype(auto) operator[](const Rng& rng) { return detail::array_at(data(), descriptor_, rng); }
-
-  /// \group Indexing
-  template <ranges::range Rng> decltype(auto) operator[](const Rng& rng) const
-  {
-    return detail::array_at(data(), descriptor_, rng);
-  }
+  decltype(auto) operator[](index_span index) const { return detail::forward_indexing<N>(data(), descriptor_, index); }
 
   auto begin() noexcept -> iterator { return data(); }
   auto end() noexcept -> iterator { return data() + size(); }
@@ -168,15 +134,9 @@ public:
 
   auto size() const noexcept { return descriptor_.size(); }
 
-  auto length() const noexcept { return descriptor_.length(); }
+  auto dimensions() const noexcept -> std::array<size_type, order> { return descriptor_.dimensions(); }
 
-  auto row_count() const noexcept { return descriptor_.row_count(); }
-
-  auto column_count() const noexcept { return descriptor_.column_count(); }
-
-  auto dimensions() const noexcept -> std::array<size_type, order> { return descriptor_.extents; }
-
-protected:
+private:
   auto data() -> value_type* { return data_; }
 
   auto data() const -> const value_type* { return data_; }
@@ -188,30 +148,30 @@ protected:
   descriptor<order> descriptor_ = {};
 };
 
-template <typename T, std::size_t N> auto eval(ref_array<T, N> source) -> ref_array<T, N> { return source; }
-
-template <std::size_t D, typename T, std::size_t N> decltype(auto) drop_to(ref_array<T, N> source)
-{
-  if constexpr (D == 0) {
-    DEBUG_ASSERT(source.size() == 1, debug::default_module, debug::level::invalid_argument, "array cannot be coerced to scalar");
-    return *source.data();
-  } else
-    return ref_array<T, D>{source.begin(), {detail::template drop_one_level_extents<D>(source.dimensions())}};
-}
-
-template <typename T, std::size_t N> decltype(auto) drop(ref_array<T, N> source) { return drop_to<1>(source); }
-
-template <typename T, std::size_t N> auto flatten(ref_array<T, N> source) noexcept
-{
-  return ref_array<T, 1>(source.begin(), {{source.size()}});
-}
-
-template <std::size_t D, typename T, std::size_t N>
-auto reshape_to(ref_array<T, N> source, descriptor<D> descriptor) noexcept -> ref_array<T, D>
-{
-  DEBUG_ASSERT(source.size() == descriptor.size(), debug::default_module, debug::level::invalid_argument, "invalid dimensions");
-  return ref_array<T, D>(source.begin(), descriptor);
-}
+// template <typename T, std::size_t N> auto eval(ref_array<T, N> source) -> ref_array<T, N> { return source; }
+//
+// template <std::size_t D, typename T, std::size_t N> decltype(auto) drop_to(ref_array<T, N> source)
+// {
+//   if constexpr (D == 0) {
+//     DEBUG_ASSERT(source.size() == 1, debug::default_module, debug::level::invalid_argument, "array cannot be coerced to
+//     scalar"); return *source.data();
+//   } else
+//     return ref_array<T, D>{source.begin(), {detail::template drop_one_level_extents<D>(source.dimensions())}};
+// }
+//
+// template <typename T, std::size_t N> decltype(auto) drop(ref_array<T, N> source) { return drop_to<1>(source); }
+//
+// template <typename T, std::size_t N> auto flatten(ref_array<T, N> source) noexcept
+// {
+//   return ref_array<T, 1>(source.begin(), {{source.size()}});
+// }
+//
+// template <std::size_t D, typename T, std::size_t N>
+// auto reshape_to(ref_array<T, N> source, descriptor<D> descriptor) noexcept -> ref_array<T, D>
+// {
+//   DEBUG_ASSERT(source.size() == descriptor.size(), debug::default_module, debug::level::invalid_argument, "invalid
+//   dimensions"); return ref_array<T, D>(source.begin(), descriptor);
+// }
 
 } // namespace jules
 

@@ -54,7 +54,7 @@ TEST_CASE("Slicing functionalities", "[array]")
   CHECK((c[slice(0u, dim() / 2u, 3u)] == tag<relative_strided>{}));
   CHECK((c[slice(0u, (dim() - 1u) / 2u, 3u)] == tag<relative_strided>{}));
 
-  CHECK(eval(slice(0u, dim()), 2u).start() == 0u);
-  CHECK(eval(slice(0u, dim()), 2u).extent() == 2u);
-  CHECK(eval(slice(0u, dim() / 2u), 2u).extent() == 1u);
+  CHECK(absolutize(slice(0u, dim()), 2u).start() == 0u);
+  CHECK(absolutize(slice(0u, dim()), 2u).extent() == 2u);
+  CHECK(absolutize(slice(0u, dim() / 2u), 2u).extent() == 1u);
 }

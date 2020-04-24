@@ -45,6 +45,17 @@ template <typename T, std::size_t N> static auto array_cat(const T& head, const 
   return array_cat(head, tail, std::make_index_sequence<N>());
 }
 
+template <typename T, std::size_t N, std::size_t... I>
+static auto array_cat(const std::array<T, N>& head, const T& tail, std::index_sequence<I...>) -> std::array<T, N + 1>
+{
+  return {{head[I]..., tail}};
+}
+
+template <typename T, std::size_t N> static auto array_cat(const std::array<T, N>& head, const T& tail) -> std::array<T, N + 1>
+{
+  return array_cat(head, tail, std::make_index_sequence<N>());
+}
+
 // [start, stop)
 constexpr auto seq_size(index_t start, index_t stop, index_t step) noexcept -> index_t
 {
@@ -71,6 +82,14 @@ constexpr auto drop_one_level_extents(const std::array<index_t, N>& extents) -> 
   });
 
   return new_extents;
+}
+
+// TODO: where should a put it?
+template <typename F, typename Tuple, std::size_t... I>
+constexpr decltype(auto) apply_n(F&& f, Tuple&& tuple,
+                                 std::index_sequence<I...>) noexcept(noexcept(std::forward<F>(f)(std::get<I>(tuple)...)))
+{
+  return std::forward<F>(f)(std::get<I>(tuple)...);
 }
 
 } // namespace jules::detail

@@ -15,7 +15,7 @@ inline namespace slicing
 template <typename T> struct slice_traits
 {
   using absolute_type = void;
-  using eval_type = void;
+  using absolutize_type = void;
 };
 
 // clang-format off
@@ -32,16 +32,17 @@ template <typename T> concept valid_slice = requires(const T& s)
   std::is_trivially_destructible_v<T>;
 
   !same_as<void, typename slice_traits<T>::absolute_type>;
-  !same_as<void, typename slice_traits<T>::eval_type>;
+  !same_as<void, typename slice_traits<T>::absolutize_type>;
 
-  { typename slice_traits<T>::eval_type{}(s, index_t{}) } noexcept -> same_as<typename slice_traits<T>::absolute_type>;
+  { typename slice_traits<T>::absolutize_type{}(s, index_t{}) } noexcept -> same_as<typename slice_traits<T>::absolute_type>;
 };
 // clang-format on
 
-template <valid_slice Slice> constexpr auto eval(Slice slice, index_t n) noexcept -> typename slice_traits<Slice>::absolute_type
+template <valid_slice Slice>
+constexpr auto absolutize(Slice slice, index_t n) noexcept -> typename slice_traits<Slice>::absolute_type
 {
-  constexpr typename slice_traits<Slice>::eval_type eval;
-  return eval(slice, n);
+  constexpr typename slice_traits<Slice>::absolutize_type absolutize;
+  return absolutize(slice, n);
 }
 
 } // namespace slicing

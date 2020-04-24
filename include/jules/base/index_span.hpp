@@ -4,6 +4,7 @@
 /// \exclude
 #define JULES_BASE_INDEX_SPAN_H
 
+#include "range/v3/range/traits.hpp"
 #include <jules/core/concepts.hpp>
 #include <jules/core/type.hpp>
 
@@ -28,18 +29,26 @@ public:
   /// \group member_types
   using const_iterator = const index_t*;
 
-  index_span(const container_for<index_t> auto& container) : begin_(container.data()), end_(container.data() + container.size())
+  constexpr index_span(const index_t* begin, const index_t* end) noexcept : begin_{begin}, end_{end} {}
+
+  constexpr index_span(const contiguous_of<index_t> auto& container) noexcept
+    : index_span(container.data(), container.data() + container.size())
   {}
 
-  [[nodiscard]] auto begin() const -> const_iterator { return begin_; }
-  [[nodiscard]] auto end() const -> const_iterator { return end_; }
+  template <ranges::range Rng>
+    requires convertible_to<ranges::range_common_iterator_t<Rng>, const index_t*> &&
+    (!contiguous_of<Rng, index_t>)constexpr index_span(const Rng& rng) noexcept : index_span(ranges::begin(rng), ranges::end(rng))
+  {}
 
-  [[nodiscard]] auto cbegin() const -> const_iterator { return begin_; }
-  [[nodiscard]] auto cend() const -> const_iterator { return end_; }
+  [[nodiscard]] constexpr auto begin() const noexcept -> const_iterator { return begin_; }
+  [[nodiscard]] constexpr auto end() const noexcept -> const_iterator { return end_; }
 
-  [[nodiscard]] auto size() const -> size_type { return end_ - begin_; }
+  [[nodiscard]] constexpr auto cbegin() const noexcept -> const_iterator { return begin_; }
+  [[nodiscard]] constexpr auto cend() const noexcept -> const_iterator { return end_; }
 
-  auto operator[](index_t i) const -> const_reference { return *(begin_ + i); }
+  [[nodiscard]] constexpr auto size() const noexcept -> size_type { return end_ - begin_; }
+
+  constexpr auto operator[](index_t i) const noexcept -> const_reference { return *(begin_ + i); }
 
 private:
   const index_t* begin_;

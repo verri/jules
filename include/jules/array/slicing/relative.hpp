@@ -142,7 +142,7 @@ template <typename F> auto slice(index_t start, relative_index<F> extent, index_
 template <typename F> struct slice_traits<relative_slice<F>>
 {
   using absolute_type = absolute_slice;
-  struct eval_type
+  struct absolutize_type
   {
     constexpr auto operator()(relative_slice<F> slice, index_t dim) const noexcept -> absolute_type
     {
@@ -154,7 +154,7 @@ template <typename F> struct slice_traits<relative_slice<F>>
 template <typename F> struct slice_traits<relative_strided_slice<F>>
 {
   using absolute_type = absolute_strided_slice;
-  struct eval_type
+  struct absolutize_type
   {
     constexpr auto operator()(relative_strided_slice<F> slice, index_t dim) const noexcept -> absolute_type
     {

@@ -4,7 +4,7 @@
 #define JULES_ARRAY_DETAIL_MAPPER_H
 
 #include <jules/array/strided_descriptor.hpp>
-#include <jules/base/index_view.hpp>
+#include <jules/base/index_span.hpp>
 #include <jules/core/debug.hpp>
 #include <jules/core/type.hpp>
 
@@ -45,10 +45,10 @@ template <std::size_t N> class vector_mapper
 {
 public:
   static constexpr auto order = N;
-  using iterator = typename index_view::const_iterator;
+  using iterator = typename container<index_t>::const_iterator;
 
-  vector_mapper(const std::array<index_t, N>& extents, index_view indexes)
-    : descriptor_{0u, extents}, indexes_{std::move(indexes)}
+  vector_mapper(const std::array<index_t, N>& extents, index_span indexes)
+    : descriptor_{0u, extents}, indexes_(indexes.begin(), indexes.end())
   {
     DEBUG_ASSERT(indexes_.size() == descriptor_.size(), debug::default_module, debug::level::invalid_argument,
                  "invalid descriptor for mapper");
@@ -60,20 +60,20 @@ public:
     return indexes_[index];
   }
 
-  [[nodiscard]] auto map(std::vector<index_t> indexes) const -> index_view
+  [[nodiscard]] auto map(container<index_t> indexes) const -> container<index_t>
   {
     for (auto& index : indexes)
       index = map(index);
-    return {std::move(indexes)};
+    return indexes;
   }
 
-  auto map(const strided_descriptor<N>& indexes) const -> index_view
+  auto map(const strided_descriptor<N>& indexes) const -> container<index_t>
   {
-    auto result = std::vector<index_t>();
+    auto result = container<index_t>();
     result.reserve(indexes.size());
     for (const auto index : indexes)
       result.push_back(map(index));
-    return {std::move(result)};
+    return result;
   }
 
   [[nodiscard]] auto descriptor() const noexcept -> const strided_descriptor<N>& { return descriptor_; }
@@ -85,7 +85,7 @@ public:
     auto dropped = descriptor_.discard_dimension();
     dropped.start = descriptor_.start + i; // strides[0] is always 1u for vector mapped.
 
-    auto new_indexes = std::vector<index_t>();
+    auto new_indexes = container<index_t>();
 
     new_indexes.reserve(prod(dropped.extents));
     for (const auto index : dropped)
@@ -101,7 +101,7 @@ public:
 
 private:
   strided_descriptor<N> descriptor_;
-  index_view indexes_;
+  container<index_t> indexes_;
 };
 
 } // namespace jules
