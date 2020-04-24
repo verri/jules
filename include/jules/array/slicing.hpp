@@ -17,7 +17,7 @@ namespace jules::detail
 {
 
 template <typename T, std::size_t Order, typename... Indexes>
-constexpr decltype(auto) do_slice(T* data, const descriptor<Order>& descriptor, Indexes... indexes)
+constexpr decltype(auto) do_slice(T* data, descriptor<Order> descriptor, Indexes... indexes)
 {
   static_assert(sizeof...(Indexes) == Order);
 
@@ -33,15 +33,46 @@ constexpr decltype(auto) do_slice(T* data, const descriptor<Order>& descriptor, 
   {
     // every time the last index is an index_t, we can reduce the problem.
     const auto ix = detail::array_cat(repeat<Order>(index_t{0}), last_arg(indexes...));
-    const auto shift = descriptor(ix);
+    data += descriptor(ix);
+
     return apply_n(
       [&](auto... newindexes) constexpr->decltype(auto) {
-        return do_slice(data + shift, descriptor.discard_tail_dimension(), newindexes...);
+        return do_slice(data, descriptor.discard_tail_dimension(), newindexes...);
       },
       std::make_tuple(indexes...), std::make_index_sequence<Order - 1>());
+  }                                                                            //
+  else if constexpr (std::is_same_v<last_element<Indexes...>, absolute_slice>) //
+  {
+    // in a similiar manner, if the last element is an absolute_slice (not strided), we
+    // also can reduce the problem (that is adjust the start and extent and forwarding as
+    // a every_index).
+
+    const absolute_slice slice = last_arg(indexes...);
+
+    // adjust the beginning
+    const auto ix = detail::array_cat(repeat<Order>(index_t{0}), slice.start());
+    data += descriptor(ix);
+
+    // adjust the extent
+    descriptor.set_extent(Order - 1, slice.extent());
+
+    return apply_n(
+      [&](auto... newindexes) constexpr->decltype(auto) { return do_slice(data, descriptor, newindexes..., every_index{}); },
+      std::make_tuple(indexes...), std::make_index_sequence<Order - 1>());
+  }                                                                                               //
+  else if constexpr (sizeof...(Indexes) == 1 && all_args(std::is_same_v<Indexes, index_span>...)) //
+  {
+    // TODO: simple mapper (1d vector)
+    throw std::runtime_error{"not implemented yet."};
+  }                                                                    //
+  else if constexpr (any_args(std::is_same_v<Indexes, index_span>...)) //
+  {
+    // TODO: treat everything as a range (must allocate for indexes)
+    throw std::runtime_error{"not implemented yet."};
   }    //
   else //
   {
+    // TODO: treat everything as a strided_slice
     throw std::runtime_error{"not implemented yet."};
   }
 }

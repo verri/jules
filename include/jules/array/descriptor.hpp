@@ -81,6 +81,8 @@ public:
     return {detail::template drop_one_level_extents<D>(extents)};
   }
 
+  constexpr auto set_extent(index_t i, index_t value) noexcept { extents[i] = value; }
+
 private:
   template <std::size_t... I>
   constexpr auto discard_head_dimension_impl(std::index_sequence<I...>) const noexcept -> descriptor<N - 1>
