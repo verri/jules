@@ -26,7 +26,7 @@ namespace jules
 ///
 /// \module Array Types
 /// \notes This class is not meant to be used in user code.
-template <typename T, typename Mapper> class strided_ref_array : private Mapper
+template <typename T, typename Mapper> class strided_ref_array
 {
   static_assert(Mapper::order > 0u, "invalid array dimension");
 
@@ -65,7 +65,7 @@ public:
 
   constexpr strided_ref_array() noexcept = default;
 
-  strided_ref_array(value_type* data, Mapper mapper) : Mapper{std::move(mapper)}, data_{data} {}
+  strided_ref_array(value_type* data, Mapper mapper) : mapper_{std::move(mapper)}, data_{data} {}
   strided_ref_array(const strided_ref_array& source) = default;
   strided_ref_array(strided_ref_array&& source) noexcept = default;
 
@@ -89,7 +89,8 @@ public:
   /// \group Assignment
   auto operator=(const strided_ref_array& source) -> strided_ref_array&
   {
-    detail::array_assign(*this, source);
+    if (this != &source)
+      detail::array_assign(*this, source);
     return *this;
   }
 
@@ -97,77 +98,20 @@ public:
   operator strided_ref_array<const value_type, Mapper>() const { return {data(), mapper()}; }
 
   /// \group Indexing
-  decltype(auto) operator[](size_type i) { return detail::array_at(data(), mapper(), i); }
+  // TODO...
 
-  /// \group Indexing
-  decltype(auto) operator[](size_type i) const { return detail::array_at(data(), mapper(), i); }
-
-  /// \group Indexing
-  decltype(auto) operator[](absolute_slice slice) { return detail::array_at(data(), mapper(), slice); }
-
-  /// \group Indexing
-  decltype(auto) operator[](absolute_slice slice) const { return detail::array_at(data(), mapper(), slice); }
-
-  /// \group Indexing
-  decltype(auto) operator[](absolute_strided_slice slice) { return detail::array_at(data(), mapper(), slice); }
-
-  /// \group Indexing
-  decltype(auto) operator[](absolute_strided_slice slice) const { return detail::array_at(data(), mapper(), slice); }
-
-  /// \group Indexing
-  decltype(auto) operator[](every_index index) { return detail::array_at(data(), mapper(), index); }
-
-  /// \group Indexing
-  decltype(auto) operator[](every_index index) const { return detail::array_at(data(), mapper(), index); }
-
-  /// \group Indexing
-  decltype(auto) operator[](bounded_slice slice)
-  {
-    return detail::array_at(data(), mapper(), eval(slice, this->descriptor().extents[0u]));
-  }
-
-  /// \group Indexing
-  decltype(auto) operator[](bounded_slice slice) const
-  {
-    return detail::array_at(data(), mapper(), eval(slice, this->descriptor().extents[0u]));
-  }
-
-  /// \group Indexing
-  decltype(auto) operator[](bounded_strided_slice slice)
-  {
-    return detail::array_at(data(), mapper(), eval(slice, this->descriptor().extents[0u]));
-  }
-
-  /// \group Indexing
-  decltype(auto) operator[](bounded_strided_slice slice) const
-  {
-    return detail::array_at(data(), mapper(), eval(slice, this->descriptor().extents[0u]));
-  }
-
-  /// \group Indexing
-  template <ranges::range Rng> decltype(auto) operator[](const Rng& rng) { return detail::array_at(data(), mapper(), rng); }
-
-  /// \group Indexing
-  template <ranges::range Rng> decltype(auto) operator[](const Rng& rng) const { return detail::array_at(data(), mapper(), rng); }
-
-  auto begin() noexcept -> iterator { return {data(), this->index_begin()}; }
-  auto end() noexcept -> iterator { return {data(), this->index_end()}; }
+  auto begin() noexcept -> iterator { return {data(), mapper().index_begin()}; }
+  auto end() noexcept -> iterator { return {data(), mapper().index_end()}; }
 
   auto begin() const noexcept -> const_iterator { return cbegin(); }
   auto end() const noexcept -> const_iterator { return cend(); }
 
-  auto cbegin() const noexcept -> const_iterator { return {data(), this->index_begin()}; }
-  auto cend() const noexcept -> const_iterator { return {data(), this->index_end()}; }
+  auto cbegin() const noexcept -> const_iterator { return {data(), mapper().index_begin()}; }
+  auto cend() const noexcept -> const_iterator { return {data(), mapper().index_end()}; }
 
   auto size() const noexcept { return this->descriptor().size(); }
 
-  auto length() const noexcept { return this->descriptor().length(); }
-
-  auto row_count() const noexcept { return this->descriptor().row_count(); }
-
-  auto column_count() const noexcept { return this->descriptor().column_count(); }
-
-  auto dimensions() const noexcept -> std::array<size_type, order> { return this->descriptor().extents; }
+  auto dimensions() const noexcept -> std::array<size_type, order> { return mapper().descriptor().extents(); }
 
   template <std::size_t D> decltype(auto) drop_to()
   {
@@ -179,7 +123,7 @@ public:
         this->data(), this->mapper().template drop_one_level_dimensions<D>()};
   }
 
-protected:
+private:
   auto mapper() const -> const Mapper& { return *this; }
 
   auto data() -> value_type* { return data_; }
@@ -187,25 +131,26 @@ protected:
   auto data() const -> const value_type* { return data_; }
 
   /// \exclude
+  Mapper mapper_;
   value_type* const data_ = nullptr;
 };
 
-template <typename T, typename Mapper> auto eval(strided_ref_array<T, Mapper> source) -> strided_ref_array<T, Mapper>
-{
-  return source;
-}
-
-template <std::size_t D, typename U, template <std::size_t> typename MapType, std::size_t M>
-decltype(auto) drop_to(strided_ref_array<U, MapType<M>> source)
-{
-  return source.template drop_to<D>();
-}
-
-template <typename U, template <std::size_t> typename MapType, std::size_t M>
-decltype(auto) drop(strided_ref_array<U, MapType<M>> source)
-{
-  return drop_to<1>(source);
-}
+// template <typename T, typename Mapper> auto eval(strided_ref_array<T, Mapper> source) -> strided_ref_array<T, Mapper>
+// {
+//   return source;
+// }
+//
+// template <std::size_t D, typename U, template <std::size_t> typename MapType, std::size_t M>
+// decltype(auto) drop_to(strided_ref_array<U, MapType<M>> source)
+// {
+//   return source.template drop_to<D>();
+// }
+//
+// template <typename U, template <std::size_t> typename MapType, std::size_t M>
+// decltype(auto) drop(strided_ref_array<U, MapType<M>> source)
+// {
+//   return drop_to<1>(source);
+// }
 
 } // namespace jules
 

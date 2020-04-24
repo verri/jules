@@ -32,7 +32,7 @@ constexpr decltype(auto) do_slice(T* data, descriptor<Order> descriptor, Indexes
   else if constexpr (std::is_same_v<last_element<Indexes...>, index_t>) //
   {
     // every time the last index is an index_t, we can reduce the problem.
-    const auto ix = detail::array_cat(repeat<Order>(index_t{0}), last_arg(indexes...));
+    const auto ix = detail::array_cat(repeat<Order - 1, index_t>(0u), last_arg(indexes...));
     data += descriptor(ix);
 
     return apply_n(
@@ -50,7 +50,7 @@ constexpr decltype(auto) do_slice(T* data, descriptor<Order> descriptor, Indexes
     const absolute_slice slice = last_arg(indexes...);
 
     // adjust the beginning
-    const auto ix = detail::array_cat(repeat<Order>(index_t{0}), slice.start());
+    const auto ix = detail::array_cat(repeat<Order - 1, index_t>(0u), slice.start());
     data += descriptor(ix);
 
     // adjust the extent

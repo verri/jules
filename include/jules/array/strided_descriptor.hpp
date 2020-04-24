@@ -4,6 +4,7 @@
 /// \exclude
 #define JULES_ARRAY_STRIDED_DESCRIPTOR_H
 
+#include <jules/array/detail/common.hpp>
 #include <jules/base/numeric.hpp>
 #include <jules/core/debug.hpp>
 #include <jules/core/type.hpp>
@@ -32,7 +33,7 @@ public:
     friend class strided_descriptor<N>;
 
   public:
-    using iterator_category = std::forward_iterator_tag;
+    using iterator_category = std::bidirectional_iterator_tag;
     using value_type = index_t;
     using difference_type = distance_t;
     using pointer = void;
@@ -46,24 +47,60 @@ public:
     constexpr auto operator=(const iterator& source) noexcept -> iterator& = default;
     constexpr auto operator=(iterator&& source) noexcept -> iterator& = default;
 
-    constexpr auto operator++() noexcept -> iterator&
+    constexpr auto operator++() -> iterator&
     {
-      auto i = index_t{0u};
-      for (; i < N - 1; ++i) {
-        indexes_[i] = (indexes_[i] + 1) % descriptor_->extents[i];
-        if (indexes_[i] != 0)
-          break;
+      DEBUG_ASSERT(indexes_[N - 1] < extents_[N - 1], debug::default_module, debug::level::boundary_check,
+                   "iterating beyond end of strided descriptor.");
+
+      if constexpr (N == 1) {
+        ++indexes_[0];
+      } else {
+        auto i = index_t{0u};
+        for (; i < N - 1; ++i) {
+          indexes_[i] = (indexes_[i] + 1) % extents_[i];
+          if (indexes_[i] != 0)
+            break;
+        }
+        if (i == N - 1)
+          ++indexes_[i];
       }
-      if (i == N - 1)
-        ++indexes_[i];
 
       return *this;
     }
 
-    constexpr auto operator++(int) noexcept -> iterator
+    constexpr auto operator++(int) -> iterator
     {
       auto copy = *this;
       ++(*this);
+      return copy;
+    }
+
+    constexpr auto operator--() -> iterator&
+    {
+      DEBUG_ASSERT(sum(indexes_) > 0, debug::default_module, debug::level::boundary_check,
+                   "iterating before the beginning strided descriptor.");
+
+      if constexpr (N == 1) {
+        --indexes_[0];
+      } else {
+        auto i = index_t{0u};
+        for (; i < N - 1; ++i) {
+          if (indexes_[i] == 0) {
+            indexes_[i] = extents_[i] - 1;
+            continue;
+          }
+          break;
+        }
+        --indexes_[i];
+      }
+
+      return *this;
+    }
+
+    constexpr auto operator--(int) -> iterator
+    {
+      auto copy = *this;
+      --(*this);
       return copy;
     }
 
@@ -72,15 +109,25 @@ public:
 
     constexpr auto operator!=(const iterator& other) const noexcept { return !(*this == other); }
 
-    constexpr auto operator*() const noexcept -> value_type { return (*descriptor_)(indexes_); }
+    constexpr auto operator*() const noexcept -> value_type
+    {
+      if constexpr (N == 1) {
+        return start_ + indexes_[0] * strides_;
+      } else {
+        return std::inner_product(std::begin(indexes_), std::end(indexes_), std::begin(strides_), start_);
+      }
+    }
 
   private:
-    constexpr iterator(const strided_descriptor* strided_descriptor, std::array<index_t, N> indexes) noexcept
-      : descriptor_{strided_descriptor}, indexes_{indexes}
+    constexpr iterator(index_t start, std::array<index_t, N> indexes, std::array<index_t, N> strides,
+                       std::array<index_t, N> extents) noexcept
+      : start_{start}, indexes_{indexes}, strides_{strides}, extents_{extents}
     {}
 
-    const strided_descriptor* descriptor_;
+    index_t start_;
     std::array<index_t, N> indexes_;
+    std::array<index_t, N> strides_;
+    std::array<index_t, N> extents_;
   };
 
   /// \group Constructor
@@ -98,7 +145,7 @@ public:
   constexpr strided_descriptor(index_t start, std::array<index_t, N> extents) noexcept : start_{start}, extents_{extents}
   {
     auto tmp = index_t{1u};
-    for (auto i = index_t{0u}; i < N; ++i) {
+    for (const auto i : indices(N)) {
       DEBUG_ASSERT(extents[i] != 0u, debug::default_module, debug::level::invalid_argument,
                    "zero extents while inferring strides");
       strides_[i] = tmp;
@@ -131,12 +178,20 @@ public:
   constexpr auto begin() const noexcept -> iterator { return cbegin(); }
   constexpr auto end() const noexcept -> iterator { return cend(); }
 
-  constexpr auto cbegin() const noexcept -> iterator { return {this, {}}; }
-  constexpr auto cend() const noexcept -> iterator { return {this, end_index()}; }
-
-  constexpr auto discard_dimension() const noexcept -> strided_descriptor<N - 1>
+  constexpr auto cbegin() const noexcept -> iterator { return {start_, repeat<N, index_t>(0u), strides_, extents_}; }
+  constexpr auto cend() const noexcept -> iterator
   {
-    return discard_dimension_impl(std::make_index_sequence<N - 1>{});
+    return {start_, detail::array_cat(repeat<N - 1, index_t>(0u), extents_[N - 1]), strides_, extents_};
+  }
+
+  constexpr auto discard_tail_dimension() const noexcept -> strided_descriptor<N - 1>
+  {
+    return discard_tail_dimension_impl(std::make_index_sequence<N - 1>{});
+  }
+
+  constexpr auto discard_head_dimension() const noexcept -> strided_descriptor<N - 1>
+  {
+    return discard_head_dimension_impl(std::make_index_sequence<N - 1>{});
   }
 
   template <std::size_t D> constexpr auto drop_one_level_dimensions() const -> strided_descriptor<D>
@@ -171,136 +226,23 @@ public:
   constexpr auto set_stride(index_t i, index_t value) noexcept { strides_[i] = value; }
 
 private:
-  constexpr auto end_index() const noexcept { return end_index_impl(std::make_index_sequence<N>{}); }
-
-  template <std::size_t... I> constexpr auto end_index_impl(std::index_sequence<I...>) const noexcept -> std::array<index_t, N>
+  template <std::size_t... I>
+  constexpr auto discard_tail_dimension_impl(std::index_sequence<I...>) const noexcept -> strided_descriptor<N - 1>
   {
-    return {{(I == N - 1 ? extents_[I] : 0u)...}};
+    static_assert(sizeof...(I) == N - 1);
+    return {start_, {{extents_[I + 1]...}}, {{strides_[I + 1]...}}};
   }
 
   template <std::size_t... I>
-  constexpr auto discard_dimension_impl(std::index_sequence<I...>) const noexcept -> strided_descriptor<N - 1>
+  constexpr auto discard_head_dimension_impl(std::index_sequence<I...>) const noexcept -> strided_descriptor<N - 1>
   {
-    return {start_, {{extents_[I + 1]...}}, {{strides_[I + 1]...}}};
+    static_assert(sizeof...(I) == N - 1);
+    return {start_, {{extents_[I]...}}, {{strides_[I]...}}};
   }
 
   index_t start_ = 0u;                                      //< Start position.
   std::array<index_t, N> extents_ = repeat<N, index_t>(0u); //< Size in each dimension.
   std::array<index_t, N> strides_;                          //< Skip in each dimension.
-};
-
-/// Array strided descriptor specialized for one dimension.
-///
-/// This class is used internally by `jules` to represent the position of elements of an
-/// array in memory.
-///
-/// \notes `strided_descriptor` is `TriviallyCopyable` and `TriviallyMovable`.
-/// \module Array Types
-template <> class strided_descriptor<1>
-{
-public:
-  /// \notes For this specialization, the iterator does not depend on the parent strided_descriptor.
-  class iterator
-  {
-    friend class strided_descriptor<1>;
-
-  public:
-    using iterator_category = std::forward_iterator_tag;
-    using value_type = index_t;
-    using difference_type = distance_t;
-    using pointer = void;
-    using reference = index_t&&;
-
-    constexpr iterator() noexcept = default;
-
-    constexpr iterator(const iterator& source) noexcept = default;
-    constexpr iterator(iterator&& source) noexcept = default;
-
-    constexpr auto operator=(const iterator& source) noexcept -> iterator& = default;
-    constexpr auto operator=(iterator&& source) noexcept -> iterator& = default;
-
-    constexpr auto operator++() noexcept -> iterator&
-    {
-      index_ = index_ + stride_;
-      return *this;
-    }
-
-    constexpr auto operator++(int) noexcept -> iterator
-    {
-      auto copy = *this;
-      ++(*this);
-      return copy;
-    }
-
-    constexpr auto operator==(const iterator& other) const noexcept { return index_ == other.index_; }
-
-    constexpr auto operator!=(const iterator& other) const noexcept { return !(*this == other); }
-
-    constexpr auto operator*() const noexcept -> value_type { return index_; }
-
-  private:
-    constexpr iterator(index_t index, index_t stride) noexcept : index_{index}, stride_{stride} {}
-
-    index_t index_ = 0u;
-    index_t stride_ = 0u;
-  };
-
-  /// \group Constructor
-  /// \param start Start position of the slicing. It defaults to 0u.
-  /// \param extents Size of the slicing in each dimension.
-  ///   It defaults to 0u.
-  /// \param strides Number of skip positions in each dimension.
-  ///   It defaults to 1u.
-  constexpr strided_descriptor(index_t start, const std::array<index_t, 1>& extents,
-                               const std::array<index_t, 1>& strides) noexcept
-    : start_{start}, extents_{extents}, strides_{strides}
-  {}
-
-  /// \group Constructor
-  constexpr strided_descriptor(index_t start, const std::array<index_t, 1>& extents) noexcept : start_{start}, extents_{extents}
-  {}
-
-  /// \group Constructor
-  constexpr strided_descriptor() noexcept = default;
-
-  constexpr strided_descriptor(const strided_descriptor& source) noexcept = default;
-  constexpr strided_descriptor(strided_descriptor&& source) noexcept = default;
-
-  constexpr auto operator=(const strided_descriptor& source) -> strided_descriptor& = default;
-  constexpr auto operator=(strided_descriptor&& source) noexcept -> strided_descriptor& = default;
-
-  /// Effectively the product of the extents.
-  [[nodiscard]] constexpr auto size() const noexcept { return extents_[0]; }
-
-  [[nodiscard]] constexpr auto dimensions() const noexcept { return extents_; }
-
-  /// \group Index
-  /// Returns the memory position of the `index`.
-  constexpr auto operator()(const std::array<index_t, 1>& index) const noexcept -> index_t { return (*this)(index[0]); }
-
-  /// \group Index
-  constexpr auto operator()(index_t index) const noexcept -> index_t { return start_ + index * strides_[0]; }
-
-  [[nodiscard]] constexpr auto begin() const noexcept -> iterator { return cbegin(); }
-  [[nodiscard]] constexpr auto end() const noexcept -> iterator { return cend(); }
-
-  [[nodiscard]] constexpr auto cbegin() const noexcept -> iterator { return {start_, strides_[0]}; }
-  [[nodiscard]] constexpr auto cend() const noexcept -> iterator { return {start_ + strides_[0] * extents_[0], strides_[0]}; }
-
-  template <std::size_t D> constexpr auto drop_one_level_dimensions() const noexcept -> strided_descriptor<D>
-  {
-    static_assert(D == 1);
-    return *this;
-  }
-
-  constexpr auto set_start(index_t start) noexcept { start_ = start; }
-  constexpr auto set_extent(index_t i, index_t value) noexcept { extents_[i] = value; }
-  constexpr auto set_stride(index_t i, index_t value) noexcept { strides_[i] = value; }
-
-private:
-  index_t start_ = 0u;                      //< Start position.
-  std::array<index_t, 1> extents_ = {{0u}}; //< Number of position.
-  std::array<index_t, 1> strides_ = {{1u}}; //< Skip positions.
 };
 
 } // namespace jules
