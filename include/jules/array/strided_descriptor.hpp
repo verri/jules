@@ -112,37 +112,34 @@ public:
     constexpr auto operator*() const noexcept -> value_type
     {
       if constexpr (N == 1) {
-        return start_ + indexes_[0] * strides_[0];
+        return indexes_[0] * strides_[0];
       } else {
-        return std::inner_product(std::begin(indexes_), std::end(indexes_), std::begin(strides_), start_);
+        return std::inner_product(std::begin(indexes_), std::end(indexes_), std::begin(strides_), index_t{0u});
       }
     }
 
   private:
-    constexpr iterator(index_t start, std::array<index_t, N> indexes, std::array<index_t, N> strides,
-                       std::array<index_t, N> extents) noexcept
-      : start_{start}, indexes_{indexes}, strides_{strides}, extents_{extents}
+    constexpr iterator(std::array<index_t, N> indexes, std::array<index_t, N> strides, std::array<index_t, N> extents) noexcept
+      : indexes_{indexes}, strides_{strides}, extents_{extents}
     {}
 
-    index_t start_;
     std::array<index_t, N> indexes_;
     std::array<index_t, N> strides_;
     std::array<index_t, N> extents_;
   };
 
   /// \group Constructor
-  /// \param start Start position of the slicing. It defaults to 0u.
   /// \param extents Size of the slicing in each dimension.
   ///   It defaults to 0u.
   /// \param strides Number of skip positions in each dimension.
   ///   It defaults to consistent strides based on the `extents`.
   /// \notes If `strides` are inferred, `extents` cannot be zero.
-  constexpr strided_descriptor(index_t start, std::array<index_t, N> extents, std::array<index_t, N> strides) noexcept
-    : start_{start}, extents_{extents}, strides_{strides}
+  constexpr strided_descriptor(std::array<index_t, N> extents, std::array<index_t, N> strides) noexcept
+    : extents_{extents}, strides_{strides}
   {}
 
   /// \group Constructor
-  constexpr strided_descriptor(index_t start, std::array<index_t, N> extents) noexcept : start_{start}, extents_{extents}
+  constexpr strided_descriptor(std::array<index_t, N> extents) noexcept : extents_{extents}
   {
     auto tmp = index_t{1u};
     for (const auto i : indices(N)) {
@@ -172,16 +169,16 @@ public:
   /// \param indexes Index that can be either an array or more than one argument.
   constexpr auto operator()(const std::array<index_t, N>& indexes) const noexcept -> index_t
   {
-    return std::inner_product(std::begin(indexes), std::end(indexes), std::begin(strides_), start_);
+    return std::inner_product(std::begin(indexes), std::end(indexes), std::begin(strides_), index_t{0});
   }
 
   constexpr auto begin() const noexcept -> iterator { return cbegin(); }
   constexpr auto end() const noexcept -> iterator { return cend(); }
 
-  constexpr auto cbegin() const noexcept -> iterator { return {start_, repeat<N, index_t>(0u), strides_, extents_}; }
+  constexpr auto cbegin() const noexcept -> iterator { return {repeat<N, index_t>(0u), strides_, extents_}; }
   constexpr auto cend() const noexcept -> iterator
   {
-    return {start_, detail::array_cat(repeat<N - 1, index_t>(0u), extents_[N - 1]), strides_, extents_};
+    return {detail::array_cat(repeat<N - 1, index_t>(0u), extents_[N - 1]), strides_, extents_};
   }
 
   constexpr auto discard_tail_dimension() const noexcept -> strided_descriptor<N - 1>
@@ -218,10 +215,9 @@ public:
 
     DEBUG_ASSERT(dropped_count == N - D, debug::default_module, debug::level::unreachable, "");
 
-    return {start_, new_extents, new_strides};
+    return {new_extents, new_strides};
   }
 
-  constexpr auto set_start(index_t start) noexcept { start_ = start; }
   constexpr auto set_extent(index_t i, index_t value) noexcept { extents_[i] = value; }
   constexpr auto set_stride(index_t i, index_t value) noexcept { strides_[i] = value; }
 
@@ -230,17 +226,16 @@ private:
   constexpr auto discard_tail_dimension_impl(std::index_sequence<I...>) const noexcept -> strided_descriptor<N - 1>
   {
     static_assert(sizeof...(I) == N - 1);
-    return {start_, {{extents_[I + 1]...}}, {{strides_[I + 1]...}}};
+    return {{{extents_[I + 1]...}}, {{strides_[I + 1]...}}};
   }
 
   template <std::size_t... I>
   constexpr auto discard_head_dimension_impl(std::index_sequence<I...>) const noexcept -> strided_descriptor<N - 1>
   {
     static_assert(sizeof...(I) == N - 1);
-    return {start_, {{extents_[I]...}}, {{strides_[I]...}}};
+    return {{{extents_[I]...}}, {{strides_[I]...}}};
   }
 
-  index_t start_ = 0u;                                      //< Start position.
   std::array<index_t, N> extents_ = repeat<N, index_t>(0u); //< Size in each dimension.
   std::array<index_t, N> strides_;                          //< Skip in each dimension.
 };

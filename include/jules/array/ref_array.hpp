@@ -100,28 +100,28 @@ public:
   // operator strided_ref_array<const value_type, identity_mapper<order>>() const { return {data(), {{0u, dimensions()}}}; }
 
   /// \group Indexing
-  decltype(auto) operator[](index_t index) { return detail::forward_indexing<N>(data(), descriptor_, index); }
+  decltype(auto) operator[](index_t index) { return detail::forward_slicing<N>(data(), descriptor_, index); }
 
   /// \group Indexing
-  decltype(auto) operator[](index_t index) const { return detail::forward_indexing<N>(data(), descriptor_, index); }
+  decltype(auto) operator[](index_t index) const { return detail::forward_slicing<N>(data(), descriptor_, index); }
 
   /// \group Indexing
-  decltype(auto) operator[](valid_slice auto index) { return detail::forward_indexing<N>(data(), descriptor_, index); }
+  decltype(auto) operator[](valid_slice auto index) { return detail::forward_slicing<N>(data(), descriptor_, index); }
 
   /// \group Indexing
-  decltype(auto) operator[](valid_slice auto index) const { return detail::forward_indexing<N>(data(), descriptor_, index); }
+  decltype(auto) operator[](valid_slice auto index) const { return detail::forward_slicing<N>(data(), descriptor_, index); }
 
   /// \group Indexing
-  decltype(auto) operator[](every_index index) { return detail::forward_indexing<N>(data(), descriptor_, index); }
+  decltype(auto) operator[](every_index index) { return detail::forward_slicing<N>(data(), descriptor_, index); }
 
   /// \group Indexing
-  decltype(auto) operator[](every_index index) const { return detail::forward_indexing<N>(data(), descriptor_, index); }
+  decltype(auto) operator[](every_index index) const { return detail::forward_slicing<N>(data(), descriptor_, index); }
 
   /// \group Indexing
-  decltype(auto) operator[](index_span index) { return detail::forward_indexing<N>(data(), descriptor_, index); }
+  decltype(auto) operator[](index_span index) { return detail::forward_slicing<N>(data(), descriptor_, index); }
 
   /// \group Indexing
-  decltype(auto) operator[](index_span index) const { return detail::forward_indexing<N>(data(), descriptor_, index); }
+  decltype(auto) operator[](index_span index) const { return detail::forward_slicing<N>(data(), descriptor_, index); }
 
   auto begin() noexcept -> iterator { return data(); }
   auto end() noexcept -> iterator { return data() + size(); }

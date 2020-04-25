@@ -1,4 +1,4 @@
-// Copyright (c) 2017 Filipe Verri <filipeverri@gmail.com>
+// Copyright (c) 2017-2020 Filipe Verri <filipeverri@gmail.com>
 
 // For by grace you have been saved through faith. And this is not your own doing; it is the gift of God,
 //   not a result of works, so that no one may boast.
@@ -14,9 +14,7 @@ namespace jules
 
 template <typename, std::size_t> class array;
 template <typename, typename> class strided_ref_array;
-template <typename, typename, typename...> class strided_ref_array_proxy;
 template <typename, std::size_t> class ref_array;
-template <typename, std::size_t, std::size_t> class ref_array_every_proxy;
 template <typename, typename, std::size_t> class unary_expr_array;
 template <typename, typename> struct left_operation;
 template <typename, typename> struct right_operation;
