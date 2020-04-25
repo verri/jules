@@ -112,7 +112,7 @@ public:
     constexpr auto operator*() const noexcept -> value_type
     {
       if constexpr (N == 1) {
-        return start_ + indexes_[0] * strides_;
+        return start_ + indexes_[0] * strides_[0];
       } else {
         return std::inner_product(std::begin(indexes_), std::end(indexes_), std::begin(strides_), start_);
       }

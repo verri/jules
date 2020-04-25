@@ -3,6 +3,7 @@
 #ifndef JULES_ARRAY_SLICING_H
 #define JULES_ARRAY_SLICING_H
 
+#include "range/v3/iterator/unreachable_sentinel.hpp"
 #include <jules/array/descriptor.hpp>
 #include <jules/array/detail/common.hpp>
 #include <jules/array/mapper.hpp>
@@ -16,12 +17,88 @@
 namespace jules::detail
 {
 
+struct absolute_every_index
+{
+  index_t dim;
+};
+
+constexpr auto indexing_size(index_t) noexcept { return 1u; }
+
+constexpr auto indexing_size(absolute_every_index index) noexcept { return index.dim; }
+
+constexpr auto indexing_size(absolute_strided_slice slice) noexcept { return slice.extent(); }
+
+constexpr auto indexing_size(absolute_slice slice) noexcept { return slice.extent(); }
+
+constexpr auto indexing_size(index_span span) noexcept { return span.size(); }
+
+template <std::size_t N, typename Descriptor, typename... Tail>
+auto indexing_fill(container<index_t>& map, const Descriptor& descriptor, std::array<index_t, N> args, index_t index,
+                   Tail... tail)
+{
+  if constexpr (sizeof...(Tail) == 0) {
+    map.push_back(descriptor(detail::array_cat(args, index)));
+  } else {
+    indexing_fill(map, descriptor, detail::array_cat(args, index), tail...);
+  }
+}
+
+template <std::size_t N, typename Descriptor, typename... Tail>
+auto indexing_fill(container<index_t>& map, const Descriptor& descriptor, std::array<index_t, N> args, absolute_every_index index,
+                   Tail... tail)
+{
+  for (const auto i : indices(index.dim)) {
+    if constexpr (sizeof...(Tail) == 0)
+      map.push_back(descriptor(detail::array_cat(args, i)));
+    else
+      indexing_fill(map, descriptor, detail::array_cat(args, i), tail...);
+  }
+}
+
+template <std::size_t N, typename Descriptor, typename... Tail>
+auto indexing_fill(container<index_t>& map, const Descriptor& descriptor, std::array<index_t, N> args, absolute_slice index,
+                   Tail... tail)
+{
+  for (const auto i : indices(index.start(), index.extent())) {
+    if constexpr (sizeof...(Tail) == 0)
+      map.push_back(descriptor(detail::array_cat(args, i)));
+    else
+      indexing_fill(map, descriptor, detail::array_cat(args, i), tail...);
+  }
+}
+
+template <std::size_t N, typename Descriptor, typename... Tail>
+auto indexing_fill(container<index_t>& map, const Descriptor& descriptor, std::array<index_t, N> args,
+                   absolute_strided_slice index, Tail... tail)
+{
+  auto indexes = ranges::views::ints(index.start(), ranges::unreachable) | ranges::views::stride(index.stride()) |
+                 ranges::views::take(index.extent());
+  for (const auto i : indexes) {
+    if constexpr (sizeof...(Tail) == 0)
+      map.push_back(descriptor(detail::array_cat(args, i)));
+    else
+      indexing_fill(map, descriptor, detail::array_cat(args, i), tail...);
+  }
+}
+
+template <std::size_t N, typename Descriptor, typename... Tail>
+auto indexing_fill(container<index_t>& map, const Descriptor& descriptor, std::array<index_t, N> args, index_span indexes,
+                   Tail... tail)
+{
+  for (const auto i : indexes) {
+    if constexpr (sizeof...(Tail) == 0)
+      map.push_back(descriptor(detail::array_cat(args, i)));
+    else
+      indexing_fill(map, descriptor, detail::array_cat(args, i), tail...);
+  }
+}
+
 template <typename T, std::size_t Order, typename... Indexes>
-constexpr decltype(auto) do_slice(T* data, descriptor<Order> descriptor, Indexes... indexes)
+decltype(auto) do_slice(T* data, descriptor<Order> descriptor, Indexes... indexes)
 {
   static_assert(sizeof...(Indexes) == Order);
 
-  if constexpr (all_args(std::is_same_v<every_index, Indexes>...)) //
+  if constexpr (all_args(std::is_same_v<absolute_every_index, Indexes>...)) //
   {
     return ref_array<T, Order>(data, descriptor);
   }                                                                 //
@@ -57,18 +134,29 @@ constexpr decltype(auto) do_slice(T* data, descriptor<Order> descriptor, Indexes
     descriptor.set_extent(Order - 1, slice.extent());
 
     return apply_n(
-      [&](auto... newindexes) constexpr->decltype(auto) { return do_slice(data, descriptor, newindexes..., every_index{}); },
+      [&](auto... newindexes) constexpr->decltype(auto) {
+        return do_slice(data, descriptor, newindexes..., absolute_every_index{slice.extent()});
+      },
       std::make_tuple(indexes...), std::make_index_sequence<Order - 1>());
   }                                                                                               //
   else if constexpr (sizeof...(Indexes) == 1 && all_args(std::is_same_v<Indexes, index_span>...)) //
   {
-    // TODO: simple mapper (1d vector)
-    throw std::runtime_error{"not implemented yet."};
+    const index_span index = first_arg(indexes...);
+    return ref_strided_array<Order, span_mapper>(data, span_mapper(index));
   }                                                                    //
   else if constexpr (any_args(std::is_same_v<Indexes, index_span>...)) //
   {
-    // TODO: treat everything as a range (must allocate for indexes)
-    throw std::runtime_error{"not implemented yet."};
+    constexpr auto D = count_args(std::is_same_v<Indexes, index_t>...);
+
+    const auto newdescriptor = descriptor<Order>{{indexing_size(indexes)...}}.template drop_one_level_dimensions<Order - D>();
+    const auto size = newdescriptor.size();
+
+    container<index_t> map;
+    map.reserve(size);
+
+    indexing_fill(map, descriptor, std::array<index_t, 0u>{}, indexes...);
+
+    return ref_strided_array<Order - D, container_mapper>(data, container_mapper(newdescriptor, std::move(map)));
   }    //
   else //
   {
@@ -113,7 +201,7 @@ template <typename Index> auto check_indexing(Index index, index_t dim)
   }
 
   if constexpr (std::is_same_v<Index, every_index>) {
-    return index;
+    return absolute_every_index{dim};
   }
 }
 

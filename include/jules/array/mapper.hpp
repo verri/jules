@@ -105,19 +105,13 @@ private:
   container<index_t> indexes_;
 };
 
-template <std::size_t N> class span_mapper
+class span_mapper
 {
 public:
-  static_assert(N == 1);
-
-  static constexpr auto order = N;
+  static constexpr auto order = 1;
   using iterator = typename index_span::const_iterator;
 
-  span_mapper(const std::array<index_t, N>& extents, index_span indexes) : descriptor_{0u, extents}, indexes_(indexes)
-  {
-    DEBUG_ASSERT(indexes_.size() == descriptor_.size(), debug::default_module, debug::level::invalid_argument,
-                 "invalid descriptor for mapper");
-  }
+  constexpr span_mapper(index_span indexes) : indexes_(indexes) {}
 
   [[nodiscard]] auto map(index_t index) const
   {
@@ -132,7 +126,7 @@ public:
     return indexes;
   }
 
-  [[nodiscard]] auto map(const strided_descriptor<N>& indexes) const -> container<index_t>
+  [[nodiscard]] auto map(const strided_descriptor<1>& indexes) const -> container<index_t>
   {
     auto result = container<index_t>();
     result.reserve(indexes.size());
@@ -141,12 +135,11 @@ public:
     return result;
   }
 
-  [[nodiscard]] auto index_descriptor() const noexcept -> const descriptor<N>& { return descriptor_; }
-  [[nodiscard]] auto index_begin() const noexcept -> iterator { return indexes_.begin(); }
-  [[nodiscard]] auto index_end() const noexcept -> iterator { return indexes_.end(); }
+  [[nodiscard]] constexpr auto index_descriptor() const noexcept -> descriptor<1> { return {{indexes_.size()}}; }
+  [[nodiscard]] constexpr auto index_begin() const noexcept -> iterator { return indexes_.begin(); }
+  [[nodiscard]] constexpr auto index_end() const noexcept -> iterator { return indexes_.end(); }
 
 private:
-  descriptor<N> descriptor_;
   index_span indexes_;
 };
 
