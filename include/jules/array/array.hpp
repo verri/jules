@@ -438,16 +438,16 @@ auto reshape_to(array<T, N>&& source, std::array<index_t, D> extents) noexcept -
   return array_builder(std::move(source).release(), extents);
 }
 
-constexpr auto row_count(const reference_array auto& a) noexcept {
-  return a.dimensions[0];
-}
+constexpr auto row_count(const reference_array auto& a) noexcept { return a.dimensions[0]; }
 
-constexpr auto column_count(const reference_array auto& a) noexcept {
+constexpr auto column_count(const reference_array auto& a) noexcept
+{
   static_assert(decltype(a)::order >= 2);
   return a.dimensions[1];
 }
 
-constexpr auto length(const reference_array auto& a) noexcept {
+constexpr auto length(const reference_array auto& a) noexcept
+{
   static_assert(decltype(a)::order == 1);
   return a.dimensions[0];
 }

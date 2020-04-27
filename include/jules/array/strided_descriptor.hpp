@@ -138,7 +138,10 @@ public:
   /// \notes If `strides` are inferred, `extents` cannot be zero.
   constexpr strided_descriptor(std::array<index_t, N> extents, std::array<index_t, N> strides) noexcept
     : extents_{extents}, strides_{strides}
-  {}
+  {
+    for (const auto i : indices(N))
+      DEBUG_ASSERT(strides_[i] > 0u, debug::default_module, debug::level::invalid_argument, "zero strides");
+  }
 
   /// \group Constructor
   constexpr strided_descriptor(std::array<index_t, N> extents) noexcept : extents_{extents}
@@ -227,8 +230,8 @@ public:
   constexpr auto extent(index_t i) const noexcept { return extents_[i]; }
   constexpr auto stride(index_t i) const noexcept { return strides_[i]; }
 
-  constexpr auto extents() const noexcept -> const std::array<index_t, N> { return extents_; }
-  constexpr auto strides() const noexcept -> const std::array<index_t, N> { return strides_; }
+  constexpr auto extents() const noexcept { return extents_; }
+  constexpr auto strides() const noexcept { return strides_; }
 
   constexpr auto set_extent(index_t i, index_t value) noexcept { extents_[i] = value; }
   constexpr auto set_stride(index_t i, index_t value) noexcept { strides_[i] = value; }

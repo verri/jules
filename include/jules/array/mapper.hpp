@@ -46,7 +46,7 @@ public:
   using iterator = typename container<index_t>::const_iterator;
 
   container_mapper(const std::array<index_t, N>& extents, container<index_t> indexes)
-    : descriptor_{0u, extents}, indexes_(std::move(indexes))
+    : descriptor_{extents}, indexes_(std::move(indexes))
   {
     DEBUG_ASSERT(indexes_.size() == descriptor_.size(), debug::default_module, debug::level::invalid_argument,
                  "invalid descriptor for mapper");

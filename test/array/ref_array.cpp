@@ -40,4 +40,8 @@ TEST_CASE("Basic reference array functionalities", "[array]")
   const auto ix = std::vector<jules::index_t>{0u, 7u, 9u};
   vector[ix] = 3.0;
   CHECK((values[0] == 3.0 && values[7] == 3.0 && values[9] == 3.0));
+
+  vector[{1u, 2u}] = 1.0;
+  CHECK(values[1] == 1.0);
+  CHECK(values[2] == 1.0);
 }

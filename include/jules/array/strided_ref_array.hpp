@@ -102,7 +102,58 @@ public:
   operator strided_ref_array<const value_type, Mapper>() const { return {data(), mapper()}; }
 
   /// \group Indexing
-  // TODO...
+  decltype(auto) operator[](index_t index) { return detail::forward_slicing<order>(data(), mapper(), index); }
+
+  /// \group Indexing
+  decltype(auto) operator[](index_t index) const { return detail::forward_slicing<order>(data(), mapper(), index); }
+
+  /// \group Indexing
+  decltype(auto) operator[](absolute_slice index) { return detail::forward_slicing<order>(data(), mapper(), index); }
+
+  /// \group Indexing
+  decltype(auto) operator[](absolute_slice index) const { return detail::forward_slicing<order>(data(), mapper(), index); }
+
+  /// \group Indexing
+  decltype(auto) operator[](absolute_strided_slice index) { return detail::forward_slicing<order>(data(), mapper(), index); }
+
+  /// \group Indexing
+  decltype(auto) operator[](absolute_strided_slice index) const
+  {
+    return detail::forward_slicing<order>(data(), mapper(), index);
+  }
+
+  /// \group Indexing
+  decltype(auto) operator[](bounded_slice index) { return detail::forward_slicing<order>(data(), mapper(), index); }
+
+  /// \group Indexing
+  decltype(auto) operator[](bounded_slice index) const { return detail::forward_slicing<order>(data(), mapper(), index); }
+
+  /// \group Indexing
+  decltype(auto) operator[](bounded_strided_slice index) { return detail::forward_slicing<order>(data(), mapper(), index); }
+
+  /// \group Indexing
+  decltype(auto) operator[](bounded_strided_slice index) const { return detail::forward_slicing<order>(data(), mapper(), index); }
+
+  /// \group Indexing
+  decltype(auto) operator[](valid_slice auto index) { return detail::forward_slicing<order>(data(), mapper(), index); }
+
+  /// \group Indexing
+  template <typename F> decltype(auto) operator[](valid_slice auto index) const
+  {
+    return detail::forward_slicing<order>(data(), mapper(), index);
+  }
+
+  /// \group Indexing
+  decltype(auto) operator[](every_index index) { return detail::forward_slicing<order>(data(), mapper(), index); }
+
+  /// \group Indexing
+  decltype(auto) operator[](every_index index) const { return detail::forward_slicing<order>(data(), mapper(), index); }
+
+  /// \group Indexing
+  decltype(auto) operator[](index_span index) { return detail::forward_slicing<order>(data(), mapper(), index); }
+
+  /// \group Indexing
+  decltype(auto) operator[](index_span index) const { return detail::forward_slicing<order>(data(), mapper(), index); }
 
   auto begin() noexcept -> iterator { return {data(), mapper().index_begin()}; }
   auto end() noexcept -> iterator { return {data(), mapper().index_end()}; }
@@ -113,9 +164,9 @@ public:
   auto cbegin() const noexcept -> const_iterator { return {data(), mapper().index_begin()}; }
   auto cend() const noexcept -> const_iterator { return {data(), mapper().index_end()}; }
 
-  auto size() const noexcept { return this->descriptor().size(); }
+  auto size() const noexcept { return mapper().size(); }
 
-  auto dimensions() const noexcept -> std::array<size_type, order> { return mapper().descriptor().extents(); }
+  auto dimensions() const noexcept -> std::array<size_type, order> { return mapper().dimensions(); }
 
   template <std::size_t D> decltype(auto) drop_to()
   {

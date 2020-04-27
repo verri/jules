@@ -161,7 +161,7 @@ public:
 
   auto size() const noexcept { return descriptor_.size(); }
 
-  auto dimensions() const noexcept -> std::array<size_type, order> { return descriptor_.dimensions(); }
+  auto dimensions() const noexcept { return descriptor_.dimensions(); }
 
 private:
   auto data() -> value_type* { return data_; }

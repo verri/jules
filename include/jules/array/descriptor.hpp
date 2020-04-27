@@ -86,7 +86,9 @@ public:
       return {detail::template drop_one_level_extents<D>(extents_)};
   }
 
+  constexpr auto extents() const noexcept { return extents_; }
   constexpr auto extent(index_t i) const noexcept { return extents_[i]; }
+
   constexpr auto set_extent(index_t i, index_t value) noexcept { extents_[i] = value; }
 
 private:

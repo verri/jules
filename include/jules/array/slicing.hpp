@@ -122,7 +122,7 @@ auto calculate_container_slicing(T* data, const Mapper& mapper, Indexes... index
 
   slicing_fill(map, mapper, std::array<index_t, 0u>{}, indexes...);
 
-  return std::make_tuple(data, container_mapper(desc, std::move(map)));
+  return std::make_tuple(data, container_mapper(desc.extents(), std::move(map)));
 }
 
 template <typename T, std::size_t Order, typename... Indexes>
@@ -152,13 +152,12 @@ auto calculate_slicing(T* data, const strided_descriptor<Order>& desc, Indexes..
 
     const auto slices = std::make_tuple(to_strided_slice(indexes)...);
 
-    data += slicing_start(desc.strides(), slices, std::make_index_sequence<Order>());
-
+    const auto start = slicing_start(desc.strides(), slices, std::make_index_sequence<Order>());
     const auto strides = slicing_strides(desc.strides(), slices, std::make_index_sequence<Order>());
     const auto extents = std::array<index_t, Order>{{slicing_size(indexes)...}};
 
     const auto newdescriptor = strided_descriptor<Order>(extents, strides).template drop_one_level_dimensions<Order - D>();
-    return std::make_tuple(data, strided_mapper(newdescriptor));
+    return std::make_tuple(data + start, strided_mapper(newdescriptor));
   }
 }
 
@@ -273,7 +272,7 @@ decltype(auto) do_slice(T* data, const Mapper& mapper, Indexes... indexes)
   static_assert(sizeof...(Indexes) == Order);
 
   auto [newdata, newmapper] = calculate_generic_slicing(data, mapper, indexes...);
-  return array_from_slicing(data, std::move(newmapper));
+  return array_from_slicing(newdata, std::move(newmapper));
 }
 
 // Checks boundaries and extents.  If index is a slice, also makes it absolute.
