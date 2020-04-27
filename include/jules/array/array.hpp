@@ -4,10 +4,10 @@
 /// \exclude
 #define JULES_ARRAY_ARRAY_H
 
-// #include <jules/array/allocator.hpp>
+#include <jules/array/allocator.hpp>
 // #include <jules/array/axis.hpp>
 // #include <jules/array/blas.hpp>
-// #include <jules/array/builder.hpp>
+#include <jules/array/builder.hpp>
 // #include <jules/array/functional.hpp>
 // #include <jules/array/io.hpp>
 // #include <jules/array/math.hpp>
@@ -15,8 +15,8 @@
 // #include <jules/array/overlap.hpp>
 #include <jules/array/ref_array.hpp>
 // #include <jules/array/reshape.hpp>
-// #include <jules/base/async.hpp>
-// #include <jules/base/numeric.hpp>
+#include <jules/base/async.hpp>
+#include <jules/base/numeric.hpp>
 
 namespace jules
 {
@@ -109,7 +109,7 @@ public:
   /// \tparam _
   ///   \exclude
   template <typename... Dims>
-  requires common_dimensions<N, Dims...> explicit array(uninitialized_t, Dims... dims) : array(allocate_tag{}, dims...)
+  requires valid_extents_for<N, Dims...> explicit array(uninitialized_t, Dims... dims) : array(allocate_tag{}, dims...)
   {
     static_assert(std::is_pod_v<value_type>, "Only POD types are allowed to be left uninitialized");
   }
@@ -117,7 +117,7 @@ public:
   /// \group constructors
   /// \tparam _
   ///   \exclude
-  template <typename... Dims> requires common_dimensions<N, Dims...> explicit array(Dims... dims) : array(allocate_tag{}, dims...)
+  template <typename... Dims> requires valid_extents_for<N, Dims...> explicit array(Dims... dims) : array(allocate_tag{}, dims...)
   {
     try {
       this->construct(this->data(), this->size());
@@ -132,7 +132,7 @@ public:
   /// \tparam _
   ///   \exclude
   template <typename... Dims>
-  requires common_dimensions<N, Dims...> array(const value_type& value, Dims... dims) : array(allocate_tag{}, dims...)
+  requires valid_extents_for<N, Dims...> array(const value_type& value, Dims... dims) : array(allocate_tag{}, dims...)
   {
     try {
       this->construct(this->data(), this->size(), value);
@@ -149,7 +149,7 @@ public:
   /// \tparam _
   ///   \exclude
   template <typename It, typename... Dims, typename R = ranges::iter_value_t<It>>
-  requires common_dimensions<N, Dims...> array(It it, Dims... dims) : array(allocate_tag{}, dims...)
+  requires valid_extents_for<N, Dims...> array(It it, Dims... dims) : array(allocate_tag{}, dims...)
   {
     try {
       this->construct(this->data(), it, this->size());
@@ -161,7 +161,7 @@ public:
   }
 
   template <typename F, typename... Dims, typename R = std::invoke_result<F>>
-  requires common_dimensions<N, Dims...> array(generated_t, F f, Dims... dims) : array(allocate_tag{}, dims...)
+  requires valid_extents_for<N, Dims...> array(generated_t, F f, Dims... dims) : array(allocate_tag{}, dims...)
   {
     try {
       auto generator = ranges::views::generate(std::move(f)) | ranges::views::common;
@@ -367,7 +367,7 @@ public:
 private:
   /// \exclude
   template <typename... Dims>
-  requires common_dimensions<N, Dims...> explicit array(allocate_tag, Dims... dims)
+  requires valid_extents_for<N, Dims...> explicit array(allocate_tag, Dims... dims)
     : ref_array<value_type, order>{this->allocate(prod_args(dims...)), {{{static_cast<index_t>(dims)...}}}}
   {}
 

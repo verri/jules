@@ -33,7 +33,7 @@ set(source_files
   # array/builder.cpp
   array/slicing.cpp
   # array/vector.cpp
-  # array/allocator.cpp
+  array/allocator.cpp
   # array/matrix.cpp
   # array/blas.cpp
   # array/array.cpp

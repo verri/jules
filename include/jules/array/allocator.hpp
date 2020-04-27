@@ -66,7 +66,7 @@ private:
   template <std::size_t N, typename List, typename... Args>
   static auto construct_recursive(value_type* to, List values, const descriptor<N>& desc, Args... indexes) noexcept
   {
-    for (auto i = index_t{0u}; i < desc.extents[sizeof...(Args)]; ++i)
+    for (auto i = index_t{0u}; i < desc.extent(sizeof...(Args)); ++i)
       construct_recursive(to, *(values.begin() + i), desc, indexes..., i);
   }
 
@@ -80,7 +80,7 @@ private:
   static auto construct_recursive(index_t& constructed_count, value_type* to, List values, const descriptor<N>& desc,
                                   Args... indexes)
   {
-    for (auto i = index_t{0u}; i < desc.extents[sizeof...(Args)]; ++i)
+    for (auto i = index_t{0u}; i < desc.extent(sizeof...(Args)); ++i)
       construct_recursive(constructed_count, to, *(values.begin() + i), desc, indexes..., i);
   }
 
@@ -96,7 +96,7 @@ private:
   static auto destroy_recursive(index_t& constructed_count, value_type* to, List values, const descriptor<N>& desc,
                                 Args... indexes) noexcept
   {
-    for (auto i = index_t{0u}; constructed_count > 0 && i < desc.extents[sizeof...(Args)]; ++i)
+    for (auto i = index_t{0u}; constructed_count > 0 && i < desc.extent(sizeof...(Args)); ++i)
       destroy_recursive(constructed_count, to, *(values.begin() + i), desc, indexes..., i);
   }
 

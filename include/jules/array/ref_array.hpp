@@ -4,7 +4,6 @@
 /// \exclude
 #define JULES_ARRAY_REF_ARRAY_H
 
-#include "range/v3/range/traits.hpp"
 #include <jules/array/descriptor.hpp>
 #include <jules/array/slicing.hpp>
 // #include <jules/array/detail/common.hpp>
@@ -27,6 +26,7 @@ template <typename T, std::size_t N> class ref_array
 {
   static_assert(N > 0u, "invalid array dimension");
 
+  template <typename, std::size_t> friend class array;
   template <typename, std::size_t> friend class ref_array;
 
 public:

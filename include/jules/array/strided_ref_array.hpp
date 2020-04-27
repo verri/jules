@@ -33,6 +33,7 @@ template <typename T, typename Mapper> class strided_ref_array
 {
   static_assert(Mapper::order > 0u, "invalid array dimension");
 
+  template <typename, std::size_t> friend class array;
   template <typename, typename> friend class strided_ref_array;
 
 public:

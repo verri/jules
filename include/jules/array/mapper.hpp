@@ -25,7 +25,7 @@ public:
 
   template <std::size_t D> constexpr auto drop_one_level_dimensions() const -> strided_mapper<D>
   {
-    return {descriptor_.template drop_one_level_dimensions<D>()};
+    return {as_descriptor().template drop_one_level_dimensions<D>()};
   }
 
   constexpr auto as_descriptor() const -> const strided_descriptor<N>&
@@ -54,7 +54,7 @@ public:
 
   [[nodiscard]] auto operator()(const std::array<index_t, N>& pos) const
   {
-    DEBUG_ASSERT(index < indexes_.size(), debug::default_module, debug::level::boundary_check, "out of range");
+    DEBUG_ASSERT(pos < indexes_.size(), debug::default_module, debug::level::boundary_check, "out of range");
     return indexes_[descriptor_(pos)];
   }
 
@@ -83,13 +83,13 @@ public:
 
   constexpr span_mapper(index_span indexes) : indexes_(indexes) {}
 
-  [[nodiscard]] auto operator(index_t pos) const
+  [[nodiscard]] auto operator()(index_t pos) const
   {
-    DEBUG_ASSERT(index < indexes_.size(), debug::default_module, debug::level::boundary_check, "out of range");
+    DEBUG_ASSERT(pos < indexes_.size(), debug::default_module, debug::level::boundary_check, "out of range");
     return indexes_[pos];
   }
 
-  [[nodiscard]] auto operator(const std::array<index_t, 1>& pos) const { return (*this)(pos[0]); }
+  [[nodiscard]] auto operator()(const std::array<index_t, 1>& pos) const { return (*this)(pos[0]); }
 
   [[nodiscard]] constexpr auto index_begin() const noexcept -> iterator { return indexes_.begin(); }
   [[nodiscard]] constexpr auto index_end() const noexcept -> iterator { return indexes_.end(); }

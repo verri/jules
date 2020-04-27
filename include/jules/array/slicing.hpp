@@ -208,7 +208,7 @@ decltype(auto) calculate_slicing(T* data, descriptor<Order> desc, Indexes... ind
   }    //
   else //
   {
-    return do_slice(data, static_cast<strided_descriptor>(desc), indexes...);
+    return do_slice(data, static_cast<strided_descriptor<Order>>(desc), indexes...);
   }
 }
 
@@ -240,7 +240,7 @@ template <typename T, typename Mapper> decltype(auto) array_from_slicing(T* data
     return *(data + mapper);
   } else {
     constexpr auto Order = Mapper::order;
-    if constexpr (std::is_same_v < Mapper, descriptor<Order>) {
+    if constexpr (std::is_same_v<Mapper, descriptor<Order>>) {
       return ref_array(data, mapper);
     } else {
       return strided_ref_array(data, std::move(mapper));
@@ -251,6 +251,7 @@ template <typename T, typename Mapper> decltype(auto) array_from_slicing(T* data
 template <typename T, typename Mapper, typename... Indexes>
 decltype(auto) do_slice(T* data, const Mapper& mapper, Indexes... indexes)
 {
+  constexpr auto Order = Mapper::order;
   static_assert(sizeof...(Indexes) == Order);
 
   if constexpr (all_args(std::is_same_v<absolute_every_index, Indexes>...)) {
@@ -259,7 +260,7 @@ decltype(auto) do_slice(T* data, const Mapper& mapper, Indexes... indexes)
     return array_from_slicing(data, mapper({{indexes...}}));
   } else {
     auto [newdata, newmapper] = calculate_slicing(data, mapper, indexes...);
-    return array_from_slicing(data, std::move(newmapper))
+    return array_from_slicing(data, std::move(newmapper));
   }
 }
 
