@@ -105,68 +105,33 @@ constexpr auto slicing_strides(std::array<index_t, N> strides, Tuple slices, std
   return {{(strides[I] * std::get<I>(slices).stride())...}};
 }
 
+template <typename T, typename Mapper, typename... Indexes>
+auto calculate_container_slicing(T* data, const Mapper& mapper, Indexes... indexes)
+{
+  constexpr auto Order = Mapper::order;
+  constexpr auto D = count_args(std::is_same_v<Indexes, index_t>...);
+
+  const auto desc = descriptor<Order>{{slicing_size(indexes)...}}.template drop_one_level_dimensions<Order - D>();
+  const auto size = desc.size();
+
+  container<index_t> map;
+  map.reserve(size);
+
+  slicing_fill(map, mapper, std::array<index_t, 0u>{}, indexes...);
+
+  return std::make_tuple(data, container_mapper(desc, std::move(map)));
+}
+
 template <typename T, std::size_t Order, typename... Indexes>
-decltype(auto) do_slice(T* data, descriptor<Order> desc, Indexes... indexes)
+auto calculate_slicing(T* data, const strided_descriptor<Order>& desc, Indexes... indexes)
 {
   static_assert(sizeof...(Indexes) == Order);
+  static_assert(!all_args(std::is_same_v<absolute_every_index, Indexes>...));
+  static_assert(!all_args(std::is_same_v<index_t, Indexes>...));
 
-  if constexpr (all_args(std::is_same_v<absolute_every_index, Indexes>...)) //
+  if constexpr (any_args(std::is_same_v<Indexes, index_span>...)) //
   {
-    return ref_array<T, Order>(data, desc);
-  }                                                                 //
-  else if constexpr (all_args(std::is_same_v<index_t, Indexes>...)) //
-  {
-    return *(data + descriptor({{indexes...}}));
-  }                                                                     //
-  else if constexpr (std::is_same_v<last_element<Indexes...>, index_t>) //
-  {
-    // every time the last index is an index_t, we can reduce the problem.
-    const auto ix = detail::array_cat(repeat<Order - 1, index_t>(0u), last_arg(indexes...));
-    data += descriptor(ix);
-
-    return apply_n(
-      [&](auto... newindexes) constexpr->decltype(auto) { return do_slice(data, desc.discard_tail_dimension(), newindexes...); },
-      std::make_tuple(indexes...), std::make_index_sequence<Order - 1>());
-  }                                                                            //
-  else if constexpr (std::is_same_v<last_element<Indexes...>, absolute_slice>) //
-  {
-    // in a similiar manner, if the last element is an absolute_slice (not strided), we
-    // also can reduce the problem (that is adjust the start and extent and forwarding as
-    // a every_index).
-
-    const absolute_slice slice = last_arg(indexes...);
-
-    // adjust the beginning
-    const auto ix = detail::array_cat(repeat<Order - 1, index_t>(0u), slice.start());
-    data += descriptor(ix);
-
-    // adjust the extent
-    desc.set_extent(Order - 1, slice.extent());
-
-    return apply_n(
-      [&](auto... newindexes) constexpr->decltype(auto) {
-        return do_slice(data, desc, newindexes..., absolute_every_index{slice.extent()});
-      },
-      std::make_tuple(indexes...), std::make_index_sequence<Order - 1>());
-  }                                                                                               //
-  else if constexpr (sizeof...(Indexes) == 1 && all_args(std::is_same_v<Indexes, index_span>...)) //
-  {
-    const index_span index = first_arg(indexes...);
-    return ref_strided_array<Order, span_mapper>(data, span_mapper(index));
-  }                                                                    //
-  else if constexpr (any_args(std::is_same_v<Indexes, index_span>...)) //
-  {
-    constexpr auto D = count_args(std::is_same_v<Indexes, index_t>...);
-
-    const auto newdescriptor = descriptor<Order>{{slicing_size(indexes)...}}.template drop_one_level_dimensions<Order - D>();
-    const auto size = newdescriptor.size();
-
-    container<index_t> map;
-    map.reserve(size);
-
-    slicing_fill(map, desc, std::array<index_t, 0u>{}, indexes...);
-
-    return ref_strided_array<Order - D, container_mapper>(data, container_mapper(newdescriptor, std::move(map)));
+    return calculate_container_slicing(data, desc, indexes...);
   }    //
   else //
   {
@@ -182,16 +147,119 @@ decltype(auto) do_slice(T* data, descriptor<Order> desc, Indexes... indexes)
       [](auto index) -> absolute_strided_slice { return index; },
     };
 
-    const strided_descriptor descriptor = desc;
     const auto slices = std::make_tuple(to_strided_slice(indexes)...);
 
     data += slicing_start(desc.strides(), slices, std::make_index_sequence<Order>());
 
     const auto strides = slicing_strides(desc.strides(), slices, std::make_index_sequence<Order>());
-    const auto extents = std::array<index_t, N>{{slicing_size(indexes)...}};
+    const auto extents = std::array<index_t, Order>{{slicing_size(indexes)...}};
 
     const auto newdescriptor = strided_descriptor<Order>(extents, strides).template drop_one_level_dimensions<Order - D>();
-    return ref_strided_array<Order - D, identity_mapper>(data, identity_mapper(newdescriptor));
+    return std::make_tuple(data, identity_mapper(newdescriptor));
+  }
+}
+
+template <typename T, std::size_t Order, typename... Indexes>
+decltype(auto) calculate_slicing(T* data, descriptor<Order> desc, Indexes... indexes)
+{
+  static_assert(sizeof...(Indexes) == Order);
+  static_assert(!all_args(std::is_same_v<absolute_every_index, Indexes>...));
+  static_assert(!all_args(std::is_same_v<index_t, Indexes>...));
+
+  if constexpr (std::is_same_v<last_element<Indexes...>, index_t>) //
+  {
+    // every time the last index is an index_t, we can reduce the problem.
+    const auto ix = detail::array_cat(repeat<Order - 1, index_t>(0u), last_arg(indexes...));
+    data += desc(ix);
+
+    return apply_n(
+      [&](auto... newindexes) constexpr->decltype(auto) { return do_slice(data, desc.discard_tail_dimension(), newindexes...); },
+      std::make_tuple(indexes...), std::make_index_sequence<Order - 1>());
+  }                                                                            //
+  else if constexpr (std::is_same_v<last_element<Indexes...>, absolute_slice>) //
+  {
+    // in a similiar manner, if the last element is an absolute_slice (not strided), we
+    // also can reduce the problem (that is adjust the start and extent and forwarding as
+    // a every_index).
+
+    const absolute_slice slice = last_arg(indexes...);
+
+    // adjust the beginning
+    const auto ix = detail::array_cat(repeat<Order - 1, index_t>(0u), slice.start());
+    data += desc(ix);
+
+    // adjust the extent
+    desc.set_extent(Order - 1, slice.extent());
+
+    return apply_n(
+      [&](auto... newindexes) constexpr->decltype(auto) {
+        return do_slice(data, desc, newindexes..., absolute_every_index{slice.extent()});
+      },
+      std::make_tuple(indexes...), std::make_index_sequence<Order - 1>());
+  }                                                                                               //
+  else if constexpr (sizeof...(Indexes) == 1 && all_args(std::is_same_v<Indexes, index_span>...)) //
+  {
+    const index_span index = first_arg(indexes...);
+    return std::make_tuple(data, span_mapper(index));
+  }                                                                    //
+  else if constexpr (any_args(std::is_same_v<Indexes, index_span>...)) //
+  {
+    return calculate_container_slicing(data, desc, indexes...);
+  }    //
+  else //
+  {
+    return do_slice(data, static_cast<strided_descriptor>(desc), indexes...);
+  }
+}
+
+template <typename T, std::size_t Order, typename... Indexes>
+auto calculate_slicing(T* data, const strided_mapper<Order>& mapper, Indexes... indexes)
+{
+  return calculate_slicing(data, mapper.as_descriptor(), indexes...);
+}
+
+template <typename T, typename Index> auto calculate_slicing(T* data, const span_mapper& mapper, Index index)
+{
+  static_assert(!std::is_same_v<absolute_every_index, Index>);
+  static_assert(!std::is_same_v<index_t, Index>);
+  return calculate_container_slicing(data, mapper, index);
+}
+
+template <typename T, std::size_t Order, typename... Indexes>
+auto calculate_slicing(T* data, const container_mapper<Order>& mapper, Indexes... indexes)
+{
+  static_assert(sizeof...(Indexes) == Order);
+  static_assert(!all_args(std::is_same_v<absolute_every_index, Indexes>...));
+  static_assert(!all_args(std::is_same_v<index_t, Indexes>...));
+  return calculate_container_slicing(data, mapper, indexes...);
+}
+
+template <typename T, typename Mapper> decltype(auto) array_from_slicing(T* data, Mapper mapper)
+{
+  if constexpr (std::is_same_v<Mapper, index_t>) {
+    return *(data + mapper);
+  } else {
+    constexpr auto Order = Mapper::order;
+    if constexpr (std::is_same_v < Mapper, descriptor<Order>) {
+      return ref_array(data, mapper);
+    } else {
+      return strided_ref_array(data, std::move(mapper));
+    }
+  }
+}
+
+template <typename T, typename Mapper, typename... Indexes>
+decltype(auto) do_slice(T* data, const Mapper& mapper, Indexes... indexes)
+{
+  static_assert(sizeof...(Indexes) == Order);
+
+  if constexpr (all_args(std::is_same_v<absolute_every_index, Indexes>...)) {
+    return array_from_slicing(data, mapper);
+  } else if constexpr (all_args(std::is_same_v<index_t, Indexes>...)) {
+    return array_from_slicing(data, mapper({{indexes...}}));
+  } else {
+    auto [newdata, newmapper] = calculate_slicing(data, mapper, indexes...);
+    return array_from_slicing(data, std::move(newmapper))
   }
 }
 
@@ -263,6 +331,7 @@ decltype(auto) forward_slicing(T* data, const Descriptor& descriptor, Index inde
 }
 
 // Array proxy to represent partial slicing.
+// TODO: if Descriptor is container_mapper&&, we can reuse the memory
 template <std::size_t Order, typename T, typename Descriptor, typename... Indexes> class array_slicing_proxy
 {
   static_assert(sizeof...(Indexes) < Order);

@@ -12,34 +12,31 @@
 namespace jules
 {
 
-template <std::size_t N> class identity_mapper
+template <std::size_t N> class strided_mapper : private strided_descriptor<N>
 {
 public:
   static constexpr auto order = N;
   using iterator = typename strided_descriptor<N>::iterator;
 
-  constexpr identity_mapper(const strided_descriptor<N>& descriptor) noexcept : descriptor_{descriptor} {}
+  constexpr strided_mapper(const strided_descriptor<N>& descriptor) noexcept : strided_descriptor<N>{descriptor} {}
 
-  constexpr auto map(index_t index) const noexcept { return index; }
+  constexpr auto index_begin() const noexcept -> iterator { return as_descriptor().begin(); }
+  constexpr auto index_end() const noexcept -> iterator { return as_descriptor().end(); }
 
-  constexpr auto index_descriptor() const noexcept -> const strided_descriptor<N>& { return descriptor_; }
-  constexpr auto index_begin() const noexcept -> iterator { return descriptor_.begin(); }
-  constexpr auto index_end() const noexcept -> iterator { return descriptor_.end(); }
-
-  constexpr auto drop_first_dimension(index_t i) const noexcept -> identity_mapper<N - 1>
-  {
-    auto new_descriptor = descriptor_.discard_dimension();
-    new_descriptor.start = descriptor_.start + descriptor_.strides[0] * i;
-    return {new_descriptor};
-  }
-
-  template <std::size_t D> constexpr auto drop_one_level_dimensions() const -> identity_mapper<D>
+  template <std::size_t D> constexpr auto drop_one_level_dimensions() const -> strided_mapper<D>
   {
     return {descriptor_.template drop_one_level_dimensions<D>()};
   }
 
-private:
-  strided_descriptor<N> descriptor_;
+  constexpr auto as_descriptor() const -> const strided_descriptor<N>&
+  {
+    return static_cast<const strided_descriptor<N>&>(*this);
+  }
+  constexpr auto as_descriptor() -> strided_descriptor<N>& { return static_cast<strided_descriptor<N>&>(*this); }
+
+  using strided_descriptor<N>::size;
+  using strided_descriptor<N>::dimensions;
+  using strided_descriptor<N>::operator();
 };
 
 template <std::size_t N> class container_mapper
@@ -55,50 +52,23 @@ public:
                  "invalid descriptor for mapper");
   }
 
-  [[nodiscard]] auto map(index_t index) const
+  [[nodiscard]] auto operator()(const std::array<index_t, N>& pos) const
   {
     DEBUG_ASSERT(index < indexes_.size(), debug::default_module, debug::level::boundary_check, "out of range");
-    return indexes_[index];
+    return indexes_[descriptor_(pos)];
   }
 
-  [[nodiscard]] auto map(container<index_t> indexes) const -> container<index_t>
-  {
-    for (auto& index : indexes)
-      index = map(index);
-    return indexes;
-  }
-
-  [[nodiscard]] auto map(const strided_descriptor<N>& indexes) const -> container<index_t>
-  {
-    auto result = container<index_t>();
-    result.reserve(indexes.size());
-    for (const auto index : indexes)
-      result.push_back(map(index));
-    return result;
-  }
-
-  [[nodiscard]] auto index_descriptor() const noexcept -> const descriptor<N>& { return descriptor_; }
   [[nodiscard]] auto index_begin() const noexcept -> iterator { return indexes_.begin(); }
   [[nodiscard]] auto index_end() const noexcept -> iterator { return indexes_.end(); }
-
-  auto drop_first_dimension(index_t i) const noexcept -> container_mapper<N - 1>
-  {
-    auto dropped = descriptor_.discard_dimension();
-    dropped.start = descriptor_.start + i; // strides[0] is always 1u for vector mapped.
-
-    auto new_indexes = container<index_t>();
-
-    new_indexes.reserve(prod(dropped.extents));
-    for (const auto index : dropped)
-      new_indexes.push_back(map(index));
-
-    return {dropped.extents, {std::move(new_indexes)}};
-  }
 
   template <std::size_t D> constexpr auto drop_one_level_dimensions() const -> container_mapper<D>
   {
     return {descriptor_.template drop_one_level_dimensions<D>(), indexes_};
   }
+
+  constexpr auto size() const noexcept { return indexes_.size(); }
+
+  constexpr auto dimensions() const noexcept { return descriptor_.dimensions(); }
 
 private:
   descriptor<N> descriptor_;
@@ -113,29 +83,14 @@ public:
 
   constexpr span_mapper(index_span indexes) : indexes_(indexes) {}
 
-  [[nodiscard]] auto map(index_t index) const
+  [[nodiscard]] auto operator(index_t pos) const
   {
     DEBUG_ASSERT(index < indexes_.size(), debug::default_module, debug::level::boundary_check, "out of range");
-    return indexes_[index];
+    return indexes_[pos];
   }
 
-  [[nodiscard]] auto map(container<index_t> indexes) const -> container<index_t>
-  {
-    for (auto& index : indexes)
-      index = map(index);
-    return indexes;
-  }
+  [[nodiscard]] auto operator(const std::array<index_t, 1>& pos) const { return (*this)(pos[0]); }
 
-  [[nodiscard]] auto map(const strided_descriptor<1>& indexes) const -> container<index_t>
-  {
-    auto result = container<index_t>();
-    result.reserve(indexes.size());
-    for (const auto index : indexes)
-      result.push_back(map(index));
-    return result;
-  }
-
-  [[nodiscard]] constexpr auto index_descriptor() const noexcept -> descriptor<1> { return {{indexes_.size()}}; }
   [[nodiscard]] constexpr auto index_begin() const noexcept -> iterator { return indexes_.begin(); }
   [[nodiscard]] constexpr auto index_end() const noexcept -> iterator { return indexes_.end(); }
 

@@ -20,6 +20,9 @@
 namespace jules
 {
 
+// TODO: change name to mapped_ref_array (should ref_array be a special case of
+// mapped_ref_array?)
+
 /// Array with non-owned, non-continuous data.
 ///
 /// This class represents a strided_ref view of an concrete array.

@@ -193,29 +193,33 @@ public:
 
   template <std::size_t D> constexpr auto drop_one_level_dimensions() const -> strided_descriptor<D>
   {
-    static_assert(D < N);
-    DEBUG_ASSERT(std::accumulate(std::begin(extents_), std::end(extents_), index_t{},
-                                 [](auto acc, auto d) { return acc + (d == 1 ? 1 : 0); }) >= N - D,
-                 debug::default_module, debug::level::invalid_argument, "array dimensions cannot be dropped");
+    if constexpr (N == D) {
+      return *this;
+    } else {
+      static_assert(D < N);
+      DEBUG_ASSERT(std::accumulate(std::begin(extents_), std::end(extents_), index_t{},
+                                   [](auto acc, auto d) { return acc + (d == 1 ? 1 : 0); }) >= N - D,
+                   debug::default_module, debug::level::invalid_argument, "array dimensions cannot be dropped");
 
-    auto dropped_count = index_t{0u};
-    auto new_extents = repeat<D, index_t>(1u);
-    auto new_strides = repeat<D, index_t>(1u);
-    auto current = index_t{0u};
+      auto dropped_count = index_t{0u};
+      auto new_extents = repeat<D, index_t>(1u);
+      auto new_strides = repeat<D, index_t>(1u);
+      auto current = index_t{0u};
 
-    for (const auto i : indices(N)) {
-      if (dropped_count == N - D || extents_[i] != 1) {
-        new_extents[current] = extents_[i];
-        new_strides[current] = strides_[i];
-        ++current;
-      } else {
-        ++dropped_count;
+      for (const auto i : indices(N)) {
+        if (dropped_count == N - D || extents_[i] != 1) {
+          new_extents[current] = extents_[i];
+          new_strides[current] = strides_[i];
+          ++current;
+        } else {
+          ++dropped_count;
+        }
       }
+
+      DEBUG_ASSERT(dropped_count == N - D, debug::default_module, debug::level::unreachable, "");
+
+      return {new_extents, new_strides};
     }
-
-    DEBUG_ASSERT(dropped_count == N - D, debug::default_module, debug::level::unreachable, "");
-
-    return {new_extents, new_strides};
   }
 
   constexpr auto set_extent(index_t i, index_t value) noexcept { extents_[i] = value; }

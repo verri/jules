@@ -78,7 +78,10 @@ public:
 
   template <std::size_t D> constexpr auto drop_one_level_dimensions() const -> descriptor<D>
   {
-    return {detail::template drop_one_level_extents<D>(extents)};
+    if constexpr (D == N)
+      return *this;
+    else
+      return {detail::template drop_one_level_extents<D>(extents)};
   }
 
   constexpr auto set_extent(index_t i, index_t value) noexcept { extents[i] = value; }
