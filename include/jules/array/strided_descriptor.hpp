@@ -24,6 +24,8 @@ template <std::size_t N> class strided_descriptor
   static_assert(N > 0, "Descriptor cannot have dimension 0.");
 
 public:
+  constexpr static auto order = N;
+
   /// `ForwardIterator` which gives the memory positions of a strided_descriptor.
   ///
   /// \notes It depends on the strided_descriptor that created it, and will be invalidated if have
@@ -221,6 +223,12 @@ public:
       return {new_extents, new_strides};
     }
   }
+
+  constexpr auto extent(index_t i) const noexcept { return extents_[i]; }
+  constexpr auto stride(index_t i) const noexcept { return strides_[i]; }
+
+  constexpr auto extents() const noexcept -> const std::array<index_t, N> { return extents_; }
+  constexpr auto strides() const noexcept -> const std::array<index_t, N> { return strides_; }
 
   constexpr auto set_extent(index_t i, index_t value) noexcept { extents_[i] = value; }
   constexpr auto set_stride(index_t i, index_t value) noexcept { strides_[i] = value; }

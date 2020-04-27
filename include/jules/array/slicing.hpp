@@ -106,6 +106,9 @@ constexpr auto slicing_strides(std::array<index_t, N> strides, Tuple slices, std
 }
 
 template <typename T, typename Mapper, typename... Indexes>
+auto calculate_generic_slicing(T* data, const Mapper& mapper, Indexes... indexes);
+
+template <typename T, typename Mapper, typename... Indexes>
 auto calculate_container_slicing(T* data, const Mapper& mapper, Indexes... indexes)
 {
   constexpr auto Order = Mapper::order;
@@ -155,12 +158,12 @@ auto calculate_slicing(T* data, const strided_descriptor<Order>& desc, Indexes..
     const auto extents = std::array<index_t, Order>{{slicing_size(indexes)...}};
 
     const auto newdescriptor = strided_descriptor<Order>(extents, strides).template drop_one_level_dimensions<Order - D>();
-    return std::make_tuple(data, identity_mapper(newdescriptor));
+    return std::make_tuple(data, strided_mapper(newdescriptor));
   }
 }
 
 template <typename T, std::size_t Order, typename... Indexes>
-decltype(auto) calculate_slicing(T* data, descriptor<Order> desc, Indexes... indexes)
+auto calculate_slicing(T* data, descriptor<Order> desc, Indexes... indexes)
 {
   static_assert(sizeof...(Indexes) == Order);
   static_assert(!all_args(std::is_same_v<absolute_every_index, Indexes>...));
@@ -173,7 +176,7 @@ decltype(auto) calculate_slicing(T* data, descriptor<Order> desc, Indexes... ind
     data += desc(ix);
 
     return apply_n(
-      [&](auto... newindexes) constexpr->decltype(auto) { return do_slice(data, desc.discard_tail_dimension(), newindexes...); },
+      [&](auto... newindexes) constexpr { return calculate_generic_slicing(data, desc.discard_tail_dimension(), newindexes...); },
       std::make_tuple(indexes...), std::make_index_sequence<Order - 1>());
   }                                                                            //
   else if constexpr (std::is_same_v<last_element<Indexes...>, absolute_slice>) //
@@ -192,8 +195,8 @@ decltype(auto) calculate_slicing(T* data, descriptor<Order> desc, Indexes... ind
     desc.set_extent(Order - 1, slice.extent());
 
     return apply_n(
-      [&](auto... newindexes) constexpr->decltype(auto) {
-        return do_slice(data, desc, newindexes..., absolute_every_index{slice.extent()});
+      [&](auto... newindexes) constexpr {
+        return calculate_generic_slicing(data, desc, newindexes..., absolute_every_index{slice.extent()});
       },
       std::make_tuple(indexes...), std::make_index_sequence<Order - 1>());
   }                                                                                               //
@@ -208,7 +211,7 @@ decltype(auto) calculate_slicing(T* data, descriptor<Order> desc, Indexes... ind
   }    //
   else //
   {
-    return do_slice(data, static_cast<strided_descriptor<Order>>(desc), indexes...);
+    return calculate_generic_slicing(data, strided_descriptor<Order>(desc.dimensions()), indexes...);
   }
 }
 
@@ -249,19 +252,28 @@ template <typename T, typename Mapper> decltype(auto) array_from_slicing(T* data
 }
 
 template <typename T, typename Mapper, typename... Indexes>
-decltype(auto) do_slice(T* data, const Mapper& mapper, Indexes... indexes)
+auto calculate_generic_slicing(T* data, const Mapper& mapper, Indexes... indexes)
 {
   constexpr auto Order = Mapper::order;
   static_assert(sizeof...(Indexes) == Order);
 
   if constexpr (all_args(std::is_same_v<absolute_every_index, Indexes>...)) {
-    return array_from_slicing(data, mapper);
+    return std::make_tuple(data, mapper);
   } else if constexpr (all_args(std::is_same_v<index_t, Indexes>...)) {
-    return array_from_slicing(data, mapper({{indexes...}}));
+    return std::make_tuple(data, mapper({{indexes...}}));
   } else {
-    auto [newdata, newmapper] = calculate_slicing(data, mapper, indexes...);
-    return array_from_slicing(data, std::move(newmapper));
+    return calculate_slicing(data, mapper, indexes...); // not trivial, try specific
   }
+}
+
+template <typename T, typename Mapper, typename... Indexes>
+decltype(auto) do_slice(T* data, const Mapper& mapper, Indexes... indexes)
+{
+  constexpr auto Order = Mapper::order;
+  static_assert(sizeof...(Indexes) == Order);
+
+  auto [newdata, newmapper] = calculate_generic_slicing(data, mapper, indexes...);
+  return array_from_slicing(data, std::move(newmapper));
 }
 
 // Checks boundaries and extents.  If index is a slice, also makes it absolute.
@@ -269,7 +281,7 @@ template <typename Index> auto check_slicing(Index index, index_t dim)
 {
   if constexpr (valid_slice<Index>) {
     using absolute_type = typename slice_traits<Index>::absolute_type;
-    static_assert(std::is_same_v<absolute_type, absolute_slice> || std::is_same_v<absolute_slice, absolute_strided_slice>);
+    static_assert(std::is_same_v<absolute_type, absolute_slice> || std::is_same_v<absolute_type, absolute_strided_slice>);
 
     const auto absolute = absolutize(index, dim);
 
@@ -342,10 +354,45 @@ public:
     : data_(data), descriptor_(descriptor), indexes_(indexes...)
   {}
 
-  decltype(auto) operator[](index_t index) && { return std::move(*this).forward(index); }
-  decltype(auto) operator[](valid_slice auto index) && { return std::move(*this).forward(index); }
-  decltype(auto) operator[](every_index index) && { return std::move(*this).forward(index); }
-  decltype(auto) operator[](index_span index) && { return std::move(*this).forward(index); }
+  decltype(auto) operator[](index_t index) &&
+  {
+    return std::move(*this).forward(index, std::make_index_sequence<sizeof...(Indexes)>());
+  }
+
+  decltype(auto) operator[](absolute_slice index) &&
+  {
+    return std::move(*this).forward(index, std::make_index_sequence<sizeof...(Indexes)>());
+  }
+
+  decltype(auto) operator[](absolute_strided_slice index) &&
+  {
+    return std::move(*this).forward(index, std::make_index_sequence<sizeof...(Indexes)>());
+  }
+
+  decltype(auto) operator[](bounded_slice index) &&
+  {
+    return std::move(*this).forward(index, std::make_index_sequence<sizeof...(Indexes)>());
+  }
+
+  decltype(auto) operator[](bounded_strided_slice index) &&
+  {
+    return std::move(*this).forward(index, std::make_index_sequence<sizeof...(Indexes)>());
+  }
+
+  decltype(auto) operator[](valid_slice auto index) &&
+  {
+    return std::move(*this).forward(index, std::make_index_sequence<sizeof...(Indexes)>());
+  }
+
+  decltype(auto) operator[](every_index index) &&
+  {
+    return std::move(*this).forward(index, std::make_index_sequence<sizeof...(Indexes)>());
+  }
+
+  decltype(auto) operator[](index_span index) &&
+  {
+    return std::move(*this).forward(index, std::make_index_sequence<sizeof...(Indexes)>());
+  }
 
 private:
   template <typename Index, std::size_t... I> decltype(auto) forward(Index index, std::index_sequence<I...>) &&

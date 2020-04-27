@@ -29,7 +29,7 @@ set(source_files
   # array/numeric.cpp
   # array/math.cpp
   # array/io.cpp
-  # array/ref_array.cpp
+  array/ref_array.cpp
   # array/builder.cpp
   array/slicing.cpp
   # array/vector.cpp

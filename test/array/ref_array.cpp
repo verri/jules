@@ -32,7 +32,7 @@ TEST_CASE("Basic reference array functionalities", "[array]")
   CHECK(values[0] == 3.0);
 
   matrix[0u][1u] = 4.0;
-  CHECK(values[matrix.row_count()] == 4.0);
+  CHECK(values[matrix.dimensions()[0]] == 4.0);
 
   vector[{0u, vector.size()}] = 0.0;
   CHECK((std::find_if(values.begin(), values.end(), [](auto value) { return value != 0.0; }) == values.end()));

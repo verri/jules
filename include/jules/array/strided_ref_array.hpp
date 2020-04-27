@@ -128,7 +128,7 @@ public:
   }
 
 private:
-  auto mapper() const -> const Mapper& { return *this; }
+  auto mapper() const -> const Mapper& { return mapper_; }
 
   auto data() -> value_type* { return data_; }
 
@@ -138,6 +138,8 @@ private:
   Mapper mapper_;
   value_type* const data_ = nullptr;
 };
+
+template <typename T, typename Mapper> strided_ref_array(T*, Mapper) -> strided_ref_array<T, Mapper>;
 
 // template <typename T, typename Mapper> auto eval(strided_ref_array<T, Mapper> source) -> strided_ref_array<T, Mapper>
 // {

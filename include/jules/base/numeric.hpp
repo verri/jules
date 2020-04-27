@@ -39,10 +39,16 @@ constexpr auto prod_impl(const std::array<T, N>& arr,
 
 struct forward_arithmetic
 {
-  template <typename T> decltype(auto) operator+(T&& value) { return std::forward<T>(value); }
-  template <typename T> decltype(auto) operator*(T&& value) { return std::forward<T>(value); }
-  template <typename T> friend decltype(auto) operator+(T&& value, forward_arithmetic) { return std::forward<T>(value); }
-  template <typename T> friend decltype(auto) operator*(T&& value, forward_arithmetic) { return std::forward<T>(value); }
+  template <typename T> constexpr decltype(auto) operator+(T&& value) { return std::forward<T>(value); }
+  template <typename T> constexpr decltype(auto) operator*(T&& value) { return std::forward<T>(value); }
+  template <typename T> friend constexpr decltype(auto) operator+(T&& value, forward_arithmetic)
+  {
+    return std::forward<T>(value);
+  }
+  template <typename T> friend constexpr decltype(auto) operator*(T&& value, forward_arithmetic)
+  {
+    return std::forward<T>(value);
+  }
 };
 
 } // namespace detail
@@ -433,24 +439,21 @@ template <ranges::range Rng, convertible_to<bool> T = ranges::range_value_t<Rng>
   return any(ranges::begin(rng), ranges::end(rng));
 }
 
-template <typename... Args> constexpr decltype(auto) prod_args(Args&&... args)
+template <typename... Args> constexpr auto prod_args(Args&&... args)
 {
   return (std::forward<Args>(args) * ... * detail::forward_arithmetic{});
 }
 
-template <typename... Args> constexpr decltype(auto) sum_args(Args&&... args)
+template <typename... Args> constexpr auto sum_args(Args&&... args)
 {
   return (std::forward<Args>(args) + ... + detail::forward_arithmetic{});
 }
 
-template <typename... Args> constexpr decltype(auto) count_args(Args&&... args)
-{
-  return sum_args((std::forward<Args>(args) ? 1 : 0)...);
-}
+template <typename... Args> constexpr auto count_args(Args&&... args) { return sum_args((std::forward<Args>(args) ? 1 : 0)...); }
 
-template <typename... Args> constexpr decltype(auto) all_args(Args&&... args) { return (std::forward<Args>(args) && ...); }
+template <typename... Args> constexpr auto all_args(Args&&... args) { return (std::forward<Args>(args) && ...); }
 
-template <typename... Args> constexpr decltype(auto) any_args(Args&&... args) { return (std::forward<Args>(args) || ...); }
+template <typename... Args> constexpr auto any_args(Args&&... args) { return (std::forward<Args>(args) || ...); }
 
 template <typename Arg, typename... Args> constexpr decltype(auto) first_arg(Arg&& arg, Args&&...)
 {

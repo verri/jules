@@ -10,7 +10,7 @@
 // #include <jules/array/drop.hpp>
 #include <jules/array/meta/common.hpp>
 // #include <jules/array/reshape.hpp>
-// #include <jules/array/strided_ref_array.hpp>
+#include <jules/array/strided_ref_array.hpp>
 #include <jules/core/type.hpp>
 
 namespace jules
@@ -106,10 +106,37 @@ public:
   decltype(auto) operator[](index_t index) const { return detail::forward_slicing<N>(data(), descriptor_, index); }
 
   /// \group Indexing
+  decltype(auto) operator[](absolute_slice index) { return detail::forward_slicing<N>(data(), descriptor_, index); }
+
+  /// \group Indexing
+  decltype(auto) operator[](absolute_slice index) const { return detail::forward_slicing<N>(data(), descriptor_, index); }
+
+  /// \group Indexing
+  decltype(auto) operator[](absolute_strided_slice index) { return detail::forward_slicing<N>(data(), descriptor_, index); }
+
+  /// \group Indexing
+  decltype(auto) operator[](absolute_strided_slice index) const { return detail::forward_slicing<N>(data(), descriptor_, index); }
+
+  /// \group Indexing
+  decltype(auto) operator[](bounded_slice index) { return detail::forward_slicing<N>(data(), descriptor_, index); }
+
+  /// \group Indexing
+  decltype(auto) operator[](bounded_slice index) const { return detail::forward_slicing<N>(data(), descriptor_, index); }
+
+  /// \group Indexing
+  decltype(auto) operator[](bounded_strided_slice index) { return detail::forward_slicing<N>(data(), descriptor_, index); }
+
+  /// \group Indexing
+  decltype(auto) operator[](bounded_strided_slice index) const { return detail::forward_slicing<N>(data(), descriptor_, index); }
+
+  /// \group Indexing
   decltype(auto) operator[](valid_slice auto index) { return detail::forward_slicing<N>(data(), descriptor_, index); }
 
   /// \group Indexing
-  decltype(auto) operator[](valid_slice auto index) const { return detail::forward_slicing<N>(data(), descriptor_, index); }
+  template <typename F> decltype(auto) operator[](valid_slice auto index) const
+  {
+    return detail::forward_slicing<N>(data(), descriptor_, index);
+  }
 
   /// \group Indexing
   decltype(auto) operator[](every_index index) { return detail::forward_slicing<N>(data(), descriptor_, index); }
@@ -147,6 +174,8 @@ private:
   /// \exclude
   descriptor<order> descriptor_ = {};
 };
+
+template <typename T, std::size_t N> ref_array(T*, descriptor<N>) -> ref_array<T, N>;
 
 // template <typename T, std::size_t N> auto eval(ref_array<T, N> source) -> ref_array<T, N> { return source; }
 //

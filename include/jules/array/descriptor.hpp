@@ -24,6 +24,8 @@ template <std::size_t N> class descriptor
   static_assert(N > 0, "Descriptor cannot have dimension 0.");
 
 public:
+  constexpr static auto order = N;
+
   /// \group Constructor
   constexpr descriptor(const std::array<index_t, N>& extents) noexcept : extents_{extents} {}
 
