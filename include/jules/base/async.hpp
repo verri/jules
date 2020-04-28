@@ -33,6 +33,6 @@ template <typename F> auto defer(F&& f) { return defer_helper<F>{std::forward<F>
 #define JULES_TOKEN_CONCAT(X, Y) X##Y
 #define JULES_TOKEN_PASTE(X, Y) JULES_TOKEN_CONCAT(X, Y)
 
-#define JULES_DEFER(...) auto JULES_TOKEN_PASTE(_deferred, __LINE__) = ::jules::detail::defer([&] { __VA_ARGS__; })
+#define JULES_DEFER(...) auto JULES_TOKEN_PASTE(_deferred, __LINE__) = ::jules::detail::defer([&]() noexcept { __VA_ARGS__; })
 
 #endif // JULES_BASE_ASYNC_H

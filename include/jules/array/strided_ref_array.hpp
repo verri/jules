@@ -173,8 +173,10 @@ public:
     if constexpr (D == 0) {
       DEBUG_ASSERT(this->size() == 1, debug::default_module, debug::level::invalid_argument, "array cannot be coerced to scalar");
       return *this->data();
-    } else
-      return strided_ref_array{this->data(), this->mapper().template drop_one_level_dimensions<D>()};
+    } else {
+      auto mapper = this->mapper().template drop_one_level_dimensions<D>();
+      return strided_ref_array<T, decltype(mapper)>{this->data(), std::move(mapper)};
+    }
   }
 
 private:

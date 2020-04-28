@@ -27,14 +27,14 @@ TEST_CASE("Vector tutorial", "[array]")
     CHECK(all(init == jules::numeric{}));
 
     // Constructors with size and optional default value.
-    auto all_same1 = jules::vector<long>(3l, 10u);
+    auto all_same1 = jules::vector<long>(3L, 10u);
     auto all_same2 = jules::vector<long>(10u);
 
     using namespace jules::slicing;
-    all_same2[every] = 3l;
+    all_same2[every] = 3L;
 
-    CHECK(all(all_same1 == 3l));
-    CHECK(all(all_same2 == 3l));
+    CHECK(all(all_same1 == 3L));
+    CHECK(all(all_same2 == 3L));
     CHECK(all(all_same1 == all_same2));
 
     auto values = std::array<long, 10>{{0, 1, 2, 3, 4, 5, 6, 7, 8, 9}};
@@ -71,14 +71,13 @@ TEST_CASE("Vector tutorial", "[array]")
 
     // Constructors from slicing.
     auto even = jules::array(x[{0u, every, 2u}]);
-    CHECK(even.length() == 5u);
+    CHECK(length(even) == 5u);
 
-    auto odd_ix1 = jules::seq(1u, x.length() - 1u, 2u);
-    auto odd_ix2 = odd_ix1;
+    const auto odd_ix1 = jules::seq(1u, length(x) - 1u, 2u);
 
-    auto odd_fast = jules::array(x[std::move(odd_ix1)]); // nothing is copied
-    auto odd_smart = jules::vector<long>(x[odd_ix2]);    // neither here
-    auto odd_ind = jules::vector<long>(x[jules::seq(0u, x.length() - 1u)][jules::seq(1u, x.length() - 1u, 2u)]);
+    auto odd_fast = jules::array(x[odd_ix1]);
+    auto odd_smart = jules::vector<long>(x[odd_ix1]);
+    auto odd_ind = jules::vector<long>(x[jules::seq(0u, length(x) - 1u)][jules::seq(1u, length(x) - 1u, 2u)]);
 
     CHECK(all(x == jules::cat(0, 1, 2, 3, 4, 5, 6, 7, 8, 9)));
     CHECK(all(x == jules::as_vector(values)));
@@ -89,7 +88,7 @@ TEST_CASE("Vector tutorial", "[array]")
     CHECK(all(odd_ind == jules::cat(1, 3, 5, 7, 9)));
 
     // Constructors from expression.
-    auto y = jules::array(x + x[jules::seq(x.length() - 1u, 0u, -1)]);
+    auto y = jules::array(x + x[jules::seq(length(x) - 1u, 0u, -1)]);
     CHECK(all(y == 9));
   }
 
@@ -98,8 +97,8 @@ TEST_CASE("Vector tutorial", "[array]")
     using namespace jules::slicing;
 
     auto x = jules::vector<long>{0, 1, 2, 3, 4, 5, 6, 7, 8, 9};
-    auto y = jules::vector<long>(-20l, 20u);
-    auto z = jules::vector<long>(-10l, 5u);
+    auto y = jules::vector<long>(-20L, 20u);
+    auto z = jules::vector<long>(-10L, 5u);
 
     y = x;
     CHECK(all(x == y));
@@ -114,7 +113,7 @@ TEST_CASE("Vector tutorial", "[array]")
     x = z[jules::slice(0u, every, 2u)];
     CHECK(all(x == jules::cat(0, 2, 4, 6, 8)));
 
-    x = z[jules::seq(0u, z.length() - 1u, 2u)];
+    x = z[jules::seq(0u, length(z) - 1u, 2u)];
     CHECK(all(x == jules::cat(0, 2, 4, 6, 8)));
 
     z = x + x;
@@ -132,7 +131,7 @@ TEST_CASE("Vector tutorial", "[array]")
 
     // To solve aliasing, eval is not enough.
     // Use overlap instead.
-    overlap(x) = x[jules::seq(x.length() - 1, 0u, -1)];
+    overlap(x) = x[jules::seq(length(x) - 1, 0u, -1)];
     CHECK(all(x == 3 * (jules::cat(16, 12, 8, 4, 0) + 1)));
 
     // This one is tricky. We must guarantee that the Memory of x is not freed before the
@@ -152,16 +151,16 @@ TEST_CASE("Vector tutorial", "[array]")
   SECTION("Iterators")
   {
     auto x = jules::vector<long>(5u);
-    const auto y = jules::vector<long>(17l, 5u);
+    const auto y = jules::vector<long>(17L, 5u);
 
     for (auto& value : x)
-      value = 42l;
-    CHECK(all(x == 42l));
+      value = 42L;
+    CHECK(all(x == 42L));
 
     auto it = x.begin();
     for (auto value : y)
       *it++ = value;
-    CHECK(all(x == 17l));
+    CHECK(all(x == 17L));
 
     auto x_it = x.cbegin();
     auto y_it = y.cbegin();
@@ -172,7 +171,7 @@ TEST_CASE("Vector tutorial", "[array]")
   SECTION("Length, size, and extents")
   {
     auto x = jules::vector<>(10u);
-    CHECK(x.length() == 10u);
+    CHECK(length(x) == 10u);
     CHECK(x.size() == 10u);
     CHECK((x.dimensions() == std::array<jules::index_t, 1u>{{10u}}));
   }
@@ -194,8 +193,8 @@ TEST_CASE("Vector tutorial", "[array]")
     x[jules::every] = 0;
     CHECK(all(x == 0));
 
-    for (auto i = 0u; i < x.size(); ++i)
-      x[i] = y[y.length() - 1];
+    for (const auto i : jules::indices(x.size()))
+      x[i] = y[length(y) - 1];
     CHECK(all(x == 9));
 
     x[jules::seq(0u, x.size() - 1u)] = y[jules::every];

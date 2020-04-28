@@ -6,11 +6,10 @@
 
 #include <jules/array/allocator.hpp>
 #include <jules/array/axis.hpp>
-// #include <jules/array/blas.hpp>
 #include <jules/array/builder.hpp>
 #include <jules/array/functional.hpp>
 #include <jules/array/numeric.hpp>
-// #include <jules/array/overlap.hpp>
+#include <jules/array/overlap.hpp>
 #include <jules/array/ref_array.hpp>
 #include <jules/array/reshape.hpp>
 #include <jules/base/async.hpp>

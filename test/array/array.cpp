@@ -8,14 +8,14 @@ TEST_CASE("Basic array functionalities", "[array]")
   using namespace jules::ranges;
 
   array<int, 2> matrix1(4u, 5u); // matrix 4x5
-  CHECK(matrix1.row_count() == 4u);
-  CHECK(matrix1.column_count() == 5u);
+  CHECK(row_count(matrix1) == 4u);
+  CHECK(column_count(matrix1) == 5u);
   CHECK(matrix1.size() == 4 * 5);
   CHECK(all(matrix1 == int{}));
 
   array<int, 2> matrix2(3, 4u, 5u); // matrix 4x5 with values 3
-  CHECK(matrix2.row_count() == 4);
-  CHECK(matrix2.column_count() == 5);
+  CHECK(row_count(matrix2) == 4);
+  CHECK(column_count(matrix2) == 5);
   CHECK(matrix2.size() == 4 * 5);
 
   CHECK(all(matrix2 == 3));
@@ -31,7 +31,7 @@ TEST_CASE("Basic array functionalities", "[array]")
   CHECK(all(reshape_as(matrix3, flatten(matrix3)) == as_vector(indices(0, 20))));
 
   CHECK(all(matrix3 == reshape_to(as_vector(indices(0, 20)), matrix3.dimensions())));
-  CHECK(all(matrix3 == reshape(as_vector(indices(0, 20)), matrix3.row_count(), matrix3.column_count())));
+  CHECK(all(matrix3 == reshape(as_vector(indices(0, 20)), row_count(matrix3), column_count(matrix3))));
   CHECK(all(matrix3 == reshape_as(as_vector(indices(0, 20)), matrix3)));
 
   {
@@ -76,8 +76,8 @@ TEST_CASE("Basic array functionalities", "[array]")
   auto expr3 = apply(matrix1, [](int a) { return -a; });
   auto expr4 = -matrix1;
 
-  CHECK(expr3.row_count() == matrix1.row_count());
-  CHECK(expr3.column_count() == matrix1.column_count());
+  CHECK(row_count(expr3) == row_count(matrix1));
+  CHECK(column_count(expr3) == column_count(matrix1));
 
   CHECK(expr3.dimensions() == expr4.dimensions());
   {
@@ -86,11 +86,11 @@ TEST_CASE("Basic array functionalities", "[array]")
     CHECK(result.second == expr4.end());
   }
 
-  auto vector2 = eval(matrix1[0] + matrix2[1]);
+  auto vector2 = eval(matrix1[0][every] + matrix2[1][every]);
   static_assert(std::is_same<decltype(vector2), vector<int>>::value);
 
   auto expr5 = -vector2;
-  CHECK(expr5.length() == vector2.length());
+  CHECK(length(expr5) == length(vector2));
 
   static_assert(expression_array<decltype(expr5)>);
 }
@@ -107,14 +107,14 @@ TEST_CASE("Type inference for as_vector", "[array]")
   static_assert(std::is_same<decltype(vector1), decltype(vector2)>::value);
   static_assert(std::is_same<decltype(vector2), decltype(vector3)>::value);
 
-  CHECK(vector1.length() == vector2.length());
+  CHECK(length(vector1) == length(vector2));
   {
     auto result = std::mismatch(vector1.begin(), vector1.end(), vector2.begin());
     CHECK(result.first == vector1.end());
     CHECK(result.second == vector2.end());
   }
 
-  CHECK(vector3.length() == vector2.length());
+  CHECK(length(vector3) == length(vector2));
   {
     auto result = std::mismatch(vector3.begin(), vector3.end(), vector2.begin());
     CHECK(result.first == vector3.end());

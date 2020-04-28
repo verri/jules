@@ -26,13 +26,13 @@ set(source_files
   array/axis.cpp
   array/functional.cpp
   array/strided_ref_array.cpp
-  # array/numeric.cpp
+  array/numeric.cpp
   array/math.cpp
   array/io.cpp
   array/ref_array.cpp
-  # array/builder.cpp
+  array/builder.cpp
   array/slicing.cpp
-  # array/vector.cpp
+  array/vector.cpp
   array/allocator.cpp
   # array/matrix.cpp
   # array/blas.cpp

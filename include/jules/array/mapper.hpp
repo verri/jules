@@ -66,9 +66,9 @@ public:
     return {descriptor_.template drop_one_level_dimensions<D>().extents(), indexes_};
   }
 
-  constexpr auto size() const noexcept { return indexes_.size(); }
+  [[nodiscard]] constexpr auto size() const noexcept { return indexes_.size(); }
 
-  constexpr auto dimensions() const noexcept { return descriptor_.dimensions(); }
+  [[nodiscard]] constexpr auto dimensions() const noexcept { return descriptor_.dimensions(); }
 
 private:
   descriptor<N> descriptor_;
@@ -78,7 +78,8 @@ private:
 class span_mapper
 {
 public:
-  static constexpr auto order = 1;
+  static constexpr auto order = index_t{1};
+
   using iterator = typename index_span::const_iterator;
 
   constexpr span_mapper(index_span indexes) : indexes_(indexes) {}
@@ -99,6 +100,10 @@ public:
     static_assert(D == 1);
     return *this;
   }
+
+  [[nodiscard]] constexpr auto size() const noexcept { return indexes_.size(); }
+
+  [[nodiscard]] constexpr auto dimensions() const noexcept -> std::array<index_t, 1> { return {{size()}}; }
 
 private:
   index_span indexes_;
