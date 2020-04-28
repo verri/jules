@@ -63,7 +63,7 @@ public:
 
   template <std::size_t D> constexpr auto drop_one_level_dimensions() const -> container_mapper<D>
   {
-    return {descriptor_.template drop_one_level_dimensions<D>(), indexes_};
+    return {descriptor_.template drop_one_level_dimensions<D>().extents(), indexes_};
   }
 
   constexpr auto size() const noexcept { return indexes_.size(); }
@@ -93,6 +93,12 @@ public:
 
   [[nodiscard]] constexpr auto index_begin() const noexcept -> iterator { return indexes_.begin(); }
   [[nodiscard]] constexpr auto index_end() const noexcept -> iterator { return indexes_.end(); }
+
+  template <std::size_t D>[[nodiscard]] constexpr auto drop_one_level_dimensions() const -> span_mapper
+  {
+    static_assert(D == 1);
+    return *this;
+  }
 
 private:
   index_span indexes_;

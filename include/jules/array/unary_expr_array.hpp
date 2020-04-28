@@ -96,9 +96,6 @@ public:
 
   using expr_array<Op, order>::size;
   using expr_array<Op, order>::dimensions;
-  using expr_array<Op, order>::length;
-  using expr_array<Op, order>::row_count;
-  using expr_array<Op, order>::column_count;
 
   /// \exclude
   auto first() const { return it_first_; }

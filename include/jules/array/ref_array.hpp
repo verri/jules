@@ -177,30 +177,30 @@ private:
 
 template <typename T, std::size_t N> ref_array(T*, descriptor<N>) -> ref_array<T, N>;
 
-// template <typename T, std::size_t N> auto eval(ref_array<T, N> source) -> ref_array<T, N> { return source; }
-//
-// template <std::size_t D, typename T, std::size_t N> decltype(auto) drop_to(ref_array<T, N> source)
-// {
-//   if constexpr (D == 0) {
-//     DEBUG_ASSERT(source.size() == 1, debug::default_module, debug::level::invalid_argument, "array cannot be coerced to
-//     scalar"); return *source.data();
-//   } else
-//     return ref_array<T, D>{source.begin(), {detail::template drop_one_level_extents<D>(source.dimensions())}};
-// }
-//
-// template <typename T, std::size_t N> decltype(auto) drop(ref_array<T, N> source) { return drop_to<1>(source); }
-//
-// template <typename T, std::size_t N> auto flatten(ref_array<T, N> source) noexcept
-// {
-//   return ref_array<T, 1>(source.begin(), {{source.size()}});
-// }
-//
-// template <std::size_t D, typename T, std::size_t N>
-// auto reshape_to(ref_array<T, N> source, descriptor<D> descriptor) noexcept -> ref_array<T, D>
-// {
-//   DEBUG_ASSERT(source.size() == descriptor.size(), debug::default_module, debug::level::invalid_argument, "invalid
-//   dimensions"); return ref_array<T, D>(source.begin(), descriptor);
-// }
+template <typename T, std::size_t N> auto eval(ref_array<T, N> source) -> ref_array<T, N> { return source; }
+
+template <std::size_t D, typename T, std::size_t N> decltype(auto) drop_to(ref_array<T, N> source)
+{
+  if constexpr (D == 0) {
+    DEBUG_ASSERT(source.size() == 1, debug::default_module, debug::level::invalid_argument, "array cannot be coerced to scalar");
+    return *source.data();
+  } else
+    return ref_array<T, D>{source.begin(), {detail::template drop_one_level_extents<D>(source.dimensions())}};
+}
+
+template <typename T, std::size_t N> decltype(auto) drop(ref_array<T, N> source) { return drop_to<1>(source); }
+
+template <typename T, std::size_t N> auto flatten(ref_array<T, N> source) noexcept
+{
+  return ref_array<T, 1>(source.begin(), {{source.size()}});
+}
+
+template <std::size_t D, typename T, std::size_t N>
+auto reshape_to(ref_array<T, N> source, std::array<index_t, D> extents) noexcept -> ref_array<T, D>
+{
+  DEBUG_ASSERT(source.size() == prod(extents), debug::default_module, debug::level::invalid_argument, "invalid dimensions");
+  return ref_array<T, D>(source.begin(), {{extents}});
+}
 
 } // namespace jules
 

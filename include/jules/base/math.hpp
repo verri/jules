@@ -15,12 +15,40 @@ namespace jules
 
 template <class T> constexpr auto pi = T(3.14159265358979323846264338327950288419716939937510);
 
+constexpr auto identity = []<typename T>(T value) -> T { return value; };
+constexpr auto lhs = []<typename T>(T value, const T&) -> T { return value; };
+constexpr auto rhs = []<typename T>(const T&, T value) -> T { return value; };
+
+template <typename T, applies_to<T> Op> constexpr decltype(auto) apply(T&& operand, Op op)
+{
+  constexpr typename apply_traits<std::decay_t<T>>::apply_type apply{};
+  return apply(std::forward<T>(operand), std::move(op));
+}
+
+template <typename T, typename U, applies_to_by<T, U> Op> constexpr decltype(auto) apply(T&& lhs, U&& rhs, Op op)
+{
+  constexpr typename apply_traits<std::decay_t<T>>::apply_type apply{};
+  return apply(std::forward<T>(lhs), std::forward<U>(rhs), std::move(op));
+}
+
+template <typename T, applies_in_place_to<T> Op> constexpr decltype(auto) apply(in_place_t, T&& operand, Op op)
+{
+  constexpr typename apply_traits<std::decay_t<T>>::apply_type apply{};
+  return apply(in_place, std::forward<T>(operand), std::move(op));
+}
+
+template <typename T, typename U, applies_in_place_to_by<T, U> Op>
+constexpr decltype(auto) apply(in_place_t, T&& lhs, U&& rhs, Op op)
+{
+  constexpr typename apply_traits<std::decay_t<T>>::apply_type apply{};
+  return apply(in_place, std::forward<T>(lhs), std::forward<U>(rhs), std::move(op));
+}
+
 template <typename Op> constexpr auto unary_operator(Op op) noexcept
 {
   return [op]<typename T>(T&& value) {
-    if constexpr (common_vector<std::decay_t<T>>) {
-      constexpr typename apply_traits<std::decay_t<T>>::apply_type apply{};
-      return apply(std::forward<T>(value), op);
+    if constexpr (applies_to<Op, decltype(value)>) {
+      return apply(std::forward<T>(value), std::move(op));
     } else {
       return op(std::as_const(value));
     }

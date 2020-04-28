@@ -31,12 +31,6 @@ public:
 
   [[nodiscard]] constexpr auto size() const noexcept { return descriptor_.size(); }
 
-  [[nodiscard]] constexpr auto length() const noexcept { return descriptor_.length(); }
-
-  [[nodiscard]] constexpr auto row_count() const noexcept { return descriptor_.row_count(); }
-
-  [[nodiscard]] constexpr auto column_count() const noexcept { return descriptor_.column_count(); }
-
   /// \exclude
   auto op() const -> const Op& { return op_; }
 

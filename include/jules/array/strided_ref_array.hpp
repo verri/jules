@@ -174,8 +174,7 @@ public:
       DEBUG_ASSERT(this->size() == 1, debug::default_module, debug::level::invalid_argument, "array cannot be coerced to scalar");
       return *this->data();
     } else
-      return strided_ref_array<T, decltype(this->mapper().template drop_one_level_dimensions<D>())>{
-        this->data(), this->mapper().template drop_one_level_dimensions<D>()};
+      return strided_ref_array{this->data(), this->mapper().template drop_one_level_dimensions<D>()};
   }
 
 private:
@@ -192,22 +191,17 @@ private:
 
 template <typename T, typename Mapper> strided_ref_array(T*, Mapper) -> strided_ref_array<T, Mapper>;
 
-// template <typename T, typename Mapper> auto eval(strided_ref_array<T, Mapper> source) -> strided_ref_array<T, Mapper>
-// {
-//   return source;
-// }
-//
-// template <std::size_t D, typename U, template <std::size_t> typename MapType, std::size_t M>
-// decltype(auto) drop_to(strided_ref_array<U, MapType<M>> source)
-// {
-//   return source.template drop_to<D>();
-// }
-//
-// template <typename U, template <std::size_t> typename MapType, std::size_t M>
-// decltype(auto) drop(strided_ref_array<U, MapType<M>> source)
-// {
-//   return drop_to<1>(source);
-// }
+template <typename T, typename Mapper> auto eval(strided_ref_array<T, Mapper> source) -> strided_ref_array<T, Mapper>
+{
+  return source;
+}
+
+template <std::size_t D, typename U, typename Mapper> decltype(auto) drop_to(strided_ref_array<U, Mapper> source)
+{
+  return source.template drop_to<D>();
+}
+
+template <typename U, typename Mapper> decltype(auto) drop(strided_ref_array<U, Mapper> source) { return drop_to<1>(source); }
 
 } // namespace jules
 

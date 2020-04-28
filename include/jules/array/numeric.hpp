@@ -8,7 +8,6 @@
 #include <jules/array/meta/common.hpp>
 #include <jules/array/meta/reference.hpp>
 #include <jules/array/slicing.hpp>
-#include <jules/base/const_vector.hpp>
 #include <jules/base/sequence.hpp>
 #include <jules/core/concepts.hpp>
 #include <jules/core/debug.hpp>
@@ -68,7 +67,7 @@ auto as_vector(const common_array auto& source) -> array<typename decltype(sourc
   return {source.begin(), source.end()};
 }
 
-template <typename Rng, typename R = ranges::range_value_t<Rng>> auto as_vector(const Rng& rng) -> array<R, 1u>
+template <ranges::range Rng, typename R = ranges::range_value_t<Rng>> auto as_vector(const Rng& rng) -> array<R, 1u>
 {
   return to_vector<R>(rng);
 }
@@ -111,7 +110,6 @@ requires(!ranges::range<std::decay_t<U>>) auto cat_push(array_builder<T, 1u>& bu
 
 } // namespace detail
 
-// XXX: does not work for strings
 template <typename... Args> auto cat(Args&&... args)
 {
   using R = std::common_type_t<detail::cat_value_type_t<std::decay_t<Args>>...>;

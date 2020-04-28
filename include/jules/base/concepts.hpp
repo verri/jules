@@ -5,13 +5,12 @@
 #define JULES_BASE_CONCEPTS_H
 
 #include <jules/core/concepts.hpp>
+#include <jules/core/type.hpp>
+#include <type_traits>
+#include <utility>
 
 namespace jules
 {
-
-constexpr auto identity = []<typename T>(const T& value) -> T { return value; };
-constexpr auto lhs = []<typename T>(const T& value, const T&) -> T { return value; };
-constexpr auto rhs = []<typename T>(const T&, const T& value) -> T { return value; };
 
 template <typename T> struct apply_traits
 {
@@ -19,16 +18,37 @@ template <typename T> struct apply_traits
 };
 
 // clang-format off
-template <typename T, typename Vector> concept apply_for =
-  requires { typename Vector::value_type; } &&
-  requires(const T& apply, const Vector& vec, const typename Vector::value_type& value) {
-    { apply(vec, identity) };
-    { apply(vec, vec, lhs) };
-    { apply(value, vec, lhs) };
-    { apply(vec, value, lhs) };
+template <typename Op, typename T> concept applies_to =
+  (!same_as<void, typename apply_traits<T>::apply_type>) &&
+  requires(T value, Op op, typename apply_traits<T>::apply_type apply) {
+    std::is_trivial_v<typename apply_traits<T>::apply_type>;
+    { typename apply_traits<T>::apply_type{} } noexcept;
+    { apply(std::forward<T>(value), std::move(op)) };
   };
 
-template <typename T> concept common_vector = ranges::range<T> && apply_for<typename apply_traits<T>::apply_type, T>;
+template <typename Op, typename T, typename U> concept applies_to_by =
+  (!same_as<void, typename apply_traits<T>::apply_type>) &&
+  requires(T lhs, U rhs, Op op, typename apply_traits<T>::apply_type apply) {
+    std::is_trivial_v<typename apply_traits<T>::apply_type>;
+    { typename apply_traits<T>::apply_type{} } noexcept;
+    { apply(std::forward<T>(lhs), std::forward<U>(rhs), std::move(op)) };
+  };
+
+template <typename Op, typename T> concept applies_in_place_to =
+  (!same_as<void, typename apply_traits<T>::apply_type>) &&
+  requires(T value, Op op, typename apply_traits<T>::apply_type apply) {
+    std::is_trivial_v<typename apply_traits<T>::apply_type>;
+    { typename apply_traits<T>::apply_type{} } noexcept;
+    { apply(in_place, std::forward<T>(value), std::move(op)) };
+  };
+
+template <typename Op, typename T, typename U> concept applies_in_place_to_by =
+  (!same_as<void, typename apply_traits<T>::apply_type>) &&
+  requires(T lhs, U rhs, Op op, typename apply_traits<T>::apply_type apply) {
+    std::is_trivial_v<typename apply_traits<T>::apply_type>;
+    { typename apply_traits<T>::apply_type{} } noexcept;
+    { apply(in_place, std::forward<T>(lhs), std::forward<U>(rhs), std::move(op)) };
+  };
 // clang-format on
 
 } // namespace jules

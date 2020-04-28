@@ -107,9 +107,6 @@ public:
 
   using expr_array<Op, N>::size;
   using expr_array<Op, N>::dimensions;
-  using expr_array<Op, N>::length;
-  using expr_array<Op, N>::row_count;
-  using expr_array<Op, N>::column_count;
 
 private:
   LhsIt lhs_first_, lhs_last_;
