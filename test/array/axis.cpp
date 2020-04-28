@@ -1,4 +1,3 @@
-#include "jules/array/axis.hpp"
 #include "jules/array/array.hpp"
 #include <catch.hpp>
 
@@ -8,8 +7,8 @@ TEST_CASE("Basic axis functionalities", "[array]")
 
   matrix<> m(indices(3 * 4).begin(), 3u, 4u);
 
-  CHECK(m.row_count() == 3u);
-  CHECK(m.column_count() == 4u);
+  CHECK(row_count(m) == 3u);
+  CHECK(column_count(m) == 4u);
 
   static_assert(std::is_same_v<decltype(drop_to<decltype(m)::order - 1>(m[0][every])), decltype(axis_at<0>(ref(m), 0))>);
 

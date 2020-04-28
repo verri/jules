@@ -23,12 +23,12 @@ set(source_files
   core/type.cpp
   core/range.cpp
   core/string.cpp
-  # array/axis.cpp
+  array/axis.cpp
   array/functional.cpp
   array/strided_ref_array.cpp
   # array/numeric.cpp
   array/math.cpp
-  # array/io.cpp
+  array/io.cpp
   array/ref_array.cpp
   # array/builder.cpp
   array/slicing.cpp

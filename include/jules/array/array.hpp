@@ -5,11 +5,10 @@
 #define JULES_ARRAY_ARRAY_H
 
 #include <jules/array/allocator.hpp>
-// #include <jules/array/axis.hpp>
+#include <jules/array/axis.hpp>
 // #include <jules/array/blas.hpp>
 #include <jules/array/builder.hpp>
 #include <jules/array/functional.hpp>
-// #include <jules/array/io.hpp>
 #include <jules/array/numeric.hpp>
 // #include <jules/array/overlap.hpp>
 #include <jules/array/ref_array.hpp>
@@ -452,18 +451,18 @@ auto reshape_to(array<T, N>&& source, std::array<index_t, D> extents) noexcept -
   return array_builder(std::move(source).release(), extents);
 }
 
-constexpr auto row_count(const reference_array auto& a) noexcept { return a.dimensions[0]; }
+constexpr auto row_count(const common_array auto& a) noexcept { return a.dimensions()[0]; }
 
-constexpr auto column_count(const reference_array auto& a) noexcept
+template <common_array Array> constexpr auto column_count(const Array& a) noexcept
 {
-  static_assert(decltype(a)::order >= 2);
-  return a.dimensions[1];
+  static_assert(Array::order >= 2);
+  return a.dimensions()[1];
 }
 
-constexpr auto length(const reference_array auto& a) noexcept
+template <common_array Array> constexpr auto length(const Array& a) noexcept
 {
-  static_assert(decltype(a)::order == 1);
-  return a.dimensions[0];
+  static_assert(Array::order == 1);
+  return a.dimensions()[0];
 }
 
 /// \group array_alias Array Aliasing

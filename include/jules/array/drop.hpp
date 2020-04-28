@@ -21,11 +21,9 @@ template <std::size_t D, typename T, std::size_t N> decltype(auto) drop_to(ref_a
 
 template <typename T, std::size_t N> decltype(auto) drop(ref_array<T, N> source);
 
-template <std::size_t D, typename U, template <std::size_t> typename MapType, std::size_t M>
-decltype(auto) drop_to(strided_ref_array<U, MapType<M>> source);
+template <std::size_t D, typename U, typename Mapper> decltype(auto) drop_to(strided_ref_array<U, Mapper> source);
 
-template <typename U, template <std::size_t> typename MapType, std::size_t M>
-decltype(auto) drop(strided_ref_array<U, MapType<M>> source);
+template <typename U, typename Mapper> decltype(auto) drop(strided_ref_array<U, Mapper> source);
 
 } // namespace jules
 

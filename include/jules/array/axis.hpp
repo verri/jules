@@ -1,4 +1,4 @@
-// Copyright (c) 2018 Filipe Verri <filipeverri@gmail.com>
+// Copyright (c) 2018-2020 Filipe Verri <filipeverri@gmail.com>
 
 #ifndef JULES_ARRAY_AXIS_H
 #define JULES_ARRAY_AXIS_H
@@ -135,8 +135,6 @@ public:
   [[nodiscard]] auto size() const noexcept { return arr_.dimensions()[Axis]; }
 
   [[nodiscard]] auto dimensions() const noexcept -> std::array<size_t, 1u> { return {{this->size()}}; }
-
-  [[nodiscard]] auto length() const noexcept { return this->size(); }
 
   [[nodiscard]] auto begin() noexcept -> iterator { return this->cbegin(); }
 

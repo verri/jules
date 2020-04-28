@@ -3,6 +3,7 @@
 #ifndef JULES_ARRAY_IO_H
 #define JULES_ARRAY_IO_H
 
+#include <jules/array/axis.hpp>
 #include <jules/array/fwd.hpp>
 #include <jules/array/meta/reference.hpp>
 #include <jules/core/type.hpp>
@@ -55,12 +56,25 @@ public:
       return *this;
     }
 
-    (*this) << a[0];
-    for (auto i = index_t{1}; i < dim_size; ++i) {
-      (*this) << fmt.separator;
-      (*this) << a[i];
+    if constexpr (N == 1) {
+      (*this) << a[0];
+      for (auto i = index_t{1}; i < dim_size; ++i) {
+        (*this) << fmt.separator;
+        (*this) << a[i];
+      }
+    } else {
+      const auto r = rows(a);
+      auto it = r.begin();
+
+      (*this) << *it++;
+      while (it != r.end()) {
+        (*this) << fmt.separator;
+        (*this) << *it++;
+      }
     }
+
     (*this) << fmt.after;
+
     return *this;
   }
 
