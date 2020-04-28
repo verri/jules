@@ -7,6 +7,7 @@
 #include <jules/array/meta/common.hpp>
 #include <jules/array/meta/reference.hpp>
 #include <jules/array/unary_expr_array.hpp>
+#include <jules/base/math.hpp>
 #include <jules/core/debug.hpp>
 
 #include <functional>
@@ -43,54 +44,67 @@ template <typename T, typename Op> struct right_operation
   }
 };
 
-template <typename Op> static auto apply(const common_array auto& operand, Op op)
+struct array_apply
 {
-  return unary_expr_array(operand.begin(), operand.end(), std::move(op), operand.dimensions());
-}
+  template <typename Op> auto operator()(const common_array auto& operand, Op op) const
+  {
+    return unary_expr_array(operand.begin(), operand.end(), std::move(op), operand.dimensions());
+  }
 
-template <typename T, std::size_t N, typename Op> static auto apply(in_place_t, array<T, N>& operand, Op op) -> array<T, N>&
+  template <typename T, std::size_t N, typename Op> auto operator()(in_place_t, array<T, N>& operand, Op op) const -> array<T, N>&
+  {
+    apply(in_place, ref(operand), std::move(op));
+    return operand;
+  }
+
+  template <typename Op> auto operator()(in_place_t, reference_array auto operand, Op op) const
+  {
+    for (auto& value : operand)
+      op(value);
+    return operand;
+  }
+
+  template <typename ArrayA, typename ArrayB, typename Op>
+  requires common_array<ArrayA>&& common_array<ArrayB> auto operator()(const ArrayA& lhs, const ArrayB& rhs, Op op) const
+  {
+    static_assert(ArrayA::order == ArrayB::order);
+    DEBUG_ASSERT(lhs.dimensions() == rhs.dimensions(), debug::default_module, debug::level::extents_check, "extents mismatch");
+    return binary_expr_array(lhs.begin(), lhs.end(), rhs.begin(), rhs.end(), std::move(op), lhs.dimensions());
+  }
+
+  template <typename T, std::size_t N, typename Op>
+  auto operator()(in_place_t, array<T, N>& lhs, const common_array auto& rhs, Op op) const -> array<T, N>&
+  {
+    (*this)(in_place, ref(lhs), rhs, std::move(op));
+    return lhs;
+  }
+
+  template <reference_array RefArrayA, common_array ArrayB, typename Op>
+  auto operator()(in_place_t, RefArrayA lhs, const ArrayB& rhs, Op op) const
+  {
+    static_assert(RefArrayA::order == ArrayB::order);
+    DEBUG_ASSERT(lhs.dimensions() == rhs.dimensions(), debug::default_module, debug::level::extents_check, "extents mismatch");
+
+    auto itl = lhs.begin();
+    auto itr = rhs.begin();
+    const auto end = lhs.end();
+
+    while (itl != end)
+      op(*itl++, *itr++);
+
+    return lhs;
+  }
+};
+
+template <typename It, typename Op, std::size_t N> struct apply_traits<unary_expr_array<It, Op, N>>
 {
-  apply(in_place, ref(operand), std::move(op));
-  return operand;
-}
+  using apply_type = array_apply;
+};
 
-template <typename Op> static auto apply(in_place_t, reference_array auto operand, Op op)
+template <typename LhsIt, typename RhsIt, typename Op, std::size_t N> struct apply_traits<binary_expr_array<LhsIt, RhsIt, Op, N>>
 {
-  for (auto& value : operand)
-    op(value);
-  return operand;
-}
-
-template <typename ArrayA, typename ArrayB, typename Op>
-requires common_array<ArrayA>&& common_array<ArrayB> static auto apply(const ArrayA& lhs, const ArrayB& rhs, Op op)
-{
-  static_assert(ArrayA::order == ArrayB::order);
-  DEBUG_ASSERT(lhs.dimensions() == rhs.dimensions(), debug::default_module, debug::level::extents_check, "extents mismatch");
-  return binary_expr_array(lhs.begin(), lhs.end(), rhs.begin(), rhs.end(), std::move(op), lhs.dimensions());
-}
-
-template <typename T, std::size_t N, typename Op>
-static auto apply(in_place_t, array<T, N>& lhs, const common_array auto& rhs, Op op) -> array<T, N>&
-{
-  apply(in_place, ref(lhs), rhs, std::move(op));
-  return lhs;
-}
-
-template <reference_array RefArrayA, common_array ArrayB, typename Op>
-static auto apply(in_place_t, RefArrayA lhs, const ArrayB& rhs, Op op)
-{
-  static_assert(RefArrayA::order == ArrayB::order);
-  DEBUG_ASSERT(lhs.dimensions() == rhs.dimensions(), debug::default_module, debug::level::extents_check, "extents mismatch");
-
-  auto itl = lhs.begin();
-  auto itr = rhs.begin();
-  const auto end = lhs.end();
-
-  while (itl != end)
-    op(*itl++, *itr++);
-
-  return lhs;
-}
+  using apply_type = array_apply;
+};
 
 #define OPERATIONS_LIST                                                                                                          \
   UNARY_OPERATIONS_LIST                                                                                                          \

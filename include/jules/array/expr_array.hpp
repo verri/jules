@@ -27,7 +27,7 @@ public:
   constexpr auto operator=(const expr_array& source) -> expr_array& = delete;
   constexpr auto operator=(expr_array&& source) noexcept -> expr_array& = delete;
 
-  [[nodiscard]] constexpr auto dimensions() const noexcept { return descriptor_.extents; }
+  [[nodiscard]] constexpr auto dimensions() const noexcept { return descriptor_.extents(); }
 
   [[nodiscard]] constexpr auto size() const noexcept { return descriptor_.size(); }
 

@@ -8,7 +8,7 @@
 // #include <jules/array/axis.hpp>
 // #include <jules/array/blas.hpp>
 #include <jules/array/builder.hpp>
-// #include <jules/array/functional.hpp>
+#include <jules/array/functional.hpp>
 // #include <jules/array/io.hpp>
 #include <jules/array/numeric.hpp>
 // #include <jules/array/overlap.hpp>
@@ -421,6 +421,21 @@ private:
 };
 
 template <common_array Array> array(const Array&) -> array<typename Array::value_type, Array::order>;
+
+template <typename T, std::size_t N> struct apply_traits<array<T, N>>
+{
+  using apply_type = array_apply;
+};
+
+template <typename T, std::size_t N> struct apply_traits<ref_array<T, N>>
+{
+  using apply_type = array_apply;
+};
+
+template <typename T, typename Mapper> struct apply_traits<strided_ref_array<T, Mapper>>
+{
+  using apply_type = array_apply;
+};
 
 template <typename T, std::size_t N> auto ref(array<T, N>& a) -> ref_array<T, N> { return {a.data(), {a.dimensions()}}; }
 

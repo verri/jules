@@ -4,10 +4,12 @@
 
 TEST_CASE("Apply in place", "[array]")
 {
-  auto v = jules::vector<>{1, 2, 3};
-  apply(jules::in_place, v, [](auto& x) { x *= 2.0; });
-  CHECK(all(v == jules::cat(2, 4, 6)));
+  using namespace jules;
 
-  apply(jules::in_place, v, jules::vector<>{1, 2, 3}, [](auto& x, auto y) { x /= y; });
+  auto v = vector<>{1, 2, 3};
+  apply(in_place, v, [](auto& x) { x *= 2.0; });
+  CHECK(all(v == cat(2, 4, 6)));
+
+  apply(in_place, v, vector<>{1, 2, 3}, [](auto& x, auto y) { x /= y; });
   CHECK(all(v == 2));
 }

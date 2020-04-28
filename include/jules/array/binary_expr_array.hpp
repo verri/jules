@@ -14,7 +14,7 @@
 namespace jules
 {
 
-template <typename LhsIt, typename RhsIt, typename Op, size_t N> class binary_expr_array : public expr_array<Op, N>
+template <typename LhsIt, typename RhsIt, typename Op, std::size_t N> class binary_expr_array : public expr_array<Op, N>
 {
   /// \exclude
   using lhs_result = decltype(*std::declval<LhsIt&>());
