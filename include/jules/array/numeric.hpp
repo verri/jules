@@ -52,10 +52,11 @@ requires common_array<ArrayA>&& common_array<ArrayB> auto product(const ArrayA& 
   return detail::product_impl<R>(eval(static_cast<const ArrayA&>(lhs)), eval(static_cast<const ArrayB&>(rhs)));
 }
 
-template <typename T> auto to_vector(const common_array auto& source) -> array<T, 1u>
+template <typename T> auto to_vector(const common_array auto& source) -> array<T, 1u> { return {source.begin(), source.end()}; }
+
+template <typename T, same_as<T> U, std::size_t N> auto to_vector(array<U, N>&& source) noexcept -> array<T, 1u>
 {
-  // TODO: Optimize if A is a temporary.
-  return {source.begin(), source.end()};
+  return array_builder<T, 1>(std::move(source).release(), {{source.size()}});
 }
 
 template <typename T, ranges::range Rng> requires(!common_array<Rng>) auto to_vector(const Rng& rng) { return array<T, 1u>(rng); }
@@ -63,8 +64,12 @@ template <typename T, ranges::range Rng> requires(!common_array<Rng>) auto to_ve
 // If higher order, copy elements column-wise.
 auto as_vector(const common_array auto& source) -> array<typename decltype(source)::value_type, 1u>
 {
-  // TODO: Optimize if A is a temporary.
   return {source.begin(), source.end()};
+}
+
+template <typename T, std::size_t N> auto as_vector(array<T, N>&& source) noexcept -> array<T, 1u>
+{
+  return array_builder<T, 1>(std::move(source).release(), {{source.size()}});
 }
 
 template <ranges::range Rng, typename R = ranges::range_value_t<Rng>> auto as_vector(const Rng& rng) -> array<R, 1u>

@@ -12,7 +12,6 @@
 
 #include <functional>
 
-// TODO: XXX: think how to reuse the memory of a base_array&&
 // TODO: better names for left_operation and right_operation
 
 namespace jules
@@ -51,9 +50,19 @@ struct array_apply
     return unary_expr_array(operand.begin(), operand.end(), std::move(op), operand.dimensions());
   }
 
+  template <typename T, std::size_t N, typename Op> auto operator()(array<T, N>&& operand, Op op) const
+  {
+    if constexpr (same_as<std::decay_t<decltype(op(std::declval<T>()))>, T>) {
+      (*this)(in_place, operand, std::move(op));
+      return array<T, N>(std::move(operand));
+    } else {
+      return (*this)(ref(operand), std::move(op));
+    }
+  }
+
   template <typename T, std::size_t N, typename Op> auto operator()(in_place_t, array<T, N>& operand, Op op) const -> array<T, N>&
   {
-    apply(in_place, ref(operand), std::move(op));
+    (*this)(in_place, ref(operand), std::move(op));
     return operand;
   }
 
