@@ -34,9 +34,9 @@ set(source_files
   array/slicing.cpp
   array/vector.cpp
   array/allocator.cpp
-  # array/matrix.cpp
-  # array/blas.cpp
-  # array/array.cpp
+  array/matrix.cpp
+  array/blas.cpp
+  array/array.cpp
   base/random.cpp
   base/math.cpp
   base/numeric.cpp

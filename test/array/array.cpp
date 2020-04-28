@@ -20,19 +20,18 @@ TEST_CASE("Basic array functionalities", "[array]")
 
   CHECK(all(matrix2 == 3));
 
-  int x[20];
-  copy(indices(0, 20), x);
-  array<int, 2> matrix3(x, 4u, 5u); // matrix 4x5 with values 0..19
+  std::array<int, 20> x;
+  copy(indices(0, 20), std::begin(x));
+  array<int, 2> matrix3(std::begin(x), 4u, 5u); // matrix 4x5 with values 0..19
 
   CHECK(all(flatten(matrix3) == as_vector(indices(0, 20))));
 
   CHECK(all(reshape(matrix3, matrix3.size()) == as_vector(indices(0, 20))));
   CHECK(all(reshape_to<1>(matrix3, {{matrix3.size()}}) == as_vector(indices(0, 20))));
-  CHECK(all(reshape_as(matrix3, flatten(matrix3)) == as_vector(indices(0, 20))));
+  CHECK(all(reshape_to(matrix3, flatten(matrix3).dimensions()) == as_vector(indices(0, 20))));
 
   CHECK(all(matrix3 == reshape_to(as_vector(indices(0, 20)), matrix3.dimensions())));
   CHECK(all(matrix3 == reshape(as_vector(indices(0, 20)), row_count(matrix3), column_count(matrix3))));
-  CHECK(all(matrix3 == reshape_as(as_vector(indices(0, 20)), matrix3)));
 
   {
     auto result = std::mismatch(begin(x), end(x), matrix3.data());
@@ -42,10 +41,10 @@ TEST_CASE("Basic array functionalities", "[array]")
 
   // array<int, 2> matrix10(3, 4u, 5u, 4u); // shouldn't not compile
 
-  array vector1 = matrix3[3]; // copy last line
-  CHECK(all(vector1 == matrix3[3]));
+  array vector1 = matrix3[3][every][every]; // copy last line
+  CHECK(all(vector1 == matrix3[3][every][every]));
 
-  matrix3[3] = 0;
+  matrix3[3][every][every] = 0;
   x[3] = x[7] = x[11] = x[15] = x[19] = 0;
   {
     auto result = std::mismatch(begin(x), end(x), matrix3.data());

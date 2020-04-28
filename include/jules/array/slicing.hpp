@@ -33,13 +33,30 @@ constexpr auto slicing_size(absolute_slice slice) noexcept { return slice.extent
 
 constexpr auto slicing_size(index_span span) noexcept { return span.size(); }
 
+// Forwarding all variations of fill.
+template <std::size_t N, typename Descriptor, typename... Tail>
+auto slicing_fill(container<index_t>&, const Descriptor&, std::array<index_t, N>, index_t, Tail...);
+
+template <std::size_t N, typename Descriptor, typename... Tail>
+auto slicing_fill(container<index_t>&, const Descriptor&, std::array<index_t, N>, absolute_every_index, Tail...);
+
+template <std::size_t N, typename Descriptor, typename... Tail>
+auto slicing_fill(container<index_t>&, const Descriptor&, std::array<index_t, N>, absolute_slice, Tail...);
+
+template <std::size_t N, typename Descriptor, typename... Tail>
+auto slicing_fill(container<index_t>&, const Descriptor&, std::array<index_t, N>, absolute_strided_slice, Tail...);
+
+template <std::size_t N, typename Descriptor, typename... Tail>
+auto slicing_fill(container<index_t>&, const Descriptor&, std::array<index_t, N>, index_span, Tail...);
+//
+
 template <std::size_t N, typename Descriptor, typename... Tail>
 auto slicing_fill(container<index_t>& map, const Descriptor& descriptor, std::array<index_t, N> args, index_t index, Tail... tail)
 {
   if constexpr (sizeof...(Tail) == 0) {
-    map.push_back(descriptor(detail::array_cat(args, index)));
+    map.push_back(descriptor(detail::array_cat(index, args)));
   } else {
-    slicing_fill(map, descriptor, detail::array_cat(args, index), tail...);
+    slicing_fill(map, descriptor, detail::array_cat(index, args), tail...);
   }
 }
 
@@ -49,9 +66,9 @@ auto slicing_fill(container<index_t>& map, const Descriptor& descriptor, std::ar
 {
   for (const auto i : indices(index.dim)) {
     if constexpr (sizeof...(Tail) == 0)
-      map.push_back(descriptor(detail::array_cat(args, i)));
+      map.push_back(descriptor(detail::array_cat(i, args)));
     else
-      slicing_fill(map, descriptor, detail::array_cat(args, i), tail...);
+      slicing_fill(map, descriptor, detail::array_cat(i, args), tail...);
   }
 }
 
@@ -59,11 +76,11 @@ template <std::size_t N, typename Descriptor, typename... Tail>
 auto slicing_fill(container<index_t>& map, const Descriptor& descriptor, std::array<index_t, N> args, absolute_slice index,
                   Tail... tail)
 {
-  for (const auto i : indices(index.start(), index.extent())) {
+  for (const auto i : indices(index.start(), index.start() + index.extent())) {
     if constexpr (sizeof...(Tail) == 0)
-      map.push_back(descriptor(detail::array_cat(args, i)));
+      map.push_back(descriptor(detail::array_cat(i, args)));
     else
-      slicing_fill(map, descriptor, detail::array_cat(args, i), tail...);
+      slicing_fill(map, descriptor, detail::array_cat(i, args), tail...);
   }
 }
 
@@ -75,9 +92,9 @@ auto slicing_fill(container<index_t>& map, const Descriptor& descriptor, std::ar
                  ranges::views::take(index.extent());
   for (const auto i : indexes) {
     if constexpr (sizeof...(Tail) == 0)
-      map.push_back(descriptor(detail::array_cat(args, i)));
+      map.push_back(descriptor(detail::array_cat(i, args)));
     else
-      slicing_fill(map, descriptor, detail::array_cat(args, i), tail...);
+      slicing_fill(map, descriptor, detail::array_cat(i, args), tail...);
   }
 }
 
@@ -87,10 +104,16 @@ auto slicing_fill(container<index_t>& map, const Descriptor& descriptor, std::ar
 {
   for (const auto i : indexes) {
     if constexpr (sizeof...(Tail) == 0)
-      map.push_back(descriptor(detail::array_cat(args, i)));
+      map.push_back(descriptor(detail::array_cat(i, args)));
     else
-      slicing_fill(map, descriptor, detail::array_cat(args, i), tail...);
+      slicing_fill(map, descriptor, detail::array_cat(i, args), tail...);
   }
+}
+
+template <typename Descriptor, typename Tuple, std::size_t... I>
+auto slicing_fill(container<index_t>& map, const Descriptor& descriptor, Tuple indexes, std::index_sequence<I...>)
+{
+  return slicing_fill(map, descriptor, std::array<index_t, 0>{}, std::get<I>(indexes)...);
 }
 
 template <std::size_t N, typename Tuple, std::size_t... I>
@@ -114,13 +137,18 @@ auto calculate_container_slicing(T* data, const Mapper& mapper, Indexes... index
   constexpr auto Order = Mapper::order;
   constexpr auto D = count_args(std::is_same_v<Indexes, index_t>...);
 
-  const auto desc = descriptor<Order>{{slicing_size(indexes)...}}.template drop_one_level_dimensions<Order - D>();
+  const auto extents = detail::drop_which<index_t, Order, !std::is_same_v<Indexes, index_t>...>({{slicing_size(indexes)...}});
+  static_assert(std::is_same_v<const std::array<index_t, Order - D>, decltype(extents)>);
+
+  const auto desc = descriptor<Order - D>(extents);
   const auto size = desc.size();
 
   container<index_t> map;
   map.reserve(size);
 
-  slicing_fill(map, mapper, std::array<index_t, 0u>{}, indexes...);
+  slicing_fill(map, mapper, reverse(std::make_tuple(indexes...)), std::make_index_sequence<sizeof...(indexes)>());
+
+  DEBUG_ASSERT(map.size() == size, debug::default_module, debug::level::unreachable, "should never happen");
 
   return std::make_tuple(data, container_mapper(desc.extents(), std::move(map)));
 }
@@ -153,10 +181,15 @@ auto calculate_slicing(T* data, const strided_descriptor<Order>& desc, Indexes..
     const auto slices = std::make_tuple(to_strided_slice(indexes)...);
 
     const auto start = slicing_start(desc.strides(), slices, std::make_index_sequence<Order>());
-    const auto strides = slicing_strides(desc.strides(), slices, std::make_index_sequence<Order>());
-    const auto extents = std::array<index_t, Order>{{slicing_size(indexes)...}};
 
-    const auto newdescriptor = strided_descriptor<Order>(extents, strides).template drop_one_level_dimensions<Order - D>();
+    const auto strides = detail::drop_which<index_t, Order, !std::is_same_v<Indexes, index_t>...>(
+      slicing_strides(desc.strides(), slices, std::make_index_sequence<Order>()));
+    static_assert(std::is_same_v<const std::array<index_t, Order - D>, decltype(strides)>);
+
+    const auto extents = detail::drop_which<index_t, Order, !std::is_same_v<Indexes, index_t>...>({{slicing_size(indexes)...}});
+    static_assert(std::is_same_v<const std::array<index_t, Order - D>, decltype(extents)>);
+
+    const auto newdescriptor = strided_descriptor<Order - D>(extents, strides);
     return std::make_tuple(data + start, strided_mapper(newdescriptor));
   }
 }

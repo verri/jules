@@ -14,6 +14,7 @@
 
 #include <algorithm>
 #include <numeric>
+#include <utility>
 
 /// \exclude
 namespace jules::detail
@@ -90,6 +91,28 @@ constexpr decltype(auto) apply_n(F&& f, Tuple&& tuple,
                                  std::index_sequence<I...>) noexcept(noexcept(std::forward<F>(f)(std::get<I>(tuple)...)))
 {
   return std::forward<F>(f)(std::get<I>(tuple)...);
+}
+
+template <typename Tuple, std::size_t... I> constexpr auto reverse(Tuple& t, std::index_sequence<I...>) noexcept
+{
+  return std::make_tuple(std::move(std::get<sizeof...(I) - I - 1>(t))...);
+}
+
+template <typename... Ts> constexpr auto reverse(std::tuple<Ts...> t) noexcept
+{
+  return reverse(t, std::make_index_sequence<sizeof...(Ts)>());
+}
+
+template <typename T, std::size_t N, bool... B> constexpr auto drop_which(const std::array<T, N>& x)
+{
+  std::array<T, count_args(B...)> y;
+  std::size_t i = 0, j = 0;
+  for (const auto b : {B...}) {
+    if (b)
+      y[i++] = x[j];
+    ++j;
+  }
+  return y;
 }
 
 } // namespace jules::detail

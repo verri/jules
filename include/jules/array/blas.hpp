@@ -47,15 +47,15 @@ auto product(const ref_array<T, 2u>& lhs, const ref_array<U, 2u>& rhs, R alpha =
   static_assert(std::is_same_v<decltype(lhs.begin()), decltype(rhs.begin())>);
 
   DEBUG_ASSERT(lhs.size() > 0 && rhs.size() > 0, debug::default_module, debug::level::invalid_argument, "empty matrix");
-  DEBUG_ASSERT(lhs.column_count() == rhs.row_count(), debug::default_module, debug::level::invalid_argument, "invalid extents");
+  DEBUG_ASSERT(column_count(lhs) == row_count(rhs), debug::default_module, debug::level::invalid_argument, "invalid extents");
 
-  auto result = array<R, 2u>(uninitialized, lhs.row_count(), rhs.column_count());
+  auto result = array<R, 2u>(uninitialized, row_count(lhs), column_count(rhs));
 
-  const auto k = safe_int_cast(lhs.column_count()); // same as rhs.row_count()
-  const auto result_row_count = safe_int_cast(result.row_count());
-  const auto result_column_count = safe_int_cast(result.column_count());
-  const auto lhs_row_count = safe_int_cast(lhs.row_count());
-  const auto rhs_row_count = safe_int_cast(rhs.row_count());
+  const auto k = safe_int_cast(column_count(lhs)); // same as row_count(rhs)
+  const auto result_row_count = safe_int_cast(row_count(result));
+  const auto result_column_count = safe_int_cast(column_count(result));
+  const auto lhs_row_count = safe_int_cast(row_count(lhs));
+  const auto rhs_row_count = safe_int_cast(row_count(rhs));
 
   cblas<R>::gemm(CblasColMajor, CblasNoTrans, CblasNoTrans,       //
                  result_row_count, result_column_count, k, alpha, //

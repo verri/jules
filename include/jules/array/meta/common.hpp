@@ -31,6 +31,20 @@ template <typename T> concept common_array = requires(const T& t)
 };
 // clang-format on
 
+constexpr auto row_count(const common_array auto& a) noexcept { return a.dimensions()[0]; }
+
+template <common_array Array> constexpr auto column_count(const Array& a) noexcept
+{
+  static_assert(Array::order >= 2);
+  return a.dimensions()[1];
+}
+
+template <common_array Array> constexpr auto length(const Array& a) noexcept
+{
+  static_assert(Array::order == 1);
+  return a.dimensions()[0];
+}
+
 } // namespace jules
 
 #endif // JULES_ARRAY_META_COMMON_H

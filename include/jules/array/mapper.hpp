@@ -54,7 +54,7 @@ public:
 
   [[nodiscard]] auto operator()(const std::array<index_t, N>& pos) const
   {
-    DEBUG_ASSERT(pos < indexes_.size(), debug::default_module, debug::level::boundary_check, "out of range");
+    DEBUG_ASSERT(descriptor_(pos) < indexes_.size(), debug::default_module, debug::level::boundary_check, "out of range");
     return indexes_[descriptor_(pos)];
   }
 

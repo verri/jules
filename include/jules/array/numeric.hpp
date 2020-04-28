@@ -30,10 +30,10 @@ requires reference_array<RefArrayA>&& reference_array<RefArrayB> auto product_im
   static_assert(RefArrayA::order == 2u && RefArrayB::order == 2u);
 
   DEBUG_ASSERT(lhs.size() > 0 && rhs.size() > 0, debug::default_module, debug::level::invalid_argument, "empty matrix");
-  DEBUG_ASSERT(lhs.column_count() == rhs.row_count(), debug::default_module, debug::level::invalid_argument, "invalid extents");
+  DEBUG_ASSERT(column_count(lhs) == row_count(rhs), debug::default_module, debug::level::invalid_argument, "invalid extents");
 
-  const auto m = lhs.row_count();
-  const auto p = rhs.column_count();
+  const auto m = row_count(lhs);
+  const auto p = column_count(rhs);
 
   auto builder = array_builder<R, 2u>{{{m, p}}};
 

@@ -450,20 +450,6 @@ auto reshape_to(array<T, N>&& source, std::array<index_t, D> extents) noexcept -
   return array_builder(std::move(source).release(), extents);
 }
 
-constexpr auto row_count(const common_array auto& a) noexcept { return a.dimensions()[0]; }
-
-template <common_array Array> constexpr auto column_count(const Array& a) noexcept
-{
-  static_assert(Array::order >= 2);
-  return a.dimensions()[1];
-}
-
-template <common_array Array> constexpr auto length(const Array& a) noexcept
-{
-  static_assert(Array::order == 1);
-  return a.dimensions()[0];
-}
-
 /// \group array_alias Array Aliasing
 /// (1) Matrix aliasing.
 ///

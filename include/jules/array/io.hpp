@@ -161,9 +161,19 @@ auto operator<<(std::basic_ostream<CharT, Traits>& os, RefArray a) -> std::basic
   if (dim_size == 0)
     return os << CharT('}');
 
-  os << a[0];
-  for (auto i = index_t{1}; i < dim_size; ++i)
-    os << CharT(' ') << a[i];
+  if constexpr (RefArray::order == 1) {
+    os << a[0];
+    for (auto i = index_t{1}; i < dim_size; ++i)
+      os << CharT(' ') << a[i];
+  } else {
+    const auto r = rows(a);
+    auto it = r.begin();
+
+    os << *it++;
+    while (it != r.end())
+      os << CharT(' ') << *it++;
+  }
+
   return os << CharT('}');
 }
 
