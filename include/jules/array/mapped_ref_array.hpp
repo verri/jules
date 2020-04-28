@@ -1,8 +1,8 @@
 // Copyright (c) 2017-2020 Filipe Verri <filipeverri@gmail.com>
 
-#ifndef JULES_ARRAY_STRIDED_REF_ARRAY_H
+#ifndef JULES_ARRAY_MAPPED_REF_ARRAY_H
 /// \exclude
-#define JULES_ARRAY_STRIDED_REF_ARRAY_H
+#define JULES_ARRAY_MAPPED_REF_ARRAY_H
 
 #include <jules/array/detail/common.hpp>
 #include <jules/array/detail/iterator.hpp>
@@ -20,21 +20,18 @@
 namespace jules
 {
 
-// TODO: change name to mapped_ref_array (should ref_array be a special case of
-// mapped_ref_array?)
-
 /// Array with non-owned, non-continuous data.
 ///
-/// This class represents a strided_ref view of an concrete array.
+/// This class represents a mapped_ref view of an concrete array.
 ///
 /// \module Array Types
 /// \notes This class is not meant to be used in user code.
-template <typename T, typename Mapper> class strided_ref_array
+template <typename T, typename Mapper> class mapped_ref_array
 {
   static_assert(Mapper::order > 0u, "invalid array dimension");
 
   template <typename, std::size_t> friend class array;
-  template <typename, typename> friend class strided_ref_array;
+  template <typename, typename> friend class mapped_ref_array;
 
 public:
   /// \group member_types Class Types and Constants
@@ -67,23 +64,23 @@ public:
   /// \group member_types Class Types and Constants
   using difference_type = distance_t;
 
-  constexpr strided_ref_array() noexcept = default;
+  constexpr mapped_ref_array() noexcept = default;
 
-  strided_ref_array(value_type* data, Mapper mapper) : mapper_{std::move(mapper)}, data_{data} {}
-  strided_ref_array(const strided_ref_array& source) = default;
-  strided_ref_array(strided_ref_array&& source) noexcept = default;
+  mapped_ref_array(value_type* data, Mapper mapper) : mapper_{std::move(mapper)}, data_{data} {}
+  mapped_ref_array(const mapped_ref_array& source) = default;
+  mapped_ref_array(mapped_ref_array&& source) noexcept = default;
 
-  ~strided_ref_array() = default;
+  ~mapped_ref_array() = default;
 
   /// \group Assignment
-  auto operator=(const common_array auto& source) -> strided_ref_array&
+  auto operator=(const common_array auto& source) -> mapped_ref_array&
   {
     detail::array_assign(*this, source);
     return *this;
   }
 
   /// \group Assignment
-  template <typename U> requires(!common_array<U>) auto operator=(const U& source) -> strided_ref_array&
+  template <typename U> requires(!common_array<U>) auto operator=(const U& source) -> mapped_ref_array&
   {
     static_assert(std::is_assignable<value_type&, U>::value, "incompatible assignment");
     ranges::fill(*this, source);
@@ -91,7 +88,7 @@ public:
   }
 
   /// \group Assignment
-  auto operator=(const strided_ref_array& source) -> strided_ref_array&
+  auto operator=(const mapped_ref_array& source) -> mapped_ref_array&
   {
     if (this != &source)
       detail::array_assign(*this, source);
@@ -99,7 +96,7 @@ public:
   }
 
   /// Implicitly convertable to hold const values.
-  operator strided_ref_array<const value_type, Mapper>() const { return {data(), mapper()}; }
+  operator mapped_ref_array<const value_type, Mapper>() const { return {data(), mapper()}; }
 
   /// \group Indexing
   decltype(auto) operator[](index_t index) { return detail::forward_slicing<order>(data(), mapper(), index); }
@@ -175,7 +172,7 @@ public:
       return *this->data();
     } else {
       auto mapper = this->mapper().template drop_one_level_dimensions<D>();
-      return strided_ref_array<T, decltype(mapper)>{this->data(), std::move(mapper)};
+      return mapped_ref_array<T, decltype(mapper)>{this->data(), std::move(mapper)};
     }
   }
 
@@ -191,20 +188,20 @@ private:
   value_type* const data_ = nullptr;
 };
 
-template <typename T, typename Mapper> strided_ref_array(T*, Mapper) -> strided_ref_array<T, Mapper>;
+template <typename T, typename Mapper> mapped_ref_array(T*, Mapper) -> mapped_ref_array<T, Mapper>;
 
-template <typename T, typename Mapper> auto eval(strided_ref_array<T, Mapper> source) -> strided_ref_array<T, Mapper>
+template <typename T, typename Mapper> auto eval(mapped_ref_array<T, Mapper> source) -> mapped_ref_array<T, Mapper>
 {
   return source;
 }
 
-template <std::size_t D, typename U, typename Mapper> decltype(auto) drop_to(strided_ref_array<U, Mapper> source)
+template <std::size_t D, typename U, typename Mapper> decltype(auto) drop_to(mapped_ref_array<U, Mapper> source)
 {
   return source.template drop_to<D>();
 }
 
-template <typename U, typename Mapper> decltype(auto) drop(strided_ref_array<U, Mapper> source) { return drop_to<1>(source); }
+template <typename U, typename Mapper> decltype(auto) drop(mapped_ref_array<U, Mapper> source) { return drop_to<1>(source); }
 
 } // namespace jules
 
-#endif // JULES_ARRAY_STRIDED_REF_ARRAY_H
+#endif // JULES_ARRAY_MAPPED_REF_ARRAY_H

@@ -13,7 +13,7 @@ namespace jules
 {
 
 template <typename, std::size_t> class array;
-template <typename, typename> class strided_ref_array;
+template <typename, typename> class mapped_ref_array;
 template <typename, std::size_t> class ref_array;
 template <typename, typename, std::size_t> class unary_expr_array;
 template <typename, typename> struct left_operation;

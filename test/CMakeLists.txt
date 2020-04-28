@@ -25,7 +25,7 @@ set(source_files
   core/string.cpp
   array/axis.cpp
   array/functional.cpp
-  array/strided_ref_array.cpp
+  array/mapped_ref_array.cpp
   array/numeric.cpp
   array/math.cpp
   array/io.cpp

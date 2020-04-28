@@ -1,4 +1,4 @@
-#include "jules/array/strided_ref_array.hpp"
+#include "jules/array/mapped_ref_array.hpp"
 #include "jules/array/meta/common.hpp"
 #include "jules/array/meta/reference.hpp"
 
@@ -15,7 +15,7 @@ TEST_CASE("1-D strided reference array view", "[array]")
   auto x = std::vector<double>(size, 0.0);
   REQUIRE(x.size() == size);
 
-  auto v = jules::strided_ref_array(x.data(), strided_mapper<1>({{x.size()}}));
+  auto v = jules::mapped_ref_array(x.data(), strided_mapper<1>({{x.size()}}));
 
   static_assert(jules::common_array<decltype(v)>);
   static_assert(jules::reference_array<decltype(v)>);
@@ -27,7 +27,7 @@ TEST_CASE("1-D strided reference array view", "[array]")
   v[2u] = 1.0;
   CHECK(x[2u] == 1.0);
 
-  auto w = jules::strided_ref_array<const double, strided_mapper<1>>(x.data(), {{{{x.size() / 2u}}, {{2u}}}});
+  auto w = jules::mapped_ref_array<const double, strided_mapper<1>>(x.data(), {{{{x.size() / 2u}}, {{2u}}}});
 
   static_assert(jules::common_array<decltype(w)>);
   static_assert(jules::reference_array<decltype(w)>);
@@ -41,8 +41,8 @@ TEST_CASE("1-D strided reference array view", "[array]")
   auto y = std::vector<double>(size, 1.0);
   REQUIRE(x.size() == y.size());
 
-  auto a = jules::strided_ref_array(x.data(), strided_mapper<1>({{x.size()}}));
-  auto b = jules::strided_ref_array(y.data(), strided_mapper<1>({{y.size()}}));
+  auto a = jules::mapped_ref_array(x.data(), strided_mapper<1>({{x.size()}}));
+  auto b = jules::mapped_ref_array(y.data(), strided_mapper<1>({{y.size()}}));
 
   a = b;
   CHECK(x == y);
@@ -50,7 +50,7 @@ TEST_CASE("1-D strided reference array view", "[array]")
   a = 2.0;
   CHECK(std::find_if(x.begin(), x.end(), [](auto value) { return value != 2.0; }) == x.end());
 
-  auto c = jules::strided_ref_array(x.data(), strided_mapper<2>({{x.size() / 2, 2u}}));
+  auto c = jules::mapped_ref_array(x.data(), strided_mapper<2>({{x.size() / 2, 2u}}));
 
   c[0][0] = 3.0;
   CHECK(x[0] == 3.0);

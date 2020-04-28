@@ -10,7 +10,7 @@
 // #include <jules/array/drop.hpp>
 #include <jules/array/meta/common.hpp>
 // #include <jules/array/reshape.hpp>
-#include <jules/array/strided_ref_array.hpp>
+#include <jules/array/mapped_ref_array.hpp>
 #include <jules/core/type.hpp>
 
 namespace jules
@@ -95,9 +95,9 @@ public:
   /// Implicitly convertable to hold const values.
   operator ref_array<const value_type, order>() const { return {data(), descriptor_}; }
 
-  // operator strided_ref_array<value_type, identity_mapper<order>>() { return {data(), {{0u, dimensions()}}}; }
+  // operator mapped_ref_array<value_type, identity_mapper<order>>() { return {data(), {{0u, dimensions()}}}; }
 
-  // operator strided_ref_array<const value_type, identity_mapper<order>>() const { return {data(), {{0u, dimensions()}}}; }
+  // operator mapped_ref_array<const value_type, identity_mapper<order>>() const { return {data(), {{0u, dimensions()}}}; }
 
   /// \group Indexing
   decltype(auto) operator[](index_t index) { return detail::forward_slicing<N>(data(), descriptor_, index); }

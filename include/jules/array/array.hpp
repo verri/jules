@@ -430,7 +430,7 @@ template <typename T, std::size_t N> struct apply_traits<ref_array<T, N>>
   using apply_type = array_apply;
 };
 
-template <typename T, typename Mapper> struct apply_traits<strided_ref_array<T, Mapper>>
+template <typename T, typename Mapper> struct apply_traits<mapped_ref_array<T, Mapper>>
 {
   using apply_type = array_apply;
 };

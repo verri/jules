@@ -278,7 +278,7 @@ template <typename T, typename Mapper> decltype(auto) array_from_slicing(T* data
     if constexpr (std::is_same_v<Mapper, descriptor<Order>>) {
       return ref_array(data, mapper);
     } else {
-      return strided_ref_array(data, std::move(mapper));
+      return mapped_ref_array(data, std::move(mapper));
     }
   }
 }
