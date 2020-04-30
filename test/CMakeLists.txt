@@ -18,6 +18,8 @@ if (NOT ${CBLAS_FOUND})
   message(FATAL_ERROR "CBLAS not found.")
 endif()
 
+find_package(Boost 1.72 REQUIRED)
+
 set(source_files
   core/debug.cpp
   core/type.cpp
@@ -41,7 +43,7 @@ set(source_files
   base/math.cpp
   base/numeric.cpp
   # dataframe/column.cpp
-  # dataframe/column_model.cpp
+  dataframe/column_model.cpp
   # dataframe/dataframe.cpp
   # dataframe/action.cpp
   test_suite.cpp
@@ -65,7 +67,8 @@ endif()
 target_include_directories(jules_test_suite PUBLIC
   ${CMAKE_CURRENT_BINARY_DIR}
   ${CMAKE_CURRENT_SOURCE_DIR}
-  ${CBLAS_INCLUDE_DIR})
+  ${CBLAS_INCLUDE_DIR}
+  ${Boost_INCLUDE_DIRS})
 
 target_link_libraries(jules_test_suite PUBLIC
   jules

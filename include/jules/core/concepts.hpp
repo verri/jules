@@ -13,6 +13,13 @@ namespace jules
 {
 
 using namespace concepts;
+template <typename T> concept floating_point = std::is_floating_point_v<T>;
+
+template <typename T, typename Tuple> struct holds_type : std::false_type
+{};
+
+template <typename T, typename... Us> struct holds_type<T, std::tuple<Us...>> : std::disjunction<std::is_same<T, Us>...>
+{};
 
 // clang-format off
 template <typename T> concept adl_convertible_to_string = requires(const T& value)
@@ -43,6 +50,8 @@ template <typename C, typename T> concept container_for = requires(C& c, const T
   { c.push_back(value) };
   { c.reserve(n) };
 };
+
+template <typename Tuple, typename T> concept holds = holds_type<T, Tuple>::value;
 // clang-format on
 
 } // namespace jules

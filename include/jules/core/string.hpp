@@ -6,6 +6,7 @@
 
 #include <algorithm>
 #include <array>
+#include <iosfwd>
 #include <memory>
 #include <string_view>
 
@@ -46,6 +47,10 @@ public:
       data_.big_string = new char[size()];
     std::copy_n(source.data(), source.size(), data());
   }
+
+  template <std::size_t M> constexpr sso_string(const char (&source)[M]) : sso_string(std::string_view{source}) {}
+
+  constexpr sso_string(const std::string& source) : sso_string(std::string_view{source}) {}
 
   constexpr auto operator=(const sso_string& source) -> sso_string&
   {
@@ -105,6 +110,16 @@ private:
     char* big_string;
   } data_ = {};
 };
+
+template <std::size_t N> auto operator<<(std::ostream& os, const sso_string<N>& str) -> std::ostream& { return os << str.view(); }
+
+template <std::size_t N> auto operator>>(std::istream& is, sso_string<N>& str) -> std::istream&
+{
+  std::string tmp;
+  is >> tmp;
+  str = tmp;
+  return is;
+}
 
 } // namespace jules
 
