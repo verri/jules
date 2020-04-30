@@ -114,7 +114,7 @@ protected:
 
   [[nodiscard]] auto can_coerce_(tag<U>) const noexcept -> bool final { return coercible_to<T, Rules, U>; }
 
-  [[nodiscard]] auto coerce_(std::type_index id, column_interface_ptr& interface) const noexcept -> bool
+  [[nodiscard]] auto coerce_(std::type_index id, column_interface_ptr& interface) const -> bool
   {
     if (id != typeid(U))
       return false;

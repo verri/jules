@@ -33,10 +33,20 @@ TEST_CASE("Column model", "[dataframe]")
   CHECK(icolumn->can_coerce<string>());
   CHECK(icolumn->can_coerce<index_t>());
 
+  CHECK(icolumn->can_coerce(typeid(integer)));
+  CHECK(icolumn->can_coerce(typeid(numeric)));
+  CHECK(icolumn->can_coerce(typeid(string)));
+  CHECK(icolumn->can_coerce(typeid(index_t)));
+
   CHECK(dcolumn->can_coerce<integer>());
   CHECK(dcolumn->can_coerce<numeric>());
   CHECK(dcolumn->can_coerce<index_t>());
   CHECK(dcolumn->can_coerce<string>());
+
+  CHECK(dcolumn->can_coerce(typeid(integer)));
+  CHECK(dcolumn->can_coerce(typeid(numeric)));
+  CHECK(dcolumn->can_coerce(typeid(index_t)));
+  CHECK(dcolumn->can_coerce(typeid(string)));
 
   auto& ivec = icolumn->downcast<integer>();
   ivec.resize(10);
@@ -63,7 +73,7 @@ TEST_CASE("Column model", "[dataframe]")
   CHECK(check.first == svec.end());
   CHECK(check.second == expected.end());
 
-  auto back_to_dcolumn = scolumn->coerce<numeric>();
+  auto back_to_dcolumn = scolumn->coerce(typeid(numeric));
   auto& back_to_dvec = back_to_dcolumn->downcast<numeric>();
 
   auto check_back =
@@ -163,6 +173,9 @@ TEST_CASE("Column model sanity conversions", "[dataframe]")
 
   CHECK_THROWS(str_column->coerce<index_t>());
   CHECK_THROWS(flt_column->coerce<index_t>());
+
+  CHECK_THROWS(str_column->coerce(typeid(index_t)));
+  CHECK_THROWS(flt_column->coerce(typeid(index_t)));
 }
 
 TEST_CASE("Column model successful coercions", "[dataframe]")
