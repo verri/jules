@@ -449,11 +449,11 @@ template <typename... Args> constexpr auto sum_args(Args&&... args)
   return (std::forward<Args>(args) + ... + detail::forward_arithmetic{});
 }
 
-template <typename... Args> constexpr auto count_args(Args&&... args) { return sum_args((std::forward<Args>(args) ? 1 : 0)...); }
+template <typename... Args> constexpr auto count_args(Args&&... args) { return (index_t{0} + ... + (std::forward<Args>(args) ? 1 : 0)); }
 
-template <typename... Args> constexpr auto all_args(Args&&... args) { return (std::forward<Args>(args) && ...); }
+template <typename... Args> constexpr auto all_args(Args&&... args) { return (static_cast<bool>(std::forward<Args>(args)) && ...); }
 
-template <typename... Args> constexpr auto any_args(Args&&... args) { return (std::forward<Args>(args) || ...); }
+template <typename... Args> constexpr auto any_args(Args&&... args) { return (static_cast<bool>(std::forward<Args>(args)) || ...); }
 
 template <typename Arg, typename... Args> constexpr decltype(auto) first_arg(Arg&& arg, Args&&...)
 {

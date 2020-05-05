@@ -9,6 +9,7 @@
 
 #include <cmath>
 #include <utility>
+#include <optional>
 
 namespace jules
 {
@@ -44,9 +45,27 @@ constexpr decltype(auto) apply(in_place_t, T&& lhs, U&& rhs, Op op)
   return apply(in_place, std::forward<T>(lhs), std::forward<U>(rhs), std::move(op));
 }
 
+template <typename Op>
+class optional_operator
+{
+public:
+  constexpr optional_operator(Op op) noexcept : op_(std::move(op)) {}
+
+  template <typename T> constexpr auto operator()(const T& x) const {
+      return op_(x);
+  }
+
+  template <typename T> constexpr auto operator()(const std::optional<T>& x) const {
+      return x.has_value() ? std::make_optional(op_(x.value())) : std::nullopt;
+  }
+
+private:
+  Op op_;
+};
+
 template <typename Op> constexpr auto unary_operator(Op op) noexcept
 {
-  return [op]<typename T>(T&& value) {
+  return [op = optional_operator(std::move(op))]<typename T>(T&& value) {
     if constexpr (applies_to<Op, decltype(value)>) {
       return apply(std::forward<T>(value), std::move(op));
     } else {

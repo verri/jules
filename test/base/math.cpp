@@ -25,4 +25,10 @@ TEST_CASE("Basic math operations", "[math]")
 
   CHECK(vpdf(normal_dist{})(0.0) < 1.0);
   CHECK(vpdf(uniform_dist{})(0.0) < 1.0);
+
+  std::optional<numeric> x;
+  CHECK(vabs(x) == std::nullopt);
+
+  x = -1.0;
+  CHECK(vabs(x) == 1.0);
 }
