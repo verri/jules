@@ -42,7 +42,7 @@ set(source_files
   base/random.cpp
   base/math.cpp
   base/numeric.cpp
-  # dataframe/column.cpp
+  dataframe/column.cpp
   dataframe/column_model.cpp
   # dataframe/dataframe.cpp
   # dataframe/action.cpp

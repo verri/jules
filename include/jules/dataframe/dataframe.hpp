@@ -3,6 +3,7 @@
 #ifndef JULES_DATAFRAME_DATAFRAME_H
 #define JULES_DATAFRAME_DATAFRAME_H
 
+#include "range/v3/algorithm/transform.hpp"
 #include <jules/array/array.hpp>
 #include <jules/core/concepts.hpp>
 #include <jules/core/debug.hpp>
@@ -21,10 +22,10 @@
 namespace jules
 {
 
-template <typename Coercion> class base_dataframe
+template <typename Rules> class base_dataframe
 {
 public:
-  using column_type = base_column<Coercion>;
+  using column_type = base_column<Rules>;
 
   struct named_column_type
   {
@@ -34,44 +35,31 @@ public:
 
   struct read_options
   {
-    read_options(std::regex line_regex = std::regex{R"(\n)"}, std::regex cell_regex = std::regex{R"(\t)"}, bool header = true)
-      : line{std::move(line_regex), true, {}}, cell{std::move(cell_regex), true, {}}, header{header}
-    {}
+    struct
+    {
+      std::regex regex;
+      bool separator;
+      std::regex_constants::match_flag_type flag;
+    } line = {{R"(\n)"}, true, {}};
 
     struct
     {
       std::regex regex;
       bool separator;
       std::regex_constants::match_flag_type flag;
-    } line;
+    } cell = {{R"(\t)"}, true, {}};
 
-    struct
-    {
-      std::regex regex;
-      bool separator;
-      std::regex_constants::match_flag_type flag;
-    } cell;
+    string na = "NA";
 
-    bool header;
+    bool header = true;
   };
 
   struct write_options
   {
-    write_options(string line_separator = "\n", string cell_separator = "\t", bool header = true)
-      : line{{std::move(line_separator)}}, cell{{std::move(cell_separator)}}, header{header}
-    {}
-
-    struct
-    {
-      string separator;
-    } line;
-
-    struct
-    {
-      string separator;
-    } cell;
-
-    bool header;
+    string eol = "\n";
+    string delimiter = "\t";
+    string na = "NA";
+    bool header = true;
   };
 
   base_dataframe() = default;
@@ -98,6 +86,9 @@ public:
   template <ranges::input_iterator Iter, ranges::sentinel_for<Iter> Sent, typename R = ranges::iter_value_t<Iter>>
   requires convertible_to<R, named_column_type> base_dataframe(Iter first, Sent last, index_t size_hint)
   {
+    if (first == last)
+      return;
+
     elements_.reserve(size_hint);
 
     elements_.push_back(*first);
@@ -121,10 +112,6 @@ public:
     }
   }
 
-  base_dataframe(named_column_type elem) : row_count_{elem.column.size()} { elements_.push_back(std::move(elem)); }
-
-  base_dataframe(column_type column) : row_count_{column.size()}, elements_{{"", std::move(column)}} {}
-
   base_dataframe(const base_dataframe& source) = default;
   base_dataframe(base_dataframe&& source) noexcept = default;
 
@@ -140,13 +127,25 @@ public:
 
     const auto as_range = [](auto&& match) { return ranges::make_subrange(match.first, match.second); };
 
-    auto raw_data = string();
+    auto raw_data = std::string();
     raw_data.assign(std::istreambuf_iterator<char>(is), std::istreambuf_iterator<char>());
 
-    auto data = std::vector<std::sub_match<string::iterator>>();
+    auto data = std::vector<std::string_view>();
     auto ncol = index_t{0u};
 
     auto line_range = raw_data | view::tokenize(opt.line.regex, opt.line.separator ? -1 : 0, opt.line.flag);
+
+    constexpr auto ltrim = [](std::string_view s) -> std::string_view {
+      const auto start = s.find_first_not_of(" \n\r\t\f\v");
+      return start == std::string_view::npos ? "" : s.substr(start);
+    };
+
+    constexpr auto rtrim = [](std::string_view s) -> std::string_view {
+      const auto end = s.find_last_not_of(" \n\r\t\f\v");
+      return end == std::string_view::npos ? "" : s.substr(0, end + 1);
+    };
+
+    constexpr auto trim = [](std::string_view s) -> std::string_view { return rtrim(ltrim(s)); };
 
     auto last_size = index_t{0u};
     for (auto&& line : line_range) {
@@ -154,7 +153,9 @@ public:
         continue;
 
       const auto cells = as_range(line) | view::tokenize(opt.cell.regex, opt.cell.separator ? -1 : 0, opt.cell.flag);
-      ranges::copy(cells, ranges::back_inserter(data));
+      ranges::transform(cells, ranges::back_inserter(data), [](const auto& match) -> std::string_view {
+        return trim({match.first, match.length()});
+      });
 
       if (ncol == 0u)
         ncol = data.size() - last_size;
@@ -173,18 +174,20 @@ public:
     // only header
     if (opt.header && data.size() / ncol == 1) {
       for (auto j : indices(ncol))
-        df.bind(named_column_type{string(data[j].first, data[j].second), {}});
+        df.bind(named_column_type{string(data[j]), {}});
       return df;
     }
 
     // optional header and data
     for (auto j : indices(ncol)) {
       auto col_data = ranges::make_subrange(data.begin() + j + (opt.header ? ncol : 0), data.end()) | view::stride(ncol) |
-                      view::transform([](auto&& match) -> string {
-                        return {match.first, match.second};
+                      view::transform([&opt](const std::string_view& match) -> std::optional<string> {
+                        if (match.empty() || match == opt.na)
+                          return std::nullopt;
+                        return string(match);
                       });
       auto col = column_type(col_data | view::move);
-      df.bind(named_column_type{opt.header ? string{data[j].first, data[j].second} : string{}, std::move(col)});
+      df.bind(named_column_type{opt.header ? string(data[j]) : string(), std::move(col)});
     }
 
     return df;
@@ -198,7 +201,7 @@ public:
       return os;
 
     std::vector<column_type> coerced; // hold temporary coerced values
-    std::vector<const string*> data;
+    std::vector<const std::optional<string>*> data;
 
     coerced.reserve(column_count());
     data.reserve(column_count());
@@ -217,15 +220,15 @@ public:
     if (opt.header) {
       os << elements_[0].name;
       for (auto j = index_t{1u}; j < column_count(); ++j)
-        os << opt.cell.separator << elements_[j].name;
-      os << opt.line.separator;
+        os << opt.delimiter << elements_[j].name;
+      os << opt.eol;
     }
 
     for (auto i = index_t{0u}; i < row_count(); ++i) {
-      os << data[0][i];
+      os << data[0][i].value_or(opt.na);
       for (auto j = index_t{1u}; j < column_count(); ++j)
-        os << opt.cell.separator << data[j][i];
-      os << opt.line.separator;
+        os << opt.delimiter << data[j][i].value_or(opt.na);
+      os << opt.eol;
     }
 
     return os;
@@ -299,14 +302,14 @@ private:
 
 using dataframe = base_dataframe<coercion_rules>;
 
-template <typename Coercion> auto operator<<(std::ostream& os, const base_dataframe<Coercion>& df) -> std::ostream&
+template <typename Rules> auto operator<<(std::ostream& os, const base_dataframe<Rules>& df) -> std::ostream&
 {
   return df.write(os);
 }
 
-template <typename Coercion> auto operator>>(std::istream& is, base_dataframe<Coercion>& df) -> std::istream&
+template <typename Rules> auto operator>>(std::istream& is, base_dataframe<Rules>& df) -> std::istream&
 {
-  df = base_dataframe<Coercion>::read(is);
+  df = base_dataframe<Rules>::read(is);
   return is;
 }
 

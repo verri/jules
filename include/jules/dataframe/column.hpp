@@ -7,21 +7,37 @@
 #include <jules/core/debug.hpp>
 #include <jules/core/ranges.hpp>
 #include <jules/core/type.hpp>
-#include <jules/dataframe/detail/column_model.hpp>
+#include <jules/dataframe/column_model.hpp>
 
 #include <memory>
 
 namespace jules
 {
 
-template <typename Coercion> class base_column;
+namespace detail
+{
+
+template <typename T> struct remove_optional
+{
+  using type = T;
+};
+
+template <typename T> struct remove_optional<std::optional<T>>
+{
+  using type = T;
+};
+
+template <typename T> using remove_optional_t = typename remove_optional<T>::type;
+} // namespace detail
+
+template <typename Rules> class base_column;
 template <typename T, typename C> auto to_column(const base_column<C>& column) -> base_column<C>;
 template <typename T, typename C> auto to_column(base_column<C>&& column) -> base_column<C>;
 
-template <typename Coercion> class base_column
+template <typename Rules> class base_column
 {
-  template <typename T> using model_t = detail::column_model<T, Coercion>;
-  using interface_type = detail::column_interface<Coercion>;
+  template <typename T> using model_t = column_model<T, Rules>;
+  using interface_type = column_interface<Rules>;
   using model_type = std::unique_ptr<interface_type>;
 
   template <typename T, typename C> friend auto to_column(const base_column<C>& column) -> base_column<C>;
@@ -30,16 +46,28 @@ template <typename Coercion> class base_column
 public:
   base_column() = default;
 
-  template <typename T> base_column(std::initializer_list<T> values) : model_{std::make_unique<model_t<T>>(values)} {}
+  template <typename T>
+  base_column(std::initializer_list<T> values) : model_{std::make_unique<model_t<T>>(values.begin(), values.end())}
+  {}
 
-  template <typename T> base_column(const T& value, index_t size) : model_{std::make_unique<model_t<T>>(size, value)} {}
+  template <typename T> base_column(std::initializer_list<std::optional<T>> values) : model_{std::make_unique<model_t<T>>(values)}
+  {}
+
+  template <typename T>
+  base_column(const T& value, index_t size) : model_{std::make_unique<model_t<T>>(size, std::make_optional(value))}
+  {}
+
+  template <typename T>
+  base_column(const std::optional<T>& value, index_t size) : model_{std::make_unique<model_t<T>>(size, value)}
+  {}
 
   template <ranges::range Rng, typename R = ranges::range_value_t<Rng>>
-  base_column(const Rng& rng) : model_{std::make_unique<model_t<R>>(ranges::begin(rng), ranges::end(rng))}
+  base_column(const Rng& rng)
+    : model_{std::make_unique<model_t<detail::remove_optional_t<R>>>(ranges::begin(rng), ranges::end(rng))}
   {}
 
   template <ranges::forward_iterator Iter, ranges::sentinel_for<Iter> Sent, typename R = ranges::iter_value_t<Iter>>
-  base_column(Iter first, Sent last) : model_{std::make_unique<model_t<R>>(first, last)}
+  base_column(Iter first, Sent last) : model_{std::make_unique<model_t<detail::remove_optional_t<R>>>(first, last)}
   {}
 
   base_column(const base_column& source, index_t first, index_t size)
@@ -52,6 +80,9 @@ public:
 
   auto operator=(const base_column& source) -> base_column&
   {
+    if (this == &source)
+      return *this;
+
     model_ = source.model_ ? source.model_->clone() : nullptr;
     return *this;
   }
@@ -65,7 +96,7 @@ public:
     return *this;
   }
 
-  template <typename T> auto can_coerce() const { return model_ ? model_->template can_coerce<T>() : false; }
+  template <typename T> auto can_coerce() const noexcept { return model_ ? model_->template can_coerce<T>() : false; }
 
   auto elements_type() const
   {
@@ -76,9 +107,7 @@ public:
 
   auto size() const { return model_ ? model_->size() : 0u; }
 
-  auto length() const { return size(); }
-
-  template <typename T> auto data()
+  template <typename T> auto data() -> std::optional<T>*
   {
     DEBUG_ASSERT(model_ != nullptr, debug::throwing_module, debug::level::invalid_state, "column has no data");
     DEBUG_ASSERT(elements_type() == typeid(T), debug::throwing_module, debug::level::invalid_state, "invalid data type");
@@ -86,7 +115,7 @@ public:
     return model.data();
   }
 
-  template <typename T> auto data() const
+  template <typename T> auto data() const -> const std::optional<T>*
   {
     DEBUG_ASSERT(model_ != nullptr, debug::throwing_module, debug::level::invalid_state, "column has no data");
     DEBUG_ASSERT(elements_type() == typeid(T), debug::throwing_module, debug::level::invalid_state, "invalid data type");
