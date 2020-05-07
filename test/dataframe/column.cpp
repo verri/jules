@@ -1,6 +1,5 @@
 #include "jules/dataframe/column.hpp"
 #include "jules/array/array.hpp"
-// #include "jules/dataframe/dataframe.hpp"
 #include "jules/dataframe/numeric.hpp"
 
 #include <catch.hpp>
@@ -105,60 +104,59 @@ TEST_CASE("Column to_view vs as_vector", "[dataframe]")
   CHECK(all(vector == jules::cat(0, 1, 2, 3, 4, 5)));
 }
 
-// TEST_CASE("Column tutorial", "[dataframe]")
-// {
-//   auto empty_column = jules::column();
-//
-//   CHECK(empty_column.size() == 0u);
-//   CHECK(empty_column.length() == 0u);
-//   CHECK_FALSE(empty_column.can_coerce<jules::numeric>());
-//
-//   CHECK_THROWS(empty_column.elements_type());
-//   CHECK_THROWS(empty_column.data<void*>());
-//   CHECK_THROWS(empty_column.coerce<jules::numeric>());
-//
-//   auto from_initializer_list = jules::column{1, 2, 3, 4};
-//   CHECK(from_initializer_list.size() == 4u);
-//   CHECK(from_initializer_list.elements_type() == typeid(int));
-//
-//   auto repeated_value = jules::column(0.0, 20u);
-//   CHECK(repeated_value.size() == 20u);
-//   CHECK(repeated_value.elements_type() == typeid(double));
-//
-//   auto x = jules::vector<long>{1l, 2l, 3l};
-//
-//   auto from_range = jules::column(x);
-//   CHECK(from_range.size() == x.size());
-//   CHECK(from_range.elements_type() == typeid(decltype(x)::value_type));
-//   CHECK(all(jules::to_view<long>(from_range) == x));
-//
-//   auto from_iterators = jules::column(x.begin(), x.end());
-//   CHECK(from_iterators.size() == x.size());
-//   CHECK(from_iterators.elements_type() == typeid(decltype(x)::value_type));
-//   CHECK(all(jules::to_view<long>(from_iterators) == x));
-//
-//   auto a = jules::column(0.0f, 5u);
-//   auto b = a;
-//   auto c = std::move(b);
-//
-//   CHECK(b.size() == 0u);
-//   CHECK(c.size() == a.size());
-//   CHECK(c.elements_type() == a.elements_type());
-//
-//   b = a;
-//   c = std::move(a);
-//
-//   CHECK(a.size() == 0u);
-//   CHECK(b.size() == c.size());
-//   CHECK(b.elements_type() == c.elements_type());
-//
-//   // View with different type
-//   auto dview = jules::to_view<double>(b);
-//   // b now holds double
-//   CHECK(b.elements_type() == typeid(double));
-//
-//   // To vector, on the other hand, doesn't convert
-//   auto fcopy = jules::to_vector<jules::string>(b);
-//   // b still holds double
-//   CHECK(b.elements_type() == typeid(double));
-// }
+TEST_CASE("Column tutorial", "[dataframe]")
+{
+  auto empty_column = jules::column();
+
+  CHECK(empty_column.size() == 0u);
+  CHECK_FALSE(empty_column.can_coerce<jules::numeric>());
+
+  CHECK_THROWS(empty_column.elements_type());
+  CHECK_THROWS(empty_column.data<void*>());
+  CHECK_THROWS(empty_column.coerce<jules::numeric>());
+
+  auto from_initializer_list = jules::column{1, 2, 3, 4};
+  CHECK(from_initializer_list.size() == 4u);
+  CHECK(from_initializer_list.elements_type() == typeid(int));
+
+  auto repeated_value = jules::column(0.0, 20u);
+  CHECK(repeated_value.size() == 20u);
+  CHECK(repeated_value.elements_type() == typeid(double));
+
+  auto x = jules::vector<long>{1L, 2L, 3L};
+
+  auto from_range = jules::column(x);
+  CHECK(from_range.size() == x.size());
+  CHECK(from_range.elements_type() == typeid(decltype(x)::value_type));
+  CHECK(all(jules::to_view<long>(from_range) == x));
+
+  auto from_iterators = jules::column(x.begin(), x.end());
+  CHECK(from_iterators.size() == x.size());
+  CHECK(from_iterators.elements_type() == typeid(decltype(x)::value_type));
+  CHECK(all(jules::to_view<long>(from_iterators) == x));
+
+  auto a = jules::column(0.0f, 5u);
+  auto b = a;
+  auto c = std::move(b);
+
+  CHECK(b.size() == 0u);
+  CHECK(c.size() == a.size());
+  CHECK(c.elements_type() == a.elements_type());
+
+  b = a;
+  c = std::move(a);
+
+  CHECK(a.size() == 0u);
+  CHECK(b.size() == c.size());
+  CHECK(b.elements_type() == c.elements_type());
+
+  // View with different type
+  auto dview = jules::to_view<double>(b);
+  // b now holds double
+  CHECK(b.elements_type() == typeid(double));
+
+  // To vector, on the other hand, doesn't convert
+  auto fcopy = jules::to_vector<jules::string>(b);
+  // b still holds double
+  CHECK(b.elements_type() == typeid(double));
+}
