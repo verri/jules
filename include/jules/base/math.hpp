@@ -8,8 +8,8 @@
 #include <jules/core/type.hpp>
 
 #include <cmath>
-#include <utility>
 #include <optional>
+#include <utility>
 
 namespace jules
 {
@@ -45,18 +45,16 @@ constexpr decltype(auto) apply(in_place_t, T&& lhs, U&& rhs, Op op)
   return apply(in_place, std::forward<T>(lhs), std::forward<U>(rhs), std::move(op));
 }
 
-template <typename Op>
-class optional_operator
+template <typename Op> class optional_operator
 {
 public:
   constexpr optional_operator(Op op) noexcept : op_(std::move(op)) {}
 
-  template <typename T> constexpr auto operator()(const T& x) const {
-      return op_(x);
-  }
+  template <typename T> constexpr auto operator()(const T& x) const { return op_(x); }
 
-  template <typename T> constexpr auto operator()(const std::optional<T>& x) const {
-      return x.has_value() ? std::make_optional(op_(x.value())) : std::nullopt;
+  template <typename T> constexpr auto operator()(const std::optional<T>& x) const
+  {
+    return x.has_value() ? std::make_optional(op_(x.value())) : std::nullopt;
   }
 
 private:
@@ -65,9 +63,9 @@ private:
 
 template <typename Op> constexpr auto unary_operator(Op op) noexcept
 {
-  return [op = optional_operator(std::move(op))]<typename T>(T&& value) {
+  return [op = std::move(op)]<typename T>(T&& value) {
     if constexpr (applies_to<Op, decltype(value)>) {
-      return apply(std::forward<T>(value), std::move(op));
+      return apply(std::forward<T>(value), op);
     } else {
       return op(std::as_const(value));
     }
@@ -119,21 +117,21 @@ template <typename T> auto tanh_fn(const T& value)
 }
 } // namespace detail
 
-constexpr auto vabs = unary_operator([]<common_numeric T>(const T& value) { return detail::abs_fn(value); });
+constexpr auto vabs = unary_operator(optional_operator([]<common_numeric T>(const T& value) { return detail::abs_fn(value); }));
 
-constexpr auto vexp = unary_operator([]<common_numeric T>(const T& value) { return detail::exp_fn(value); });
+constexpr auto vexp = unary_operator(optional_operator([]<common_numeric T>(const T& value) { return detail::exp_fn(value); }));
 
-constexpr auto vlog = unary_operator([]<common_numeric T>(const T& value) { return detail::log_fn(value); });
+constexpr auto vlog = unary_operator(optional_operator([]<common_numeric T>(const T& value) { return detail::log_fn(value); }));
 
-constexpr auto vsin = unary_operator([]<common_numeric T>(const T& value) { return detail::sin_fn(value); });
+constexpr auto vsin = unary_operator(optional_operator([]<common_numeric T>(const T& value) { return detail::sin_fn(value); }));
 
-constexpr auto vcos = unary_operator([]<common_numeric T>(const T& value) { return detail::cos_fn(value); });
+constexpr auto vcos = unary_operator(optional_operator([]<common_numeric T>(const T& value) { return detail::cos_fn(value); }));
 
-constexpr auto vsqrt = unary_operator([]<common_numeric T>(const T& value) { return detail::sqrt_fn(value); });
+constexpr auto vsqrt = unary_operator(optional_operator([]<common_numeric T>(const T& value) { return detail::sqrt_fn(value); }));
 
-constexpr auto vtanh = unary_operator([]<common_numeric T>(const T& value) { return detail::tanh_fn(value); });
+constexpr auto vtanh = unary_operator(optional_operator([]<common_numeric T>(const T& value) { return detail::tanh_fn(value); }));
 
-constexpr auto vsq = unary_operator([]<common_numeric T>(const T& value) { return value * value; });
+constexpr auto vsq = unary_operator(optional_operator([]<common_numeric T>(const T& value) { return value * value; }));
 
 template <common_numeric T = numeric> struct normal_dist
 {
@@ -160,15 +158,22 @@ template <typename T> bernoulli_dist(T) -> bernoulli_dist<T>;
 
 constexpr auto vpdf = overloaded{
   []<typename T>(normal_dist<T> dist) {
-    return unary_operator([dist](const T& x) -> T {
+    return unary_operator(optional_operator([dist](const T& x) -> T {
       const auto sigma2 = 2 * vsq(dist.sigma);
       return exp(-vsq(x - dist.mu) / sigma2) / sqrt(sigma2 * pi<T>);
-    });
+    }));
   },
   []<typename T>(uniform_dist<T> dist) {
-    return unary_operator(
-      [dist](const T& x) -> T { return (x > dist.alpha && x < dist.beta) ? 1 / (dist.beta - dist.alpha) : 0; });
+    return unary_operator(optional_operator(
+      [dist](const T& x) -> T { return (x > dist.alpha && x < dist.beta) ? 1 / (dist.beta - dist.alpha) : 0; }));
   },
+};
+
+constexpr auto replace_missing = []<typename T>(T value) {
+  return unary_operator([value = std::move(value)]<typename U>(const std::optional<U>& x) -> U {
+    static_assert(convertible_to<T, U>);
+    return x.value_or(value);
+  });
 };
 
 // TODO: constexpr auto pmax =

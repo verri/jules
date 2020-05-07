@@ -23,12 +23,25 @@ TEST_CASE("Basic math operations", "[math]")
 
   CHECK(vsq(-1) == 1);
 
-  CHECK(vpdf(normal_dist{})(0.0) < 1.0);
-  CHECK(vpdf(uniform_dist{})(0.0) < 1.0);
+  constexpr auto vnormal = vpdf(normal_dist{});
+  constexpr auto vuniform = vpdf(uniform_dist{});
+
+  CHECK(vnormal(0.0) < 1.0);
+  CHECK(vuniform(0.0) < 1.0);
 
   std::optional<numeric> x;
+  REQUIRE(!x.has_value());
   CHECK(vabs(x) == std::nullopt);
 
   x = -1.0;
+  REQUIRE(x.has_value());
   CHECK(vabs(x) == 1.0);
+
+  constexpr auto fix_na = replace_missing(0);
+
+  x = std::nullopt;
+  CHECK(fix_na(x) == 0);
+
+  x = 1;
+  CHECK(fix_na(x) == 1);
 }
