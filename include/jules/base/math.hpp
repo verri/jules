@@ -20,29 +20,29 @@ constexpr auto identity = []<typename T>(T value) -> T { return value; };
 constexpr auto lhs = []<typename T>(T value, const T&) -> T { return value; };
 constexpr auto rhs = []<typename T>(const T&, T value) -> T { return value; };
 
-template <typename T, applies_to<T> Op> constexpr decltype(auto) apply(T&& operand, Op op)
+template <typename T, applies_to<T> Op> constexpr auto apply(T&& operand, Op op)
 {
-  constexpr typename apply_traits<std::decay_t<T>>::apply_type apply{};
-  return apply(std::forward<T>(operand), std::move(op));
+  constexpr typename apply_traits<std::decay_t<T>>::apply_type a{};
+  return a(std::forward<T>(operand), std::move(op));
 }
 
-template <typename T, typename U, applies_to_by<T, U> Op> constexpr decltype(auto) apply(T&& lhs, U&& rhs, Op op)
+template <typename T, typename U, applies_to_by<T, U> Op> constexpr auto apply(T&& lhs, U&& rhs, Op op)
 {
-  constexpr typename apply_traits<std::decay_t<T>>::apply_type apply{};
-  return apply(std::forward<T>(lhs), std::forward<U>(rhs), std::move(op));
+  constexpr typename apply_traits<std::decay_t<T>>::apply_type a{};
+  return a(std::forward<T>(lhs), std::forward<U>(rhs), std::move(op));
 }
 
 template <typename T, applies_in_place_to<T> Op> constexpr decltype(auto) apply(in_place_t, T&& operand, Op op)
 {
-  constexpr typename apply_traits<std::decay_t<T>>::apply_type apply{};
-  return apply(in_place, std::forward<T>(operand), std::move(op));
+  constexpr typename apply_traits<std::decay_t<T>>::apply_type a{};
+  return a(in_place, std::forward<T>(operand), std::move(op));
 }
 
 template <typename T, typename U, applies_in_place_to_by<T, U> Op>
 constexpr decltype(auto) apply(in_place_t, T&& lhs, U&& rhs, Op op)
 {
-  constexpr typename apply_traits<std::decay_t<T>>::apply_type apply{};
-  return apply(in_place, std::forward<T>(lhs), std::forward<U>(rhs), std::move(op));
+  constexpr typename apply_traits<std::decay_t<T>>::apply_type a{};
+  return a(in_place, std::forward<T>(lhs), std::forward<U>(rhs), std::move(op));
 }
 
 template <typename Op> class optional_operator

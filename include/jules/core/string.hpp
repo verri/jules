@@ -57,19 +57,7 @@ public:
     if (this == &source)
       return *this;
 
-    if (source.is_small()) {
-      if (!is_small())
-        delete[] source.data();
-      size_ = source.size_;
-      std::copy_n(source.data(), source.size(), data());
-      return *this;
-    }
-
-    if (is_small())
-      data_.big_string = new char[source.size()];
-
-    size_ = source.size_;
-    std::copy_n(source.data(), source.size(), data());
+    *this = source.view();
     return *this;
   }
 
@@ -78,6 +66,24 @@ public:
     if (this == &source)
       return *this;
     swap(source);
+    return *this;
+  }
+
+  constexpr auto operator=(std::string_view source) -> sso_string&
+  {
+    if (source.size() <= N) {
+      if (!is_small())
+        delete[] source.data();
+      size_ = source.size();
+      std::copy_n(source.data(), source.size(), data());
+      return *this;
+    }
+
+    if (is_small())
+      data_.big_string = new char[source.size()];
+
+    size_ = source.size();
+    std::copy_n(source.data(), source.size(), data());
     return *this;
   }
 
@@ -91,9 +97,15 @@ public:
     std::swap(size_, other.size_);
   };
 
-  constexpr auto operator<=>(const sso_string& other) const noexcept { return view() <=> other.view(); }
+  // TODO constexpr auto operator<=>(const sso_string& other) const noexcept { return view() <=> other.view(); }
+
   constexpr auto operator==(const sso_string& other) const noexcept -> bool { return view() == other.view(); }
   constexpr auto operator!=(const sso_string& other) const noexcept -> bool { return view() != other.view(); }
+
+  constexpr auto operator<(const sso_string& other) const noexcept { return view() < other.view(); }
+  constexpr auto operator>(const sso_string& other) const noexcept { return view() > other.view(); }
+  constexpr auto operator>=(const sso_string& other) const noexcept { return view() >= other.view(); }
+  constexpr auto operator<=(const sso_string& other) const noexcept { return view() <= other.view(); }
 
 private:
   [[nodiscard]] constexpr auto size() const noexcept { return size_; }
@@ -122,5 +134,10 @@ template <std::size_t N> auto operator>>(std::istream& is, sso_string<N>& str) -
 }
 
 } // namespace jules
+
+template <std::size_t N> struct std::hash<jules::sso_string<N>>
+{
+  auto operator()(const jules::sso_string<N>& str) const noexcept { return std::hash<std::string_view>{}(str.view()); }
+};
 
 #endif // JULES_CORE_STRING_H

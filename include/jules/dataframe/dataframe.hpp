@@ -3,8 +3,8 @@
 #ifndef JULES_DATAFRAME_DATAFRAME_H
 #define JULES_DATAFRAME_DATAFRAME_H
 
-#include "range/v3/algorithm/transform.hpp"
 #include <jules/array/array.hpp>
+#include <jules/base/string.hpp>
 #include <jules/core/concepts.hpp>
 #include <jules/core/debug.hpp>
 #include <jules/core/ranges.hpp>
@@ -40,14 +40,14 @@ public:
       std::regex regex;
       bool separator;
       std::regex_constants::match_flag_type flag;
-    } line = {{R"(\n)"}, true, {}};
+    } line = {std::regex{R"(\n)"}, true, {}};
 
     struct
     {
       std::regex regex;
       bool separator;
       std::regex_constants::match_flag_type flag;
-    } cell = {{R"(\t)"}, true, {}};
+    } cell = {std::regex{R"(\t)"}, true, {}};
 
     string na = "NA";
 
@@ -104,7 +104,7 @@ public:
     auto i = index_t{0u};
     for (auto& element : elements_) {
       auto& name = element.name;
-      if (!name.empty()) {
+      if (!name.view().empty()) {
         DEBUG_ASSERT(indexes_.find(name) == indexes_.end(), debug::throwing_module, debug::level::invalid_argument,
                      "repeated column name");
         indexes_[name] = i++;
@@ -130,22 +130,10 @@ public:
     auto raw_data = std::string();
     raw_data.assign(std::istreambuf_iterator<char>(is), std::istreambuf_iterator<char>());
 
-    auto data = std::vector<std::string_view>();
+    auto data = container<string>();
     auto ncol = index_t{0u};
 
     auto line_range = raw_data | view::tokenize(opt.line.regex, opt.line.separator ? -1 : 0, opt.line.flag);
-
-    constexpr auto ltrim = [](std::string_view s) -> std::string_view {
-      const auto start = s.find_first_not_of(" \n\r\t\f\v");
-      return start == std::string_view::npos ? "" : s.substr(start);
-    };
-
-    constexpr auto rtrim = [](std::string_view s) -> std::string_view {
-      const auto end = s.find_last_not_of(" \n\r\t\f\v");
-      return end == std::string_view::npos ? "" : s.substr(0, end + 1);
-    };
-
-    constexpr auto trim = [](std::string_view s) -> std::string_view { return rtrim(ltrim(s)); };
 
     auto last_size = index_t{0u};
     for (auto&& line : line_range) {
@@ -153,8 +141,9 @@ public:
         continue;
 
       const auto cells = as_range(line) | view::tokenize(opt.cell.regex, opt.cell.separator ? -1 : 0, opt.cell.flag);
-      ranges::transform(cells, ranges::back_inserter(data), [](const auto& match) -> std::string_view {
-        return trim({match.first, match.length()});
+      ranges::transform(cells, ranges::back_inserter(data), [](const auto& match) -> string {
+        std::string_view sv(&*match.first, match.length());
+        return trim(string(sv));
       });
 
       if (ncol == 0u)
@@ -182,7 +171,7 @@ public:
     for (auto j : indices(ncol)) {
       auto col_data = ranges::make_subrange(data.begin() + j + (opt.header ? ncol : 0), data.end()) | view::stride(ncol) |
                       view::transform([&opt](const std::string_view& match) -> std::optional<string> {
-                        if (match.empty() || match == opt.na)
+                        if (match.empty() || match == opt.na.view())
                           return std::nullopt;
                         return string(match);
                       });
@@ -200,8 +189,8 @@ public:
     if (!(*this))
       return os;
 
-    std::vector<column_type> coerced; // hold temporary coerced values
-    std::vector<const std::optional<string>*> data;
+    container<column_type> coerced; // hold temporary coerced values
+    container<const std::optional<string>*> data;
 
     coerced.reserve(column_count());
     data.reserve(column_count());
@@ -235,24 +224,30 @@ public:
   }
 
   // other options are `bind_left`, `bind_right`, `bind_up`, `bind_down`, or something similar.
-  auto bind(base_dataframe other) -> base_dataframe&
+  auto bind(named_column_type elem) -> base_dataframe&
   {
-    for (const auto& name : other.names())
-      DEBUG_ASSERT(name.empty() || indexes_.find(name) == indexes_.end(), debug::throwing_module, debug::level::invalid_argument,
-                   "repeated column name");
+    DEBUG_ASSERT(elem.name.view().empty() || indexes_.find(elem.name) == indexes_.end(), debug::throwing_module,
+                 debug::level::invalid_argument, "repeated column name");
 
     if (*this)
-      DEBUG_ASSERT(row_count() == other.row_count(), debug::throwing_module, debug::level::invalid_argument,
+      DEBUG_ASSERT(row_count() == elem.column.size(), debug::throwing_module, debug::level::invalid_argument,
                    "invalid column size");
     else
-      row_count_ = other.row_count();
+      row_count_ = elem.column.size();
 
-    for (auto& elem : other.elements_) {
-      if (!elem.name.empty())
-        indexes_[elem.name] = elements_.size();
-      elements_.push_back(std::move(elem));
-    }
+    if (!elem.name.view().empty())
+      indexes_[elem.name] = elements_.size();
+    elements_.push_back(std::move(elem));
 
+    return *this;
+  }
+
+  auto bind(column elem) -> base_dataframe& { return bind(named_column_type{"", std::move(elem)}); }
+
+  auto bind(base_dataframe other) -> base_dataframe&
+  {
+    for (auto& elem : other.elements_)
+      bind(std::move(elem));
     return *this;
   }
 
@@ -275,6 +270,8 @@ public:
   auto row_count() const noexcept { return row_count_; }
   auto column_count() const noexcept { return elements_.size(); }
 
+  auto dimensions() const noexcept -> std::array<index_t, 2> { return {row_count(), column_count()}; }
+
   auto column_types() const -> vector<std::type_index>
   {
     namespace view = ::jules::ranges::views;
@@ -296,7 +293,7 @@ public:
 
 private:
   index_t row_count_ = 0u;
-  std::vector<named_column_type> elements_;
+  container<named_column_type> elements_;
   std::unordered_map<string, index_t> indexes_;
 };
 

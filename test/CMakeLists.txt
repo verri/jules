@@ -44,7 +44,7 @@ set(source_files
   base/numeric.cpp
   dataframe/column.cpp
   dataframe/column_model.cpp
-  # dataframe/dataframe.cpp
+  dataframe/dataframe.cpp
   # dataframe/action.cpp
   test_suite.cpp
   version.cpp)
