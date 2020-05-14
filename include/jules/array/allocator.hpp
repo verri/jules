@@ -9,6 +9,7 @@
 #include <array>
 #include <iterator>
 #include <memory>
+#include <new>
 #include <type_traits>
 
 namespace jules
@@ -20,9 +21,12 @@ template <typename T> struct array_allocator
 
   using storage_type = std::aligned_storage_t<sizeof(value_type), alignof(value_type)>;
 
-  static auto allocate(index_t size) -> value_type* { return reinterpret_cast<value_type*>(new storage_type[size]); }
+  static auto allocate(index_t size) -> value_type*
+  {
+    return std::launder(reinterpret_cast<value_type*>(new storage_type[size]));
+  }
 
-  static auto deallocate(value_type* data, index_t) noexcept { delete[] reinterpret_cast<storage_type*>(data); }
+  static auto deallocate(value_type* data, index_t) noexcept { delete[] std::launder(reinterpret_cast<storage_type*>(data)); }
 
   template <typename... Args>
   static auto construct(value_type* data, index_t size) noexcept(std::is_nothrow_constructible_v<value_type>)
@@ -104,7 +108,7 @@ private:
   static auto destroy_recursive(index_t& constructed_count, value_type* to, const value_type&, const descriptor<N>& desc,
                                 Args... indexes) noexcept
   {
-    (to + desc({{indexes...}}))->~value_type();
+    std::destroy_at(to + desc({{indexes...}}));
     --constructed_count;
   }
 };

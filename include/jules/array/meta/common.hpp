@@ -24,7 +24,7 @@ template <typename T> concept common_array = requires(const T& t)
 
   T::order > 0u;
 
-  { T::order } -> same_as<const std::size_t>;
+  { T::order } -> convertible_to<typename T::size_type>;
 
   { t.size() } -> same_as<typename T::size_type>;
   { t.dimensions() } -> same_as<std::array<typename T::size_type, T::order>>;

@@ -93,7 +93,7 @@ template <typename F, typename G> constexpr auto operator/(relative_index<F> lhs
 constexpr auto dim() noexcept
 {
   return make_relative_index(+[](index_t size) constexpr noexcept { return size; });
-};
+}
 
 template <typename F> struct relative_slice
 {

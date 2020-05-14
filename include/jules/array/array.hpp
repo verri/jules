@@ -14,6 +14,7 @@
 #include <jules/array/reshape.hpp>
 #include <jules/base/async.hpp>
 #include <jules/base/numeric.hpp>
+#include <utility>
 
 namespace jules
 {
@@ -108,7 +109,7 @@ public:
   template <typename... Dims>
   requires valid_extents_for<N, Dims...> explicit array(uninitialized_t, Dims... dims) : array(allocate_tag{}, dims...)
   {
-    static_assert(std::is_pod_v<value_type>, "Only POD types are allowed to be left uninitialized");
+    static_assert(std::is_trivial_v<value_type>, "Only trivial types are allowed to be left uninitialized");
   }
 
   /// \group constructors
@@ -221,7 +222,7 @@ public:
 
   /// \group constructors
   template <ranges::range Rng>
-  requires(!common_array<Rng>) array(const Rng& rng)
+  requires(!common_array<Rng>) explicit array(const Rng& rng)
     : ref_array<value_type, order>{this->allocate(ranges::size(rng)), {{{ranges::size(rng)}}}}
   {
     static_assert(order == 1u, "Only vectors can be initialized from a range");
