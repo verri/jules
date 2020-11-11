@@ -50,7 +50,7 @@ public:
   virtual ~column_interface() = default;
 
   auto operator=(const column_interface&) -> column_interface& = delete;
-  auto operator=(column_interface &&) -> column_interface& = delete;
+  auto operator=(column_interface&&) -> column_interface& = delete;
 
   [[nodiscard]] virtual auto clone() const -> column_interface_ptr = 0;
   [[nodiscard]] virtual auto partial_clone(index_t first, index_t size) const -> column_interface_ptr = 0;
@@ -60,17 +60,17 @@ public:
 
   [[nodiscard]] virtual auto size() const noexcept -> index_t = 0;
 
-  template <typename T>[[nodiscard]] auto coerce() const -> column_interface_ptr { return this->coerce_(tag<T>{}); }
-  template <typename T>[[nodiscard]] auto can_coerce() const noexcept -> bool { return this->can_coerce_(tag<T>{}); }
+  template <typename T> [[nodiscard]] auto coerce() const -> column_interface_ptr { return this->coerce_(tag<T>{}); }
+  template <typename T> [[nodiscard]] auto can_coerce() const noexcept -> bool { return this->can_coerce_(tag<T>{}); }
 
   [[nodiscard]] virtual auto coerce(std::type_index) const -> column_interface_ptr = 0;
   [[nodiscard]] virtual auto can_coerce(std::type_index) const noexcept -> bool = 0;
 
   [[nodiscard]] virtual auto elements_type() const noexcept -> std::type_index = 0;
 
-  template <typename T>[[nodiscard]] decltype(auto) downcast() { return dynamic_cast<concrete_type<T>&>(*this); }
+  template <typename T> [[nodiscard]] decltype(auto) downcast() { return dynamic_cast<concrete_type<T>&>(*this); }
 
-  template <typename T>[[nodiscard]] decltype(auto) downcast() const { return dynamic_cast<const concrete_type<T>&>(*this); }
+  template <typename T> [[nodiscard]] decltype(auto) downcast() const { return dynamic_cast<const concrete_type<T>&>(*this); }
 
 protected:
   using virtual_coercion<column_interface<Rules, std::tuple<Ts...>>, Ts>::coerce_...;

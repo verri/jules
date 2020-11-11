@@ -23,7 +23,7 @@ struct coercion_rules
 {
   using types = default_types;
 
-  template <typename T> requires holds<types, T>[[nodiscard]] auto coerce(tag<T>, tag<T>, const T& value) const -> T
+  template <typename T> requires holds<types, T> [[nodiscard]] auto coerce(tag<T>, tag<T>, const T& value) const -> T
   {
     return value;
   }
@@ -46,12 +46,12 @@ struct coercion_rules
     return boost::numeric_cast<index_t>(boost::lexical_cast<distance_t>(view.data(), view.size()));
   }
 
-  template <integral T>[[nodiscard]] auto coerce(tag<T>, tag<string>, const T& value) const -> string
+  template <integral T> [[nodiscard]] auto coerce(tag<T>, tag<string>, const T& value) const -> string
   {
     return boost::lexical_cast<std::string>(value);
   }
 
-  template <floating_point T>[[nodiscard]] auto coerce(tag<T>, tag<string>, const T& value) const -> string
+  template <floating_point T> [[nodiscard]] auto coerce(tag<T>, tag<string>, const T& value) const -> string
   {
     return boost::lexical_cast<std::string>(value);
   }

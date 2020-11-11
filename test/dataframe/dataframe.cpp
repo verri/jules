@@ -208,88 +208,79 @@ TEST_CASE("Reading a dataframe", "[dataframe]")
   CHECK(all(cols == jules::cat(""_s, ""_s, ""_s)));
 }
 
-// TEST_CASE("Reading matrix of integers", "[dataframe]")
-// {
-//   struct Foo
-//   {
-//     operator int() const { return 0; }
-//   };
-//
-//   struct my_integer_rules : jules::default_rule<int>
-//   {
-//     using jules::default_rule<int>::type;
-//     using jules::default_rule<int>::coerce_from;
-//     static auto coerce_from(const jules::string& value) -> type { return std::stoi(value); }
-//   };
-//
-//   struct my_string_rules : jules::default_rule<std::string>
-//   {
-//     using jules::default_rule<std::string>::type;
-//     using jules::default_rule<std::string>::coerce_from;
-//     static auto coerce_from(int value) -> type { return std::to_string(value); }
-//   };
-//
-//   struct my_foo_rules : jules::default_rule<Foo>
-//   {
-//     using jules::default_rule<Foo>::type;
-//     using jules::default_rule<Foo>::coerce_from;
-//   };
-//
-//   using my_coercion_rules = jules::base_coercion_rules<my_integer_rules, my_string_rules, my_foo_rules>;
-//   using my_dataframe = jules::base_dataframe<my_coercion_rules>;
-//
-//   auto opts = my_dataframe::read_options();
-//   opts.header = false;
-//
-//   auto stream = std::stringstream();
-//   constexpr auto N = 3u;
-//   for (auto i = 0u; i < N; ++i) {
-//     for (auto j = 0u; j < N; ++j) {
-//       stream << (i * N + j) << "\t";
-//     }
-//     stream << "\n";
-//   }
-//
-//   auto df = my_dataframe::read(stream, opts);
-//   CHECK(df.column_count() == N);
-//   CHECK(df.row_count() == N);
-//
-//   // jules::string -> double: Not OK
-//   CHECK_FALSE(df.at(0u).column.can_coerce<double>());
-//   CHECK_THROWS(jules::to_column<double>(df.at(0).column));
-//   CHECK(df.at(0).column.can_coerce<int>());
-//
-//   auto idf = my_dataframe();
-//
-//   for (auto i = 0u; i < df.column_count(); ++i) {
-//     idf.bind(jules::to_column<int>(df.at(i).column));
-//     CHECK(idf.at(idf.column_count() - 1).column.elements_type() == typeid(int));
-//   }
-//
-//   // TODO: coerce all columns
-//   // df.coerce_to<int, ...>();
-//
-//   // int -> double: Not OK
-//   CHECK_FALSE(idf.at(0).column.can_coerce<double>());
-//   CHECK_THROWS(jules::to_column<double>(idf.at(0).column));
-//   CHECK(idf.at(0).column.can_coerce<int>());
-//
-//   // int -> string: OK
-//   CHECK(idf.at(0).column.can_coerce<jules::string>());
-//   CHECK_NOTHROW(jules::to_column<jules::string>(idf.at(0).column));
-//
-//   CHECK(idf.column_count() == N);
-//   CHECK(idf.row_count() == N);
-//
-//   CHECK_THROWS(jules::to_column<Foo>(idf.at(0).column));
-//
-//   // Converting to matrix
-//   const auto imatrix = jules::to_matrix<int>(idf);
-//   CHECK(all(imatrix == jules::matrix<int>{{0, 1, 2}, {3, 4, 5}, {6, 7, 8}}));
-//
-//   const auto smatrix = jules::to_matrix<jules::string>(idf);
-//   CHECK(all(smatrix == jules::matrix<jules::string>{{"0", "1", "2"}, {"3", "4", "5"}, {"6", "7", "8"}}));
-// }
+TEST_CASE("Reading matrix of integers", "[dataframe]")
+{
+  using namespace jules;
+
+  struct Foo
+  {
+    operator int() const { return 0; }
+  };
+
+  struct custom_rules
+  {
+    using types = std::tuple<string, Foo, int>;
+    [[nodiscard]] auto coerce(tag<Foo>, tag<int>, const Foo& foo) const -> int { return foo; }
+    [[nodiscard]] auto coerce(tag<string>, tag<int>, const string& str) const -> int
+    {
+      return boost::lexical_cast<int>(str.view().data(), str.view().size());
+    }
+  };
+
+  (void)custom_rules::types{}; // XXX: weird...
+  using custom_dataframe = base_dataframe<custom_rules>;
+
+  auto opts = custom_dataframe::read_options();
+  opts.header = false;
+
+  auto stream = std::stringstream();
+  constexpr auto N = 3u;
+  for (auto i = 0u; i < N; ++i) {
+    for (auto j = 0u; j < N; ++j) {
+      stream << (i * N + j) << "\t";
+    }
+    stream << "\n";
+  }
+
+  auto df = custom_dataframe::read(stream, opts);
+  CHECK(df.column_count() == N);
+  CHECK(df.row_count() == N);
+
+  CHECK_FALSE(df.at(0u).column.can_coerce<double>());
+  CHECK_THROWS(jules::to_column<double>(df.at(0).column));
+  CHECK(df.at(0).column.can_coerce<int>());
+
+  auto idf = custom_dataframe();
+
+  for (auto i = 0u; i < df.column_count(); ++i) {
+    idf.bind({string{}, jules::to_column<int>(df.at(i).column)});
+    CHECK(idf.at(idf.column_count() - 1).column.elements_type() == typeid(int));
+  }
+
+  //   // TODO: coerce all columns
+  //   // df.coerce_to<int, ...>();
+  //
+  //   // int -> double: Not OK
+  //   CHECK_FALSE(idf.at(0).column.can_coerce<double>());
+  //   CHECK_THROWS(jules::to_column<double>(idf.at(0).column));
+  //   CHECK(idf.at(0).column.can_coerce<int>());
+  //
+  //   // int -> string: OK
+  //   CHECK(idf.at(0).column.can_coerce<jules::string>());
+  //   CHECK_NOTHROW(jules::to_column<jules::string>(idf.at(0).column));
+  //
+  //   CHECK(idf.column_count() == N);
+  //   CHECK(idf.row_count() == N);
+  //
+  //   CHECK_THROWS(jules::to_column<Foo>(idf.at(0).column));
+  //
+  //   // Converting to matrix
+  //   const auto imatrix = jules::to_matrix<int>(idf);
+  //   CHECK(all(imatrix == jules::matrix<int>{{0, 1, 2}, {3, 4, 5}, {6, 7, 8}}));
+  //
+  //   const auto smatrix = jules::to_matrix<jules::string>(idf);
+  //   CHECK(all(smatrix == jules::matrix<jules::string>{{"0", "1", "2"}, {"3", "4", "5"}, {"6", "7", "8"}}));
+}
 
 TEST_CASE("Reading an inconsistent dataframe", "[dataframe]")
 {

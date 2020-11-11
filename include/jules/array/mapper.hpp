@@ -95,7 +95,7 @@ public:
   [[nodiscard]] constexpr auto index_begin() const noexcept -> iterator { return indexes_.begin(); }
   [[nodiscard]] constexpr auto index_end() const noexcept -> iterator { return indexes_.end(); }
 
-  template <std::size_t D>[[nodiscard]] constexpr auto drop_one_level_dimensions() const -> span_mapper
+  template <std::size_t D> [[nodiscard]] constexpr auto drop_one_level_dimensions() const -> span_mapper
   {
     static_assert(D == 1);
     return *this;
