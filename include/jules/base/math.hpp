@@ -141,14 +141,14 @@ template <typename T> auto tanh_fn(const T& value)
 
 template <typename T, typename U> auto min_fn(const T& lhs, const U& rhs)
 {
-  using std::min;
-  return min(lhs, rhs);
+  using std::fmin;
+  return fmin(lhs, rhs);
 }
 
 template <typename T, typename U> auto max_fn(const T& lhs, const U& rhs)
 {
-  using std::max;
-  return max(lhs, rhs);
+  using std::fmax;
+  return fmax(lhs, rhs);
 }
 } // namespace detail
 
