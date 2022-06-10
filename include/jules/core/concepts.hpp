@@ -13,7 +13,8 @@ namespace jules
 {
 
 using namespace concepts;
-template <typename T> concept floating_point = std::is_floating_point_v<T>;
+template <typename T>
+concept floating_point = std::is_floating_point_v<T>;
 
 template <typename T, typename Tuple> struct holds_type : std::false_type
 {};

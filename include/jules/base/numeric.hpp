@@ -471,7 +471,8 @@ template <typename Arg, typename... Args> constexpr decltype(auto) first_arg(Arg
 
 template <typename Arg> constexpr decltype(auto) last_arg(Arg&& arg) { return std::forward<Arg>(arg); }
 
-template <typename Arg, typename... Args> requires(sizeof...(Args) > 0) constexpr decltype(auto) last_arg(Arg&&, Args&&... args)
+template <typename Arg, typename... Args>
+requires(sizeof...(Args) > 0) constexpr decltype(auto) last_arg(Arg&&, Args&&... args)
 {
   return last_arg(std::forward<Args>(args)...);
 }

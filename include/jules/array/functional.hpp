@@ -74,7 +74,8 @@ struct array_apply
   }
 
   template <typename ArrayA, typename ArrayB, typename Op>
-  requires common_array<ArrayA>&& common_array<ArrayB> auto operator()(const ArrayA& lhs, const ArrayB& rhs, Op op) const
+  requires common_array<ArrayA> && common_array<ArrayB>
+  auto operator()(const ArrayA& lhs, const ArrayB& rhs, Op op) const
   {
     static_assert(ArrayA::order == ArrayB::order);
     DEBUG_ASSERT(lhs.dimensions() == rhs.dimensions(), debug::default_module, debug::level::extents_check, "extents mismatch");
@@ -153,10 +154,8 @@ template <typename LhsIt, typename RhsIt, typename Op, std::size_t N> struct app
 #define BINARY_OPERATION(OP__, FUNCTOR__)                                                                                        \
   template <typename ArrayA, typename ArrayB,                                                                                    \
             typename R = std::result_of_t<FUNCTOR__(const typename ArrayA::value_type&, const typename ArrayB::value_type&)>>    \
-  requires common_array<ArrayA>&& common_array<ArrayB> auto operator OP__(const ArrayA& lhs, const ArrayB& rhs)                  \
-  {                                                                                                                              \
-    return apply(lhs, rhs, FUNCTOR__{});                                                                                         \
-  }
+  requires common_array<ArrayA> && common_array<ArrayB>                                                                          \
+  auto operator OP__(const ArrayA& lhs, const ArrayB& rhs) { return apply(lhs, rhs, FUNCTOR__{}); }
 
 #define BINARY_INPLACE_REF_OPERATION(OP__)                                                                                       \
   template <reference_array RefArrayA, common_array ArrayB,                                                                      \

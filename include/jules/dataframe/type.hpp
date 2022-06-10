@@ -23,10 +23,9 @@ struct coercion_rules
 {
   using types = default_types;
 
-  template <typename T> requires holds<types, T> [[nodiscard]] auto coerce(tag<T>, tag<T>, const T& value) const -> T
-  {
-    return value;
-  }
+  template <typename T>
+  requires holds<types, T>
+  [[nodiscard]] auto coerce(tag<T>, tag<T>, const T& value) const -> T { return value; }
 
   [[nodiscard]] auto coerce(tag<string>, tag<numeric>, const string& value) const -> numeric
   {
@@ -57,7 +56,7 @@ struct coercion_rules
   }
 
   template <typename T, typename U>
-    requires(integral<T> || floating_point<T>) &&
+  requires(integral<T> || floating_point<T>) &&
     (!same_as<T, U>)&&(same_as<U, numeric> || same_as<U, integer> || same_as<U, index_t>)
       [[nodiscard]] auto coerce(tag<T>, tag<U>, const T& value) const -> U
   {
@@ -65,7 +64,7 @@ struct coercion_rules
   }
 
   template <typename T, typename U>
-    requires convertible_to<T, U> && (!same_as<T, U>)&&(!holds<types, T>)&&holds<types, U> &&
+  requires convertible_to<T, U> &&(!same_as<T, U>)&&(!holds<types, T>)&&holds<types, U> &&
     (!(integral<T> || floating_point<T>) || !(same_as<U, numeric> || same_as<U, integer> || same_as<U, index_t>))
       [[nodiscard]] auto coerce(tag<T>, tag<U>, const T& value) const -> U
   {

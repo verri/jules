@@ -36,8 +36,9 @@ public:
   {}
 
   template <ranges::range Rng>
-    requires convertible_to<ranges::range_common_iterator_t<Rng>, const index_t*> &&
-    (!contiguous_of<Rng, index_t>)constexpr index_span(const Rng& rng) noexcept : index_span(ranges::begin(rng), ranges::end(rng))
+  requires convertible_to < ranges::range_common_iterator_t<Rng>,
+  const index_t* > &&(!contiguous_of<Rng, index_t>)constexpr index_span(const Rng& rng) noexcept
+    : index_span(ranges::begin(rng), ranges::end(rng))
   {}
 
   [[nodiscard]] constexpr auto begin() const noexcept -> const_iterator { return begin_; }

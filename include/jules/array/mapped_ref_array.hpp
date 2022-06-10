@@ -80,7 +80,8 @@ public:
   }
 
   /// \group Assignment
-  template <typename U> requires(!common_array<U>) auto operator=(const U& source) -> mapped_ref_array&
+  template <typename U>
+  requires(!common_array<U>) auto operator=(const U& source) -> mapped_ref_array&
   {
     static_assert(std::is_assignable<value_type&, U>::value, "incompatible assignment");
     ranges::fill(*this, source);

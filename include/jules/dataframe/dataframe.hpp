@@ -74,7 +74,7 @@ public:
   {}
 
   template <ranges::input_iterator Iter, ranges::sentinel_for<Iter> Sent, typename R = ranges::iter_value_t<Iter>>
-    requires convertible_to<R, named_column_type> && (!ranges::forward_iterator<Iter>)base_dataframe(Iter first, Sent last)
+  requires convertible_to<R, named_column_type> &&(!ranges::forward_iterator<Iter>)base_dataframe(Iter first, Sent last)
     : base_dataframe(first, last, 0u)
   {}
 

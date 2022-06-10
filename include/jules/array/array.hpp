@@ -107,7 +107,8 @@ public:
   /// \tparam _
   ///   \exclude
   template <typename... Dims>
-  requires valid_extents_for<N, Dims...> explicit array(uninitialized_t, Dims... dims) : array(allocate_tag{}, dims...)
+  requires valid_extents_for<N, Dims...>
+  explicit array(uninitialized_t, Dims... dims) : array(allocate_tag{}, dims...)
   {
     static_assert(std::is_trivial_v<value_type>, "Only trivial types are allowed to be left uninitialized");
   }
@@ -115,7 +116,9 @@ public:
   /// \group constructors
   /// \tparam _
   ///   \exclude
-  template <typename... Dims> requires valid_extents_for<N, Dims...> explicit array(Dims... dims) : array(allocate_tag{}, dims...)
+  template <typename... Dims>
+  requires valid_extents_for<N, Dims...>
+  explicit array(Dims... dims) : array(allocate_tag{}, dims...)
   {
     try {
       this->construct(this->data(), this->size());
@@ -365,7 +368,8 @@ public:
 private:
   /// \exclude
   template <typename... Dims>
-  requires valid_extents_for<N, Dims...> explicit array(allocate_tag, Dims... dims)
+  requires valid_extents_for<N, Dims...>
+  explicit array(allocate_tag, Dims... dims)
     : ref_array<value_type, order>{this->allocate(prod_args(dims...)), {{{static_cast<index_t>(dims)...}}}}
   {}
 
