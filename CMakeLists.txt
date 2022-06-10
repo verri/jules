@@ -6,7 +6,7 @@ set(CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/cmake/modules ${CMAKE_MODULE_P
 
 add_library(jules INTERFACE)
 
-target_compile_features(jules INTERFACE cxx_std_20)
+target_compile_features(jules INTERFACE cxx_std_23)
 
 target_include_directories(jules INTERFACE
   $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include/>

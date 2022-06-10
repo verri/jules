@@ -39,13 +39,13 @@ constexpr auto prod_impl(const std::array<T, N>& arr,
 
 struct forward_arithmetic
 {
-  template <typename T> constexpr decltype(auto) operator+(T&& value) { return std::forward<T>(value); }
-  template <typename T> constexpr decltype(auto) operator*(T&& value) { return std::forward<T>(value); }
-  template <typename T> friend constexpr decltype(auto) operator+(T&& value, forward_arithmetic)
+  template <typename T> constexpr auto operator+(T&& value) -> decltype(auto) { return std::forward<T>(value); }
+  template <typename T> constexpr auto operator*(T&& value) -> decltype(auto) { return std::forward<T>(value); }
+  template <typename T> friend constexpr auto operator+(T&& value, forward_arithmetic) -> decltype(auto)
   {
     return std::forward<T>(value);
   }
-  template <typename T> friend constexpr decltype(auto) operator*(T&& value, forward_arithmetic)
+  template <typename T> friend constexpr auto operator*(T&& value, forward_arithmetic) -> decltype(auto)
   {
     return std::forward<T>(value);
   }
@@ -464,15 +464,15 @@ template <typename... Args> constexpr auto any_args(Args&&... args)
   return (static_cast<bool>(std::forward<Args>(args)) || ...);
 }
 
-template <typename Arg, typename... Args> constexpr decltype(auto) first_arg(Arg&& arg, Args&&...)
+template <typename Arg, typename... Args> constexpr auto first_arg(Arg&& arg, Args&&...) -> decltype(auto)
 {
   return std::forward<Arg>(arg);
 }
 
-template <typename Arg> constexpr decltype(auto) last_arg(Arg&& arg) { return std::forward<Arg>(arg); }
+template <typename Arg> constexpr auto last_arg(Arg&& arg) -> decltype(auto) { return std::forward<Arg>(arg); }
 
 template <typename Arg, typename... Args>
-requires(sizeof...(Args) > 0) constexpr decltype(auto) last_arg(Arg&&, Args&&... args)
+requires(sizeof...(Args) > 0) constexpr auto last_arg(Arg&&, Args&&... args) -> decltype(auto)
 {
   return last_arg(std::forward<Args>(args)...);
 }

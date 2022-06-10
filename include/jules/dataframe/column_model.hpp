@@ -68,9 +68,12 @@ public:
 
   [[nodiscard]] virtual auto elements_type() const noexcept -> std::type_index = 0;
 
-  template <typename T> [[nodiscard]] decltype(auto) downcast() { return dynamic_cast<concrete_type<T>&>(*this); }
+  template <typename T> [[nodiscard]] auto downcast() -> decltype(auto) { return dynamic_cast<concrete_type<T>&>(*this); }
 
-  template <typename T> [[nodiscard]] decltype(auto) downcast() const { return dynamic_cast<const concrete_type<T>&>(*this); }
+  template <typename T> [[nodiscard]] auto downcast() const -> decltype(auto)
+  {
+    return dynamic_cast<const concrete_type<T>&>(*this);
+  }
 
 protected:
   using virtual_coercion<column_interface<Rules, std::tuple<Ts...>>, Ts>::coerce_...;

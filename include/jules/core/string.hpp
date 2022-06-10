@@ -9,6 +9,7 @@
 #include <iosfwd>
 #include <memory>
 #include <string_view>
+#include <utility>
 
 namespace jules
 {
@@ -112,13 +113,16 @@ private:
 
   [[nodiscard]] constexpr auto is_small() const noexcept { return size() <= N; }
 
-  [[nodiscard]] constexpr auto data() const noexcept -> const char* { return is_small() ? data_.small_string : data_.big_string; }
+  [[nodiscard]] constexpr auto data() const noexcept -> const char*
+  {
+    return is_small() ? data_.small_string.data() : data_.big_string;
+  }
 
-  [[nodiscard]] constexpr auto data() noexcept -> char* { return is_small() ? data_.small_string : data_.big_string; }
+  [[nodiscard]] constexpr auto data() noexcept -> char* { return is_small() ? data_.small_string.data() : data_.big_string; }
 
   std::size_t size_ = 0;
   union {
-    char small_string[N];
+    std::array<char, N> small_string;
     char* big_string;
   } data_ = {};
 };
