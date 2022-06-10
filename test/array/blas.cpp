@@ -1,7 +1,7 @@
 #include "jules/array/blas.hpp"
 #include "jules/array/array.hpp"
 
-#include <catch.hpp>
+#include <catch2/catch_test_macros.hpp>
 
 TEST_CASE("Matrix multiplication", "[blas]")
 {

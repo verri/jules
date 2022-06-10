@@ -1,7 +1,7 @@
 #include "jules/array/array.hpp"
 #include "jules/core/type.hpp"
 
-#include <catch.hpp>
+#include <catch2/catch_test_macros.hpp>
 
 static void (*volatile not_optimize_away)(void*) = [](void*) {};
 

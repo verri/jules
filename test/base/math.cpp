@@ -1,6 +1,6 @@
 #include "jules/base/math.hpp"
 
-#include <catch.hpp>
+#include <catch2/catch_test_macros.hpp>
 
 TEST_CASE("Basic math operations", "[math]")
 {

@@ -1,6 +1,6 @@
 #include "jules/dataframe/dataframe.hpp"
 
-#include <catch.hpp>
+#include <catch2/catch_test_macros.hpp>
 
 TEST_CASE("Head and tail of a matrix", "[dataframe]")
 {

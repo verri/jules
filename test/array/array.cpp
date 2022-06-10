@@ -1,6 +1,6 @@
 #include "jules/array/array.hpp"
 
-#include <catch.hpp>
+#include <catch2/catch_test_macros.hpp>
 
 TEST_CASE("Basic array functionalities", "[array]")
 {
@@ -152,7 +152,7 @@ TEST_CASE("Safe throwing constructor", "[array]")
 
   auto foos = std::vector<Foo>();
   for (const auto i : indices(10))
-    foos.emplace_back(false);
+    (void)i, foos.emplace_back(false);
 
   auto foo = Foo{false};
 

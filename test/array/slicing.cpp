@@ -3,7 +3,7 @@
 #include "jules/array/slicing/relative.hpp"
 // #include "jules/array/slicing/range.hpp"
 
-#include <catch.hpp>
+#include <catch2/catch_test_macros.hpp>
 
 using namespace jules::slicing;
 using jules::tag;

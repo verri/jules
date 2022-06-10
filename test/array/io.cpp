@@ -1,7 +1,7 @@
 #include "jules/array/io.hpp"
 #include "jules/array/array.hpp"
 
-#include <catch.hpp>
+#include <catch2/catch_test_macros.hpp>
 
 #include <sstream>
 #include <string>

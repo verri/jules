@@ -1,6 +1,9 @@
 #include "jules/dataframe/column_model.hpp"
 
-#include <catch.hpp>
+#include <catch2/catch_test_macros.hpp>
+
+#include <catch2/catch_approx.hpp>
+using Catch::Approx;
 
 TEST_CASE("Column model", "[dataframe]")
 {

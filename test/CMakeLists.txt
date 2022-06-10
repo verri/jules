@@ -1,17 +1,12 @@
-if(NOT EXISTS ${CMAKE_CURRENT_BINARY_DIR}/catch.hpp)
-  file(DOWNLOAD
-    https://github.com/catchorg/Catch2/releases/download/v2.1.0/catch.hpp
-    ${CMAKE_CURRENT_BINARY_DIR}/catch.hpp
-    STATUS status
-    LOG log)
+Include(FetchContent)
 
-  list(GET status 0 status_code)
-  list(GET status 1 status_string)
+FetchContent_Declare(
+  Catch2
+  GIT_REPOSITORY https://github.com/catchorg/Catch2.git
+  GIT_TAG        v3.0.1 # or a later release
+)
 
-  if(NOT status_code EQUAL 0)
-    message(FATAL_ERROR "error downloading catch: ${status_string}" "${log}")
-  endif()
-endif()
+FetchContent_MakeAvailable(Catch2)
 
 find_package(CBLAS REQUIRED)
 if (NOT ${CBLAS_FOUND})
@@ -72,7 +67,8 @@ target_include_directories(jules_test_suite PUBLIC
 
 target_link_libraries(jules_test_suite PUBLIC
   jules
-  ${CBLAS_LIBRARIES})
+  ${CBLAS_LIBRARIES}
+  Catch2::Catch2WithMain)
 
 target_compile_definitions(jules_test_suite PUBLIC -DJULES_DEBUG_THROWS)
 

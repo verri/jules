@@ -2,14 +2,12 @@
 #include "jules/array/meta/reference.hpp"
 #include "jules/array/slicing.hpp"
 
-#include <catch.hpp>
+#include <catch2/catch_test_macros.hpp>
 
 #include <vector>
 
 TEST_CASE("Basic reference array functionalities", "[array]")
 {
-  constexpr auto size = jules::index_t{20u};
-
   auto values = std::vector<double>(10u, 0.0);
 
   auto vector = jules::ref_array<double, 1u>(values.data(), {{{values.size()}}});

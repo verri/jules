@@ -2,7 +2,7 @@
 #include "jules/array/array.hpp"
 #include "jules/dataframe/numeric.hpp"
 
-#include <catch.hpp>
+#include <catch2/catch_test_macros.hpp>
 
 TEST_CASE("Column constructor using initializer list", "[dataframe]")
 {
@@ -151,7 +151,7 @@ TEST_CASE("Column tutorial", "[dataframe]")
   CHECK(b.elements_type() == c.elements_type());
 
   // View with different type
-  auto dview = jules::to_view<double>(b);
+  (void)jules::to_view<double>(b);
   // b now holds double
   CHECK(b.elements_type() == typeid(double));
 

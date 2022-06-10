@@ -2,7 +2,7 @@
 #include "jules/array/meta/common.hpp"
 #include "jules/array/meta/reference.hpp"
 
-#include <catch.hpp>
+#include <catch2/catch_test_macros.hpp>
 
 #include <vector>
 
