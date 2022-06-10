@@ -17,14 +17,13 @@ concept valid_extents_for = (sizeof...(Dims) == N) && (convertible_to<Dims, inde
 
 template <typename T> concept common_array = requires(const T& t)
 {
-  ranges::range<T>;
+  requires ranges::range<T>;
 
   typename T::value_type;
   typename T::size_type;
 
-  T::order > 0u;
-
   { T::order } -> convertible_to<typename T::size_type>;
+  requires T::order > 0u;
 
   { t.size() } -> same_as<typename T::size_type>;
   { t.dimensions() } -> same_as<std::array<typename T::size_type, T::order>>;

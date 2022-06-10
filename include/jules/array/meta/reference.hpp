@@ -22,10 +22,10 @@ template <typename T> concept exposes_data = requires(T t)
 template <typename T>
 concept reference_array = requires(T t, index_t i, absolute_slice ai, absolute_strided_slice asi, index_span ix)
 {
-  ranges::forward_range<T>;
-  common_array<T>;
+  requires ranges::forward_range<T>;
+  requires common_array<T>;
 
-  !exposes_data<T>;
+  requires !exposes_data<T>;
 
   { t[i] };
   { t[ai] };

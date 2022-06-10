@@ -23,8 +23,8 @@ template <typename T, typename Op> struct left_operation
   Op op;
 
   template <typename U>
-  constexpr decltype(auto) operator()(U&& other) const
-    noexcept(noexcept(std::declval<const Op&>()(std::declval<const T&>(), std::declval<U>())))
+  constexpr auto operator()(U&& other) const
+    noexcept(noexcept(std::declval<const Op&>()(std::declval<const T&>(), std::declval<U>()))) -> decltype(auto)
   {
     return op(lhs, std::forward<U>(other));
   }
@@ -36,8 +36,8 @@ template <typename T, typename Op> struct right_operation
   Op op;
 
   template <typename U>
-  constexpr decltype(auto) operator()(U&& other) const
-    noexcept(noexcept(std::declval<const Op&>()(std::declval<U>(), std::declval<const T&>())))
+  constexpr auto operator()(U&& other) const
+    noexcept(noexcept(std::declval<const Op&>()(std::declval<U>(), std::declval<const T&>()))) -> decltype(auto)
   {
     return op(std::forward<U>(other), rhs);
   }

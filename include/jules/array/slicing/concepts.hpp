@@ -19,22 +19,21 @@ template <typename T> struct slice_traits
 };
 
 // clang-format off
-template <typename T> concept valid_slice = requires(const T& s)
+template <typename T>
+concept valid_slice = requires(const T& s)
 {
-  !default_constructible<T>;
+  requires !default_constructible<T>;
 
-  copy_constructible<T>;
-  move_constructible<T>;
+  requires copy_constructible<T>;
+  requires move_constructible<T>;
 
-  copyable<T>;
-  movable<T>;
+  requires std::is_trivially_destructible_v<T>;
 
-  std::is_trivially_destructible_v<T>;
+  requires !same_as<void, typename slice_traits<T>::absolute_type>;
+  requires !same_as<void, typename slice_traits<T>::absolutize_type>;
 
-  !same_as<void, typename slice_traits<T>::absolute_type>;
-  !same_as<void, typename slice_traits<T>::absolutize_type>;
-
-  { typename slice_traits<T>::absolutize_type{}(s, index_t{}) } noexcept -> same_as<typename slice_traits<T>::absolute_type>;
+  { typename slice_traits<T>::absolutize_type{}(s, index_t{}) } noexcept ->
+    same_as<typename slice_traits<T>::absolute_type>;
 };
 // clang-format on
 
