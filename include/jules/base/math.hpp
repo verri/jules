@@ -52,9 +52,21 @@ public:
 
   template <typename T> constexpr auto operator()(const T& x) const { return op_(x); }
 
+  template <typename T, typename U> constexpr auto operator()(const T& x, const U& y) const { return op_(x, y); }
+
   template <typename T> constexpr auto operator()(const std::optional<T>& x) const
   {
     return x.has_value() ? std::make_optional(op_(x.value())) : std::nullopt;
+  }
+
+  template <typename T, typename U> constexpr auto operator()(const std::optional<T>& x, const U& y) const
+  {
+    return x.has_value() ? std::make_optional(op_(x.value(), y)) : std::nullopt;
+  }
+
+  template <typename T, typename U> constexpr auto operator()(const T& x, const std::optional<U>& y) const
+  {
+    return y.has_value() ? std::make_optional(op_(x, y.value())) : std::nullopt;
   }
 
 private:
@@ -64,10 +76,21 @@ private:
 template <typename Op> constexpr auto unary_operator(Op op) noexcept
 {
   return [op = std::move(op)]<typename T>(T&& value) {
-    if constexpr (applies_to<Op, decltype(value)>) {
+    if constexpr (applies_to<Op, T>) {
       return apply(std::forward<T>(value), op);
     } else {
       return op(std::as_const(value));
+    }
+  };
+}
+
+template <typename Op> constexpr auto binary_operator(Op op) noexcept
+{
+  return [op = std::move(op)]<typename T, typename U>(T&& lhs, U&& rhs) {
+    if constexpr (applies_to_by<Op, T, U>) {
+      return apply(std::forward<T>(lhs), std::forward<U>(rhs), op);
+    } else {
+      return op(std::as_const(lhs), std::as_const(rhs));
     }
   };
 }
@@ -114,6 +137,18 @@ template <typename T> auto tanh_fn(const T& value)
 {
   using std::tanh;
   return tanh(value);
+}
+
+template <typename T, typename U> auto min_fn(const T& lhs, const U& rhs)
+{
+  using std::min;
+  return min(lhs, rhs);
+}
+
+template <typename T, typename U> auto max_fn(const T& lhs, const U& rhs)
+{
+  using std::max;
+  return max(lhs, rhs);
 }
 } // namespace detail
 
@@ -176,8 +211,11 @@ constexpr auto replace_missing = []<typename T>(T value) {
   });
 };
 
-// TODO: constexpr auto pmax =
-// TODO: constexpr auto pmin =
+constexpr auto pmin = binary_operator(
+  optional_operator([]<common_numeric T, common_numeric U>(const T& lhs, const U& rhs) { return detail::min_fn(lhs, rhs); }));
+
+constexpr auto pmax = binary_operator(
+  optional_operator([]<common_numeric T, common_numeric U>(const T& lhs, const U& rhs) { return detail::max_fn(lhs, rhs); }));
 
 } // namespace jules
 

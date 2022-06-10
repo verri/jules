@@ -35,7 +35,7 @@ public:
   auto op() const -> const Op& { return op_; }
 
 protected:
-  template <typename... Args> decltype(auto) operate(Args&&... args) const { return op_(std::forward<Args>(args)...); }
+  template <typename... Args> auto operate(Args&&... args) const -> decltype(auto) { return op_(std::forward<Args>(args)...); }
 
 private:
   Op op_;

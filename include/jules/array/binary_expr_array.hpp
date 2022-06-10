@@ -131,7 +131,7 @@ auto drop_to(const binary_expr_array<LhsIt, RhsIt, Op, N>& source)
 }
 
 template <typename LhsIt, typename RhsIt, typename Op, std::size_t N>
-decltype(auto) drop(const binary_expr_array<LhsIt, RhsIt, Op, N>& source)
+auto drop(const binary_expr_array<LhsIt, RhsIt, Op, N>& source) -> decltype(auto)
 {
   return drop_to<1>(source);
 }

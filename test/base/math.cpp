@@ -44,4 +44,7 @@ TEST_CASE("Basic math operations", "[math]")
 
   x = 1;
   CHECK(fix_na(x) == 1);
+
+  CHECK(pmax(1, 2) == std::max(1, 2));
+  CHECK(pmin(1, 2) == std::min(1, 2));
 }

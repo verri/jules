@@ -29,7 +29,7 @@ concept applies_to =
 template <typename Op, typename T, typename U, typename Apply = typename apply_traits<std::decay_t<T>>::apply_type>
 concept applies_to_by =
   (!same_as<void, Apply>) && std::is_trivial_v<Apply> &&
-  requires(T lhs, U rhs, Op op, const Apply apply) {
+  requires(T&& lhs, U&& rhs, Op op, const Apply apply) {
     { Apply{} } noexcept;
     { apply(std::forward<T>(lhs), std::forward<U>(rhs), std::move(op)) };
   };
