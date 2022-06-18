@@ -111,10 +111,23 @@ public:
   }
 
   base_data(const base_data& source) = default;
-  base_data(base_data&& source) noexcept = default;
+
+  base_data(base_data&& source) noexcept
+    : row_count_{std::exchange(source.row_count_, 0)},
+      elements_{std::exchange(source.elements_, {})},
+      indexes_{std::exchange(source.indexes_, {})}
+  {}
 
   auto operator=(const base_data& source) -> base_data& = default;
-  auto operator=(base_data&& source) noexcept -> base_data& = default;
+
+  auto operator=(base_data&& source) noexcept -> base_data&
+  {
+    row_count_ = std::exchange(source.row_count_, 0);
+    elements_ = std::exchange(source.elements_, {});
+    indexes_ = std::exchange(source.indexes_, {});
+
+    return *this;
+  }
 
   static auto read(std::istream& is, read_options opt = {}) -> base_data
   {
@@ -288,6 +301,13 @@ public:
 
   auto cbegin() const { return elements_.cbegin(); }
   auto cend() const { return elements_.cend(); }
+
+  auto resize_columns(std::size_t nrows)
+  {
+    for (auto& [_, col] : elements_)
+      col.model_->resize(nrows);
+    row_count_ = nrows;
+  }
 
 private:
   index_t row_count_ = 0u;

@@ -17,7 +17,13 @@ TEST_CASE("Head and tail of a matrix", "[data]")
 
   CHECK_THROWS(df | head(10u));
 
-  const auto hdf = df | head(2u);
+  auto hdf = df | head(2u);
 
   CHECK(hdf.row_count() == 2u);
+
+  auto h1df = std::move(hdf) | head(1u);
+
+  CHECK_FALSE(hdf);
+
+  CHECK(h1df.row_count() == 1u);
 }

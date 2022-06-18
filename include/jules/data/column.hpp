@@ -8,6 +8,7 @@
 #include <jules/core/ranges.hpp>
 #include <jules/core/type.hpp>
 #include <jules/data/column_model.hpp>
+#include <jules/data/type.hpp>
 
 #include <memory>
 
@@ -36,6 +37,8 @@ template <typename T, typename C> auto to_column(base_column<C>&& column) -> bas
 
 template <typename Rules> class base_column
 {
+  friend class base_data<Rules>;
+
   template <typename T> using model_t = column_model<T, Rules>;
   using interface_type = column_interface<Rules>;
   using model_type = std::unique_ptr<interface_type>;

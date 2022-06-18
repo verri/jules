@@ -38,16 +38,23 @@ namespace action
 {
 
 constexpr auto head = [](index_t n) {
-  // TODO: composed lambdas to accept temporary data
-  return make_data_action([n](const auto& df) {
-    if (n > df.row_count())
-      throw std::out_of_range{"not enough rows"};
+  return make_data_action(overloaded{[n](const auto& df) {
+                                       if (n > df.row_count())
+                                         throw std::out_of_range{"not enough rows"};
 
-    namespace view = ::jules::ranges::views;
-    return decltype(df)(view::all(df) | view::transform([n](const auto& named_column) {
-                          return decltype(named_column){named_column.name, {named_column.column, 0u, n}};
-                        }));
-  });
+                                       namespace view = ::jules::ranges::views;
+                                       return decltype(df)(
+                                         view::all(df) | view::transform([n](const auto& named_column) {
+                                           return decltype(named_column){named_column.name, {named_column.column, 0u, n}};
+                                         }));
+                                     },
+                                     [n]<typename C>(base_data<C>&& df) -> base_data<C> {
+                                       if (n > df.row_count())
+                                         throw std::out_of_range{"not enough rows"};
+
+                                       df.resize_columns(n);
+                                       return std::move(df);
+                                     }});
 };
 
 } // namespace action

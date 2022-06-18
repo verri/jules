@@ -43,6 +43,10 @@ TEST_CASE("Null data colbind", "[data]")
 
   CHECK(df2.row_count() == df1.row_count());
   CHECK(df2.column_count() == df1.column_count());
+
+  df2 = std::move(df1); // move guarantees null
+  CHECK_FALSE(df1);
+  CHECK(df2);
 }
 
 TEST_CASE("Dataframe colbind", "[data]")

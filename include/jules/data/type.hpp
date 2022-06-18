@@ -14,6 +14,8 @@
 namespace jules
 {
 
+template <typename> class base_data;
+
 using default_types = std::tuple<numeric, integer, index_t, string>;
 
 /// Default class with coercion rules for [numeric](standardese://jules::numeric/) and
