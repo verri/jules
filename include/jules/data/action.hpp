@@ -38,8 +38,7 @@ template <typename Op> auto make_dataframe_action(Op op) -> base_dataframe_actio
 namespace action
 {
 
-static inline auto head(index_t n)
-{
+constexpr auto head = [](index_t n) {
   // TODO: composed lambdas to accept temporary dataframe
   return make_dataframe_action([n](const auto& df) {
     if (n > df.row_count())
@@ -50,7 +49,7 @@ static inline auto head(index_t n)
                           return decltype(named_column){named_column.name, {named_column.column, 0u, n}};
                         }));
   });
-}
+};
 
 } // namespace action
 } // namespace jules

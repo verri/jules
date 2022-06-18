@@ -203,8 +203,6 @@ public:
   {
     return (concrete_coercion<T, Rules, Ts>::can_coerce_(id) || ...);
   }
-
-private:
 };
 
 } // namespace jules::detail
