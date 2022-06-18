@@ -1,6 +1,7 @@
 #include "jules/data/column.hpp"
 #include "jules/array/array.hpp"
 #include "jules/data/numeric.hpp"
+#include "jules/data/type.hpp"
 
 #include <catch2/catch_test_macros.hpp>
 
@@ -31,13 +32,14 @@ TEST_CASE("Column constructor using initializer list", "[data]")
   CHECK(!toy_column.can_coerce<numeric>());
   CHECK(!toy_column.can_coerce<string>());
 
+  using jules::as_numeric;
   using jules::to_column;
   using jules::to_view;
 
   auto string_numbers = column{"1.0"_s, "2.4"_s, "3.3"_s};
-  auto numeric_numbers = to_column<numeric>(string_numbers);
+  auto numeric_numbers = to_column(as_numeric, string_numbers);
 
-  auto v = to_view<numeric>(numeric_numbers);
+  auto v = to_view(as_numeric, numeric_numbers);
 
   CHECK(numeric_numbers.size() == v.size());
   CHECK(numeric_numbers.size() != 0u);
@@ -94,7 +96,7 @@ TEST_CASE("Column to_view vs as_vector", "[data]")
   auto col = jules::column{{0, 1, 2, 3, 4, 5}};
 
   auto view1 = jules::to_view<int>(col);
-  auto view2 = jules::to_view<int>(col);
+  auto view2 = to_view(jules::tag<int>{}, col);
   auto vector = jules::to_vector<int>(col);
 
   for (auto i : jules::indices(col.size()))
@@ -156,7 +158,7 @@ TEST_CASE("Column tutorial", "[data]")
   CHECK(b.elements_type() == typeid(double));
 
   // To vector, on the other hand, doesn't convert
-  auto fcopy = jules::to_vector<jules::string>(b);
+  auto fcopy = to_vector(jules::as_string, b);
   // b still holds double
   CHECK(b.elements_type() == typeid(double));
 }

@@ -85,6 +85,20 @@ template <typename T, typename Rules, typename U> concept coercible_to = require
 };
 // clang-format on
 
+constexpr auto as_numeric = tag<numeric>{};
+
+constexpr auto as_string = tag<string>{};
+
+constexpr auto as_uinteger = tag<uinteger>{};
+
+constexpr auto as_integer = tag<integer>{};
+
+constexpr auto as_index = tag<index_t>{};
+
+constexpr auto as_size = tag<size_t>{};
+
+constexpr auto as_distance = tag<distance_t>{};
+
 } // namespace jules
 
 #endif // JULES_DATAFRAME_TYPE_H

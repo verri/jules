@@ -94,6 +94,14 @@ template <typename T, typename C> auto to_matrix(const base_data<C>& df) -> arra
   return array<T, 2>(std::move(builder));
 }
 
+template <typename T, typename Arg> auto to_view(tag<T>, Arg&& arg) { return to_view<T>(std::forward<Arg>(arg)); }
+
+template <typename T, typename Arg> auto to_column(tag<T>, Arg&& arg) { return to_column<T>(std::forward<Arg>(arg)); }
+
+template <typename T, typename Arg> auto to_vector(tag<T>, Arg&& arg) { return to_vector<T>(std::forward<Arg>(arg)); }
+
+template <typename T, typename Arg> auto to_matrix(tag<T>, Arg&& arg) { return to_matrix<T>(std::forward<Arg>(arg)); }
+
 } // namespace jules
 
 #endif // JULES_DATAFRAME_NUMERIC_H

@@ -37,10 +37,10 @@ set(source_files
   base/random.cpp
   base/math.cpp
   base/numeric.cpp
-  dataframe/column.cpp
-  dataframe/column_model.cpp
-  dataframe/dataframe.cpp
-  # dataframe/action.cpp
+  data/column.cpp
+  data/column_model.cpp
+  data/data.cpp
+  # data/action.cpp
   test_suite.cpp
   version.cpp)
 
