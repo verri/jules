@@ -4,7 +4,7 @@
 #define JULES_DATAFRAME_NUMERIC_H
 
 #include <jules/array/array.hpp>
-#include <jules/dataframe/detail/common.hpp>
+#include <jules/data/detail/common.hpp>
 
 namespace jules
 {
@@ -62,7 +62,7 @@ template <typename T, typename C> auto to_vector(base_column<C>&& column) -> arr
   return {std::make_move_iterator(data), std::make_move_iterator(data + size)};
 }
 
-template <typename T, typename C> auto to_matrix(const base_dataframe<C>& df) -> array<std::optional<T>, 2u>
+template <typename T, typename C> auto to_matrix(const base_data<C>& df) -> array<std::optional<T>, 2u>
 {
   const auto nrow = df.row_count();
   const auto ncol = df.column_count();

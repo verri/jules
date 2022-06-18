@@ -1,10 +1,10 @@
-#include "jules/dataframe/column.hpp"
+#include "jules/data/column.hpp"
 #include "jules/array/array.hpp"
-#include "jules/dataframe/numeric.hpp"
+#include "jules/data/numeric.hpp"
 
 #include <catch2/catch_test_macros.hpp>
 
-TEST_CASE("Column constructor using initializer list", "[dataframe]")
+TEST_CASE("Column constructor using initializer list", "[data]")
 {
   using jules::column;
   using jules::numeric;
@@ -63,7 +63,7 @@ static_assert(!convertible_to_view<jules::column, int>);
 static_assert(!convertible_to_view<jules::column&&, int>);
 static_assert(!convertible_to_view<const jules::column&&, int>);
 
-TEST_CASE("Column constructor inference", "[dataframe]")
+TEST_CASE("Column constructor inference", "[data]")
 {
   using jules::column;
   using jules::numeric;
@@ -77,7 +77,7 @@ TEST_CASE("Column constructor inference", "[dataframe]")
   check_column({"1.0"_s, "2.0"_s, "3.0"_s, "1.0"_s}, typeid(string));
 }
 
-TEST_CASE("Temporary columns", "[dataframe]")
+TEST_CASE("Temporary columns", "[data]")
 {
   using jules::numeric;
 
@@ -89,7 +89,7 @@ TEST_CASE("Temporary columns", "[dataframe]")
     CHECK(view[i] == i + 1);
 }
 
-TEST_CASE("Column to_view vs as_vector", "[dataframe]")
+TEST_CASE("Column to_view vs as_vector", "[data]")
 {
   auto col = jules::column{{0, 1, 2, 3, 4, 5}};
 
@@ -104,7 +104,7 @@ TEST_CASE("Column to_view vs as_vector", "[dataframe]")
   CHECK(all(vector == jules::cat(0, 1, 2, 3, 4, 5)));
 }
 
-TEST_CASE("Column tutorial", "[dataframe]")
+TEST_CASE("Column tutorial", "[data]")
 {
   auto empty_column = jules::column();
 

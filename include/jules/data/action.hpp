@@ -5,26 +5,25 @@
 
 #include <jules/core/ranges.hpp>
 #include <jules/core/type.hpp>
-#include <jules/dataframe/detail/common.hpp>
+#include <jules/data/detail/common.hpp>
 
 #include <stdexcept>
 
 namespace jules
 {
 
-template <typename Op> struct base_dataframe_action
+template <typename Op> struct base_data_action
 {
 
-  base_dataframe_action(Op op) : op_{std::move(op)} {}
+  base_data_action(Op op) : op_{std::move(op)} {}
 
   template <typename Coercion>
-  friend auto operator|(const base_dataframe<Coercion>& df, const base_dataframe_action& a) -> base_dataframe<Coercion>
+  friend auto operator|(const base_data<Coercion>& df, const base_data_action& a) -> base_data<Coercion>
   {
     return a.op_(df);
   }
 
-  template <typename Coercion>
-  friend auto operator|(base_dataframe<Coercion>&& df, const base_dataframe_action& a) -> base_dataframe<Coercion>
+  template <typename Coercion> friend auto operator|(base_data<Coercion>&& df, const base_data_action& a) -> base_data<Coercion>
   {
     return a.op_(std::move(df));
   }
@@ -33,14 +32,14 @@ private:
   Op op_;
 };
 
-template <typename Op> auto make_dataframe_action(Op op) -> base_dataframe_action<Op> { return {std::move(op)}; }
+template <typename Op> auto make_data_action(Op op) -> base_data_action<Op> { return {std::move(op)}; }
 
 namespace action
 {
 
 constexpr auto head = [](index_t n) {
-  // TODO: composed lambdas to accept temporary dataframe
-  return make_dataframe_action([n](const auto& df) {
+  // TODO: composed lambdas to accept temporary data
+  return make_data_action([n](const auto& df) {
     if (n > df.row_count())
       throw std::out_of_range{"not enough rows"};
 

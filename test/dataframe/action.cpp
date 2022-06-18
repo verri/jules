@@ -1,13 +1,13 @@
-#include "jules/dataframe/dataframe.hpp"
+#include "jules/data/data.hpp"
 
 #include <catch2/catch_test_macros.hpp>
 
-TEST_CASE("Head and tail of a matrix", "[dataframe]")
+TEST_CASE("Head and tail of a matrix", "[data]")
 {
   // TODO: missing tail
   using namespace jules::action;
 
-  const auto df = jules::dataframe{
+  const auto df = jules::data{
     {"a", {1, 2, 3}},       //
     {"b", {1.0, 2.0, 3.0}}, //
     {"c", {1u, 2u, 3u}},    //

@@ -7,7 +7,7 @@ namespace jules
 {
 
 template <typename C> class base_column;
-template <typename C> class base_dataframe;
+template <typename C> class base_data;
 
 } // namespace jules
 

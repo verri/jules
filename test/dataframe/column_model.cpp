@@ -1,11 +1,11 @@
-#include "jules/dataframe/column_model.hpp"
+#include "jules/data/column_model.hpp"
 
 #include <catch2/catch_test_macros.hpp>
 
 #include <catch2/catch_approx.hpp>
 using Catch::Approx;
 
-TEST_CASE("Column model", "[dataframe]")
+TEST_CASE("Column model", "[data]")
 {
   using namespace jules;
   using namespace jules::literals;
@@ -91,7 +91,7 @@ TEST_CASE("Column model", "[dataframe]")
   CHECK(clone->elements_type() == scolumn->elements_type());
 }
 
-TEST_CASE("Column model sanity conversions", "[dataframe]")
+TEST_CASE("Column model sanity conversions", "[data]")
 {
   using namespace jules;
   using namespace jules::literals;
@@ -181,7 +181,7 @@ TEST_CASE("Column model sanity conversions", "[dataframe]")
   CHECK_THROWS(flt_column->coerce(typeid(index_t)));
 }
 
-TEST_CASE("Column model successful coercions", "[dataframe]")
+TEST_CASE("Column model successful coercions", "[data]")
 {
   using namespace jules;
 
@@ -219,7 +219,7 @@ TEST_CASE("Column model successful coercions", "[dataframe]")
   CHECK(ind_column2->downcast<index_t>().at(0u).value_or(0) == 17u);
 }
 
-TEST_CASE("Column model partial clone and resize", "[dataframe]")
+TEST_CASE("Column model partial clone and resize", "[data]")
 {
   using namespace jules;
 

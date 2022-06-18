@@ -4,7 +4,7 @@
 #define JULES_DATAFRAME_DETAIL_COLUMN_MODEL_H
 
 #include <jules/base/async.hpp>
-#include <jules/dataframe/type.hpp>
+#include <jules/data/type.hpp>
 
 #include <any>
 #include <optional>

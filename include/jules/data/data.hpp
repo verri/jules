@@ -9,9 +9,9 @@
 #include <jules/core/debug.hpp>
 #include <jules/core/ranges.hpp>
 #include <jules/core/type.hpp>
-#include <jules/dataframe/action.hpp>
-#include <jules/dataframe/column.hpp>
-#include <jules/dataframe/numeric.hpp>
+#include <jules/data/action.hpp>
+#include <jules/data/column.hpp>
+#include <jules/data/numeric.hpp>
 
 #include <algorithm>
 #include <iosfwd>
@@ -22,7 +22,7 @@
 namespace jules
 {
 
-template <typename Rules> class base_dataframe
+template <typename Rules> class base_data
 {
 public:
   using column_type = base_column<Rules>;
@@ -62,29 +62,27 @@ public:
     bool header = true;
   };
 
-  base_dataframe() = default;
+  base_data() = default;
 
-  base_dataframe(std::initializer_list<named_column_type> elements)
-    : base_dataframe(elements.begin(), elements.end(), elements.size())
-  {}
+  base_data(std::initializer_list<named_column_type> elements) : base_data(elements.begin(), elements.end(), elements.size()) {}
 
   template <ranges::range Rng, typename R = ranges::range_value_t<Rng>>
-  requires convertible_to<R, named_column_type> base_dataframe(const Rng& rng)
-    : base_dataframe(ranges::begin(rng), ranges::end(rng), ranges::size(rng))
+  requires convertible_to<R, named_column_type> base_data(const Rng& rng)
+    : base_data(ranges::begin(rng), ranges::end(rng), ranges::size(rng))
   {}
 
   template <ranges::input_iterator Iter, ranges::sentinel_for<Iter> Sent, typename R = ranges::iter_value_t<Iter>>
-  requires convertible_to<R, named_column_type> &&(!ranges::forward_iterator<Iter>)base_dataframe(Iter first, Sent last)
-    : base_dataframe(first, last, 0u)
+  requires convertible_to<R, named_column_type> &&(!ranges::forward_iterator<Iter>)base_data(Iter first, Sent last)
+    : base_data(first, last, 0u)
   {}
 
   template <ranges::forward_iterator Iter, ranges::sentinel_for<Iter> Sent, typename R = ranges::iter_value_t<Iter>>
-  requires convertible_to<R, named_column_type> base_dataframe(Iter first, Sent last)
-    : base_dataframe(first, last, ranges::distance(first, last))
+  requires convertible_to<R, named_column_type> base_data(Iter first, Sent last)
+    : base_data(first, last, ranges::distance(first, last))
   {}
 
   template <ranges::input_iterator Iter, ranges::sentinel_for<Iter> Sent, typename R = ranges::iter_value_t<Iter>>
-  requires convertible_to<R, named_column_type> base_dataframe(Iter first, Sent last, index_t size_hint)
+  requires convertible_to<R, named_column_type> base_data(Iter first, Sent last, index_t size_hint)
   {
     if (first == last)
       return;
@@ -112,13 +110,13 @@ public:
     }
   }
 
-  base_dataframe(const base_dataframe& source) = default;
-  base_dataframe(base_dataframe&& source) noexcept = default;
+  base_data(const base_data& source) = default;
+  base_data(base_data&& source) noexcept = default;
 
-  auto operator=(const base_dataframe& source) -> base_dataframe& = default;
-  auto operator=(base_dataframe&& source) noexcept -> base_dataframe& = default;
+  auto operator=(const base_data& source) -> base_data& = default;
+  auto operator=(base_data&& source) noexcept -> base_data& = default;
 
-  static auto read(std::istream& is, read_options opt = {}) -> base_dataframe
+  static auto read(std::istream& is, read_options opt = {}) -> base_data
   {
     namespace view = ::jules::ranges::views;
 
@@ -158,7 +156,7 @@ public:
     if (ncol == 0)
       return {};
 
-    auto df = base_dataframe();
+    auto df = base_data();
 
     // only header
     if (opt.header && data.size() / ncol == 1) {
@@ -224,7 +222,7 @@ public:
   }
 
   // other options are `bind_left`, `bind_right`, `bind_up`, `bind_down`, or something similar.
-  auto bind(named_column_type elem) -> base_dataframe&
+  auto bind(named_column_type elem) -> base_data&
   {
     DEBUG_ASSERT(elem.name.view().empty() || indexes_.find(elem.name) == indexes_.end(), debug::throwing_module,
                  debug::level::invalid_argument, "repeated column name");
@@ -242,9 +240,9 @@ public:
     return *this;
   }
 
-  auto bind(column elem) -> base_dataframe& { return bind(named_column_type{"", std::move(elem)}); }
+  auto bind(column elem) -> base_data& { return bind(named_column_type{"", std::move(elem)}); }
 
-  auto bind(base_dataframe other) -> base_dataframe&
+  auto bind(base_data other) -> base_data&
   {
     for (auto& elem : other.elements_)
       bind(std::move(elem));
@@ -297,16 +295,13 @@ private:
   std::unordered_map<string, index_t> indexes_;
 };
 
-using dataframe = base_dataframe<coercion_rules>;
+using data = base_data<coercion_rules>;
 
-template <typename Rules> auto operator<<(std::ostream& os, const base_dataframe<Rules>& df) -> std::ostream&
-{
-  return df.write(os);
-}
+template <typename Rules> auto operator<<(std::ostream& os, const base_data<Rules>& df) -> std::ostream& { return df.write(os); }
 
-template <typename Rules> auto operator>>(std::istream& is, base_dataframe<Rules>& df) -> std::istream&
+template <typename Rules> auto operator>>(std::istream& is, base_data<Rules>& df) -> std::istream&
 {
-  df = base_dataframe<Rules>::read(is);
+  df = base_data<Rules>::read(is);
   return is;
 }
 

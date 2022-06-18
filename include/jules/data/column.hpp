@@ -7,7 +7,7 @@
 #include <jules/core/debug.hpp>
 #include <jules/core/ranges.hpp>
 #include <jules/core/type.hpp>
-#include <jules/dataframe/column_model.hpp>
+#include <jules/data/column_model.hpp>
 
 #include <memory>
 
