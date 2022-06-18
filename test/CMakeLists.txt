@@ -40,7 +40,7 @@ set(source_files
   data/column.cpp
   data/column_model.cpp
   data/data.cpp
-  # data/action.cpp
+  data/action.cpp
   test_suite.cpp
   version.cpp)
 

@@ -4,7 +4,6 @@
 
 TEST_CASE("Head and tail of a matrix", "[data]")
 {
-  // TODO: missing tail
   using namespace jules::action;
 
   const auto df = jules::data{
@@ -13,7 +12,7 @@ TEST_CASE("Head and tail of a matrix", "[data]")
     {"c", {1u, 2u, 3u}},    //
   };
 
-  CHECK(df.row_count() == 3u);
+  REQUIRE(df.row_count() == 3u);
 
   CHECK_THROWS(df | head(10u));
 
@@ -21,9 +20,15 @@ TEST_CASE("Head and tail of a matrix", "[data]")
 
   CHECK(hdf.row_count() == 2u);
 
-  auto h1df = std::move(hdf) | head(1u);
+  const auto h1df = std::move(hdf) | head(1u);
 
   CHECK_FALSE(hdf);
 
   CHECK(h1df.row_count() == 1u);
+
+  CHECK_THROWS(df | tail(10u));
+
+  const auto tdf = df | tail(2u);
+
+  CHECK(tdf.row_count() == 2u);
 }

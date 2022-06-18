@@ -57,6 +57,20 @@ constexpr auto head = [](index_t n) {
                                      }});
 };
 
+// TODO: move-version
+constexpr auto tail = [](index_t n) {
+  return make_data_action([n](const auto& df) {
+    const auto nrow = df.row_count();
+    if (n > nrow)
+      throw std::out_of_range{"not enough rows"};
+
+    namespace view = ::jules::ranges::views;
+    return decltype(df)(view::all(df) | view::transform([&](const auto& named_column) {
+                          return decltype(named_column){named_column.name, {named_column.column, nrow - n, n}};
+                        }));
+  });
+};
+
 } // namespace action
 } // namespace jules
 
