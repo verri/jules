@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2020 Filipe Verri <filipeverri@gmail.com>
+// Copyright (c) 2017-2024 Filipe Verri <filipeverri@gmail.com>
 
 #ifndef JULES_BASE_NUMERIC_H
 /// \exclude
@@ -11,7 +11,6 @@
 #include <algorithm>
 #include <array>
 #include <cmath>
-#include <functional>
 #include <tuple>
 #include <type_traits>
 #include <utility>

@@ -10,3 +10,4 @@ build
 include/jules/version.hpp
 compile_commands.json
 .clangd
+.cache

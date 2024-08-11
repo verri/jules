@@ -1,4 +1,4 @@
-// Copyright (c) 2019-2020 Filipe Verri <filipeverri@gmail.com>
+// Copyright (c) 2019-2024 Filipe Verri <filipeverri@gmail.com>
 
 // Oh how I love your law!
 //    It is my meditation all the day.
@@ -16,7 +16,6 @@
 #include <jules/core/type.hpp>
 
 #include <algorithm>
-#include <iterator>
 #include <type_traits>
 #include <utility>
 

@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2020 Filipe Verri <filipeverri@gmail.com>
+// Copyright (c) 2017-2024 Filipe Verri <filipeverri@gmail.com>
 
 #ifndef JULES_BASE_RANDOM_H
 /// \exclude
@@ -10,7 +10,6 @@
 
 #include <cmath>
 #include <random>
-#include <vector>
 
 namespace jules
 {
