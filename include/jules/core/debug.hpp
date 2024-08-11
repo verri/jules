@@ -49,11 +49,11 @@ struct throwing_module_t : debug_assert::set_level<static_cast<unsigned>(-1)>, d
     std::array<char, 512> buffer;
 
     if (*expression == '\0')
-      std::snprintf(buffer.data(), buffer.size(), "[jules] %s:%u: Unreachable code reached - %s.\n", loc.file_name,
-                    loc.line_number, message);
+      (void)std::snprintf(buffer.data(), buffer.size(), "[jules] %s:%u: Unreachable code reached - %s.\n", loc.file_name,
+                          loc.line_number, message);
     else
-      std::snprintf(buffer.data(), buffer.size(), "[jules] %s:%u: Assertion '%s' failed - %s.\n", loc.file_name, loc.line_number,
-                    expression, message);
+      (void)std::snprintf(buffer.data(), buffer.size(), "[jules] %s:%u: Assertion '%s' failed - %s.\n", loc.file_name,
+                          loc.line_number, expression, message);
 
     throw std::logic_error{buffer.data()};
   }
