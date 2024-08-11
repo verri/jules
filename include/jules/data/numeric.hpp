@@ -1,10 +1,10 @@
-// Copyright (c) 2017-2019 Filipe Verri <filipeverri@gmail.com>
+// Copyright (c) 2017-2020 Filipe Verri <filipeverri@gmail.com>
 
 #ifndef JULES_DATAFRAME_NUMERIC_H
 #define JULES_DATAFRAME_NUMERIC_H
 
 #include <jules/array/array.hpp>
-#include <jules/dataframe/detail/common.hpp>
+#include <jules/data/detail/common.hpp>
 
 namespace jules
 {
@@ -22,21 +22,21 @@ template <typename T, typename C> auto to_column(base_column<C>&& column) -> bas
   return {std::move(column)};
 }
 
-template <typename T, typename C> auto to_view(base_column<C>& column) -> ref_array<T, 1u>
+template <typename T, typename C> auto to_view(base_column<C>& column) -> ref_array<std::optional<T>, 1u>
 {
   if (column.elements_type() != typeid(T))
     column.template coerce<T>();
   return {column.template data<T>(), {{{column.size()}}}};
 }
 
-template <typename T, typename C> auto to_view(const base_column<C>& column) -> ref_array<const T, 1u>
+template <typename T, typename C> auto to_view(const base_column<C>& column) -> ref_array<const std::optional<T>, 1u>
 {
   return {column.template data<T>(), {{column.size()}}};
 }
 
 template <typename T, typename C> auto to_view(const base_column<C>&& column) = delete;
 
-template <typename T, typename C> auto to_vector(const base_column<C>& column) -> array<T, 1u>
+template <typename T, typename C> auto to_vector(const base_column<C>& column) -> array<std::optional<T>, 1u>
 {
   auto size = column.size();
 
@@ -50,7 +50,7 @@ template <typename T, typename C> auto to_vector(const base_column<C>& column) -
   return {data, data + size};
 }
 
-template <typename T, typename C> auto to_vector(base_column<C>&& column) -> array<T, 1u>
+template <typename T, typename C> auto to_vector(base_column<C>&& column) -> array<std::optional<T>, 1u>
 {
   auto size = column.size();
 
@@ -62,7 +62,7 @@ template <typename T, typename C> auto to_vector(base_column<C>&& column) -> arr
   return {std::make_move_iterator(data), std::make_move_iterator(data + size)};
 }
 
-template <typename T, typename C> auto to_matrix(const base_dataframe<C>& df) -> array<T, 2u>
+template <typename T, typename C> auto to_matrix(const base_data<C>& df) -> array<std::optional<T>, 2u>
 {
   const auto nrow = df.row_count();
   const auto ncol = df.column_count();
@@ -87,12 +87,20 @@ template <typename T, typename C> auto to_matrix(const base_dataframe<C>& df) ->
   for (const auto [should_move, data] : data_vector)
     for (const auto i : indices(nrow))
       if (should_move)
-        builder.push_back(std::move(data[i]));
+        builder.push_back(std::move(data[i])); // XXX: is not moving anything.
       else
         builder.push_back(data[i]);
 
   return array<T, 2>(std::move(builder));
 }
+
+template <typename T, typename Arg> auto to_view(tag<T>, Arg&& arg) { return to_view<T>(std::forward<Arg>(arg)); }
+
+template <typename T, typename Arg> auto to_column(tag<T>, Arg&& arg) { return to_column<T>(std::forward<Arg>(arg)); }
+
+template <typename T, typename Arg> auto to_vector(tag<T>, Arg&& arg) { return to_vector<T>(std::forward<Arg>(arg)); }
+
+template <typename T, typename Arg> auto to_matrix(tag<T>, Arg&& arg) { return to_matrix<T>(std::forward<Arg>(arg)); }
 
 } // namespace jules
 

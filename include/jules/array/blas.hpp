@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2019 Filipe Verri <filipeverri@gmail.com>
+// Copyright (c) 2017-2020 Filipe Verri <filipeverri@gmail.com>
 
 #if __has_include(<cblas.h>)
 #ifndef JULES_ARRAY_BLAS_H
@@ -8,12 +8,12 @@
 #include <jules/array/fwd.hpp>
 #include <jules/core/debug.hpp>
 
-namespace jules
-{
-namespace blas
-{
-
+extern "C" {
 #include <cblas.h>
+}
+
+namespace jules::blas
+{
 
 template <typename T> struct invalid : public std::false_type
 {};
@@ -42,18 +42,20 @@ template <typename T> static inline auto safe_int_cast(T value)
 
 template <typename T, typename U, typename R = std::remove_const_t<T>>
 auto product(const ref_array<T, 2u>& lhs, const ref_array<U, 2u>& rhs, R alpha = numeric_traits<R>::multiplicative_identity())
-  -> meta::requires_t<array<R, 2u>, std::is_same<decltype(lhs.begin()), decltype(rhs.begin())>>
+  -> array<R, 2u>
 {
+  static_assert(std::is_same_v<decltype(lhs.begin()), decltype(rhs.begin())>);
+
   DEBUG_ASSERT(lhs.size() > 0 && rhs.size() > 0, debug::default_module, debug::level::invalid_argument, "empty matrix");
-  DEBUG_ASSERT(lhs.column_count() == rhs.row_count(), debug::default_module, debug::level::invalid_argument, "invalid extents");
+  DEBUG_ASSERT(column_count(lhs) == row_count(rhs), debug::default_module, debug::level::invalid_argument, "invalid extents");
 
-  auto result = array<R, 2u>(uninitialized, lhs.row_count(), rhs.column_count());
+  auto result = array<R, 2u>(uninitialized, row_count(lhs), column_count(rhs));
 
-  const auto k = safe_int_cast(lhs.column_count()); // same as rhs.row_count()
-  const auto result_row_count = safe_int_cast(result.row_count());
-  const auto result_column_count = safe_int_cast(result.column_count());
-  const auto lhs_row_count = safe_int_cast(lhs.row_count());
-  const auto rhs_row_count = safe_int_cast(rhs.row_count());
+  const auto k = safe_int_cast(column_count(lhs)); // same as row_count(rhs)
+  const auto result_row_count = safe_int_cast(row_count(result));
+  const auto result_column_count = safe_int_cast(column_count(result));
+  const auto lhs_row_count = safe_int_cast(row_count(lhs));
+  const auto rhs_row_count = safe_int_cast(row_count(rhs));
 
   cblas<R>::gemm(CblasColMajor, CblasNoTrans, CblasNoTrans,       //
                  result_row_count, result_column_count, k, alpha, //
@@ -64,8 +66,8 @@ auto product(const ref_array<T, 2u>& lhs, const ref_array<U, 2u>& rhs, R alpha =
   return result;
 }
 
-template <typename T, typename U, typename V, typename R = std::remove_const_t<T>,
-          typename = meta::requires_<std::is_same<std::remove_const_t<T>, std::remove_const_t<U>>, std::is_convertible<V, R>>>
+template <typename T, typename U, typename V, typename R = std::remove_const_t<T>>
+requires same_as<std::remove_const_t<T>, std::remove_const_t<U>> && convertible_to<V, R>
 auto product(const unary_expr_array<T*, left_operation<V, std::multiplies<>>, 2u>& lhs, const ref_array<U, 2u>& rhs)
 {
   const auto new_lhs = ref_array<T, 2u>{lhs.first(), {lhs.dimensions()}};
@@ -74,8 +76,7 @@ auto product(const unary_expr_array<T*, left_operation<V, std::multiplies<>>, 2u
 
 // TODO: other optimized versions.
 
-} // namespace blas
-} // namespace jules
+} // namespace jules::blas
 
 #endif // JULES_ARRAY_BLAS_H
 #endif // __has_include(<cblas.h>)

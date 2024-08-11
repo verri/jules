@@ -1,8 +1,5 @@
 # Jules
 
-[![Join the chat at https://gitter.im/verri-jules/Lobby](https://badges.gitter.im/verri-jules/Lobby.svg)](https://gitter.im/verri-jules/Lobby?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
-[![Build Status](https://travis-ci.org/verri/jules.svg?branch=master)](https://travis-ci.org/verri/jules)
-[![codecov](https://codecov.io/gh/verri/jules/branch/master/graph/badge.svg)](https://codecov.io/gh/verri/jules)
 [![GitHub license](https://img.shields.io/badge/license-Zlib-blue.svg)](https://raw.githubusercontent.com/verri/jules/master/license.txt)
 [![Github Releases](https://img.shields.io/github/release/verri/jules.svg)](https://github.com/verri/jules/releases)
 [![AUR](https://img.shields.io/aur/version/jules-git.svg)](https://aur.archlinux.org/packages/jules-git)
@@ -17,13 +14,12 @@ is also intended, but it will probably require many features to come to C++ in t
 
 ## Dependencies
 
- - C++17 compiler
-    - Tested on GCC 7.4.0 and Clang 7.0.0
+ - C++20 compiler
+    - Tested on GCC 11.4.0 and Clang 14.0.0
  - [debug_assert](https://github.com/foonathan/debug_assert)
  - [range-v3](https://github.com/ericniebler/range-v3) (soon to be superseded by C++20 Ranges)
  - [CBLAS](http://www.netlib.org/blas/) (optional)
  - [Catch](https://github.com/philsquared/Catch.git) (testing)
-
 
 ## Installation
 
@@ -77,8 +73,8 @@ target_link_libraries(my-target PRIVATE jules)
 
 If you installed system-wide, use
 ```
-find_package(Cool REQUIRED)
-target_link_libraries(my-target PRIVATE ${Cool_LIBRARY})
+find_package(Jules REQUIRED)
+target_link_libraries(my-target PRIVATE jules)
 ```
 
 If using BLAS, make sure to link to your target.
@@ -91,7 +87,7 @@ target_link_libraries(my-target PRIVATE ${BLAS_LIBRARIES})
 
 You can directly specify the compiler flags:
 ```sh
-CXXFLAGS="-std=c++17 -isystem/path/to/release/include"
+CXXFLAGS="-std=c++23 -isystem/path/to/release/include"
 ```
 
 If using BLAS, make sure to link it using `-lblas` or `-lcblas`, depending on your system.
@@ -107,6 +103,6 @@ the examples in the test folder should suffice.
 
 ## Acknowledgements
 
-This project is supported by **FAPESP** as part of the project *"High level data
+This project was supported by **FAPESP** as part of the project *"High level data
 classification based on complex network applied to invariant pattern recognition"*
 (2013/25876-6).

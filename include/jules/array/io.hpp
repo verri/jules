@@ -1,8 +1,9 @@
-// Copyright (c) 2017-2019 Filipe Verri <filipeverri@gmail.com>
+// Copyright (c) 2017-2020 Filipe Verri <filipeverri@gmail.com>
 
 #ifndef JULES_ARRAY_IO_H
 #define JULES_ARRAY_IO_H
 
+#include <jules/array/axis.hpp>
 #include <jules/array/fwd.hpp>
 #include <jules/array/meta/reference.hpp>
 #include <jules/core/type.hpp>
@@ -40,7 +41,7 @@ public:
 
   template <typename T, std::size_t N> auto operator<<(const array<T, N>& a) -> array_ostream& { return (*this) << ref(a); }
 
-  template <typename RefArray> auto operator<<(RefArray a) -> meta::requires_t<array_ostream&, ReferenceArray<RefArray>>
+  template <reference_array RefArray> auto operator<<(RefArray a) -> array_ostream&
   {
     constexpr auto N = RefArray::order;
 
@@ -55,12 +56,25 @@ public:
       return *this;
     }
 
-    (*this) << a[0];
-    for (auto i = index_t{1}; i < dim_size; ++i) {
-      (*this) << fmt.separator;
-      (*this) << a[i];
+    if constexpr (N == 1) {
+      (*this) << a[0];
+      for (auto i = index_t{1}; i < dim_size; ++i) {
+        (*this) << fmt.separator;
+        (*this) << a[i];
+      }
+    } else {
+      const auto r = rows(a);
+      auto it = r.begin();
+
+      (*this) << *it++;
+      while (it != r.end()) {
+        (*this) << fmt.separator;
+        (*this) << *it++;
+      }
     }
+
     (*this) << fmt.after;
+
     return *this;
   }
 
@@ -136,9 +150,8 @@ auto operator<<(std::basic_ostream<CharT, Traits>& os, const array<T, N>& a) -> 
   return os << ref(a);
 }
 
-template <typename CharT, typename Traits, typename RefArray>
-auto operator<<(std::basic_ostream<CharT, Traits>& os, RefArray a)
-  -> meta::requires_t<std::basic_ostream<CharT, Traits>&, ReferenceArray<RefArray>>
+template <typename CharT, typename Traits, reference_array RefArray>
+auto operator<<(std::basic_ostream<CharT, Traits>& os, RefArray a) -> std::basic_ostream<CharT, Traits>&
 {
   if (auto os_ptr = dynamic_cast<array_ostream<CharT, Traits>*>(&os))
     return (*os_ptr) << std::move(a);
@@ -148,9 +161,19 @@ auto operator<<(std::basic_ostream<CharT, Traits>& os, RefArray a)
   if (dim_size == 0)
     return os << CharT('}');
 
-  os << a[0];
-  for (auto i = index_t{1}; i < dim_size; ++i)
-    os << CharT(' ') << a[i];
+  if constexpr (RefArray::order == 1) {
+    os << a[0];
+    for (auto i = index_t{1}; i < dim_size; ++i)
+      os << CharT(' ') << a[i];
+  } else {
+    const auto r = rows(a);
+    auto it = r.begin();
+
+    os << *it++;
+    while (it != r.end())
+      os << CharT(' ') << *it++;
+  }
+
   return os << CharT('}');
 }
 

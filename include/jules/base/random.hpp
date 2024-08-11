@@ -1,16 +1,15 @@
-// Copyright (c) 2017-2019 Filipe Verri <filipeverri@gmail.com>
+// Copyright (c) 2017-2024 Filipe Verri <filipeverri@gmail.com>
 
 #ifndef JULES_BASE_RANDOM_H
+/// \exclude
 #define JULES_BASE_RANDOM_H
 
-#include <jules/base/const_vector.hpp>
-#include <jules/base/numeric.hpp>
-#include <jules/core/meta.hpp>
+#include <jules/base/math.hpp>
+#include <jules/core/concepts.hpp>
 #include <jules/core/ranges.hpp>
 
 #include <cmath>
 #include <random>
-#include <vector>
 
 namespace jules
 {
@@ -22,85 +21,104 @@ struct no_replacement_t
 
 static constexpr auto no_replacement = no_replacement_t{};
 
-static inline auto construct_default_random_engine() noexcept { return std::mt19937{std::random_device{}()}; }
-
-static thread_local auto random_engine = construct_default_random_engine();
-
-template <typename G = decltype(random_engine)> auto canon_sample(G& g = random_engine)
+namespace detail
 {
-  return std::generate_canonical<numeric, numeric_traits<numeric>::digits>(g);
-}
-
-template <typename Dist, typename G = decltype(random_engine)> auto sample(Dist& dist, G& g = random_engine) { return dist(g); }
-
-template <typename Dist, typename G = decltype(random_engine)> auto sample(index_t n, Dist& dist, G& g = random_engine)
+struct int_bernoulli_distribution
 {
-  auto rng = ranges::views::generate_n([&] { return dist(g); }, n) | ranges::views::common;
-  return const_vector<decltype(dist(g))>(ranges::begin(rng), ranges::end(rng));
-}
+  using result_type = int;
+  template <typename G> auto operator()(G& rng_) -> int { return static_cast<int>(dist(rng_)); }
+  std::bernoulli_distribution dist;
+};
+} // namespace detail
 
-template <typename G = decltype(random_engine)> auto bernoulli_sample(index_t n, numeric p, G& g = random_engine)
+template <typename Rng = std::mt19937> class random_engine
 {
-  auto dist = std::bernoulli_distribution(p);
-  return sample(n, dist, g);
-}
+public:
+  random_engine() : rng_(std::random_device{}()) {}
 
-template <typename G = decltype(random_engine)> auto bernoulli_sample(numeric p, G& g = random_engine)
-{
-  auto dist = std::bernoulli_distribution(p);
-  return sample(dist, g);
-}
+  template <typename... Args> random_engine(Args&&... args) : rng_(std::forward<Args>(args)...) {}
 
-template <typename G = decltype(random_engine)> auto uniform_index_sample(index_t n, index_t end, G& g = random_engine)
-{
-  auto dist = std::uniform_int_distribution<index_t>(0u, end - 1);
-  return sample(n, dist, g);
-}
+  // Generic sampling
+  template <typename Dist> auto sample(Dist& dist) { return dist(rng_); }
 
-template <typename G = decltype(random_engine)> auto uniform_index_sample(index_t end, G& g = random_engine)
-{
-  auto dist = std::uniform_int_distribution<index_t>(0u, end - 1);
-  return sample(dist, g);
-}
+  template <typename Dist, typename T = typename Dist::result_type, container_for<T> C = container<T>>
+  auto sample(index_t n, Dist& dist, C result = container<T>{}) -> C
+  {
+    result.reserve(result.size() + n);
 
-template <typename G = decltype(random_engine)>
-auto uniform_index_sample(no_replacement_t, index_t n, index_t end, G& g = random_engine) -> const_vector<index_t>
-{
-  // inspired by John D. Cook, http://stackoverflow.com/a/311716/15485
-  auto t = index_t{0};
-  auto m = index_t{0};
+    auto rng = ranges::views::generate_n([&] { return dist(rng_); }, n);
+    ranges::copy(ranges::begin(rng), ranges::end(rng), ranges::back_inserter(result));
 
-  auto result = std::vector<index_t>();
-  result.reserve(n);
-
-  while (m < n) {
-    if ((end - t) * canon_sample(g) < n - m) {
-      result.push_back(t);
-      ++m;
-    }
-    ++t;
+    return result;
   }
 
-  return {std::move(result)};
-}
+  // Canonical sampling
 
-template <typename Rng, typename G = decltype(random_engine), typename U = ranges::range_value_t<Rng>,
-          typename = meta::requires_concept<ranges::range<Rng>>>
-auto discrete_index_sample(index_t n, const Rng& rng, G& g = random_engine)
-{
-  static_assert(std::is_convertible<U, double>::value, "weights must be convertible to double");
-  auto dist = std::discrete_distribution<index_t>(ranges::begin(rng), ranges::end(rng));
-  return sample(n, dist, g);
-}
+  auto canon_sample() { return std::generate_canonical<numeric, numeric_traits<numeric>::digits>(rng_); }
 
-template <typename Rng, typename G = decltype(random_engine), typename U = ranges::range_value_t<Rng>,
-          typename = meta::requires_concept<ranges::range<Rng>>>
-auto discrete_index_sample(const Rng& rng, G& g = random_engine)
-{
-  static_assert(std::is_convertible<U, double>::value, "weights must be convertible to double");
-  auto dist = std::discrete_distribution<index_t>(ranges::begin(rng), ranges::end(rng));
-  return sample(dist, g);
-}
+  template <container_for<numeric> C = container<numeric>> auto canon_sample(index_t n, C result = container<numeric>{}) -> C
+  {
+    result.reserve(result.size() + n);
+
+    auto rng = ranges::views::generate_n([&] { return this->canon_sample(); }, n);
+    ranges::copy(ranges::begin(rng), ranges::end(rng), ranges::back_inserter(result));
+
+    return result;
+  }
+
+  // Uniform index sampling
+
+  auto uniform_index_sample(index_t end)
+  {
+    auto dist = std::uniform_int_distribution<index_t>(0u, end - 1);
+    return this->sample(dist);
+  }
+
+  template <container_for<index_t> C = container<index_t>>
+  auto uniform_index_sample(index_t n, index_t end, C result = container<index_t>{}) -> C
+  {
+    auto dist = std::uniform_int_distribution<index_t>(0u, end - 1);
+    return this->sample(n, dist, std::move(result));
+  }
+
+  template <container_for<index_t> C = container<index_t>>
+  auto uniform_index_sample(no_replacement_t, index_t n, index_t end, C result = container<index_t>{}) -> C
+  {
+    // inspired by John D. Cook, http://stackoverflow.com/a/311716/15485
+    auto t = index_t{0};
+    auto m = index_t{0};
+
+    result.reserve(result.size() + n);
+
+    while (m < n) {
+      if ((end - t) * this->canon_sample() < n - m) {
+        result.push_back(t);
+        ++m;
+      }
+      ++t;
+    }
+
+    return result;
+  }
+
+  // Bernoulli samping
+
+  auto sample(bernoulli_dist<numeric> dist)
+  {
+    auto bdist = detail::int_bernoulli_distribution{std::bernoulli_distribution(dist.p)};
+    return this->sample(bdist);
+  }
+
+  template <container_for<int> C = container<int>>
+  auto sample(index_t n, bernoulli_dist<numeric> dist, C result = container<int>{}) -> C
+  {
+    auto bdist = detail::int_bernoulli_distribution{std::bernoulli_distribution(dist.p)};
+    return this->sample(n, bdist, std::move(result));
+  }
+
+private:
+  Rng rng_;
+};
 
 } // namespace jules
 

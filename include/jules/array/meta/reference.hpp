@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2019 Filipe Verri <filipeverri@gmail.com>
+// Copyright (c) 2017-2020 Filipe Verri <filipeverri@gmail.com>
 
 #ifndef JULES_ARRAY_META_REFERENCE_H
 /// \exclude
@@ -6,37 +6,33 @@
 
 #include <jules/array/meta/common.hpp>
 #include <jules/array/slicing/absolute.hpp>
-#include <jules/base/index_view.hpp>
-#include <jules/core/meta.hpp>
+#include <jules/base/index_span.hpp>
+#include <jules/core/concepts.hpp>
 #include <jules/core/ranges.hpp>
 
 namespace jules
 {
-namespace meta::result
+
+// clang-format off
+template <typename T> concept exposes_data = requires(T t)
 {
-template <typename T> using indexing = decltype(std::declval<T&>()[index_t()]);
-template <typename T> using slice_indexing = decltype(std::declval<T&>()[std::declval<absolute_slice>()]);
-template <typename T> using strided_indexing = decltype(std::declval<T&>()[std::declval<absolute_strided_slice>()]);
-template <typename T> using indirect_indexing = decltype(std::declval<T&>()[std::declval<index_view>()]);
-template <typename T> using public_data = decltype(std::declval<T&>().data());
-} // namespace meta::result
+  { t.data() } -> same_as<typename T::value_type*>;
+};
 
-template <typename T, typename = void> struct ReferenceArray : std::false_type
-{};
-
-// TODO: bidirectional in the future
 template <typename T>
-struct ReferenceArray<                                             //
-  T, meta::requires_<                                              //
-       std::bool_constant<ranges::forward_range<T>>,               //
-       CommonArray<T>,                                             //
-       meta::compiles<T, meta::result::indexing>,                  //
-       meta::compiles<T, meta::result::slice_indexing>,            //
-       meta::compiles<T, meta::result::strided_indexing>,          //
-       meta::compiles<T, meta::result::indirect_indexing>,         //
-       std::negation<meta::compiles<T, meta::result::public_data>> //
-       >> : std::true_type
-{};
+concept reference_array = requires(T t, index_t i, absolute_slice ai, absolute_strided_slice asi, index_span ix)
+{
+  requires ranges::forward_range<T>;
+  requires common_array<T>;
+
+  requires !exposes_data<T>;
+
+  { t[i] };
+  { t[ai] };
+  { t[asi] };
+  { t[ix] };
+};
+// clang-format on
 
 } // namespace jules
 

@@ -1,4 +1,4 @@
-// Copyright (c) 2018 Filipe Verri <filipeverri@gmail.com>
+// Copyright (c) 2018-2020 Filipe Verri <filipeverri@gmail.com>
 
 #ifndef JULES_ARRAY_AXIS_H
 #define JULES_ARRAY_AXIS_H
@@ -15,7 +15,7 @@ namespace detail
 {
 
 template <size_t Order, size_t Axis, size_t I, typename ArrayLike>
-constexpr decltype(auto) axis_at_impl(ArrayLike&& arr, [[maybe_unused]] index_t i)
+constexpr auto axis_at_impl(ArrayLike&& arr, [[maybe_unused]] index_t i) -> decltype(auto)
 {
   if constexpr (I == Order)
     return static_cast<ArrayLike>(arr);
@@ -27,16 +27,14 @@ constexpr decltype(auto) axis_at_impl(ArrayLike&& arr, [[maybe_unused]] index_t 
 
 } // namespace detail
 
-template <size_t Axis, typename RefArray, typename = meta::requires_<ReferenceArray<RefArray>>>
-constexpr decltype(auto) axis_at(RefArray arr, index_t i)
+template <size_t Axis, reference_array RefArray> constexpr auto axis_at(RefArray arr, index_t i) -> decltype(auto)
 {
   static_assert(Axis < RefArray::order);
   return drop_to<RefArray::order - 1>(detail::axis_at_impl<RefArray::order, Axis, 0>(arr, i));
 }
 
-template <size_t Axis, typename RefArray> class axis_iterator
+template <size_t Axis, reference_array RefArray> class axis_iterator
 {
-  static_assert(ReferenceArray<RefArray>::value);
   static_assert(RefArray::order >= 2);
 
 public:
@@ -105,7 +103,7 @@ public:
     return static_cast<difference_type>(other.pos_) - static_cast<difference_type>(pos_);
   }
 
-  constexpr auto operator*() -> reference { return axis_at<Axis>(arr_, pos_); }
+  constexpr auto operator*() const -> reference { return axis_at<Axis>(arr_, pos_); }
 
   constexpr auto operator[](difference_type n) const -> reference { return axis_at<Axis>(arr_, pos_ + n); }
 
@@ -119,7 +117,7 @@ private:
   index_t pos_;
 };
 
-template <size_t Axis, typename RefArray> class axis_array : public common_array_base<axis_array<Axis, RefArray>>
+template <size_t Axis, typename RefArray> class axis_array
 {
   static_assert(Axis < RefArray::order);
 
@@ -138,8 +136,6 @@ public:
 
   [[nodiscard]] auto dimensions() const noexcept -> std::array<size_t, 1u> { return {{this->size()}}; }
 
-  [[nodiscard]] auto length() const noexcept { return this->size(); }
-
   [[nodiscard]] auto begin() noexcept -> iterator { return this->cbegin(); }
 
   [[nodiscard]] auto end() noexcept -> iterator { return this->cend(); }
@@ -156,8 +152,7 @@ private:
   RefArray arr_;
 };
 
-template <size_t Axis, typename RefArray, typename meta::requires_<ReferenceArray<RefArray>>>
-auto axis(RefArray arr) -> axis_array<Axis, RefArray>
+template <size_t Axis, reference_array RefArray> auto axis(RefArray arr) -> axis_array<Axis, RefArray>
 {
   return {std::move(arr)};
 }
@@ -172,21 +167,13 @@ template <size_t Axis, typename T, size_t N> auto axis(const array<T, N>& arr) -
   return {ref(arr)};
 }
 
-template <typename RefArray, typename meta::requires_<ReferenceArray<RefArray>>>
-auto rows(RefArray arr) -> axis_array<0, RefArray>
-{
-  return {std::move(arr)};
-}
+template <reference_array RefArray> auto rows(RefArray arr) -> axis_array<0, RefArray> { return {std::move(arr)}; }
 
 template <typename T, size_t N> auto rows(array<T, N>& arr) -> axis_array<0, decltype(ref(arr))> { return {ref(arr)}; }
 
 template <typename T, size_t N> auto rows(const array<T, N>& arr) -> axis_array<0, decltype(ref(arr))> { return {ref(arr)}; }
 
-template <typename RefArray, typename meta::requires_<ReferenceArray<RefArray>>>
-auto columns(RefArray arr) -> axis_array<1, RefArray>
-{
-  return {std::move(arr)};
-}
+template <reference_array RefArray> auto columns(RefArray arr) -> axis_array<1, RefArray> { return {std::move(arr)}; }
 
 template <typename T, size_t N> auto columns(array<T, N>& arr) -> axis_array<1, decltype(ref(arr))> { return {ref(arr)}; }
 

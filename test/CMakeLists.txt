@@ -1,30 +1,28 @@
-if(NOT EXISTS ${CMAKE_CURRENT_BINARY_DIR}/catch.hpp)
-  file(DOWNLOAD
-    https://github.com/catchorg/Catch2/releases/download/v2.1.0/catch.hpp
-    ${CMAKE_CURRENT_BINARY_DIR}/catch.hpp
-    STATUS status
-    LOG log)
+Include(FetchContent)
 
-  list(GET status 0 status_code)
-  list(GET status 1 status_string)
+FetchContent_Declare(
+  Catch2
+  GIT_REPOSITORY https://github.com/catchorg/Catch2.git
+  GIT_TAG        v3.0.1 # or a later release
+)
 
-  if(NOT status_code EQUAL 0)
-    message(FATAL_ERROR "error downloading catch: ${status_string}" "${log}")
-  endif()
-endif()
+FetchContent_MakeAvailable(Catch2)
 
 find_package(CBLAS REQUIRED)
 if (NOT ${CBLAS_FOUND})
   message(FATAL_ERROR "CBLAS not found.")
 endif()
 
+find_package(Boost 1.72 REQUIRED)
+
 set(source_files
   core/debug.cpp
   core/type.cpp
   core/range.cpp
+  core/string.cpp
   array/axis.cpp
   array/functional.cpp
-  array/strided_ref_array.cpp
+  array/mapped_ref_array.cpp
   array/numeric.cpp
   array/math.cpp
   array/io.cpp
@@ -36,13 +34,13 @@ set(source_files
   array/matrix.cpp
   array/blas.cpp
   array/array.cpp
-  base/const_vector.cpp
   base/random.cpp
+  base/math.cpp
   base/numeric.cpp
-  dataframe/column.cpp
-  dataframe/column_model.cpp
-  dataframe/dataframe.cpp
-  dataframe/action.cpp
+  data/column.cpp
+  data/column_model.cpp
+  data/data.cpp
+  data/action.cpp
   test_suite.cpp
   version.cpp)
 
@@ -64,11 +62,13 @@ endif()
 target_include_directories(jules_test_suite PUBLIC
   ${CMAKE_CURRENT_BINARY_DIR}
   ${CMAKE_CURRENT_SOURCE_DIR}
-  ${CBLAS_INCLUDE_DIR})
+  ${CBLAS_INCLUDE_DIR}
+  ${Boost_INCLUDE_DIRS})
 
 target_link_libraries(jules_test_suite PUBLIC
   jules
-  ${CBLAS_LIBRARIES})
+  ${CBLAS_LIBRARIES}
+  Catch2::Catch2WithMain)
 
 target_compile_definitions(jules_test_suite PUBLIC -DJULES_DEBUG_THROWS)
 

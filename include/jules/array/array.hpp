@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2019 Filipe Verri <filipeverri@gmail.com>
+// Copyright (c) 2017-2020 Filipe Verri <filipeverri@gmail.com>
 
 #ifndef JULES_ARRAY_ARRAY_H
 /// \exclude
@@ -6,19 +6,14 @@
 
 #include <jules/array/allocator.hpp>
 #include <jules/array/axis.hpp>
-#include <jules/array/blas.hpp>
 #include <jules/array/builder.hpp>
 #include <jules/array/functional.hpp>
-#include <jules/array/io.hpp>
-#include <jules/array/math.hpp>
 #include <jules/array/numeric.hpp>
 #include <jules/array/overlap.hpp>
 #include <jules/array/ref_array.hpp>
 #include <jules/array/reshape.hpp>
 #include <jules/base/async.hpp>
 #include <jules/base/numeric.hpp>
-
-#include <type_traits>
 #include <utility>
 
 namespace jules
@@ -40,9 +35,6 @@ template <typename T, std::size_t N> class array : public ref_array<T, N>, priva
   static_assert(N > 0u, "invalid array dimension");
 
   template <typename, std::size_t> friend class array;
-
-  template <typename... Dims>
-  using requires_dimensions = meta::requires_<std::bool_constant<(sizeof...(Dims) == N)>, std::is_convertible<Dims, index_t>...>;
 
   struct allocate_tag
   {};
@@ -114,16 +106,18 @@ public:
   /// \group constructors
   /// \tparam _
   ///   \exclude
-  template <typename... Dims, typename _ = requires_dimensions<Dims...>>
+  template <typename... Dims>
+  requires valid_extents_for<N, Dims...>
   explicit array(uninitialized_t, Dims... dims) : array(allocate_tag{}, dims...)
   {
-    static_assert(std::is_pod_v<value_type>, "Only POD types are allowed to be left uninitialized");
+    static_assert(std::is_trivial_v<value_type>, "Only trivial types are allowed to be left uninitialized");
   }
 
   /// \group constructors
   /// \tparam _
   ///   \exclude
-  template <typename... Dims, typename _ = requires_dimensions<Dims...>>
+  template <typename... Dims>
+  requires valid_extents_for<N, Dims...>
   explicit array(Dims... dims) : array(allocate_tag{}, dims...)
   {
     try {
@@ -138,8 +132,8 @@ public:
   /// \group constructors
   /// \tparam _
   ///   \exclude
-  template <typename... Dims, typename _ = requires_dimensions<Dims...>>
-  array(const value_type& value, Dims... dims) : array(allocate_tag{}, dims...)
+  template <typename... Dims>
+  requires valid_extents_for<N, Dims...> array(const value_type& value, Dims... dims) : array(allocate_tag{}, dims...)
   {
     try {
       this->construct(this->data(), this->size(), value);
@@ -155,8 +149,8 @@ public:
   ///   \exclude
   /// \tparam _
   ///   \exclude
-  template <typename It, typename... Dims, typename R = ranges::iter_value_t<It>, typename _ = requires_dimensions<Dims...>>
-  array(It it, Dims... dims) : array(allocate_tag{}, dims...)
+  template <typename It, typename... Dims, typename R = ranges::iter_value_t<It>>
+  requires valid_extents_for<N, Dims...> array(It it, Dims... dims) : array(allocate_tag{}, dims...)
   {
     try {
       this->construct(this->data(), it, this->size());
@@ -167,8 +161,8 @@ public:
     }
   }
 
-  template <typename F, typename... Dims, typename R = std::invoke_result<F>, typename _ = requires_dimensions<Dims...>>
-  array(generated_t, F f, Dims... dims) : array(allocate_tag{}, dims...)
+  template <typename F, typename... Dims, typename R = std::invoke_result<F>>
+  requires valid_extents_for<N, Dims...> array(generated_t, F f, Dims... dims) : array(allocate_tag{}, dims...)
   {
     try {
       auto generator = ranges::views::generate(std::move(f)) | ranges::views::common;
@@ -215,9 +209,8 @@ public:
   /// \group constructors
   /// \tparam _
   ///   \exclude
-  template <typename Array>
-  array(const common_array_base<Array>& source)
-    : ref_array<value_type, order>{this->allocate(source.size()), {source.dimensions()}}
+  template <common_array Array>
+  array(const Array& source) : ref_array<value_type, order>{this->allocate(source.size()), {source.dimensions()}}
   {
     static_assert(Array::order == order, "array order mismatch");
     static_assert(std::is_constructible<value_type, const typename Array::value_type&>::value, "incompatible value types");
@@ -231,9 +224,9 @@ public:
   }
 
   /// \group constructors
-  template <typename Rng,
-            typename = meta::requires_<std::bool_constant<ranges::sized_range<Rng>>, std::negation<CommonArray<Rng>>>>
-  array(const Rng& rng) : ref_array<value_type, order>{this->allocate(ranges::size(rng)), {{{ranges::size(rng)}}}}
+  template <ranges::range Rng>
+  requires(!common_array<Rng>) explicit array(const Rng& rng)
+    : ref_array<value_type, order>{this->allocate(ranges::size(rng)), {{{ranges::size(rng)}}}}
   {
     static_assert(order == 1u, "Only vectors can be initialized from a range");
     static_assert(std::is_constructible<value_type, ranges::iter_reference_t<ranges::iterator_t<Rng>>>::value,
@@ -248,7 +241,7 @@ public:
   }
 
   /// \group constructors
-  template <typename Iter, typename Sent, typename = meta::requires_concept<ranges::sentinel_for<Sent, Iter>>>
+  template <ranges::forward_iterator Iter, ranges::sentinel_for<Iter> Sent>
   array(Iter begin, Sent end)
     : ref_array<value_type, order>{this->allocate(ranges::distance(begin, end)),
                                    {{{static_cast<size_type>(ranges::distance(begin, end))}}}}
@@ -315,7 +308,7 @@ public:
 
   /// \group assignment
   /// \synopsis_return array&
-  template <typename Array> auto operator=(const common_array_base<Array>& source) -> array&
+  template <common_array Array> auto operator=(const Array& source) -> array&
   {
     static_assert(Array::order == order, "array order mismatch");
     static_assert(std::is_assignable<value_type&, typename Array::value_type>::value, "incompatible assignment");
@@ -374,7 +367,8 @@ public:
 
 private:
   /// \exclude
-  template <typename... Dims, typename _ = requires_dimensions<Dims...>>
+  template <typename... Dims>
+  requires valid_extents_for<N, Dims...>
   explicit array(allocate_tag, Dims... dims)
     : ref_array<value_type, order>{this->allocate(prod_args(dims...)), {{{static_cast<index_t>(dims)...}}}}
   {}
@@ -429,7 +423,22 @@ private:
   static constexpr auto calculate_descriptor_check(const std::array<index_t, order>&, const value_type&, index_t) { return true; }
 };
 
-template <typename Array> array(const common_array_base<Array>&)->array<typename Array::value_type, Array::order>;
+template <common_array Array> array(const Array&) -> array<typename Array::value_type, Array::order>;
+
+template <typename T, std::size_t N> struct apply_traits<array<T, N>>
+{
+  using apply_type = array_apply;
+};
+
+template <typename T, std::size_t N> struct apply_traits<ref_array<T, N>>
+{
+  using apply_type = array_apply;
+};
+
+template <typename T, typename Mapper> struct apply_traits<mapped_ref_array<T, Mapper>>
+{
+  using apply_type = array_apply;
+};
 
 template <typename T, std::size_t N> auto ref(array<T, N>& a) -> ref_array<T, N> { return {a.data(), {a.dimensions()}}; }
 

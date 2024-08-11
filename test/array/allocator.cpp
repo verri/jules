@@ -1,6 +1,6 @@
 #include "jules/array/array.hpp"
 
-#include <catch.hpp>
+#include <catch2/catch_test_macros.hpp>
 
 TEST_CASE("Proper clean-up after throwing recursive initializer", "[array]")
 {
@@ -23,6 +23,8 @@ TEST_CASE("Proper clean-up after throwing recursive initializer", "[array]")
       if (from_copy)
         ++destroyed_from_copy_count;
     }
+
+  private:
     bool from_copy = false;
   };
 

@@ -1,4 +1,4 @@
-// Copyright (c) 2017 Filipe Verri <filipeverri@gmail.com>
+// Copyright (c) 2017-2020 Filipe Verri <filipeverri@gmail.com>
 
 #ifndef JULES_ARRAY_ALLOCATOR_H
 #define JULES_ARRAY_ALLOCATOR_H
@@ -9,6 +9,7 @@
 #include <array>
 #include <iterator>
 #include <memory>
+#include <new>
 #include <type_traits>
 
 namespace jules
@@ -20,9 +21,12 @@ template <typename T> struct array_allocator
 
   using storage_type = std::aligned_storage_t<sizeof(value_type), alignof(value_type)>;
 
-  static auto allocate(index_t size) -> value_type* { return reinterpret_cast<value_type*>(new storage_type[size]); }
+  static auto allocate(index_t size) -> value_type*
+  {
+    return std::launder(reinterpret_cast<value_type*>(new storage_type[size]));
+  }
 
-  static auto deallocate(value_type* data, index_t) noexcept { delete[] reinterpret_cast<storage_type*>(data); }
+  static auto deallocate(value_type* data, index_t) noexcept { delete[] std::launder(reinterpret_cast<storage_type*>(data)); }
 
   template <typename... Args>
   static auto construct(value_type* data, index_t size) noexcept(std::is_nothrow_constructible_v<value_type>)
@@ -30,7 +34,8 @@ template <typename T> struct array_allocator
     std::uninitialized_value_construct_n(data, size);
   }
 
-  template <typename U, typename = meta::requires_<std::is_constructible<value_type, const U&>>>
+  template <typename U>
+  requires constructible_from<value_type, const U&>
   static auto construct(value_type* to, index_t size,
                         const U& value) noexcept(std::is_nothrow_constructible_v<value_type, const U&>)
   {
@@ -66,7 +71,7 @@ private:
   template <std::size_t N, typename List, typename... Args>
   static auto construct_recursive(value_type* to, List values, const descriptor<N>& desc, Args... indexes) noexcept
   {
-    for (auto i = index_t{0u}; i < desc.extents[sizeof...(Args)]; ++i)
+    for (auto i = index_t{0u}; i < desc.extent(sizeof...(Args)); ++i)
       construct_recursive(to, *(values.begin() + i), desc, indexes..., i);
   }
 
@@ -80,7 +85,7 @@ private:
   static auto construct_recursive(index_t& constructed_count, value_type* to, List values, const descriptor<N>& desc,
                                   Args... indexes)
   {
-    for (auto i = index_t{0u}; i < desc.extents[sizeof...(Args)]; ++i)
+    for (auto i = index_t{0u}; i < desc.extent(sizeof...(Args)); ++i)
       construct_recursive(constructed_count, to, *(values.begin() + i), desc, indexes..., i);
   }
 
@@ -96,7 +101,7 @@ private:
   static auto destroy_recursive(index_t& constructed_count, value_type* to, List values, const descriptor<N>& desc,
                                 Args... indexes) noexcept
   {
-    for (auto i = index_t{0u}; constructed_count > 0 && i < desc.extents[sizeof...(Args)]; ++i)
+    for (auto i = index_t{0u}; constructed_count > 0 && i < desc.extent(sizeof...(Args)); ++i)
       destroy_recursive(constructed_count, to, *(values.begin() + i), desc, indexes..., i);
   }
 
@@ -104,7 +109,7 @@ private:
   static auto destroy_recursive(index_t& constructed_count, value_type* to, const value_type&, const descriptor<N>& desc,
                                 Args... indexes) noexcept
   {
-    (to + desc({{indexes...}}))->~value_type();
+    std::destroy_at(to + desc({{indexes...}}));
     --constructed_count;
   }
 };

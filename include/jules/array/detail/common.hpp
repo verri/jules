@@ -1,4 +1,4 @@
-// Copyright (c) 2017 Filipe Verri <filipeverri@gmail.com>
+// Copyright (c) 2017-2020 Filipe Verri <filipeverri@gmail.com>
 
 // Whoever pursues righteousness and kindness will find life, righteousness, and honor.
 // Proverbs 21:21 (ESV)
@@ -14,13 +14,13 @@
 
 #include <algorithm>
 #include <numeric>
+#include <utility>
 
 /// \exclude
 namespace jules::detail
 {
 
-template <typename Dest, typename Source>
-static auto array_assign(common_array_base<Dest>& destination, const common_array_base<Source>& source)
+template <common_array Dest, common_array Source> static auto array_assign(Dest& destination, Source& source)
 {
   static_assert(Source::order == Dest::order, "array order mismatch");
   static_assert(std::is_assignable_v<typename Dest::value_type&, const typename Source::value_type&>, "incompatible assignment");
@@ -42,6 +42,17 @@ static auto array_cat(const T& head, const std::array<T, N>& tail, std::index_se
 }
 
 template <typename T, std::size_t N> static auto array_cat(const T& head, const std::array<T, N>& tail) -> std::array<T, N + 1>
+{
+  return array_cat(head, tail, std::make_index_sequence<N>());
+}
+
+template <typename T, std::size_t N, std::size_t... I>
+static auto array_cat(const std::array<T, N>& head, const T& tail, std::index_sequence<I...>) -> std::array<T, N + 1>
+{
+  return {{head[I]..., tail}};
+}
+
+template <typename T, std::size_t N> static auto array_cat(const std::array<T, N>& head, const T& tail) -> std::array<T, N + 1>
 {
   return array_cat(head, tail, std::make_index_sequence<N>());
 }
@@ -72,6 +83,36 @@ constexpr auto drop_one_level_extents(const std::array<index_t, N>& extents) -> 
   });
 
   return new_extents;
+}
+
+// TODO: where should a put it?
+template <typename F, typename Tuple, std::size_t... I>
+constexpr auto apply_n(F&& f, Tuple&& tuple,
+                       std::index_sequence<I...>) noexcept(noexcept(std::forward<F>(f)(std::get<I>(tuple)...))) -> decltype(auto)
+{
+  return std::forward<F>(f)(std::get<I>(tuple)...);
+}
+
+template <typename Tuple, std::size_t... I> constexpr auto reverse(Tuple& t, std::index_sequence<I...>) noexcept
+{
+  return std::make_tuple(std::move(std::get<sizeof...(I) - I - 1>(t))...);
+}
+
+template <typename... Ts> constexpr auto reverse(std::tuple<Ts...> t) noexcept
+{
+  return reverse(t, std::make_index_sequence<sizeof...(Ts)>());
+}
+
+template <typename T, std::size_t N, bool... B> constexpr auto drop_which(const std::array<T, N>& x)
+{
+  std::array<T, count_args(B...)> y;
+  std::size_t i = 0, j = 0;
+  for (const auto b : {B...}) {
+    if (b)
+      y[i++] = x[j];
+    ++j;
+  }
+  return y;
 }
 
 } // namespace jules::detail

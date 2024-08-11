@@ -1,6 +1,7 @@
-// Copyright (c) 2017-2019 Filipe Verri <filipeverri@gmail.com>
+// Copyright (c) 2017-2020 Filipe Verri <filipeverri@gmail.com>
 
 #ifndef JULES_ARRAY_SLICING_H
+/// \exclude
 #define JULES_ARRAY_SLICING_H
 
 #include <jules/array/descriptor.hpp>
@@ -10,427 +11,433 @@
 #include <jules/array/slicing/bounded.hpp>
 #include <jules/array/strided_descriptor.hpp>
 
-#define CHECK_BOUNDS(I, MAX)                                                                                                     \
-  DEBUG_ASSERT((I) < (MAX), debug::default_module, debug::level::boundary_check, "slicing out of array limits");
-
-#define CHECK_STRIDE(X)                                                                                                          \
-  DEBUG_ASSERT((X).stride > 0u, debug::default_module, debug::level::invalid_argument, "invalid slicing stride");
-
-#define CHECK_EXTENT(X)                                                                                                          \
-  DEBUG_ASSERT((X).extent > 0u, debug::default_module, debug::level::invalid_argument, "invalid slicing extent");
+#include <stdexcept>
+#include <type_traits>
+#include <utility>
 
 namespace jules::detail
 {
 
-// Slicing size
-
-constexpr auto slicing_size(index_t) noexcept -> index_t { return 1u; }
-
-constexpr auto slicing_size(const absolute_strided_slice& slice) noexcept -> index_t { return slice.extent; }
-
-template <typename Rng, typename = meta::requires_concept<ranges::sized_range<Rng>>> auto slicing_size(const Rng& rng) -> index_t
+struct absolute_every_index
 {
-  return ranges::size(rng);
+  index_t dim;
+};
+
+constexpr auto slicing_size(index_t) noexcept { return 1u; }
+
+constexpr auto slicing_size(absolute_every_index index) noexcept { return index.dim; }
+
+constexpr auto slicing_size(absolute_strided_slice slice) noexcept { return slice.extent(); }
+
+constexpr auto slicing_size(absolute_slice slice) noexcept { return slice.extent(); }
+
+constexpr auto slicing_size(index_span span) noexcept { return span.size(); }
+
+// Forwarding all variations of fill.
+template <std::size_t N, typename Descriptor, typename... Tail>
+auto slicing_fill(container<index_t>&, const Descriptor&, std::array<index_t, N>, index_t, Tail...);
+
+template <std::size_t N, typename Descriptor, typename... Tail>
+auto slicing_fill(container<index_t>&, const Descriptor&, std::array<index_t, N>, absolute_every_index, Tail...);
+
+template <std::size_t N, typename Descriptor, typename... Tail>
+auto slicing_fill(container<index_t>&, const Descriptor&, std::array<index_t, N>, absolute_slice, Tail...);
+
+template <std::size_t N, typename Descriptor, typename... Tail>
+auto slicing_fill(container<index_t>&, const Descriptor&, std::array<index_t, N>, absolute_strided_slice, Tail...);
+
+template <std::size_t N, typename Descriptor, typename... Tail>
+auto slicing_fill(container<index_t>&, const Descriptor&, std::array<index_t, N>, index_span, Tail...);
+//
+
+template <std::size_t N, typename Descriptor, typename... Tail>
+auto slicing_fill(container<index_t>& map, const Descriptor& descriptor, std::array<index_t, N> args, index_t index, Tail... tail)
+{
+  if constexpr (sizeof...(Tail) == 0) {
+    map.push_back(descriptor(detail::array_cat(index, args)));
+  } else {
+    slicing_fill(map, descriptor, detail::array_cat(index, args), tail...);
+  }
 }
 
-template <typename... Args, typename = meta::requires_<std::bool_constant<(sizeof...(Args) >= 2u)>>>
-auto slicing_size(Args&&... args) -> index_t
+template <std::size_t N, typename Descriptor, typename... Tail>
+auto slicing_fill(container<index_t>& map, const Descriptor& descriptor, std::array<index_t, N> args, absolute_every_index index,
+                  Tail... tail)
 {
-  return (1u * ... * slicing_size(args));
+  for (const auto i : indices(index.dim)) {
+    if constexpr (sizeof...(Tail) == 0)
+      map.push_back(descriptor(detail::array_cat(i, args)));
+    else
+      slicing_fill(map, descriptor, detail::array_cat(i, args), tail...);
+  }
 }
 
-// Default slicing Helpers
-
-template <std::size_t D, std::size_t N> auto do_slice(strided_descriptor<N>&) -> void;
-
-template <std::size_t D, std::size_t N, typename... Args>
-auto do_slice(strided_descriptor<N>&, const absolute_strided_slice&, Args&&...) -> void;
-
-template <std::size_t D, std::size_t N, typename... Args> auto do_slice(strided_descriptor<N>&, index_t, Args&&...) -> void;
-
-template <std::size_t D, std::size_t N> auto do_slice(strided_descriptor<N>&) -> void
+template <std::size_t N, typename Descriptor, typename... Tail>
+auto slicing_fill(container<index_t>& map, const Descriptor& descriptor, std::array<index_t, N> args, absolute_slice index,
+                  Tail... tail)
 {
-  static_assert(N == D, "invalid number of arguments");
+  for (const auto i : indices(index.start(), index.start() + index.extent())) {
+    if constexpr (sizeof...(Tail) == 0)
+      map.push_back(descriptor(detail::array_cat(i, args)));
+    else
+      slicing_fill(map, descriptor, detail::array_cat(i, args), tail...);
+  }
 }
 
-template <std::size_t D, std::size_t N, typename... Args>
-auto do_slice(strided_descriptor<N>& result, const absolute_strided_slice& slice, Args&&... args) -> void
+template <std::size_t N, typename Descriptor, typename... Tail>
+auto slicing_fill(container<index_t>& map, const Descriptor& descriptor, std::array<index_t, N> args,
+                  absolute_strided_slice index, Tail... tail)
 {
-  static_assert(N - D - 1 == sizeof...(args), "invalid number of arguments");
-
-  CHECK_STRIDE(slice);
-  CHECK_EXTENT(slice);
-  CHECK_BOUNDS(slice.start + (slice.extent - 1u) * slice.stride, result.extents[D]);
-
-  result.start += result.strides[D] * slice.start;
-  result.strides[D] = result.strides[D] * slice.stride;
-  result.extents[D] = slice.extent;
-
-  do_slice<D + 1>(result, args...);
+  auto indexes = ranges::views::ints(index.start(), ranges::unreachable) | ranges::views::stride(index.stride()) |
+                 ranges::views::take(index.extent());
+  for (const auto i : indexes) {
+    if constexpr (sizeof...(Tail) == 0)
+      map.push_back(descriptor(detail::array_cat(i, args)));
+    else
+      slicing_fill(map, descriptor, detail::array_cat(i, args), tail...);
+  }
 }
 
-template <std::size_t D, std::size_t N, typename... Args>
-auto do_slice(strided_descriptor<N>& result, index_t i, Args&&... args) -> void
+template <std::size_t N, typename Descriptor, typename... Tail>
+auto slicing_fill(container<index_t>& map, const Descriptor& descriptor, std::array<index_t, N> args, index_span indexes,
+                  Tail... tail)
 {
-  static_assert(N - D - 1 == sizeof...(args), "invalid number of arguments");
-
-  CHECK_BOUNDS(i, result.extents[D]);
-
-  result.start += result.strides[D] * i;
-  result.extents[D] = 1u;
-  result.strides[D] = 1u;
-
-  do_slice<D + 1>(result, args...);
+  for (const auto i : indexes) {
+    if constexpr (sizeof...(Tail) == 0)
+      map.push_back(descriptor(detail::array_cat(i, args)));
+    else
+      slicing_fill(map, descriptor, detail::array_cat(i, args), tail...);
+  }
 }
 
-template <std::size_t N, typename... Args>
-auto default_slicing(const strided_descriptor<N>& source, Args&&... args) -> strided_descriptor<N>
+template <typename Descriptor, typename Tuple, std::size_t... I>
+auto slicing_fill(container<index_t>& map, const Descriptor& descriptor, Tuple indexes, std::index_sequence<I...>)
 {
-  static_assert(sizeof...(args) == N, "invalid number of arguments");
-
-  auto result = source;
-  do_slice<0>(result, args...);
-
-  return result;
-}
-
-// Indirect Slicing Helpers
-
-template <std::size_t D, std::size_t N>
-auto do_slice(const std::array<index_t, N>&, std::vector<index_t>&, const strided_descriptor<N>&, std::array<index_t, D>) -> void;
-
-template <std::size_t D, std::size_t N, typename... Args>
-auto do_slice(std::array<index_t, N>&, std::vector<index_t>&, const strided_descriptor<N>&, std::array<index_t, D>, index_t,
-              Args&&...) -> void;
-
-template <std::size_t D, std::size_t N, typename... Args>
-auto do_slice(std::array<index_t, N>&, std::vector<index_t>&, const strided_descriptor<N>&, std::array<index_t, D>,
-              const absolute_strided_slice&, Args&&...) -> void;
-
-template <std::size_t D, std::size_t N, typename Rng, typename... Args, typename T = ranges::range_value_t<Rng>,
-          typename = meta::requires_concept<ranges::sized_range<Rng>>>
-auto do_slice(std::array<index_t, N>& extents, std::vector<index_t>& indexes, const strided_descriptor<N>& descriptor,
-              std::array<index_t, D> ix, const Rng& rng, Args&&... args) -> void
-{
-  constexpr auto I = N - D - 1;
-
-  static_assert(std::is_convertible<T, index_t>::value, "arbitrary ranges must contain indexes");
-  static_assert(I == sizeof...(args), "invalid number of arguments");
-
-  CHECK_BOUNDS(max(rng), descriptor.extents[I]);
-
-  extents[I] = ranges::size(rng);
-
-  for (index_t i : rng)
-    do_slice(extents, indexes, descriptor, detail::array_cat(i, ix), args...);
-}
-
-template <std::size_t D, std::size_t N>
-auto do_slice(const std::array<index_t, N>&, std::vector<index_t>& indexes, const strided_descriptor<N>& descriptor,
-              std::array<index_t, D> ix) -> void
-{
-  static_assert(D == N, "invalid number of arguments");
-  indexes.push_back(descriptor(ix));
-}
-
-template <std::size_t D, std::size_t N, typename... Args>
-auto do_slice(std::array<index_t, N>& extents, std::vector<index_t>& indexes, const strided_descriptor<N>& descriptor,
-              std::array<index_t, D> ix, index_t i, Args&&... args) -> void
-{
-  constexpr auto I = N - D - 1;
-  static_assert(I == sizeof...(args), "invalid number of arguments");
-
-  CHECK_BOUNDS(i, descriptor.extents[I]);
-
-  extents[I] = 1u;
-
-  do_slice(extents, indexes, descriptor, detail::array_cat(i, ix), args...);
-}
-
-template <std::size_t D, std::size_t N, typename... Args>
-auto do_slice(std::array<index_t, N>& extents, std::vector<index_t>& indexes, const strided_descriptor<N>& descriptor,
-              std::array<index_t, D> ix, const absolute_strided_slice& slice, Args&&... args) -> void
-{
-  constexpr auto I = N - D - 1;
-  static_assert(I == sizeof...(args), "invalid number of arguments");
-
-  CHECK_STRIDE(slice);
-  CHECK_EXTENT(slice)
-  CHECK_BOUNDS(slice.start + (slice.extent - 1u) * slice.stride, descriptor.extents[I]);
-
-  extents[I] = slice.extent;
-
-  for (index_t i = 0u; i < slice.extent; ++i)
-    do_slice(extents, indexes, descriptor, detail::array_cat(slice.start + i * slice.stride, ix), args...);
+  return slicing_fill(map, descriptor, std::array<index_t, 0>{}, std::get<I>(indexes)...);
 }
 
 template <std::size_t N, typename Tuple, std::size_t... I>
-auto indirect_slicing_impl(const strided_descriptor<N>& descriptor, const Tuple& args, std::index_sequence<I...>)
+constexpr auto slicing_start(std::array<index_t, N> strides, Tuple slices, std::index_sequence<I...>)
 {
-  auto extents = std::array<index_t, N>{};
-  auto indexes = std::vector<index_t>();
-
-  indexes.reserve(slicing_size(std::get<I>(args)...));
-
-  do_slice(extents, indexes, descriptor, std::array<index_t, 0>{}, std::get<N - I - 1>(args)...);
-
-  return std::make_pair(std::move(extents), std::move(indexes));
+  return (index_t{0} + ... + (strides[I] * std::get<I>(slices).start()));
 }
 
-template <std::size_t N, typename... Args> auto indirect_slicing(const strided_descriptor<N>& descriptor, Args&&... args)
+template <std::size_t N, typename Tuple, std::size_t... I>
+constexpr auto slicing_strides(std::array<index_t, N> strides, Tuple slices, std::index_sequence<I...>) -> std::array<index_t, N>
 {
-  static_assert(sizeof...(args) == N, "invalid number of arguments");
-  return indirect_slicing_impl(descriptor, std::forward_as_tuple(args...), std::make_index_sequence<N>());
+  return {{(strides[I] * std::get<I>(slices).stride())...}};
 }
 
-// General slicing utilities
+template <typename T, typename Mapper, typename... Indexes>
+auto calculate_generic_slicing(T* data, const Mapper& mapper, Indexes... indexes);
 
-template <typename T, typename Mapper, typename... Args> auto array_slice(T* data, Mapper mapper, Args&&... args)
+template <typename T, typename Mapper, typename... Indexes>
+auto calculate_container_slicing(T* data, const Mapper& mapper, Indexes... indexes)
 {
-  constexpr auto order = Mapper::order;
-  static_assert(sizeof...(Args) > 0u);
-  if constexpr (((std::is_convertible_v<Args, index_t> || std::is_convertible_v<Args, absolute_strided_slice>)&&...)) {
-    auto new_descriptor = detail::default_slicing(mapper.descriptor(), std::forward<Args>(args)...);
-    if constexpr (std::is_same_v<Mapper, identity_mapper<order>>) {
-      return strided_ref_array<T, Mapper>{data, {std::move(new_descriptor)}};
+  constexpr auto Order = Mapper::order;
+  constexpr auto D = count_args(std::is_same_v<Indexes, index_t>...);
+
+  const auto extents = detail::drop_which<index_t, Order, !std::is_same_v<Indexes, index_t>...>({{slicing_size(indexes)...}});
+  static_assert(std::is_same_v<const std::array<index_t, Order - D>, decltype(extents)>);
+
+  const auto desc = descriptor<Order - D>(extents);
+  const auto size = desc.size();
+
+  container<index_t> map;
+  map.reserve(size);
+
+  slicing_fill(map, mapper, reverse(std::make_tuple(indexes...)), std::make_index_sequence<sizeof...(indexes)>());
+
+  DEBUG_ASSERT(map.size() == size, debug::default_module, debug::level::unreachable, "should never happen");
+
+  return std::make_tuple(data, container_mapper(desc.extents(), std::move(map)));
+}
+
+template <typename T, std::size_t Order, typename... Indexes>
+auto calculate_slicing(T* data, const strided_descriptor<Order>& desc, Indexes... indexes)
+{
+  static_assert(sizeof...(Indexes) == Order);
+  static_assert(!all_args(std::is_same_v<absolute_every_index, Indexes>...));
+  static_assert(!all_args(std::is_same_v<index_t, Indexes>...));
+
+  if constexpr (any_args(std::is_same_v<Indexes, index_span>...)) //
+  {
+    return calculate_container_slicing(data, desc, indexes...);
+  }    //
+  else //
+  {
+    constexpr auto D = count_args(std::is_same_v<Indexes, index_t>...);
+
+    constexpr auto to_strided_slice = overloaded{
+      [](index_t i) -> absolute_strided_slice {
+        return {i, 1, 1};
+      },
+      [](absolute_every_index index) -> absolute_strided_slice {
+        return {0, index.dim, 1};
+      },
+      [](auto index) -> absolute_strided_slice { return index; },
+    };
+
+    const auto slices = std::make_tuple(to_strided_slice(indexes)...);
+
+    const auto start = slicing_start(desc.strides(), slices, std::make_index_sequence<Order>());
+
+    const auto strides = detail::drop_which<index_t, Order, !std::is_same_v<Indexes, index_t>...>(
+      slicing_strides(desc.strides(), slices, std::make_index_sequence<Order>()));
+    static_assert(std::is_same_v<const std::array<index_t, Order - D>, decltype(strides)>);
+
+    const auto extents = detail::drop_which<index_t, Order, !std::is_same_v<Indexes, index_t>...>({{slicing_size(indexes)...}});
+    static_assert(std::is_same_v<const std::array<index_t, Order - D>, decltype(extents)>);
+
+    const auto newdescriptor = strided_descriptor<Order - D>(extents, strides);
+    return std::make_tuple(data + start, strided_mapper(newdescriptor));
+  }
+}
+
+template <typename T, std::size_t Order, typename... Indexes>
+auto calculate_slicing(T* data, descriptor<Order> desc, Indexes... indexes)
+{
+  static_assert(sizeof...(Indexes) == Order);
+  static_assert(!all_args(std::is_same_v<absolute_every_index, Indexes>...));
+  static_assert(!all_args(std::is_same_v<index_t, Indexes>...));
+
+  if constexpr (std::is_same_v<last_element<Indexes...>, index_t>) //
+  {
+    // every time the last index is an index_t, we can reduce the problem.
+    const auto ix = detail::array_cat(repeat<Order - 1, index_t>(0u), last_arg(indexes...));
+    data += desc(ix);
+
+    return apply_n(
+      [&](auto... newindexes) constexpr { return calculate_generic_slicing(data, desc.discard_tail_dimension(), newindexes...); },
+      std::make_tuple(indexes...), std::make_index_sequence<Order - 1>());
+  }                                                                            //
+  else if constexpr (std::is_same_v<last_element<Indexes...>, absolute_slice>) //
+  {
+    // in a similiar manner, if the last element is an absolute_slice (not strided), we
+    // also can reduce the problem (that is adjust the start and extent and forwarding as
+    // a every_index).
+
+    const absolute_slice slice = last_arg(indexes...);
+
+    // adjust the beginning
+    const auto ix = detail::array_cat(repeat<Order - 1, index_t>(0u), slice.start());
+    data += desc(ix);
+
+    // adjust the extent
+    desc.set_extent(Order - 1, slice.extent());
+
+    return apply_n(
+      [&](auto... newindexes) constexpr {
+        return calculate_generic_slicing(data, desc, newindexes..., absolute_every_index{slice.extent()});
+      },
+      std::make_tuple(indexes...), std::make_index_sequence<Order - 1>());
+  }                                                                                               //
+  else if constexpr (sizeof...(Indexes) == 1 && all_args(std::is_same_v<Indexes, index_span>...)) //
+  {
+    const index_span index = first_arg(indexes...);
+    return std::make_tuple(data, span_mapper(index));
+  }                                                                    //
+  else if constexpr (any_args(std::is_same_v<Indexes, index_span>...)) //
+  {
+    return calculate_container_slicing(data, desc, indexes...);
+  }    //
+  else //
+  {
+    return calculate_generic_slicing(data, strided_descriptor<Order>(desc.dimensions()), indexes...);
+  }
+}
+
+template <typename T, std::size_t Order, typename... Indexes>
+auto calculate_slicing(T* data, const strided_mapper<Order>& mapper, Indexes... indexes)
+{
+  return calculate_slicing(data, mapper.as_descriptor(), indexes...);
+}
+
+template <typename T, typename Index> auto calculate_slicing(T* data, const span_mapper& mapper, Index index)
+{
+  static_assert(!std::is_same_v<absolute_every_index, Index>);
+  static_assert(!std::is_same_v<index_t, Index>);
+  return calculate_container_slicing(data, mapper, index);
+}
+
+template <typename T, std::size_t Order, typename... Indexes>
+auto calculate_slicing(T* data, const container_mapper<Order>& mapper, Indexes... indexes)
+{
+  static_assert(sizeof...(Indexes) == Order);
+  static_assert(!all_args(std::is_same_v<absolute_every_index, Indexes>...));
+  static_assert(!all_args(std::is_same_v<index_t, Indexes>...));
+  return calculate_container_slicing(data, mapper, indexes...);
+}
+
+template <typename T, typename Mapper> auto array_from_slicing(T* data, Mapper mapper) -> decltype(auto)
+{
+  if constexpr (std::is_same_v<Mapper, index_t>) {
+    return *(data + mapper);
+  } else {
+    constexpr auto Order = Mapper::order;
+    if constexpr (std::is_same_v<Mapper, descriptor<Order>>) {
+      return ref_array(data, mapper);
     } else {
-      auto indexes = mapper.map(new_descriptor);
-      return strided_ref_array<T, Mapper>{data, {new_descriptor.extents, std::move(indexes)}};
+      return mapped_ref_array(data, std::move(mapper));
     }
+  }
+}
+
+template <typename T, typename Mapper, typename... Indexes>
+auto calculate_generic_slicing(T* data, const Mapper& mapper, Indexes... indexes)
+{
+  constexpr auto Order = Mapper::order;
+  static_assert(sizeof...(Indexes) == Order);
+
+  if constexpr (all_args(std::is_same_v<absolute_every_index, Indexes>...)) {
+    return std::make_tuple(data, mapper);
+  } else if constexpr (all_args(std::is_same_v<index_t, Indexes>...)) {
+    return std::make_tuple(data, mapper({{indexes...}}));
   } else {
-    auto [extents, positions] = detail::indirect_slicing(mapper.descriptor(), std::forward<Args>(args)...);
-    if constexpr (std::is_same_v<Mapper, identity_mapper<order>>) {
-      return strided_ref_array<T, vector_mapper<order>>{data, {extents, {std::move(positions)}}};
+    return calculate_slicing(data, mapper, indexes...); // not trivial, try specific
+  }
+}
+
+template <typename T, typename Mapper, typename... Indexes>
+auto do_slice(T* data, const Mapper& mapper, Indexes... indexes) -> decltype(auto)
+{
+  constexpr auto Order = Mapper::order;
+  static_assert(sizeof...(Indexes) == Order);
+
+  auto [newdata, newmapper] = calculate_generic_slicing(data, mapper, indexes...);
+  return array_from_slicing(newdata, std::move(newmapper));
+}
+
+// Checks boundaries and extents.  If index is a slice, also makes it absolute.
+template <typename Index> auto check_slicing(Index index, index_t dim)
+{
+  if constexpr (valid_slice<Index>) {
+    using absolute_type = typename slice_traits<Index>::absolute_type;
+    static_assert(std::is_same_v<absolute_type, absolute_slice> || std::is_same_v<absolute_type, absolute_strided_slice>);
+
+    const auto absolute = absolutize(index, dim);
+
+    DEBUG_ASSERT(absolute.start() < dim, debug::default_module, debug::level::boundary_check, "slicing out of array limits");
+    DEBUG_ASSERT(absolute.extent() > 0u, debug::default_module, debug::level::invalid_argument, "invalid slicing extent");
+
+    if constexpr (std::is_same_v<absolute_type, absolute_strided_slice>) {
+      DEBUG_ASSERT(absolute.start() + (absolute.extent() - 1u) * absolute.stride() < dim, debug::default_module,
+                   debug::level::boundary_check, "slicing out of array limits");
+      DEBUG_ASSERT(absolute.stride() > 0u, debug::default_module, debug::level::invalid_argument, "invalid slicing stride");
     } else {
-      auto indexes = mapper.map(std::move(positions));
-      return strided_ref_array<T, vector_mapper<order>>{data, {extents, std::move(indexes)}};
+      DEBUG_ASSERT(absolute.start() + absolute.extent() <= dim, debug::default_module, debug::level::boundary_check,
+                   "slicing out of array limits");
     }
+
+    return absolute;
+  }
+
+  if constexpr (std::is_same_v<Index, index_t>) {
+    DEBUG_ASSERT(index < dim, debug::default_module, debug::level::boundary_check, "slicing out of array limits");
+    return index;
+  }
+
+  if constexpr (std::is_same_v<Index, index_span>) {
+    DEBUG_ASSERT(index.size() > 0u, debug::default_module, debug::level::invalid_argument, "invalid slicing extent");
+    DEBUG_ASSERT(max(index) < dim, debug::default_module, debug::level::boundary_check, "slicing out of array limits");
+    return index;
+  }
+
+  if constexpr (std::is_same_v<Index, every_index>) {
+    return absolute_every_index{dim};
   }
 }
 
-template <typename T, typename Mapper> decltype(auto) array_at(T* data, const Mapper& mapper, index_t i)
+template <std::size_t, typename, typename, typename...> class array_slicing_proxy;
+
+// Calls do_slice when the number of array indexes (that is array[index1]...[indexN]) is
+// the same as array order, otherwise keeps proxing.
+template <std::size_t Order, typename T, typename Descriptor, typename Tuple, std::size_t... I>
+auto forward_slicing(T* data, const Descriptor& descriptor, Tuple indexes, std::index_sequence<I...>) -> decltype(auto)
 {
-  const auto& descriptor = mapper.descriptor();
-  DEBUG_ASSERT(i < descriptor.extents[0], debug::default_module, debug::level::boundary_check, "out of range");
-  if constexpr (Mapper::order == 1) {
-    const auto pos = mapper.map(descriptor(i));
-    return data[pos];
+  if constexpr (Order == sizeof...(I)) {
+    const auto dims = descriptor.dimensions();
+    return do_slice(data, descriptor, check_slicing(std::get<I>(indexes), dims[I])...);
   } else {
-    auto new_mapper = mapper.drop_first_dimension(i);
-    return strided_ref_array<T, decltype(new_mapper)>{data, std::move(new_mapper)};
+    return array_slicing_proxy<Order, T, Descriptor, std::tuple_element_t<I, Tuple>...>(data, descriptor,
+                                                                                        std::get<I>(indexes)...);
   }
 }
 
-template <typename T, typename Mapper> decltype(auto) array_at(T* data, const Mapper& mapper, every_index)
+template <std::size_t Order, typename T, typename Descriptor, typename Index>
+auto forward_slicing(T* data, const Descriptor& descriptor, Index index) -> decltype(auto)
 {
-  const auto& descriptor = mapper.descriptor();
-  if constexpr (Mapper::order == 1) {
-    return strided_ref_array<T, Mapper>{data, mapper};
+  if constexpr (Order == 1) {
+    const auto dims = descriptor.dimensions();
+    return do_slice(data, descriptor, check_slicing(index, dims[0]));
   } else {
-    return strided_ref_array_proxy<T, Mapper, absolute_strided_slice>{data, mapper, slice(0u, descriptor.extents[0], 1u)};
+    return array_slicing_proxy<Order, T, Descriptor, Index>(data, descriptor, index);
   }
 }
 
-template <typename T, typename Mapper, typename Index> decltype(auto) array_at(T* data, const Mapper& mapper, Index&& index)
+// Array proxy to represent partial slicing.
+// TODO: if Descriptor is container_mapper&&, we can reuse the memory
+template <std::size_t Order, typename T, typename Descriptor, typename... Indexes> class array_slicing_proxy
 {
-  if constexpr (Mapper::order == 1) {
-    return detail::array_slice(data, mapper, std::forward<Index>(index));
-  } else {
-    using IndexType = std::conditional_t<std::is_rvalue_reference_v<Index>, std::decay_t<Index>, Index>;
-    return strided_ref_array_proxy<T, Mapper, IndexType>{data, mapper, std::forward<Index>(index)};
-  }
-}
-
-template <typename U, std::size_t M> decltype(auto) array_at(U* data, const descriptor<M>& desc, index_t i)
-{
-  DEBUG_ASSERT(i < desc.extents[0], debug::default_module, debug::level::boundary_check, "out of range");
-  if constexpr (M == 1) {
-    return data[i];
-  } else {
-    const auto new_desc = strided_descriptor<M>{i, desc.extents};
-    return strided_ref_array<U, identity_mapper<M - 1>>{data, {new_desc.discard_dimension()}};
-  }
-}
-
-template <typename U, std::size_t M> decltype(auto) array_at(U* data, const descriptor<M>& desc, every_index)
-{
-  if constexpr (M == 1)
-    return ref_array<U, M>{data, desc};
-  else
-    return ref_array_every_proxy<U, M, 1u>{data, desc};
-}
-
-template <typename U, std::size_t M, typename Rng, typename = meta::requires_concept<ranges::sized_range<Rng>>>
-decltype(auto) array_at(U* data, const descriptor<M>& desc, const Rng& rng)
-{
-  if constexpr (M == 1 && std::is_constructible_v<index_view, const Rng&>) {
-    DEBUG_ASSERT(max(rng) < desc.length(), debug::default_module, debug::level::boundary_check, "out of range");
-    auto view = index_view(rng);
-    const auto size = view.size();
-    return strided_ref_array<U, vector_mapper<1u>>{data, {{{size}}, std::move(view)}};
-  } else {
-    return array_at(data, identity_mapper<M>{{0u, desc.extents}}, rng);
-  }
-}
-
-template <typename U, std::size_t M> decltype(auto) array_at(U* data, const descriptor<M>& desc, absolute_slice slice)
-{
-  if constexpr (M == 1) {
-    DEBUG_ASSERT(slice.start + slice.extent - 1u < desc.extents[0], debug::default_module, debug::level::boundary_check,
-                 "out of range");
-    return ref_array<U, 1u>{data + slice.start, {{{slice.extent}}}};
-  } else {
-    return array_at(data, identity_mapper<M>{{0u, desc.extents}}, std::move(slice));
-  }
-}
-
-template <typename U, std::size_t M, typename Index> decltype(auto) array_at(U* data, const descriptor<M>& desc, Index&& index)
-{
-  return array_at(data, identity_mapper<M>{{0u, desc.extents}}, std::forward<Index>(index));
-}
-
-} // namespace jules::detail
-
-// Proxy types
-namespace jules
-{
-
-/// \exclude
-template <typename T, typename Mapper, typename... Indexes> class strided_ref_array_proxy
-{
-  static constexpr auto order = Mapper::order;
-  static_assert(sizeof...(Indexes) < order);
+  static_assert(sizeof...(Indexes) < Order);
 
 public:
-  strided_ref_array_proxy(T* data, Mapper mapper, Indexes... indexes)
-    : data_{data}, mapper_{std::move(mapper)}, indexes_(std::forward<Indexes>(indexes)...)
+  array_slicing_proxy(T* data, const Descriptor& descriptor, Indexes... indexes)
+    : data_(data), descriptor_(descriptor), indexes_(indexes...)
   {}
 
-  decltype(auto) operator[](index_t i) && { return at(i); }
-
-  decltype(auto) operator[](absolute_slice slice) && { return at(slice); }
-
-  decltype(auto) operator[](absolute_strided_slice slice) && { return at(slice); }
-
-  decltype(auto) operator[](every_index) && { return at(slice(0u, mapper_.descriptor().extents[sizeof...(Indexes)], 1u)); }
-
-  decltype(auto) operator[](bounded_slice slice) && { return at(eval(slice, mapper_.descriptor().extents[sizeof...(Indexes)])); }
-
-  decltype(auto) operator[](bounded_strided_slice slice) &&
+  auto operator[](index_t index) && -> decltype(auto)
   {
-    return at(eval(slice, mapper_.descriptor().extents[sizeof...(Indexes)]));
+    return std::move(*this).forward(index, std::make_index_sequence<sizeof...(Indexes)>());
   }
 
-  template <typename Rng, typename = meta::requires_concept<ranges::sized_range<Rng>>>
-  decltype(auto) operator[](const Rng& rng) &&
+  auto operator[](absolute_slice index) && -> decltype(auto)
   {
-    return at(rng);
+    return std::move(*this).forward(index, std::make_index_sequence<sizeof...(Indexes)>());
+  }
+
+  auto operator[](absolute_strided_slice index) && -> decltype(auto)
+  {
+    return std::move(*this).forward(index, std::make_index_sequence<sizeof...(Indexes)>());
+  }
+
+  auto operator[](bounded_slice index) && -> decltype(auto)
+  {
+    return std::move(*this).forward(index, std::make_index_sequence<sizeof...(Indexes)>());
+  }
+
+  auto operator[](bounded_strided_slice index) && -> decltype(auto)
+  {
+    return std::move(*this).forward(index, std::make_index_sequence<sizeof...(Indexes)>());
+  }
+
+  auto operator[](valid_slice auto index) && -> decltype(auto)
+  {
+    return std::move(*this).forward(index, std::make_index_sequence<sizeof...(Indexes)>());
+  }
+
+  auto operator[](every_index index) && -> decltype(auto)
+  {
+    return std::move(*this).forward(index, std::make_index_sequence<sizeof...(Indexes)>());
+  }
+
+  auto operator[](index_span index) && -> decltype(auto)
+  {
+    return std::move(*this).forward(index, std::make_index_sequence<sizeof...(Indexes)>());
   }
 
 private:
-  template <typename Index> decltype(auto) at(Index&& index)
+  template <typename Index, std::size_t... I> auto forward(Index index, std::index_sequence<I...>) && -> decltype(auto)
   {
-    return at_impl(std::forward<Index>(index), std::make_index_sequence<sizeof...(Indexes)>());
-  }
-
-  template <typename Index, std::size_t... I> decltype(auto) at_impl(Index&& index, std::index_sequence<I...>)
-  {
-    if constexpr (sizeof...(Indexes) == order - 1) {
-      return detail::array_slice(data_, std::move(mapper_), std::get<I>(indexes_)..., std::forward<Index>(index));
-    } else {
-      using IndexType = std::conditional_t<std::is_rvalue_reference_v<Index>, std::decay_t<Index>, Index>;
-      return strided_ref_array_proxy<T, Mapper, Indexes..., IndexType>{data_, std::move(mapper_), std::get<I>(indexes_)...,
-                                                                       std::forward<Index>(index)};
-    }
+    return forward_slicing<Order>(data_, descriptor_, std::make_tuple(std::get<I>(indexes_)..., index),
+                                  std::make_index_sequence<sizeof...(Indexes) + 1>());
   }
 
   T* data_;
-  Mapper mapper_;
+  const Descriptor& descriptor_;
   std::tuple<Indexes...> indexes_;
 };
 
-/// \exclude
-template <typename T, std::size_t N, std::size_t M> class ref_array_every_proxy
-{
-  static_assert(M >= 1u && M < N);
-
-public:
-  ref_array_every_proxy(T* data, const descriptor<N>& descriptor) : data_{data}, descriptor_{descriptor} {}
-
-  decltype(auto) operator[](index_t i) &&
-  {
-    if constexpr (M == N - 1) {
-      const auto last_dim = descriptor_.extents[N - 1];
-      DEBUG_ASSERT(i < last_dim, debug::default_module, debug::level::boundary_check, "out of range");
-
-      const auto stride = prod(descriptor_.extents) / last_dim;
-      descriptor_.extents[N - 1] = 1u;
-
-      return ref_array<T, N>{data_ + i * stride, descriptor_};
-    } else {
-      return at(slice);
-    }
-  }
-
-  decltype(auto) operator[](absolute_slice slice) &&
-  {
-    if constexpr (M == N - 1) {
-      const auto last_dim = descriptor_.extents[N - 1];
-      DEBUG_ASSERT(slice.start + slice.extent - 1u < last_dim, debug::default_module, debug::level::boundary_check,
-                   "out of range");
-
-      const auto stride = prod(descriptor_.extents) / last_dim;
-      descriptor_.extents[N - 1] = slice.extent;
-
-      return ref_array<T, N>{data_ + slice.start * stride, descriptor_};
-    } else {
-      return at(slice);
-    }
-  }
-
-  decltype(auto) operator[](absolute_strided_slice slice) && { return at(slice); }
-
-  decltype(auto) operator[](every_index) &&
-  {
-    if constexpr (M == N - 1) {
-      return ref_array<T, N>{data_, descriptor_};
-    } else {
-      return ref_array_every_proxy<T, N, M + 1>{data_, descriptor_};
-    }
-  }
-
-  decltype(auto) operator[](bounded_slice slice) && { return at(eval(slice, descriptor_.extents[M])); }
-
-  decltype(auto) operator[](bounded_strided_slice slice) && { return at(eval(slice, descriptor_.extents[M])); }
-
-  template <typename Rng, typename = meta::requires_concept<ranges::sized_range<Rng>>>
-  decltype(auto) operator[](const Rng& rng) &&
-  {
-    return at(rng);
-  }
-
-private:
-  template <typename Index> decltype(auto) at(Index&& index)
-  {
-    return at(std::forward<Index>(index), std::make_index_sequence<M>());
-  }
-
-  template <std::size_t> using slice_type = absolute_strided_slice;
-
-  template <typename Index, std::size_t... I> decltype(auto) at(Index&& index, std::index_sequence<I...>)
-  {
-    using proxy_type = strided_ref_array_proxy<T, identity_mapper<N>, slice_type<I>...>;
-    return proxy_type{data_, {{0u, descriptor_.extents}}, slice(0u, descriptor_.extents[I], 1u)...}[std::forward<Index>(index)];
-  }
-
-  T* data_;
-  descriptor<N> descriptor_;
-};
-
-} // namespace jules
-
-#undef CHECK_BOUNDS
-#undef CHECK_STRIDE
-#undef CHECK_EXTENT
+} // namespace jules::detail
 
 #endif // JULES_ARRAY_SLICING_H
