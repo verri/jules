@@ -269,7 +269,7 @@ auto calculate_slicing(T* data, const container_mapper<Order>& mapper, Indexes..
   return calculate_container_slicing(data, mapper, indexes...);
 }
 
-template <typename T, typename Mapper> decltype(auto) array_from_slicing(T* data, Mapper mapper)
+template <typename T, typename Mapper> auto array_from_slicing(T* data, Mapper mapper) -> decltype(auto)
 {
   if constexpr (std::is_same_v<Mapper, index_t>) {
     return *(data + mapper);
@@ -299,7 +299,7 @@ auto calculate_generic_slicing(T* data, const Mapper& mapper, Indexes... indexes
 }
 
 template <typename T, typename Mapper, typename... Indexes>
-decltype(auto) do_slice(T* data, const Mapper& mapper, Indexes... indexes)
+auto do_slice(T* data, const Mapper& mapper, Indexes... indexes) -> decltype(auto)
 {
   constexpr auto Order = Mapper::order;
   static_assert(sizeof...(Indexes) == Order);
@@ -353,7 +353,7 @@ template <std::size_t, typename, typename, typename...> class array_slicing_prox
 // Calls do_slice when the number of array indexes (that is array[index1]...[indexN]) is
 // the same as array order, otherwise keeps proxing.
 template <std::size_t Order, typename T, typename Descriptor, typename Tuple, std::size_t... I>
-decltype(auto) forward_slicing(T* data, const Descriptor& descriptor, Tuple indexes, std::index_sequence<I...>)
+auto forward_slicing(T* data, const Descriptor& descriptor, Tuple indexes, std::index_sequence<I...>) -> decltype(auto)
 {
   if constexpr (Order == sizeof...(I)) {
     const auto dims = descriptor.dimensions();
@@ -365,7 +365,7 @@ decltype(auto) forward_slicing(T* data, const Descriptor& descriptor, Tuple inde
 }
 
 template <std::size_t Order, typename T, typename Descriptor, typename Index>
-decltype(auto) forward_slicing(T* data, const Descriptor& descriptor, Index index)
+auto forward_slicing(T* data, const Descriptor& descriptor, Index index) -> decltype(auto)
 {
   if constexpr (Order == 1) {
     const auto dims = descriptor.dimensions();
@@ -386,48 +386,48 @@ public:
     : data_(data), descriptor_(descriptor), indexes_(indexes...)
   {}
 
-  decltype(auto) operator[](index_t index) &&
+  auto operator[](index_t index) && -> decltype(auto)
   {
     return std::move(*this).forward(index, std::make_index_sequence<sizeof...(Indexes)>());
   }
 
-  decltype(auto) operator[](absolute_slice index) &&
+  auto operator[](absolute_slice index) && -> decltype(auto)
   {
     return std::move(*this).forward(index, std::make_index_sequence<sizeof...(Indexes)>());
   }
 
-  decltype(auto) operator[](absolute_strided_slice index) &&
+  auto operator[](absolute_strided_slice index) && -> decltype(auto)
   {
     return std::move(*this).forward(index, std::make_index_sequence<sizeof...(Indexes)>());
   }
 
-  decltype(auto) operator[](bounded_slice index) &&
+  auto operator[](bounded_slice index) && -> decltype(auto)
   {
     return std::move(*this).forward(index, std::make_index_sequence<sizeof...(Indexes)>());
   }
 
-  decltype(auto) operator[](bounded_strided_slice index) &&
+  auto operator[](bounded_strided_slice index) && -> decltype(auto)
   {
     return std::move(*this).forward(index, std::make_index_sequence<sizeof...(Indexes)>());
   }
 
-  decltype(auto) operator[](valid_slice auto index) &&
+  auto operator[](valid_slice auto index) && -> decltype(auto)
   {
     return std::move(*this).forward(index, std::make_index_sequence<sizeof...(Indexes)>());
   }
 
-  decltype(auto) operator[](every_index index) &&
+  auto operator[](every_index index) && -> decltype(auto)
   {
     return std::move(*this).forward(index, std::make_index_sequence<sizeof...(Indexes)>());
   }
 
-  decltype(auto) operator[](index_span index) &&
+  auto operator[](index_span index) && -> decltype(auto)
   {
     return std::move(*this).forward(index, std::make_index_sequence<sizeof...(Indexes)>());
   }
 
 private:
-  template <typename Index, std::size_t... I> decltype(auto) forward(Index index, std::index_sequence<I...>) &&
+  template <typename Index, std::size_t... I> auto forward(Index index, std::index_sequence<I...>) && -> decltype(auto)
   {
     return forward_slicing<Order>(data_, descriptor_, std::make_tuple(std::get<I>(indexes_)..., index),
                                   std::make_index_sequence<sizeof...(Indexes) + 1>());

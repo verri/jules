@@ -101,55 +101,67 @@ public:
   // operator mapped_ref_array<const value_type, identity_mapper<order>>() const { return {data(), {{0u, dimensions()}}}; }
 
   /// \group Indexing
-  decltype(auto) operator[](index_t index) { return detail::forward_slicing<N>(data(), descriptor_, index); }
+  auto operator[](index_t index) -> decltype(auto) { return detail::forward_slicing<N>(data(), descriptor_, index); }
 
   /// \group Indexing
-  decltype(auto) operator[](index_t index) const { return detail::forward_slicing<N>(data(), descriptor_, index); }
+  auto operator[](index_t index) const -> decltype(auto) { return detail::forward_slicing<N>(data(), descriptor_, index); }
 
   /// \group Indexing
-  decltype(auto) operator[](absolute_slice index) { return detail::forward_slicing<N>(data(), descriptor_, index); }
+  auto operator[](absolute_slice index) -> decltype(auto) { return detail::forward_slicing<N>(data(), descriptor_, index); }
 
   /// \group Indexing
-  decltype(auto) operator[](absolute_slice index) const { return detail::forward_slicing<N>(data(), descriptor_, index); }
+  auto operator[](absolute_slice index) const -> decltype(auto) { return detail::forward_slicing<N>(data(), descriptor_, index); }
 
   /// \group Indexing
-  decltype(auto) operator[](absolute_strided_slice index) { return detail::forward_slicing<N>(data(), descriptor_, index); }
-
-  /// \group Indexing
-  decltype(auto) operator[](absolute_strided_slice index) const { return detail::forward_slicing<N>(data(), descriptor_, index); }
-
-  /// \group Indexing
-  decltype(auto) operator[](bounded_slice index) { return detail::forward_slicing<N>(data(), descriptor_, index); }
-
-  /// \group Indexing
-  decltype(auto) operator[](bounded_slice index) const { return detail::forward_slicing<N>(data(), descriptor_, index); }
-
-  /// \group Indexing
-  decltype(auto) operator[](bounded_strided_slice index) { return detail::forward_slicing<N>(data(), descriptor_, index); }
-
-  /// \group Indexing
-  decltype(auto) operator[](bounded_strided_slice index) const { return detail::forward_slicing<N>(data(), descriptor_, index); }
-
-  /// \group Indexing
-  decltype(auto) operator[](valid_slice auto index) { return detail::forward_slicing<N>(data(), descriptor_, index); }
-
-  /// \group Indexing
-  template <typename F> decltype(auto) operator[](valid_slice auto index) const
+  auto operator[](absolute_strided_slice index) -> decltype(auto)
   {
     return detail::forward_slicing<N>(data(), descriptor_, index);
   }
 
   /// \group Indexing
-  decltype(auto) operator[](every_index index) { return detail::forward_slicing<N>(data(), descriptor_, index); }
+  auto operator[](absolute_strided_slice index) const -> decltype(auto)
+  {
+    return detail::forward_slicing<N>(data(), descriptor_, index);
+  }
 
   /// \group Indexing
-  decltype(auto) operator[](every_index index) const { return detail::forward_slicing<N>(data(), descriptor_, index); }
+  auto operator[](bounded_slice index) -> decltype(auto) { return detail::forward_slicing<N>(data(), descriptor_, index); }
 
   /// \group Indexing
-  decltype(auto) operator[](index_span index) { return detail::forward_slicing<N>(data(), descriptor_, index); }
+  auto operator[](bounded_slice index) const -> decltype(auto) { return detail::forward_slicing<N>(data(), descriptor_, index); }
 
   /// \group Indexing
-  decltype(auto) operator[](index_span index) const { return detail::forward_slicing<N>(data(), descriptor_, index); }
+  auto operator[](bounded_strided_slice index) -> decltype(auto)
+  {
+    return detail::forward_slicing<N>(data(), descriptor_, index);
+  }
+
+  /// \group Indexing
+  auto operator[](bounded_strided_slice index) const -> decltype(auto)
+  {
+    return detail::forward_slicing<N>(data(), descriptor_, index);
+  }
+
+  /// \group Indexing
+  auto operator[](valid_slice auto index) -> decltype(auto) { return detail::forward_slicing<N>(data(), descriptor_, index); }
+
+  /// \group Indexing
+  template <typename F> auto operator[](valid_slice auto index) const -> decltype(auto)
+  {
+    return detail::forward_slicing<N>(data(), descriptor_, index);
+  }
+
+  /// \group Indexing
+  auto operator[](every_index index) -> decltype(auto) { return detail::forward_slicing<N>(data(), descriptor_, index); }
+
+  /// \group Indexing
+  auto operator[](every_index index) const -> decltype(auto) { return detail::forward_slicing<N>(data(), descriptor_, index); }
+
+  /// \group Indexing
+  auto operator[](index_span index) -> decltype(auto) { return detail::forward_slicing<N>(data(), descriptor_, index); }
+
+  /// \group Indexing
+  auto operator[](index_span index) const -> decltype(auto) { return detail::forward_slicing<N>(data(), descriptor_, index); }
 
   auto begin() noexcept -> iterator { return data(); }
   auto end() noexcept -> iterator { return data() + size(); }
@@ -180,7 +192,7 @@ template <typename T, std::size_t N> ref_array(T*, descriptor<N>) -> ref_array<T
 
 template <typename T, std::size_t N> auto eval(ref_array<T, N> source) -> ref_array<T, N> { return source; }
 
-template <std::size_t D, typename T, std::size_t N> decltype(auto) drop_to(ref_array<T, N> source)
+template <std::size_t D, typename T, std::size_t N> auto drop_to(ref_array<T, N> source) -> decltype(auto)
 {
   if constexpr (D == 0) {
     DEBUG_ASSERT(source.size() == 1, debug::default_module, debug::level::invalid_argument, "array cannot be coerced to scalar");
@@ -189,7 +201,7 @@ template <std::size_t D, typename T, std::size_t N> decltype(auto) drop_to(ref_a
     return ref_array<T, D>{source.begin(), {detail::template drop_one_level_extents<D>(source.dimensions())}};
 }
 
-template <typename T, std::size_t N> decltype(auto) drop(ref_array<T, N> source) { return drop_to<1>(source); }
+template <typename T, std::size_t N> auto drop(ref_array<T, N> source) -> decltype(auto) { return drop_to<1>(source); }
 
 template <typename T, std::size_t N> auto flatten(ref_array<T, N> source) noexcept
 {

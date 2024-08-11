@@ -74,4 +74,3 @@ BraceWrapping:
   SplitEmptyNamespace: false
 ConstructorInitializerAllOnOneLineOrOnePerLine: true
 ...
-

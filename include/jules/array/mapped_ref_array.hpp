@@ -100,58 +100,70 @@ public:
   operator mapped_ref_array<const value_type, Mapper>() const { return {data(), mapper()}; }
 
   /// \group Indexing
-  decltype(auto) operator[](index_t index) { return detail::forward_slicing<order>(data(), mapper(), index); }
+  auto operator[](index_t index) -> decltype(auto) { return detail::forward_slicing<order>(data(), mapper(), index); }
 
   /// \group Indexing
-  decltype(auto) operator[](index_t index) const { return detail::forward_slicing<order>(data(), mapper(), index); }
+  auto operator[](index_t index) const -> decltype(auto) { return detail::forward_slicing<order>(data(), mapper(), index); }
 
   /// \group Indexing
-  decltype(auto) operator[](absolute_slice index) { return detail::forward_slicing<order>(data(), mapper(), index); }
+  auto operator[](absolute_slice index) -> decltype(auto) { return detail::forward_slicing<order>(data(), mapper(), index); }
 
   /// \group Indexing
-  decltype(auto) operator[](absolute_slice index) const { return detail::forward_slicing<order>(data(), mapper(), index); }
-
-  /// \group Indexing
-  decltype(auto) operator[](absolute_strided_slice index) { return detail::forward_slicing<order>(data(), mapper(), index); }
-
-  /// \group Indexing
-  decltype(auto) operator[](absolute_strided_slice index) const
+  auto operator[](absolute_slice index) const -> decltype(auto)
   {
     return detail::forward_slicing<order>(data(), mapper(), index);
   }
 
   /// \group Indexing
-  decltype(auto) operator[](bounded_slice index) { return detail::forward_slicing<order>(data(), mapper(), index); }
-
-  /// \group Indexing
-  decltype(auto) operator[](bounded_slice index) const { return detail::forward_slicing<order>(data(), mapper(), index); }
-
-  /// \group Indexing
-  decltype(auto) operator[](bounded_strided_slice index) { return detail::forward_slicing<order>(data(), mapper(), index); }
-
-  /// \group Indexing
-  decltype(auto) operator[](bounded_strided_slice index) const { return detail::forward_slicing<order>(data(), mapper(), index); }
-
-  /// \group Indexing
-  decltype(auto) operator[](valid_slice auto index) { return detail::forward_slicing<order>(data(), mapper(), index); }
-
-  /// \group Indexing
-  template <typename F> decltype(auto) operator[](valid_slice auto index) const
+  auto operator[](absolute_strided_slice index) -> decltype(auto)
   {
     return detail::forward_slicing<order>(data(), mapper(), index);
   }
 
   /// \group Indexing
-  decltype(auto) operator[](every_index index) { return detail::forward_slicing<order>(data(), mapper(), index); }
+  auto operator[](absolute_strided_slice index) const -> decltype(auto)
+  {
+    return detail::forward_slicing<order>(data(), mapper(), index);
+  }
 
   /// \group Indexing
-  decltype(auto) operator[](every_index index) const { return detail::forward_slicing<order>(data(), mapper(), index); }
+  auto operator[](bounded_slice index) -> decltype(auto) { return detail::forward_slicing<order>(data(), mapper(), index); }
 
   /// \group Indexing
-  decltype(auto) operator[](index_span index) { return detail::forward_slicing<order>(data(), mapper(), index); }
+  auto operator[](bounded_slice index) const -> decltype(auto) { return detail::forward_slicing<order>(data(), mapper(), index); }
 
   /// \group Indexing
-  decltype(auto) operator[](index_span index) const { return detail::forward_slicing<order>(data(), mapper(), index); }
+  auto operator[](bounded_strided_slice index) -> decltype(auto)
+  {
+    return detail::forward_slicing<order>(data(), mapper(), index);
+  }
+
+  /// \group Indexing
+  auto operator[](bounded_strided_slice index) const -> decltype(auto)
+  {
+    return detail::forward_slicing<order>(data(), mapper(), index);
+  }
+
+  /// \group Indexing
+  auto operator[](valid_slice auto index) -> decltype(auto) { return detail::forward_slicing<order>(data(), mapper(), index); }
+
+  /// \group Indexing
+  template <typename F> auto operator[](valid_slice auto index) const -> decltype(auto)
+  {
+    return detail::forward_slicing<order>(data(), mapper(), index);
+  }
+
+  /// \group Indexing
+  auto operator[](every_index index) -> decltype(auto) { return detail::forward_slicing<order>(data(), mapper(), index); }
+
+  /// \group Indexing
+  auto operator[](every_index index) const -> decltype(auto) { return detail::forward_slicing<order>(data(), mapper(), index); }
+
+  /// \group Indexing
+  auto operator[](index_span index) -> decltype(auto) { return detail::forward_slicing<order>(data(), mapper(), index); }
+
+  /// \group Indexing
+  auto operator[](index_span index) const -> decltype(auto) { return detail::forward_slicing<order>(data(), mapper(), index); }
 
   auto begin() noexcept -> iterator { return {data(), mapper().index_begin()}; }
   auto end() noexcept -> iterator { return {data(), mapper().index_end()}; }
@@ -166,7 +178,7 @@ public:
 
   auto dimensions() const noexcept -> std::array<size_type, order> { return mapper().dimensions(); }
 
-  template <std::size_t D> decltype(auto) drop_to()
+  template <std::size_t D> auto drop_to() -> decltype(auto)
   {
     if constexpr (D == 0) {
       DEBUG_ASSERT(this->size() == 1, debug::default_module, debug::level::invalid_argument, "array cannot be coerced to scalar");
@@ -196,12 +208,15 @@ template <typename T, typename Mapper> auto eval(mapped_ref_array<T, Mapper> sou
   return source;
 }
 
-template <std::size_t D, typename U, typename Mapper> decltype(auto) drop_to(mapped_ref_array<U, Mapper> source)
+template <std::size_t D, typename U, typename Mapper> auto drop_to(mapped_ref_array<U, Mapper> source) -> decltype(auto)
 {
   return source.template drop_to<D>();
 }
 
-template <typename U, typename Mapper> decltype(auto) drop(mapped_ref_array<U, Mapper> source) { return drop_to<1>(source); }
+template <typename U, typename Mapper> auto drop(mapped_ref_array<U, Mapper> source) -> decltype(auto)
+{
+  return drop_to<1>(source);
+}
 
 } // namespace jules
 

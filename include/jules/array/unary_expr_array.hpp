@@ -119,7 +119,7 @@ template <std::size_t D, typename It, typename Op, std::size_t N> auto drop_to(c
                           detail::template drop_one_level_extents<D>(source.dimensions()));
 }
 
-template <typename It, typename Op, std::size_t N> decltype(auto) drop(const unary_expr_array<It, Op, N>& source)
+template <typename It, typename Op, std::size_t N> auto drop(const unary_expr_array<It, Op, N>& source) -> decltype(auto)
 {
   return drop_to<1>(source);
 }

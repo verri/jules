@@ -15,7 +15,7 @@ namespace detail
 {
 
 template <size_t Order, size_t Axis, size_t I, typename ArrayLike>
-constexpr decltype(auto) axis_at_impl(ArrayLike&& arr, [[maybe_unused]] index_t i)
+constexpr auto axis_at_impl(ArrayLike&& arr, [[maybe_unused]] index_t i) -> decltype(auto)
 {
   if constexpr (I == Order)
     return static_cast<ArrayLike>(arr);
@@ -27,7 +27,7 @@ constexpr decltype(auto) axis_at_impl(ArrayLike&& arr, [[maybe_unused]] index_t 
 
 } // namespace detail
 
-template <size_t Axis, reference_array RefArray> constexpr decltype(auto) axis_at(RefArray arr, index_t i)
+template <size_t Axis, reference_array RefArray> constexpr auto axis_at(RefArray arr, index_t i) -> decltype(auto)
 {
   static_assert(Axis < RefArray::order);
   return drop_to<RefArray::order - 1>(detail::axis_at_impl<RefArray::order, Axis, 0>(arr, i));

@@ -87,8 +87,8 @@ constexpr auto drop_one_level_extents(const std::array<index_t, N>& extents) -> 
 
 // TODO: where should a put it?
 template <typename F, typename Tuple, std::size_t... I>
-constexpr decltype(auto) apply_n(F&& f, Tuple&& tuple,
-                                 std::index_sequence<I...>) noexcept(noexcept(std::forward<F>(f)(std::get<I>(tuple)...)))
+constexpr auto apply_n(F&& f, Tuple&& tuple,
+                       std::index_sequence<I...>) noexcept(noexcept(std::forward<F>(f)(std::get<I>(tuple)...))) -> decltype(auto)
 {
   return std::forward<F>(f)(std::get<I>(tuple)...);
 }
