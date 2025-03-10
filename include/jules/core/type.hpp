@@ -136,10 +136,7 @@ template <typename T> struct numeric_traits : std::numeric_limits<T>
 };
 
 template <typename T>
-concept common_numeric = std::is_arithmetic_v<T> && requires
-{
-  typename numeric_traits<T>;
-};
+concept common_numeric = std::is_arithmetic_v<T> && requires { typename numeric_traits<T>; };
 
 template <typename... Fs> struct overloaded : public Fs...
 {

@@ -369,7 +369,8 @@ auto which(Iter first, Sent last, C indexes = container<index_t>{}) -> C
 }
 
 /// \group Which
-template <ranges::range Rng, std::convertible_to<bool> T = ranges::range_value_t<Rng>, container_for<index_t> C = container<index_t>>
+template <ranges::range Rng, std::convertible_to<bool> T = ranges::range_value_t<Rng>,
+          container_for<index_t> C = container<index_t>>
 auto which(const Rng& rng, C indexes = container<index_t>{}) -> C
 {
   return ::jules::which(ranges::begin(rng), ranges::end(rng), std::move(indexes));
@@ -471,7 +472,8 @@ template <typename Arg, typename... Args> constexpr auto first_arg(Arg&& arg, Ar
 template <typename Arg> constexpr auto last_arg(Arg&& arg) -> decltype(auto) { return std::forward<Arg>(arg); }
 
 template <typename Arg, typename... Args>
-requires(sizeof...(Args) > 0) constexpr auto last_arg(Arg&&, Args&&... args) -> decltype(auto)
+  requires(sizeof...(Args) > 0)
+constexpr auto last_arg(Arg&&, Args&&... args) -> decltype(auto)
 {
   return last_arg(std::forward<Args>(args)...);
 }

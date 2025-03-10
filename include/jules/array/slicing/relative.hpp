@@ -38,56 +38,56 @@ template <typename G> constexpr auto make_relative_index(G g) noexcept -> relati
 
 template <typename G> constexpr auto operator-(relative_index<G> index, index_t value) noexcept
 {
-  return make_relative_index([ g = std::move(index), value = value ](index_t i) constexpr noexcept { return g(i) - value; });
+  return make_relative_index([g = std::move(index), value = value](index_t i) constexpr noexcept { return g(i) - value; });
 }
 
 template <typename G> constexpr auto operator-(index_t value, relative_index<G> index) noexcept
 {
-  return make_relative_index([ g = std::move(index), value = value ](index_t i) constexpr noexcept { return value - g(i); });
+  return make_relative_index([g = std::move(index), value = value](index_t i) constexpr noexcept { return value - g(i); });
 }
 
 template <typename G> constexpr auto operator+(relative_index<G> index, index_t value) noexcept
 {
-  return make_relative_index([ g = std::move(index), value = value ](index_t i) constexpr noexcept { return g(i) + value; });
+  return make_relative_index([g = std::move(index), value = value](index_t i) constexpr noexcept { return g(i) + value; });
 }
 
 template <typename G> constexpr auto operator+(index_t value, relative_index<G> index) noexcept { return index + value; }
 
 template <typename G> constexpr auto operator/(relative_index<G> index, index_t value) noexcept
 {
-  return make_relative_index([ g = std::move(index), value = value ](index_t i) constexpr noexcept { return g(i) / value; });
+  return make_relative_index([g = std::move(index), value = value](index_t i) constexpr noexcept { return g(i) / value; });
 }
 
 template <typename G> constexpr auto operator/(index_t value, relative_index<G> index) noexcept
 {
-  return make_relative_index([ g = std::move(index), value = value ](index_t i) constexpr noexcept { return value / g(i); });
+  return make_relative_index([g = std::move(index), value = value](index_t i) constexpr noexcept { return value / g(i); });
 }
 
 template <typename G> constexpr auto operator*(relative_index<G> index, index_t value) noexcept
 {
-  return make_relative_index([ g = std::move(index), value = value ](index_t i) constexpr noexcept { return g(i) * value; });
+  return make_relative_index([g = std::move(index), value = value](index_t i) constexpr noexcept { return g(i) * value; });
 }
 
 template <typename G> constexpr auto operator*(index_t value, relative_index<G> index) noexcept { return index * value; }
 
 template <typename F, typename G> constexpr auto operator+(relative_index<F> lhs, relative_index<G> rhs) noexcept
 {
-  return make_relative_index([ lhs = std::move(lhs), rhs = rhs ](index_t i) constexpr noexcept { return lhs(i) + rhs(i); });
+  return make_relative_index([lhs = std::move(lhs), rhs = rhs](index_t i) constexpr noexcept { return lhs(i) + rhs(i); });
 }
 
 template <typename F, typename G> constexpr auto operator-(relative_index<F> lhs, relative_index<G> rhs) noexcept
 {
-  return make_relative_index([ lhs = std::move(lhs), rhs = rhs ](index_t i) constexpr noexcept { return lhs(i) - rhs(i); });
+  return make_relative_index([lhs = std::move(lhs), rhs = rhs](index_t i) constexpr noexcept { return lhs(i) - rhs(i); });
 }
 
 template <typename F, typename G> constexpr auto operator*(relative_index<F> lhs, relative_index<G> rhs) noexcept
 {
-  return make_relative_index([ lhs = std::move(lhs), rhs = rhs ](index_t i) constexpr noexcept { return lhs(i) * rhs(i); });
+  return make_relative_index([lhs = std::move(lhs), rhs = rhs](index_t i) constexpr noexcept { return lhs(i) * rhs(i); });
 }
 
 template <typename F, typename G> constexpr auto operator/(relative_index<F> lhs, relative_index<G> rhs) noexcept
 {
-  return make_relative_index([ lhs = std::move(lhs), rhs = rhs ](index_t i) constexpr noexcept { return lhs(i) / rhs(i); });
+  return make_relative_index([lhs = std::move(lhs), rhs = rhs](index_t i) constexpr noexcept { return lhs(i) / rhs(i); });
 }
 
 constexpr auto dim() noexcept

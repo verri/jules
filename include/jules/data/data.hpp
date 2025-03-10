@@ -67,22 +67,23 @@ public:
   base_data(std::initializer_list<named_column_type> elements) : base_data(elements.begin(), elements.end(), elements.size()) {}
 
   template <ranges::range Rng, typename R = ranges::range_value_t<Rng>>
-  requires std::convertible_to<R, named_column_type> base_data(const Rng& rng)
-    : base_data(ranges::begin(rng), ranges::end(rng), ranges::size(rng))
+    requires std::convertible_to<R, named_column_type>
+  base_data(const Rng& rng) : base_data(ranges::begin(rng), ranges::end(rng), ranges::size(rng))
   {}
 
   template <std::input_iterator Iter, std::sentinel_for<Iter> Sent, typename R = std::iter_value_t<Iter>>
-  requires std::convertible_to<R, named_column_type> &&(!std::forward_iterator<Iter>)base_data(Iter first, Sent last)
-    : base_data(first, last, 0u)
+    requires std::convertible_to<R, named_column_type> && (!std::forward_iterator<Iter>)
+  base_data(Iter first, Sent last) : base_data(first, last, 0u)
   {}
 
   template <std::forward_iterator Iter, std::sentinel_for<Iter> Sent, typename R = std::iter_value_t<Iter>>
-  requires std::convertible_to<R, named_column_type> base_data(Iter first, Sent last)
-    : base_data(first, last, ranges::distance(first, last))
+    requires std::convertible_to<R, named_column_type>
+  base_data(Iter first, Sent last) : base_data(first, last, ranges::distance(first, last))
   {}
 
   template <std::input_iterator Iter, std::sentinel_for<Iter> Sent, typename R = std::iter_value_t<Iter>>
-  requires std::convertible_to<R, named_column_type> base_data(Iter first, Sent last, index_t size_hint)
+    requires std::convertible_to<R, named_column_type>
+  base_data(Iter first, Sent last, index_t size_hint)
   {
     if (first == last)
       return;
@@ -140,7 +141,8 @@ public:
     auto data = container<string>();
     auto ncol = index_t{0u};
 
-    auto line_begin = std::sregex_token_iterator(raw_data.begin(), raw_data.end(), opt.line.regex, opt.line.separator ? -1 : 0, opt.line.flag);
+    auto line_begin =
+      std::sregex_token_iterator(raw_data.begin(), raw_data.end(), opt.line.regex, opt.line.separator ? -1 : 0, opt.line.flag);
     auto line_end = std::sregex_token_iterator();
     auto line_range = ranges::subrange(line_begin, line_end);
 
@@ -149,8 +151,8 @@ public:
       if (line.first == line.second)
         continue;
 
-
-      auto cells_begin = std::sregex_token_iterator(line.first, line.second, opt.cell.regex, opt.cell.separator ? -1 : 0, opt.cell.flag);
+      auto cells_begin =
+        std::sregex_token_iterator(line.first, line.second, opt.cell.regex, opt.cell.separator ? -1 : 0, opt.cell.flag);
       auto cells_end = std::sregex_token_iterator();
       const auto cells = ranges::subrange(cells_begin, cells_end);
       ranges::transform(cells, std::back_inserter(data), [](const auto& match) -> string {

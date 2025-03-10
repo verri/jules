@@ -89,8 +89,7 @@ template <std::size_t N, typename Descriptor, typename... Tail>
 auto slicing_fill(container<index_t>& map, const Descriptor& descriptor, std::array<index_t, N> args,
                   absolute_strided_slice index, Tail... tail)
 {
-  auto indexes = std::views::iota(index.start()) | std::views::stride(index.stride()) |
-                 ranges::views::take(index.extent());
+  auto indexes = std::views::iota(index.start()) | std::views::stride(index.stride()) | ranges::views::take(index.extent());
 
   for (const auto i : indexes) {
     if constexpr (sizeof...(Tail) == 0)
@@ -165,18 +164,14 @@ auto calculate_slicing(T* data, const strided_descriptor<Order>& desc, Indexes..
   if constexpr (any_args(std::is_same_v<Indexes, index_span>...)) //
   {
     return calculate_container_slicing(data, desc, indexes...);
-  }    //
+  } //
   else //
   {
     constexpr auto D = count_args(std::is_same_v<Indexes, index_t>...);
 
     constexpr auto to_strided_slice = overloaded{
-      [](index_t i) -> absolute_strided_slice {
-        return {i, 1, 1};
-      },
-      [](absolute_every_index index) -> absolute_strided_slice {
-        return {0, index.dim, 1};
-      },
+      [](index_t i) -> absolute_strided_slice { return {i, 1, 1}; },
+      [](absolute_every_index index) -> absolute_strided_slice { return {0, index.dim, 1}; },
       [](auto index) -> absolute_strided_slice { return index; },
     };
 
@@ -212,7 +207,7 @@ auto calculate_slicing(T* data, descriptor<Order> desc, Indexes... indexes)
     return apply_n(
       [&](auto... newindexes) constexpr { return calculate_generic_slicing(data, desc.discard_tail_dimension(), newindexes...); },
       std::make_tuple(indexes...), std::make_index_sequence<Order - 1>());
-  }                                                                            //
+  } //
   else if constexpr (std::is_same_v<last_element<Indexes...>, absolute_slice>) //
   {
     // in a similiar manner, if the last element is an absolute_slice (not strided), we
@@ -233,16 +228,16 @@ auto calculate_slicing(T* data, descriptor<Order> desc, Indexes... indexes)
         return calculate_generic_slicing(data, desc, newindexes..., absolute_every_index{slice.extent()});
       },
       std::make_tuple(indexes...), std::make_index_sequence<Order - 1>());
-  }                                                                                               //
+  } //
   else if constexpr (sizeof...(Indexes) == 1 && all_args(std::is_same_v<Indexes, index_span>...)) //
   {
     const index_span index = first_arg(indexes...);
     return std::make_tuple(data, span_mapper(index));
-  }                                                                    //
+  } //
   else if constexpr (any_args(std::is_same_v<Indexes, index_span>...)) //
   {
     return calculate_container_slicing(data, desc, indexes...);
-  }    //
+  } //
   else //
   {
     return calculate_generic_slicing(data, strided_descriptor<Order>(desc.dimensions()), indexes...);

@@ -80,12 +80,17 @@ protected:
   using virtual_coercion<column_interface<Rules, std::tuple<Ts...>>, Ts>::can_coerce_...;
 
   template <typename T>
-  requires(!any_args(std::same_as<T, Ts>...)) [[noreturn]] auto coerce_(tag<T>) const -> column_interface_ptr
+    requires(!any_args(std::same_as<T, Ts>...))
+  [[noreturn]] auto coerce_(tag<T>) const -> column_interface_ptr
   {
     throw std::bad_cast{};
   }
   template <typename T>
-  requires(!any_args(std::same_as<T, Ts>...)) [[nodiscard]] auto can_coerce_(tag<T>) const noexcept -> bool { return false; }
+    requires(!any_args(std::same_as<T, Ts>...))
+  [[nodiscard]] auto can_coerce_(tag<T>) const noexcept -> bool
+  {
+    return false;
+  }
 };
 
 template <typename T, typename Rules, typename U>

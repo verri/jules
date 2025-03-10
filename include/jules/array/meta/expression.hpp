@@ -12,8 +12,8 @@ namespace jules
 {
 
 template <typename T>
-concept expression_array = !std::default_initializable<T> && !std::copy_constructible<T> && !std::move_constructible<T> && !std::copyable<T> &&
-                           !std::movable<T> && ranges::input_range<T> && common_array<T>;
+concept expression_array = !std::default_initializable<T> && !std::copy_constructible<T> && !std::move_constructible<T> &&
+                           !std::copyable<T> && !std::movable<T> && ranges::input_range<T> && common_array<T>;
 
 } // namespace jules
 

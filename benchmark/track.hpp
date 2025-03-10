@@ -143,7 +143,7 @@ private:
   Alloc total_usage, recent_usage, still_using;
 
   std::unordered_map<void*, std::size_t, std::hash<void*>, std::equal_to<void*>,
-                     SafeAllocator<std::pair<void*const, std::size_t>>>
+                     SafeAllocator<std::pair<void* const, std::size_t>>>
     all_blocks, recently_allocated;
 
   std::vector<std::pair<void* const, std::size_t>, SafeAllocator<std::pair<void* const, std::size_t>>> recently_freed;

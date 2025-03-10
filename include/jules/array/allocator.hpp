@@ -24,7 +24,10 @@ template <typename T> struct array_allocator
     return std::launder(reinterpret_cast<value_type*>(new (std::align_val_t(alignof(T))) std::byte[size * sizeof(T)]));
   }
 
-  static auto deallocate(value_type* data, index_t) noexcept { operator delete[](std::launder(reinterpret_cast<std::byte*>(data)), std::align_val_t(alignof(T))); }
+  static auto deallocate(value_type* data, index_t) noexcept
+  {
+    operator delete[](std::launder(reinterpret_cast<std::byte*>(data)), std::align_val_t(alignof(T)));
+  }
 
   template <typename... Args>
   static auto construct(value_type* data, index_t size) noexcept(std::is_nothrow_constructible_v<value_type>)
@@ -33,7 +36,7 @@ template <typename T> struct array_allocator
   }
 
   template <typename U>
-  requires std::constructible_from<value_type, const U&>
+    requires std::constructible_from<value_type, const U&>
   static auto construct(value_type* to, index_t size,
                         const U& value) noexcept(std::is_nothrow_constructible_v<value_type, const U&>)
   {

@@ -39,21 +39,27 @@ public:
   constexpr auto operator->() const noexcept { return &value_; }
 
   constexpr auto operator*() const noexcept { return value_; }
-  constexpr auto operator++() noexcept -> index_iterator& { ++value_; return *this; }
+  constexpr auto operator++() noexcept -> index_iterator&
+  {
+    ++value_;
+    return *this;
+  }
   constexpr auto operator++(int) noexcept -> index_iterator { return index_iterator{value_++}; }
 
   constexpr auto operator==(const index_iterator& other) const noexcept { return value_ == other.value_; }
   constexpr auto operator!=(const index_iterator& other) const noexcept { return value_ != other.value_; }
 
-  constexpr auto operator-(const index_iterator& other) const noexcept { return static_cast<std::ptrdiff_t>(value_) - other.value_; }
+  constexpr auto operator-(const index_iterator& other) const noexcept
+  {
+    return static_cast<std::ptrdiff_t>(value_) - other.value_;
+  }
 
 private:
   T value_;
 };
 } // namespace detail
 
-template <std::integral T>
-class indices_t
+template <std::integral T> class indices_t
 {
 public:
   using value_type = T;
@@ -81,14 +87,14 @@ private:
   T last_;
 };
 
-template <std::integral T>
-constexpr auto indices(T first, T last) noexcept -> indices_t<T> { return indices_t<T>{first, last}; }
+template <std::integral T> constexpr auto indices(T first, T last) noexcept -> indices_t<T> { return indices_t<T>{first, last}; }
 
-template <std::integral T>
-constexpr auto indices(T last) noexcept -> indices_t<T> { return indices_t<T>{last}; }
+template <std::integral T> constexpr auto indices(T last) noexcept -> indices_t<T> { return indices_t<T>{last}; }
 
-template <std::integral T>
-constexpr auto closed_indices(T first, T last) noexcept -> indices_t<T> { return indices_t<T>{first, last + 1}; }
+template <std::integral T> constexpr auto closed_indices(T first, T last) noexcept -> indices_t<T>
+{
+  return indices_t<T>{first, last + 1};
+}
 
 static_assert(std::ranges::range<indices_t<int>>);
 

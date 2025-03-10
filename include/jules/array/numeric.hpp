@@ -24,7 +24,7 @@ namespace jules
 namespace detail
 {
 template <typename R, typename RefArrayA, typename RefArrayB>
-requires reference_array<RefArrayA> && reference_array<RefArrayB>
+  requires reference_array<RefArrayA> && reference_array<RefArrayB>
 auto product_impl(const RefArrayA lhs, const RefArrayB& rhs) -> array<R, 2u>
 {
   static_assert(RefArrayA::order == 2u && RefArrayB::order == 2u);
@@ -47,7 +47,7 @@ auto product_impl(const RefArrayA lhs, const RefArrayB& rhs) -> array<R, 2u>
 
 template <typename ArrayA, typename ArrayB,
           typename R = decltype(std::declval<typename ArrayA::value_type>() * std::declval<typename ArrayB::value_type>())>
-requires common_array<ArrayA> && common_array<ArrayB>
+  requires common_array<ArrayA> && common_array<ArrayB>
 auto product(const ArrayA& lhs, const ArrayB& rhs) -> array<R, 2u>
 {
   return detail::product_impl<R>(eval(static_cast<const ArrayA&>(lhs)), eval(static_cast<const ArrayB&>(rhs)));
@@ -61,7 +61,11 @@ template <typename T, std::same_as<T> U, std::size_t N> auto to_vector(array<U, 
 }
 
 template <typename T, ranges::range Rng>
-requires(!common_array<Rng>) auto to_vector(const Rng& rng) { return array<T, 1u>(rng); }
+  requires(!common_array<Rng>)
+auto to_vector(const Rng& rng)
+{
+  return array<T, 1u>(rng);
+}
 
 // If higher order, copy elements column-wise.
 auto as_vector(const common_array auto& source) -> array<typename decltype(source)::value_type, 1u>
@@ -110,7 +114,8 @@ template <typename T, ranges::range Rng> auto cat_push(array_builder<T, 1u>& bui
 }
 
 template <typename T, typename U>
-requires(!ranges::range<std::decay_t<U>>) auto cat_push(array_builder<T, 1u>& builder, U&& value) -> void
+  requires(!ranges::range<std::decay_t<U>>)
+auto cat_push(array_builder<T, 1u>& builder, U&& value) -> void
 {
   builder.push_back(std::forward<U>(value));
 }

@@ -107,7 +107,7 @@ public:
   /// \tparam _
   ///   \exclude
   template <typename... Dims>
-  requires valid_extents_for<N, Dims...>
+    requires valid_extents_for<N, Dims...>
   explicit array(uninitialized_t, Dims... dims) : array(allocate_tag{}, dims...)
   {
     static_assert(std::is_trivial_v<value_type>, "Only trivial types are allowed to be left uninitialized");
@@ -117,7 +117,7 @@ public:
   /// \tparam _
   ///   \exclude
   template <typename... Dims>
-  requires valid_extents_for<N, Dims...>
+    requires valid_extents_for<N, Dims...>
   explicit array(Dims... dims) : array(allocate_tag{}, dims...)
   {
     try {
@@ -133,7 +133,8 @@ public:
   /// \tparam _
   ///   \exclude
   template <typename... Dims>
-  requires valid_extents_for<N, Dims...> array(const value_type& value, Dims... dims) : array(allocate_tag{}, dims...)
+    requires valid_extents_for<N, Dims...>
+  array(const value_type& value, Dims... dims) : array(allocate_tag{}, dims...)
   {
     try {
       this->construct(this->data(), this->size(), value);
@@ -150,7 +151,8 @@ public:
   /// \tparam _
   ///   \exclude
   template <typename It, typename... Dims, typename R = std::iter_value_t<It>>
-  requires valid_extents_for<N, Dims...> array(It it, Dims... dims) : array(allocate_tag{}, dims...)
+    requires valid_extents_for<N, Dims...>
+  array(It it, Dims... dims) : array(allocate_tag{}, dims...)
   {
     try {
       this->construct(this->data(), it, this->size());
@@ -162,7 +164,8 @@ public:
   }
 
   template <typename F, typename... Dims, typename R = std::invoke_result<F>>
-  requires valid_extents_for<N, Dims...> array(generated_t, F f, Dims... dims) : array(allocate_tag{}, dims...)
+    requires valid_extents_for<N, Dims...>
+  array(generated_t, F f, Dims... dims) : array(allocate_tag{}, dims...)
   {
     try {
       // XXX generate is not in standard
@@ -230,8 +233,8 @@ public:
 
   /// \group constructors
   template <ranges::range Rng>
-  requires(!common_array<Rng>) explicit array(const Rng& rng)
-    : ref_array<value_type, order>{this->allocate(ranges::size(rng)), {{{ranges::size(rng)}}}}
+    requires(!common_array<Rng>)
+  explicit array(const Rng& rng) : ref_array<value_type, order>{this->allocate(ranges::size(rng)), {{{ranges::size(rng)}}}}
   {
     static_assert(order == 1u, "Only vectors can be initialized from a range");
     static_assert(std::is_constructible<value_type, std::iter_reference_t<ranges::iterator_t<Rng>>>::value,
@@ -373,7 +376,7 @@ public:
 private:
   /// \exclude
   template <typename... Dims>
-  requires valid_extents_for<N, Dims...>
+    requires valid_extents_for<N, Dims...>
   explicit array(allocate_tag, Dims... dims)
     : ref_array<value_type, order>{this->allocate(prod_args(dims...)), {{{static_cast<index_t>(dims)...}}}}
   {}
