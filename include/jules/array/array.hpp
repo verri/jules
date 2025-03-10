@@ -149,7 +149,7 @@ public:
   ///   \exclude
   /// \tparam _
   ///   \exclude
-  template <typename It, typename... Dims, typename R = ranges::iter_value_t<It>>
+  template <typename It, typename... Dims, typename R = std::iter_value_t<It>>
   requires valid_extents_for<N, Dims...> array(It it, Dims... dims) : array(allocate_tag{}, dims...)
   {
     try {
@@ -165,8 +165,13 @@ public:
   requires valid_extents_for<N, Dims...> array(generated_t, F f, Dims... dims) : array(allocate_tag{}, dims...)
   {
     try {
-      auto generator = ranges::views::generate(std::move(f)) | ranges::views::common;
-      this->construct(this->data(), ranges::begin(generator), this->size());
+      // XXX generate is not in standard
+      // auto generator = std::views::generate(std::move(f)) | ranges::views::common;
+      std::vector<R> values;
+      values.reserve(this->size());
+      std::generate_n(std::back_inserter(values), this->size(), std::move(f));
+
+      this->construct(this->data(), values.begin(), this->size());
     } catch (...) {
       this->deallocate(this->data(), this->size());
       this->data_ = nullptr;
@@ -229,7 +234,7 @@ public:
     : ref_array<value_type, order>{this->allocate(ranges::size(rng)), {{{ranges::size(rng)}}}}
   {
     static_assert(order == 1u, "Only vectors can be initialized from a range");
-    static_assert(std::is_constructible<value_type, ranges::iter_reference_t<ranges::iterator_t<Rng>>>::value,
+    static_assert(std::is_constructible<value_type, std::iter_reference_t<ranges::iterator_t<Rng>>>::value,
                   "incompatible value types");
     try {
       this->construct(this->data(), ranges::begin(rng), this->size());
@@ -241,13 +246,13 @@ public:
   }
 
   /// \group constructors
-  template <ranges::forward_iterator Iter, ranges::sentinel_for<Iter> Sent>
+  template <std::forward_iterator Iter, std::sentinel_for<Iter> Sent>
   array(Iter begin, Sent end)
     : ref_array<value_type, order>{this->allocate(ranges::distance(begin, end)),
                                    {{{static_cast<size_type>(ranges::distance(begin, end))}}}}
   {
     static_assert(order == 1u, "Only vectors can be initialized from a pair of iterators");
-    static_assert(std::is_constructible<value_type, ranges::iter_reference_t<Iter>>::value, "incompatible value types");
+    static_assert(std::is_constructible<value_type, std::iter_reference_t<Iter>>::value, "incompatible value types");
     try {
       this->construct(this->data(), begin, this->size());
     } catch (...) {

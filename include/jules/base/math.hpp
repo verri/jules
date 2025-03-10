@@ -206,7 +206,7 @@ constexpr auto vpdf = overloaded{
 
 constexpr auto replace_missing = []<typename T>(T value) {
   return unary_operator([value = std::move(value)]<typename U>(const std::optional<U>& x) -> U {
-    static_assert(convertible_to<T, U>);
+    static_assert(std::convertible_to<T, U>);
     return x.value_or(value);
   });
 };

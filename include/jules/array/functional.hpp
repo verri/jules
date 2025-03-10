@@ -10,6 +10,7 @@
 #include <jules/base/math.hpp>
 #include <jules/core/debug.hpp>
 
+#include <compare>
 #include <functional>
 
 // TODO: better names for left_operation and right_operation
@@ -52,7 +53,7 @@ struct array_apply
 
   template <typename T, std::size_t N, typename Op> auto operator()(array<T, N>&& operand, Op op) const
   {
-    if constexpr (same_as<std::decay_t<decltype(op(std::declval<T>()))>, T>) {
+    if constexpr (std::same_as<std::decay_t<decltype(op(std::declval<T>()))>, T>) {
       (*this)(in_place, operand, std::move(op));
       return array<T, N>(std::move(operand));
     } else {
@@ -155,7 +156,7 @@ template <typename LhsIt, typename RhsIt, typename Op, std::size_t N> struct app
   template <typename ArrayA, typename ArrayB,                                                                                    \
             typename R = std::result_of_t<FUNCTOR__(const typename ArrayA::value_type&, const typename ArrayB::value_type&)>>    \
   requires common_array<ArrayA> && common_array<ArrayB>                                                                          \
-  auto operator OP__(const ArrayA& lhs, const ArrayB& rhs) { return apply(lhs, rhs, FUNCTOR__{}); }
+  auto operator OP__(const ArrayA& lhs, const ArrayB& rhs) { return ::jules::apply(lhs, rhs, FUNCTOR__{}); }
 
 #define BINARY_INPLACE_REF_OPERATION(OP__)                                                                                       \
   template <reference_array RefArrayA, common_array ArrayB,                                                                      \
@@ -163,7 +164,7 @@ template <typename LhsIt, typename RhsIt, typename Op, std::size_t N> struct app
                                   std::declval<const typename ArrayB::value_type&>())>                                           \
   auto operator OP__##=(RefArrayA lhs, const ArrayB& rhs)                                                                        \
   {                                                                                                                              \
-    return apply(in_place, lhs, rhs, [](auto& x, const auto& y) { x OP__## = y; });                                              \
+    return ::jules::apply(in_place, lhs, rhs, [](auto& x, const auto& y) { x OP__## = y; });                                              \
   }
 
 #define BINARY_INPLACE_OPERATION(OP__)                                                                                           \
@@ -171,7 +172,7 @@ template <typename LhsIt, typename RhsIt, typename Op, std::size_t N> struct app
             typename = decltype(std::declval<T&>() OP__## = std::declval<const typename ArrayB::value_type&>())>                 \
   auto operator OP__##=(array<T, N>& lhs, const ArrayB& rhs)->array<T, N>&                                                       \
   {                                                                                                                              \
-    return apply(in_place, lhs, rhs, [](auto& x, const auto& y) { x OP__## = y; });                                              \
+    return ::jules::apply(in_place, lhs, rhs, [](auto& x, const auto& y) { x OP__## = y; });                                              \
   }
 
 #define BINARY_RIGHT_TYPE_OPERATION(OP__, FUNCTOR__)                                                                             \
@@ -179,7 +180,7 @@ template <typename LhsIt, typename RhsIt, typename Op, std::size_t N> struct app
             typename R = std::result_of_t<FUNCTOR__(const typename Array::value_type&, const T&)>>                               \
   requires(!common_array<T>) auto operator OP__(const Array& lhs, T rhs)                                                         \
   {                                                                                                                              \
-    return apply(lhs, right_operation<T, FUNCTOR__>{std::move(rhs), {}});                                                        \
+    return ::jules::apply(lhs, right_operation<T, FUNCTOR__>{std::move(rhs), {}});                                                        \
   }
 
 #define BINARY_LEFT_TYPE_OPERATION(OP__, FUNCTOR__)                                                                              \
@@ -187,7 +188,7 @@ template <typename LhsIt, typename RhsIt, typename Op, std::size_t N> struct app
             typename R = std::result_of_t<FUNCTOR__(const T&, const typename Array::value_type&)>>                               \
   requires(!common_array<T>) auto operator OP__(T lhs, const Array& rhs)                                                         \
   {                                                                                                                              \
-    return apply(rhs, left_operation<T, FUNCTOR__>{std::move(lhs), {}});                                                         \
+    return ::jules::apply(rhs, left_operation<T, FUNCTOR__>{std::move(lhs), {}});                                                         \
   }
 
 #define BINARY_INPLACE_REF_TYPE_OPERATION(OP__)                                                                                  \
@@ -195,14 +196,14 @@ template <typename LhsIt, typename RhsIt, typename Op, std::size_t N> struct app
             typename = decltype(std::declval<typename RefArray::value_type&>() OP__## = std::declval<const T&>())>               \
   requires(!common_array<T>) auto operator OP__##=(RefArray lhs, const T& rhs)                                                   \
   {                                                                                                                              \
-    return apply(in_place, lhs, [&rhs](auto& x) { x OP__## = rhs; });                                                            \
+    return ::jules::apply(in_place, lhs, [&rhs](auto& x) { x OP__## = rhs; });                                                            \
   }
 
 #define BINARY_INPLACE_TYPE_OPERATION(OP__)                                                                                      \
   template <typename T, std::size_t N, typename U, typename = decltype(std::declval<T&>() OP__## = std::declval<const U&>())>    \
   requires(!common_array<U>) auto operator OP__##=(array<T, N>& lhs, const U& rhs)->array<T, N>&                                 \
   {                                                                                                                              \
-    return apply(in_place, lhs, [&rhs](auto& x) { x OP__## = rhs; });                                                            \
+    return ::jules::apply(in_place, lhs, [&rhs](auto& x) { x OP__## = rhs; });                                                            \
   }
 
 #define UNARY_OPERATIONS_LIST                                                                                                    \
@@ -210,7 +211,7 @@ template <typename LhsIt, typename RhsIt, typename Op, std::size_t N> struct app
   UNARY_OPERATION(!, std::logical_not<>)
 
 #define UNARY_OPERATION(OP__, FUNCTOR__)                                                                                         \
-  template <common_array Array> auto operator OP__(const Array& operand) { return apply(operand, FUNCTOR__{}); }
+  template <common_array Array> auto operator OP__(const Array& operand) { return ::jules::apply(operand, FUNCTOR__{}); }
 
 OPERATIONS_LIST
 

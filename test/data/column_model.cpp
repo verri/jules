@@ -5,6 +5,8 @@
 #include <catch2/catch_approx.hpp>
 using Catch::Approx;
 
+#include <numeric>
+
 TEST_CASE("Column model", "[data]")
 {
   using namespace jules;
@@ -108,7 +110,7 @@ TEST_CASE("Column model sanity conversions", "[data]")
   {};
 
   static_assert(coercible_to<uinteger, coercion_rules, string>);
-  static_assert(convertible_to<Foo, string>);
+  static_assert(std::convertible_to<Foo, string>);
   static_assert(coercible_to<Foo, coercion_rules, string>);
 
   const auto str_column = column_ptr{new column_model<string, coercion_rules>{"1"_s, "-1"_s}};

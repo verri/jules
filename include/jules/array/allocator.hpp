@@ -6,7 +6,7 @@
 #include <jules/array/descriptor.hpp>
 #include <jules/core/type.hpp>
 
-#include <array>
+#include <cstddef>
 #include <iterator>
 #include <memory>
 #include <new>
@@ -19,14 +19,12 @@ template <typename T> struct array_allocator
 {
   using value_type = T;
 
-  using storage_type = std::aligned_storage_t<sizeof(value_type), alignof(value_type)>;
-
   static auto allocate(index_t size) -> value_type*
   {
-    return std::launder(reinterpret_cast<value_type*>(new storage_type[size]));
+    return std::launder(reinterpret_cast<value_type*>(new (std::align_val_t(alignof(T))) std::byte[size * sizeof(T)]));
   }
 
-  static auto deallocate(value_type* data, index_t) noexcept { delete[] std::launder(reinterpret_cast<storage_type*>(data)); }
+  static auto deallocate(value_type* data, index_t) noexcept { operator delete[](std::launder(reinterpret_cast<std::byte*>(data)), std::align_val_t(alignof(T))); }
 
   template <typename... Args>
   static auto construct(value_type* data, index_t size) noexcept(std::is_nothrow_constructible_v<value_type>)
@@ -35,14 +33,14 @@ template <typename T> struct array_allocator
   }
 
   template <typename U>
-  requires constructible_from<value_type, const U&>
+  requires std::constructible_from<value_type, const U&>
   static auto construct(value_type* to, index_t size,
                         const U& value) noexcept(std::is_nothrow_constructible_v<value_type, const U&>)
   {
     std::uninitialized_fill_n(to, size, value);
   }
 
-  template <typename It, typename U = typename ranges::iter_reference_t<It>>
+  template <typename It, typename U = typename std::iter_reference_t<It>>
   static auto construct(value_type* to, It from, index_t size) noexcept(std::is_nothrow_constructible_v<value_type, U>)
   {
     std::uninitialized_copy_n(from, size, to);

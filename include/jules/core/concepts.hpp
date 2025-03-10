@@ -4,15 +4,14 @@
 /// \exclude
 #define JULES_CORE_CONCEPTS_H
 
-#include <concepts/concepts.hpp>
-#include <range/v3/range/concepts.hpp>
-
+#include <concepts>
+#include <ranges>
 #include <type_traits>
+#include <utility>
 
 namespace jules
 {
 
-using namespace concepts;
 template <typename T>
 concept floating_point = std::is_floating_point_v<T>;
 
@@ -26,13 +25,13 @@ template <typename T, typename... Us> struct holds_type<T, std::tuple<Us...>> : 
 template <typename T>
 concept adl_convertible_to_string = requires(const T& value)
 {
-  { to_string(value) } -> convertible_to<std::string>;
+  { to_string(value) } -> std::convertible_to<std::string>;
 };
 
 template <typename T>
 concept std_convertible_to_string = requires(const T& value)
 {
-  { std::to_string(value) } -> convertible_to<std::string>;
+  { std::to_string(value) } -> std::convertible_to<std::string>;
 };
 
 template <typename T>
@@ -42,11 +41,11 @@ template <typename C, typename T>
 concept contiguous_of = requires(const C& c)
 {
   typename C::value_type;
-  requires same_as<typename C::value_type, T>;
+  requires std::same_as<typename C::value_type, T>;
 
-  requires ranges::range<C>;
-  { std::as_const(c).data() } -> same_as<const T*>;
-  { std::as_const(c).size() } -> convertible_to<std::size_t>;
+  requires std::ranges::range<C>;
+  { std::as_const(c).data() } -> std::same_as<const T*>;
+  { std::as_const(c).size() } -> std::convertible_to<std::size_t>;
 };
 
 template <typename C, typename T>

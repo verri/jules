@@ -45,10 +45,7 @@ public:
   auto sample(index_t n, Dist& dist, C result = container<T>{}) -> C
   {
     result.reserve(result.size() + n);
-
-    auto rng = ranges::views::generate_n([&] { return dist(rng_); }, n);
-    ranges::copy(ranges::begin(rng), ranges::end(rng), ranges::back_inserter(result));
-
+    std::generate_n(std::back_inserter(result), n, [&] { return dist(rng_); });
     return result;
   }
 
@@ -59,9 +56,7 @@ public:
   template <container_for<numeric> C = container<numeric>> auto canon_sample(index_t n, C result = container<numeric>{}) -> C
   {
     result.reserve(result.size() + n);
-
-    auto rng = ranges::views::generate_n([&] { return this->canon_sample(); }, n);
-    ranges::copy(ranges::begin(rng), ranges::end(rng), ranges::back_inserter(result));
+    std::generate_n(std::back_inserter(result), n, [&] { return this->canon_sample(); });
 
     return result;
   }

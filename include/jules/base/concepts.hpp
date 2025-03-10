@@ -6,6 +6,8 @@
 
 #include <jules/core/concepts.hpp>
 #include <jules/core/type.hpp>
+
+#include <concepts>
 #include <type_traits>
 #include <utility>
 
@@ -20,34 +22,34 @@ template <typename T> struct apply_traits
 // clang-format off
 template <typename Op, typename T, typename Apply = typename apply_traits<std::decay_t<T>>::apply_type>
 concept applies_to =
-  (!same_as<void, Apply>) && std::is_trivial_v<Apply> &&
+  (!std::same_as<void, Apply>) && std::is_trivial_v<Apply> &&
   requires(T value, Op op, const Apply apply) {
     { Apply{} } noexcept;
-    { apply(std::forward<T>(value), std::move(op)) };
+    { apply(value, std::move(op)) };
   };
 
 template <typename Op, typename T, typename U, typename Apply = typename apply_traits<std::decay_t<T>>::apply_type>
 concept applies_to_by =
-  (!same_as<void, Apply>) && std::is_trivial_v<Apply> &&
-  requires(T&& lhs, U&& rhs, Op op, const Apply apply) {
+  (!std::same_as<void, Apply>) && std::is_trivial_v<Apply> &&
+  requires(const T& lhs, const U& rhs, Op op, const Apply apply) {
     { Apply{} } noexcept;
-    { apply(std::forward<T>(lhs), std::forward<U>(rhs), std::move(op)) };
+    { apply(lhs, rhs, std::move(op)) };
   };
 
 template <typename Op, typename T, typename Apply = typename apply_traits<std::decay_t<T>>::apply_type>
 concept applies_in_place_to =
-  (!same_as<void, Apply>) && std::is_trivial_v<Apply> &&
-  requires(T value, Op op, const Apply apply) {
+  (!std::same_as<void, Apply>) && std::is_trivial_v<Apply> &&
+  requires(T& value, Op op, const Apply apply) {
     { Apply{} } noexcept;
-    { apply(in_place, std::forward<T>(value), std::move(op)) };
+    { apply(in_place, value, std::move(op)) };
   };
 
 template <typename Op, typename T, typename U, typename Apply = typename apply_traits<std::decay_t<T>>::apply_type>
 concept applies_in_place_to_by =
-  (!same_as<void, Apply>) && std::is_trivial_v<Apply> &&
-  requires(T lhs, U rhs, Op op, const Apply apply) {
+  (!std::same_as<void, Apply>) && std::is_trivial_v<Apply> &&
+  requires(T& lhs, U rhs, Op op, const Apply apply) {
     { Apply{} } noexcept;
-    { apply(in_place, std::forward<T>(lhs), std::forward<U>(rhs), std::move(op)) };
+    { apply(in_place, lhs, rhs, std::move(op)) };
   };
 // clang-format on
 

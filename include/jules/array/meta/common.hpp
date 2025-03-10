@@ -13,7 +13,7 @@ namespace jules
 
 // clang-format off
 template <std::size_t N, typename... Dims>
-concept valid_extents_for = (sizeof...(Dims) == N) && (convertible_to<Dims, index_t> && ...);
+concept valid_extents_for = (sizeof...(Dims) == N) && (std::convertible_to<Dims, index_t> && ...);
 
 template <typename T> concept common_array = requires(const T& t)
 {
@@ -22,11 +22,11 @@ template <typename T> concept common_array = requires(const T& t)
   typename T::value_type;
   typename T::size_type;
 
-  { T::order } -> convertible_to<typename T::size_type>;
+  { T::order } -> std::convertible_to<typename T::size_type>;
   requires T::order > 0u;
 
-  { t.size() } -> same_as<typename T::size_type>;
-  { t.dimensions() } -> same_as<std::array<typename T::size_type, T::order>>;
+  { t.size() } -> std::same_as<typename T::size_type>;
+  { t.dimensions() } -> std::same_as<std::array<typename T::size_type, T::order>>;
 };
 // clang-format on
 

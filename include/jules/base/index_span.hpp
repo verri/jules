@@ -4,9 +4,10 @@
 /// \exclude
 #define JULES_BASE_INDEX_SPAN_H
 
-#include "range/v3/range/traits.hpp"
+#include <iterator>
 #include <jules/core/concepts.hpp>
 #include <jules/core/type.hpp>
+#include <ranges>
 
 namespace jules
 {
@@ -35,10 +36,10 @@ public:
     : index_span(container.data(), container.data() + container.size())
   {}
 
-  template <ranges::range Rng>
-  requires convertible_to < ranges::range_common_iterator_t<Rng>,
+  template <std::ranges::range Rng>
+  requires std::convertible_to < std::common_iterator<std::ranges::iterator_t<Rng>, std::ranges::sentinel_t<Rng>>,
   const index_t* > &&(!contiguous_of<Rng, index_t>)constexpr index_span(const Rng& rng) noexcept
-    : index_span(ranges::begin(rng), ranges::end(rng))
+    : index_span(std::ranges::begin(rng), std::ranges::end(rng))
   {}
 
   [[nodiscard]] constexpr auto begin() const noexcept -> const_iterator { return begin_; }

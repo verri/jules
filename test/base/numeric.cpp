@@ -51,8 +51,8 @@ TEST_CASE("Base numeric utilities", "[numeric]")
     CHECK(sd(a) == Approx(std::sqrt(6 / 3)));
     CHECK(sd(b) == Approx(std::sqrt(6 / 3)));
 
-    CHECK(std::tuple(mean(a), sd(a)) == meansd(a));
-    CHECK(std::tuple(mean(b), sd(b)) == meansd(b));
+    CHECK((std::tuple(mean(a), sd(a)) == meansd(a)));
+    CHECK((std::tuple(mean(b), sd(b)) == meansd(b)));
 
     CHECK(prod(a.begin(), a.end()) == 24);
     CHECK(prod(a) == 24);

@@ -55,7 +55,7 @@ auto product(const ArrayA& lhs, const ArrayB& rhs) -> array<R, 2u>
 
 template <typename T> auto to_vector(const common_array auto& source) -> array<T, 1u> { return {source.begin(), source.end()}; }
 
-template <typename T, same_as<T> U, std::size_t N> auto to_vector(array<U, N>&& source) noexcept -> array<T, 1u>
+template <typename T, std::same_as<T> U, std::size_t N> auto to_vector(array<U, N>&& source) noexcept -> array<T, 1u>
 {
   return array_builder<T, 1>(std::move(source).release(), {{source.size()}});
 }
@@ -74,7 +74,7 @@ template <typename T, std::size_t N> auto as_vector(array<T, N>&& source) noexce
   return array_builder<T, 1>(std::move(source).release(), {{source.size()}});
 }
 
-template <ranges::range Rng, typename R = ranges::range_value_t<Rng>> auto as_vector(const Rng& rng) -> array<R, 1u>
+template <ranges::range Rng, typename R = std::ranges::range_value_t<Rng>> auto as_vector(const Rng& rng) -> array<R, 1u>
 {
   return to_vector<R>(rng);
 }
@@ -89,7 +89,7 @@ template <typename T> struct cat_value_type
 
 template <ranges::range T> struct cat_value_type<T>
 {
-  using type = ranges::value_type_t<T>;
+  using type = std::iter_value_t<T>;
 };
 
 template <typename T> using cat_value_type_t = typename cat_value_type<T>::type;
@@ -106,7 +106,7 @@ template <typename T> auto cat_push(array_builder<T, 1u>& builder, T value) { bu
 
 template <typename T, ranges::range Rng> auto cat_push(array_builder<T, 1u>& builder, const Rng& rng) -> void
 {
-  ranges::copy(rng, ranges::back_inserter(builder));
+  ranges::copy(rng, std::back_inserter(builder));
 }
 
 template <typename T, typename U>

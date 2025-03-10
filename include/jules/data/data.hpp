@@ -67,22 +67,22 @@ public:
   base_data(std::initializer_list<named_column_type> elements) : base_data(elements.begin(), elements.end(), elements.size()) {}
 
   template <ranges::range Rng, typename R = ranges::range_value_t<Rng>>
-  requires convertible_to<R, named_column_type> base_data(const Rng& rng)
+  requires std::convertible_to<R, named_column_type> base_data(const Rng& rng)
     : base_data(ranges::begin(rng), ranges::end(rng), ranges::size(rng))
   {}
 
-  template <ranges::input_iterator Iter, ranges::sentinel_for<Iter> Sent, typename R = ranges::iter_value_t<Iter>>
-  requires convertible_to<R, named_column_type> &&(!ranges::forward_iterator<Iter>)base_data(Iter first, Sent last)
+  template <std::input_iterator Iter, std::sentinel_for<Iter> Sent, typename R = std::iter_value_t<Iter>>
+  requires std::convertible_to<R, named_column_type> &&(!std::forward_iterator<Iter>)base_data(Iter first, Sent last)
     : base_data(first, last, 0u)
   {}
 
-  template <ranges::forward_iterator Iter, ranges::sentinel_for<Iter> Sent, typename R = ranges::iter_value_t<Iter>>
-  requires convertible_to<R, named_column_type> base_data(Iter first, Sent last)
+  template <std::forward_iterator Iter, std::sentinel_for<Iter> Sent, typename R = std::iter_value_t<Iter>>
+  requires std::convertible_to<R, named_column_type> base_data(Iter first, Sent last)
     : base_data(first, last, ranges::distance(first, last))
   {}
 
-  template <ranges::input_iterator Iter, ranges::sentinel_for<Iter> Sent, typename R = ranges::iter_value_t<Iter>>
-  requires convertible_to<R, named_column_type> base_data(Iter first, Sent last, index_t size_hint)
+  template <std::input_iterator Iter, std::sentinel_for<Iter> Sent, typename R = std::iter_value_t<Iter>>
+  requires std::convertible_to<R, named_column_type> base_data(Iter first, Sent last, index_t size_hint)
   {
     if (first == last)
       return;
@@ -131,12 +131,8 @@ public:
 
   static auto read(std::istream& is, read_options opt = {}) -> base_data
   {
-    namespace view = ::jules::ranges::views;
-
     if (!is)
       return {};
-
-    const auto as_range = [](auto&& match) { return ranges::make_subrange(match.first, match.second); };
 
     auto raw_data = std::string();
     raw_data.assign(std::istreambuf_iterator<char>(is), std::istreambuf_iterator<char>());
@@ -144,15 +140,20 @@ public:
     auto data = container<string>();
     auto ncol = index_t{0u};
 
-    auto line_range = raw_data | view::tokenize(opt.line.regex, opt.line.separator ? -1 : 0, opt.line.flag);
+    auto line_begin = std::sregex_token_iterator(raw_data.begin(), raw_data.end(), opt.line.regex, opt.line.separator ? -1 : 0, opt.line.flag);
+    auto line_end = std::sregex_token_iterator();
+    auto line_range = ranges::subrange(line_begin, line_end);
 
     auto last_size = index_t{0u};
     for (auto&& line : line_range) {
       if (line.first == line.second)
         continue;
 
-      const auto cells = as_range(line) | view::tokenize(opt.cell.regex, opt.cell.separator ? -1 : 0, opt.cell.flag);
-      ranges::transform(cells, ranges::back_inserter(data), [](const auto& match) -> string {
+
+      auto cells_begin = std::sregex_token_iterator(line.first, line.second, opt.cell.regex, opt.cell.separator ? -1 : 0, opt.cell.flag);
+      auto cells_end = std::sregex_token_iterator();
+      const auto cells = ranges::subrange(cells_begin, cells_end);
+      ranges::transform(cells, std::back_inserter(data), [](const auto& match) -> string {
         std::string_view sv(&*match.first, match.length());
         return trim(string(sv));
       });
@@ -180,13 +181,13 @@ public:
 
     // optional header and data
     for (auto j : indices(ncol)) {
-      auto col_data = ranges::make_subrange(data.begin() + j + (opt.header ? ncol : 0), data.end()) | view::stride(ncol) |
-                      view::transform([&opt](const std::string_view& match) -> std::optional<string> {
+      auto col_data = ranges::subrange(data.begin() + j + (opt.header ? ncol : 0), data.end()) | std::views::stride(ncol) |
+                      std::views::transform([&opt](const std::string_view& match) -> std::optional<string> {
                         if (match.empty() || match == opt.na.view())
                           return std::nullopt;
                         return string(match);
                       });
-      auto col = column_type(col_data | view::move);
+      auto col = column_type(col_data);
       df.bind(named_column_type{opt.header ? string(data[j]) : string(), std::move(col)});
     }
 

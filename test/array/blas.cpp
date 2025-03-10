@@ -5,8 +5,7 @@
 
 TEST_CASE("Matrix multiplication", "[blas]")
 {
-  namespace view = jules::ranges::views;
-  const auto values = jules::as_vector(view::indices(128u) | view::transform([](auto i) -> double { return i; }));
+  const auto values = jules::to_vector<double>(jules::indices(128u));
 
   const auto a = jules::matrix<>(values.begin(), 8u, 16u);
   const auto b = jules::matrix<>(values.begin(), 16u, 8u);

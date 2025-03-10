@@ -47,7 +47,7 @@ struct coercion_rules
     return boost::numeric_cast<index_t>(boost::lexical_cast<distance_t>(view.data(), view.size()));
   }
 
-  template <integral T> [[nodiscard]] auto coerce(tag<T>, tag<string>, const T& value) const -> string
+  template <std::integral T> [[nodiscard]] auto coerce(tag<T>, tag<string>, const T& value) const -> string
   {
     return boost::lexical_cast<std::string>(value);
   }
@@ -58,16 +58,16 @@ struct coercion_rules
   }
 
   template <typename T, typename U>
-  requires(integral<T> || floating_point<T>) &&
-    (!same_as<T, U>)&&(same_as<U, numeric> || same_as<U, integer> || same_as<U, index_t>)
+  requires(std::integral<T> || floating_point<T>) &&
+    (!std::same_as<T, U>)&&(std::same_as<U, numeric> || std::same_as<U, integer> || std::same_as<U, index_t>)
       [[nodiscard]] auto coerce(tag<T>, tag<U>, const T& value) const -> U
   {
     return boost::numeric_cast<U>(value);
   }
 
   template <typename T, typename U>
-  requires convertible_to<T, U> &&(!same_as<T, U>)&&(!holds<types, T>)&&holds<types, U> &&
-    (!(integral<T> || floating_point<T>) || !(same_as<U, numeric> || same_as<U, integer> || same_as<U, index_t>))
+  requires std::convertible_to<T, U> &&(!std::same_as<T, U>)&&(!holds<types, T>)&&holds<types, U> &&
+    (!(std::integral<T> || floating_point<T>) || !(std::same_as<U, numeric> || std::same_as<U, integer> || std::same_as<U, index_t>))
       [[nodiscard]] auto coerce(tag<T>, tag<U>, const T& value) const -> U
   {
     return value;
@@ -83,7 +83,7 @@ template <typename T, typename Rules, typename U> concept coercible_to = require
   { Rules{} } noexcept;
   std::is_trivial_v<Rules>;
 
-  { rules.coerce(tag<T>{}, tag<U>{}, value) } -> same_as<U>;
+  { rules.coerce(tag<T>{}, tag<U>{}, value) } -> std::same_as<U>;
 };
 // clang-format on
 

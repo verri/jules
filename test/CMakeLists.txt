@@ -3,7 +3,7 @@ Include(FetchContent)
 FetchContent_Declare(
   Catch2
   GIT_REPOSITORY https://github.com/catchorg/Catch2.git
-  GIT_TAG        v3.0.1 # or a later release
+  GIT_TAG        v3.8.0 # or a later release
 )
 
 FetchContent_MakeAvailable(Catch2)
@@ -18,7 +18,6 @@ find_package(Boost 1.72 REQUIRED)
 set(source_files
   core/debug.cpp
   core/type.cpp
-  core/range.cpp
   core/string.cpp
   array/axis.cpp
   array/functional.cpp

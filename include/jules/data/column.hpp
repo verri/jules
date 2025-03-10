@@ -69,7 +69,7 @@ public:
     : model_{std::make_unique<model_t<detail::remove_optional_t<R>>>(ranges::begin(rng), ranges::end(rng))}
   {}
 
-  template <ranges::forward_iterator Iter, ranges::sentinel_for<Iter> Sent, typename R = ranges::iter_value_t<Iter>>
+  template <std::forward_iterator Iter, std::sentinel_for<Iter> Sent, typename R = std::iter_value_t<Iter>>
   base_column(Iter first, Sent last) : model_{std::make_unique<model_t<detail::remove_optional_t<R>>>(first, last)}
   {}
 

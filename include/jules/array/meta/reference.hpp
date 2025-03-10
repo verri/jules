@@ -16,7 +16,7 @@ namespace jules
 // clang-format off
 template <typename T> concept exposes_data = requires(T t)
 {
-  { t.data() } -> same_as<typename T::value_type*>;
+  { t.data() } -> std::same_as<typename T::value_type*>;
 };
 
 template <typename T>

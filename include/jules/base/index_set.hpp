@@ -16,6 +16,7 @@
 #include <jules/core/type.hpp>
 
 #include <algorithm>
+#include <iterator>
 #include <type_traits>
 #include <utility>
 
@@ -68,7 +69,7 @@ template <ranges::range RngX, ranges::range RngY, container_for<index_t> C = con
 auto set_union(const RngX& x, const RngY& y, C c = container<index_t>{}) -> C
 {
   c.reserve(c.size() + std::max(x.size(), y.size())); // underestimate (at most 1 reallocation)
-  std::set_union(ranges::begin(x), ranges::end(x), ranges::begin(y), ranges::end(y), ranges::back_inserter(c));
+  std::set_union(ranges::begin(x), ranges::end(x), ranges::begin(y), ranges::end(y), std::back_inserter(c));
   return c;
 }
 
@@ -76,7 +77,7 @@ template <ranges::range RngX, ranges::range RngY, container_for<index_t> C = con
 auto set_intersection(const RngX& x, const RngY& y, C c = container<index_t>{}) -> C
 {
   c.reserve(c.size() + std::min(x.size(), y.size())); // overestimate (at most one reallocation to fit)
-  std::set_intersection(ranges::begin(x), ranges::end(x), ranges::begin(y), ranges::end(y), ranges::back_inserter(c));
+  std::set_intersection(ranges::begin(x), ranges::end(x), ranges::begin(y), ranges::end(y), std::back_inserter(c));
   c.shrink_to_fit();
   return c;
 }
@@ -85,7 +86,7 @@ template <ranges::range RngX, ranges::range RngY, container_for<index_t> C = con
 auto set_difference(const RngX& x, const RngY& y, C c = container<index_t>{}) -> C
 {
   c.reserve(c.size() + x.size()); // overestimate (at most one reallocation to fit)
-  std::set_difference(ranges::begin(x), ranges::end(x), ranges::begin(y), ranges::end(y), ranges::back_inserter(c));
+  std::set_difference(ranges::begin(x), ranges::end(x), ranges::begin(y), ranges::end(y), std::back_inserter(c));
   c.shrink_to_fit();
   return c;
 }

@@ -11,6 +11,7 @@
 #include <jules/array/slicing/bounded.hpp>
 #include <jules/array/strided_descriptor.hpp>
 
+#include <ranges>
 #include <stdexcept>
 #include <type_traits>
 #include <utility>
@@ -88,8 +89,9 @@ template <std::size_t N, typename Descriptor, typename... Tail>
 auto slicing_fill(container<index_t>& map, const Descriptor& descriptor, std::array<index_t, N> args,
                   absolute_strided_slice index, Tail... tail)
 {
-  auto indexes = ranges::views::ints(index.start(), ranges::unreachable) | ranges::views::stride(index.stride()) |
+  auto indexes = std::views::iota(index.start()) | std::views::stride(index.stride()) |
                  ranges::views::take(index.extent());
+
   for (const auto i : indexes) {
     if constexpr (sizeof...(Tail) == 0)
       map.push_back(descriptor(detail::array_cat(i, args)));
