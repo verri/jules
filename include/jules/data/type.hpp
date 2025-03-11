@@ -82,7 +82,7 @@ struct coercion_rules
 template <typename T, typename Rules, typename U> concept coercible_to = requires(const Rules rules, const T& value)
 {
   typename Rules::types;
-  holds<typename Rules::types, U>;
+  requires holds<typename Rules::types, U>;
 
   { Rules{} } noexcept;
   std::is_trivial_v<Rules>;

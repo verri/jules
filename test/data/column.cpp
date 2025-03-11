@@ -81,6 +81,7 @@ TEST_CASE("Column constructor inference", "[data]")
 
 TEST_CASE("Temporary columns", "[data]")
 {
+  // XXX: GCC fails, probably something related to inheritance.
   using jules::numeric;
 
   auto col = jules::column{1, 2, 3, 4, 5};

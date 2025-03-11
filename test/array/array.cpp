@@ -42,7 +42,7 @@ TEST_CASE("Basic array functionalities", "[array]")
   // array<int, 2> matrix10(3, 4u, 5u, 4u); // shouldn't not compile
 
   array vector1 = matrix3[3][every][every]; // copy last line
-  CHECK(all(vector1 == matrix3[3][every][every]));
+  CHECK((all(vector1 == matrix3[3][every][every])));
 
   matrix3[3][every][every] = 0;
   x[3] = x[7] = x[11] = x[15] = x[19] = 0;

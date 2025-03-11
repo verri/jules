@@ -192,7 +192,12 @@ public:
       throw std::bad_cast{};
   }
 
-  auto shrink_to_fit() -> void final { container<std::optional<T>>::shrink_to_fit(); }
+  auto shrink_to_fit() -> void final {
+#if !defined(__GNUC__)
+    container<std::optional<T>>::shrink_to_fit();
+#endif
+    // XXX: GCC fails, probably something related to inheritance. We must simplify that.
+  }
 
   [[nodiscard]] auto size() const noexcept -> index_t final { return container<std::optional<T>>::size(); }
 
