@@ -1,4 +1,4 @@
-// Copyright (c) 2020 Filipe Verri <filipeverri@gmail.com>
+// Copyright (c) 2020-2025 Filipe Verri <filipeverri@gmail.com>
 
 #ifndef JULES_CORE_STRING_H
 /// \exclude
@@ -7,7 +7,7 @@
 #include <algorithm>
 #include <array>
 #include <iosfwd>
-#include <memory>
+#include <string>
 #include <string_view>
 #include <utility>
 
@@ -51,7 +51,7 @@ public:
 
   template <std::size_t M> constexpr sso_string(const char (&source)[M]) : sso_string(std::string_view{source}) {}
 
-  constexpr sso_string(const std::string& source) : sso_string(std::string_view{source}) {}
+  constexpr sso_string(const std::string& source) : sso_string(static_cast<std::string_view>(source)) {}
 
   constexpr auto operator=(const sso_string& source) -> sso_string&
   {

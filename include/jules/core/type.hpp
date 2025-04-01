@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2020 Filipe Verri <filipeverri@gmail.com>
+// Copyright (c) 2017-2025 Filipe Verri <filipeverri@gmail.com>
 
 #ifndef JULES_CORE_TYPE_H
 /// \exclude
@@ -9,7 +9,6 @@
 
 #include <initializer_list>
 #include <limits>
-#include <stdexcept>
 #include <type_traits>
 #include <utility>
 #include <vector>
@@ -27,7 +26,7 @@ constexpr auto infinity = std::numeric_limits<numeric>::infinity();
 
 /// Standard string type.
 ///
-/// Small-string optimized tyeiG6dec6pe that do not behave as a range.
+/// Small-string optimized type that do not behave as a range.
 ///
 /// \module Basic Types
 

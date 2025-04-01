@@ -1,4 +1,4 @@
-// Copyright (c) 2016-2020 Filipe Verri <filipeverri@gmail.com>
+// Copyright (c) 2016-2025 Filipe Verri <filipeverri@gmail.com>
 
 #ifndef JULES_DATAFRAME_DETAIL_COLUMN_MODEL_H
 #define JULES_DATAFRAME_DETAIL_COLUMN_MODEL_H
@@ -7,6 +7,7 @@
 #include <jules/data/type.hpp>
 
 #include <any>
+#include <memory>
 #include <optional>
 #include <typeindex>
 

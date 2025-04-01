@@ -1,4 +1,4 @@
-// Copyright (c) 2020 Filipe Verri <filipeverri@gmail.com>
+// Copyright (c) 2020-2025 Filipe Verri <filipeverri@gmail.com>
 
 #ifndef JULES_DATAFRAME_TYPE_H
 /// \exclude
@@ -55,13 +55,13 @@ struct coercion_rules
     return boost::lexical_cast<std::string>(value);
   }
 
-  template <floating_point T> [[nodiscard]] auto coerce(tag<T>, tag<string>, const T& value) const -> string
+  template <std::floating_point T> [[nodiscard]] auto coerce(tag<T>, tag<string>, const T& value) const -> string
   {
     return boost::lexical_cast<std::string>(value);
   }
 
   template <typename T, typename U>
-    requires(std::integral<T> || floating_point<T>) && (!std::same_as<T, U>) &&
+    requires(std::integral<T> || std::floating_point<T>) && (!std::same_as<T, U>) &&
             (std::same_as<U, numeric> || std::same_as<U, integer> || std::same_as<U, index_t>)
   [[nodiscard]] auto coerce(tag<T>, tag<U>, const T& value) const -> U
   {
@@ -70,7 +70,7 @@ struct coercion_rules
 
   template <typename T, typename U>
     requires std::convertible_to<T, U> && (!std::same_as<T, U>) && (!holds<types, T>) && holds<types, U> &&
-             (!(std::integral<T> || floating_point<T>) ||
+             (!(std::integral<T> || std::floating_point<T>) ||
               !(std::same_as<U, numeric> || std::same_as<U, integer> || std::same_as<U, index_t>))
   [[nodiscard]] auto coerce(tag<T>, tag<U>, const T& value) const -> U
   {

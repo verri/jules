@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2020 Filipe Verri <filipeverri@gmail.com>
+// Copyright (c) 2017-2025 Filipe Verri <filipeverri@gmail.com>
 
 #ifndef JULES_CORE_CONCEPTS_H
 /// \exclude
@@ -11,9 +11,6 @@
 
 namespace jules
 {
-
-template <typename T>
-concept floating_point = std::is_floating_point_v<T>;
 
 template <typename T, typename Tuple> struct holds_type : std::false_type
 {};

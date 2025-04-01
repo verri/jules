@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2020 Filipe Verri <filipeverri@gmail.com>
+// Copyright (c) 2017-2025 Filipe Verri <filipeverri@gmail.com>
 
 #ifndef JULES_CORE_RANGE_H
 /// \exclude
@@ -16,8 +16,6 @@ namespace ranges
 using namespace std::ranges;
 }
 
-namespace detail
-{
 template <typename T> class index_iterator
 {
 public:
@@ -57,25 +55,24 @@ public:
 private:
   T value_;
 };
-} // namespace detail
 
 template <std::integral T> class indices_t
 {
 public:
   using value_type = T;
-  using iterator = detail::index_iterator<T>;
-  using const_iterator = detail::index_iterator<T>;
+  using iterator = index_iterator<T>;
+  using const_iterator = index_iterator<T>;
   using difference_type = std::ptrdiff_t;
   using size_type = std::size_t;
 
   constexpr indices_t(T first, T last) noexcept : first_{first}, last_{last} {}
   constexpr indices_t(T last) noexcept : first_{0}, last_{last} {}
 
-  constexpr auto begin() const noexcept -> detail::index_iterator<T> { return first_; }
-  constexpr auto end() const noexcept -> detail::index_iterator<T> { return last_; }
+  constexpr auto begin() const noexcept -> index_iterator<T> { return first_; }
+  constexpr auto end() const noexcept -> index_iterator<T> { return last_; }
 
-  constexpr auto cbegin() const noexcept -> detail::index_iterator<T> { return first_; }
-  constexpr auto cend() const noexcept -> detail::index_iterator<T> { return last_; }
+  constexpr auto cbegin() const noexcept -> index_iterator<T> { return first_; }
+  constexpr auto cend() const noexcept -> index_iterator<T> { return last_; }
 
   constexpr auto size() const noexcept -> std::size_t { return static_cast<std::size_t>(last_ - first_); }
   constexpr auto ssize() const noexcept -> std::ptrdiff_t { return static_cast<std::ptrdiff_t>(last_) - first_; }
